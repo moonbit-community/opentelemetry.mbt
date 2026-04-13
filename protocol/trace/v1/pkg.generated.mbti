@@ -1,0 +1,176 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/protocol/trace/v1"
+
+import {
+  "moonbitlang/core/json",
+  "moonbitlang/protobuf",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct ResourceSpans {
+  mut resource : @moonbit-community/opentelemetry/protocol/resource/v1.Resource
+  mut scope_spans : Array[ScopeSpans]
+  mut schema_url : String
+} derive(Eq)
+pub fn ResourceSpans::new(@moonbit-community/opentelemetry/protocol/resource/v1.Resource, Array[ScopeSpans], String) -> Self
+pub impl Default for ResourceSpans
+pub impl ToJson for ResourceSpans
+pub impl @json.FromJson for ResourceSpans
+pub impl @protobuf.AsyncRead for ResourceSpans
+pub impl @protobuf.AsyncWrite for ResourceSpans
+pub impl @protobuf.Read for ResourceSpans
+pub impl @protobuf.Sized for ResourceSpans
+pub impl @protobuf.Write for ResourceSpans
+
+pub(all) struct ScopeSpans {
+  mut scope : @moonbit-community/opentelemetry/protocol/common/v1.InstrumentationScope
+  mut spans : Array[Span]
+  mut schema_url : String
+} derive(Eq)
+pub fn ScopeSpans::new(@moonbit-community/opentelemetry/protocol/common/v1.InstrumentationScope, Array[Span], String) -> Self
+pub impl Default for ScopeSpans
+pub impl ToJson for ScopeSpans
+pub impl @json.FromJson for ScopeSpans
+pub impl @protobuf.AsyncRead for ScopeSpans
+pub impl @protobuf.AsyncWrite for ScopeSpans
+pub impl @protobuf.Read for ScopeSpans
+pub impl @protobuf.Sized for ScopeSpans
+pub impl @protobuf.Write for ScopeSpans
+
+pub(all) struct Span {
+  mut trace_id : Bytes
+  mut span_id : Bytes
+  mut trace_state : String
+  mut parent_span_id : Bytes
+  mut flags : UInt
+  mut name : String
+  mut kind : Span_SpanKind
+  mut start_time_unix_nano : UInt64
+  mut end_time_unix_nano : UInt64
+  mut attributes : Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue]
+  mut dropped_attributes_count : UInt
+  mut events : Array[Span_Event]
+  mut dropped_events_count : UInt
+  mut links : Array[Span_Link]
+  mut dropped_links_count : UInt
+  mut status : Status
+} derive(Eq)
+pub fn Span::new(Bytes, Bytes, String, Bytes, UInt, String, Span_SpanKind, UInt64, UInt64, Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt, Array[Span_Event], UInt, Array[Span_Link], UInt, Status) -> Self
+pub impl Default for Span
+pub impl ToJson for Span
+pub impl @json.FromJson for Span
+pub impl @protobuf.AsyncRead for Span
+pub impl @protobuf.AsyncWrite for Span
+pub impl @protobuf.Read for Span
+pub impl @protobuf.Sized for Span
+pub impl @protobuf.Write for Span
+
+pub(all) enum SpanFlags {
+  SPAN_FLAGS_DO_NOT_USE
+  SPAN_FLAGS_TRACE_FLAGS_MASK
+  SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK
+  SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK
+} derive(Eq)
+pub fn SpanFlags::from_enum(@protobuf.Enum) -> Self
+pub fn SpanFlags::to_enum(Self) -> @protobuf.Enum
+pub impl Default for SpanFlags
+pub impl ToJson for SpanFlags
+pub impl @json.FromJson for SpanFlags
+pub impl @protobuf.Sized for SpanFlags
+
+pub(all) struct Span_Event {
+  mut time_unix_nano : UInt64
+  mut name : String
+  mut attributes : Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue]
+  mut dropped_attributes_count : UInt
+} derive(Eq)
+pub fn Span_Event::new(UInt64, String, Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt) -> Self
+pub impl Default for Span_Event
+pub impl ToJson for Span_Event
+pub impl @json.FromJson for Span_Event
+pub impl @protobuf.AsyncRead for Span_Event
+pub impl @protobuf.AsyncWrite for Span_Event
+pub impl @protobuf.Read for Span_Event
+pub impl @protobuf.Sized for Span_Event
+pub impl @protobuf.Write for Span_Event
+
+pub(all) struct Span_Link {
+  mut trace_id : Bytes
+  mut span_id : Bytes
+  mut trace_state : String
+  mut attributes : Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue]
+  mut dropped_attributes_count : UInt
+  mut flags : UInt
+} derive(Eq)
+pub fn Span_Link::new(Bytes, Bytes, String, Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt, UInt) -> Self
+pub impl Default for Span_Link
+pub impl ToJson for Span_Link
+pub impl @json.FromJson for Span_Link
+pub impl @protobuf.AsyncRead for Span_Link
+pub impl @protobuf.AsyncWrite for Span_Link
+pub impl @protobuf.Read for Span_Link
+pub impl @protobuf.Sized for Span_Link
+pub impl @protobuf.Write for Span_Link
+
+pub(all) enum Span_SpanKind {
+  SPAN_KIND_UNSPECIFIED
+  SPAN_KIND_INTERNAL
+  SPAN_KIND_SERVER
+  SPAN_KIND_CLIENT
+  SPAN_KIND_PRODUCER
+  SPAN_KIND_CONSUMER
+} derive(Eq)
+pub fn Span_SpanKind::from_enum(@protobuf.Enum) -> Self
+pub fn Span_SpanKind::to_enum(Self) -> @protobuf.Enum
+pub impl Default for Span_SpanKind
+pub impl ToJson for Span_SpanKind
+pub impl @json.FromJson for Span_SpanKind
+pub impl @protobuf.Sized for Span_SpanKind
+
+pub(all) struct Status {
+  mut message : String
+  mut code : Status_StatusCode
+} derive(Eq)
+pub fn Status::new(String, Status_StatusCode) -> Self
+pub impl Default for Status
+pub impl ToJson for Status
+pub impl @json.FromJson for Status
+pub impl @protobuf.AsyncRead for Status
+pub impl @protobuf.AsyncWrite for Status
+pub impl @protobuf.Read for Status
+pub impl @protobuf.Sized for Status
+pub impl @protobuf.Write for Status
+
+pub(all) enum Status_StatusCode {
+  STATUS_CODE_UNSET
+  STATUS_CODE_OK
+  STATUS_CODE_ERROR
+} derive(Eq)
+pub fn Status_StatusCode::from_enum(@protobuf.Enum) -> Self
+pub fn Status_StatusCode::to_enum(Self) -> @protobuf.Enum
+pub impl Default for Status_StatusCode
+pub impl ToJson for Status_StatusCode
+pub impl @json.FromJson for Status_StatusCode
+pub impl @protobuf.Sized for Status_StatusCode
+
+pub(all) struct TracesData {
+  mut resource_spans : Array[ResourceSpans]
+} derive(Eq)
+pub fn TracesData::new(Array[ResourceSpans]) -> Self
+pub impl Default for TracesData
+pub impl ToJson for TracesData
+pub impl @json.FromJson for TracesData
+pub impl @protobuf.AsyncRead for TracesData
+pub impl @protobuf.AsyncWrite for TracesData
+pub impl @protobuf.Read for TracesData
+pub impl @protobuf.Sized for TracesData
+pub impl @protobuf.Write for TracesData
+
+// Type aliases
+
+// Traits
+

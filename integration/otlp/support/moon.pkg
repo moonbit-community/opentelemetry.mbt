@@ -1,0 +1,16 @@
+import {
+  "moonbitlang/async" @async,
+  "moonbitlang/async/http" @http,
+  "moonbitlang/async/fs" @fs,
+  "moonbitlang/async/socket" @socket,
+  "moonbitlang/core/debug",
+  "moonbitlang/core/env" @env,
+  "moonbitlang/core/json" @json,
+  "moonbit-community/opentelemetry/otlp" @otlp,
+  "moonbit-community/opentelemetry/protocol/logs/v1" @otlp_logs,
+  "moonbit-community/opentelemetry/protocol/trace/v1" @otlp_trace,
+}
+
+options(
+  backend: [ "native" ],
+)

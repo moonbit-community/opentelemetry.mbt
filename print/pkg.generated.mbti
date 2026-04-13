@@ -1,0 +1,69 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/print"
+
+import {
+  "moonbit-community/opentelemetry/sdk/error",
+  "moonbit-community/opentelemetry/sdk/logs",
+  "moonbit-community/opentelemetry/sdk/metrics",
+  "moonbit-community/opentelemetry/sdk/trace",
+  "moonbitlang/core/ref",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct LogExporter {
+  state : @ref.Ref[SignalExporterState]
+}
+pub fn LogExporter::export_batch(Self, ArrayView[@logs.LogRecord]) -> Result[Unit, @error.OTelSdkError]
+pub fn LogExporter::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn LogExporter::into_log_exporter(Self) -> @logs.LogExporter
+pub fn LogExporter::name(Self) -> String
+pub fn LogExporter::new() -> Self
+pub fn LogExporter::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn LogExporter::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub impl Default for LogExporter
+
+pub struct MetricExporter {
+  state : @ref.Ref[MetricExporterState]
+  temporality : @metrics.Temporality
+}
+pub fn MetricExporter::builder() -> MetricExporterBuilder
+pub fn MetricExporter::export_batch(Self, ArrayView[@metrics.MetricData]) -> Result[Unit, @error.OTelSdkError]
+pub fn MetricExporter::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn MetricExporter::into_metric_exporter(Self) -> @metrics.MetricExporter
+pub fn MetricExporter::into_periodic_reader(Self, interval_millis? : Int) -> @metrics.PeriodicMetricReader
+pub fn MetricExporter::name(Self) -> String
+pub fn MetricExporter::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn MetricExporter::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub fn MetricExporter::temporality(Self) -> @metrics.Temporality
+pub impl Default for MetricExporter
+
+pub struct MetricExporterBuilder {
+  mut temporality : @metrics.Temporality
+}
+pub fn MetricExporterBuilder::build(Self) -> MetricExporter
+pub fn MetricExporterBuilder::with_temporality(Self, @metrics.Temporality) -> Self
+
+type MetricExporterState
+
+type SignalExporterState
+
+pub struct SpanExporter {
+  state : @ref.Ref[SignalExporterState]
+}
+pub fn SpanExporter::export_batch(Self, ArrayView[@trace.SpanData]) -> Result[Unit, @error.OTelSdkError]
+pub fn SpanExporter::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn SpanExporter::into_span_exporter(Self) -> @trace.SpanExporter
+pub fn SpanExporter::name(Self) -> String
+pub fn SpanExporter::new() -> Self
+pub fn SpanExporter::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn SpanExporter::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub impl Default for SpanExporter
+
+// Type aliases
+
+// Traits
+

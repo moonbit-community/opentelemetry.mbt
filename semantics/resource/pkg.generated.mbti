@@ -1,0 +1,374 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/semantics/resource"
+
+// Values
+pub const ANDROID_OS_API_LEVEL : String = "android.os.api_level"
+
+pub const APP_INSTALLATION_ID : String = "app.installation.id"
+
+pub const AWS_ECS_CLUSTER_ARN : String = "aws.ecs.cluster.arn"
+
+pub const AWS_ECS_CONTAINER_ARN : String = "aws.ecs.container.arn"
+
+pub const AWS_ECS_LAUNCHTYPE : String = "aws.ecs.launchtype"
+
+pub const AWS_ECS_TASK_ARN : String = "aws.ecs.task.arn"
+
+pub const AWS_ECS_TASK_FAMILY : String = "aws.ecs.task.family"
+
+pub const AWS_ECS_TASK_ID : String = "aws.ecs.task.id"
+
+pub const AWS_ECS_TASK_REVISION : String = "aws.ecs.task.revision"
+
+pub const AWS_EKS_CLUSTER_ARN : String = "aws.eks.cluster.arn"
+
+pub const AWS_LOG_GROUP_ARNS : String = "aws.log.group.arns"
+
+pub const AWS_LOG_GROUP_NAMES : String = "aws.log.group.names"
+
+pub const AWS_LOG_STREAM_ARNS : String = "aws.log.stream.arns"
+
+pub const AWS_LOG_STREAM_NAMES : String = "aws.log.stream.names"
+
+pub const BROWSER_BRANDS : String = "browser.brands"
+
+pub const BROWSER_LANGUAGE : String = "browser.language"
+
+pub const BROWSER_MOBILE : String = "browser.mobile"
+
+pub const BROWSER_PLATFORM : String = "browser.platform"
+
+pub const CICD_PIPELINE_NAME : String = "cicd.pipeline.name"
+
+pub const CICD_PIPELINE_RUN_ID : String = "cicd.pipeline.run.id"
+
+pub const CICD_PIPELINE_RUN_URL_FULL : String = "cicd.pipeline.run.url.full"
+
+pub const CICD_WORKER_ID : String = "cicd.worker.id"
+
+pub const CICD_WORKER_NAME : String = "cicd.worker.name"
+
+pub const CICD_WORKER_URL_FULL : String = "cicd.worker.url.full"
+
+pub const CLOUDFOUNDRY_APP_ID : String = "cloudfoundry.app.id"
+
+pub const CLOUDFOUNDRY_APP_NAME : String = "cloudfoundry.app.name"
+
+pub const CLOUDFOUNDRY_ORG_ID : String = "cloudfoundry.org.id"
+
+pub const CLOUDFOUNDRY_ORG_NAME : String = "cloudfoundry.org.name"
+
+pub const CLOUDFOUNDRY_PROCESS_ID : String = "cloudfoundry.process.id"
+
+pub const CLOUDFOUNDRY_PROCESS_TYPE : String = "cloudfoundry.process.type"
+
+pub const CLOUDFOUNDRY_SPACE_ID : String = "cloudfoundry.space.id"
+
+pub const CLOUDFOUNDRY_SPACE_NAME : String = "cloudfoundry.space.name"
+
+pub const CLOUDFOUNDRY_SYSTEM_ID : String = "cloudfoundry.system.id"
+
+pub const CLOUDFOUNDRY_SYSTEM_INSTANCE_ID : String = "cloudfoundry.system.instance.id"
+
+pub const CLOUD_ACCOUNT_ID : String = "cloud.account.id"
+
+pub const CLOUD_AVAILABILITY_ZONE : String = "cloud.availability_zone"
+
+pub const CLOUD_PLATFORM : String = "cloud.platform"
+
+pub const CLOUD_PROVIDER : String = "cloud.provider"
+
+pub const CLOUD_REGION : String = "cloud.region"
+
+pub const CLOUD_RESOURCE_ID : String = "cloud.resource_id"
+
+pub const CONTAINER_COMMAND : String = "container.command"
+
+pub const CONTAINER_COMMAND_ARGS : String = "container.command_args"
+
+pub const CONTAINER_COMMAND_LINE : String = "container.command_line"
+
+pub const CONTAINER_ID : String = "container.id"
+
+pub const CONTAINER_IMAGE_ID : String = "container.image.id"
+
+pub const CONTAINER_IMAGE_NAME : String = "container.image.name"
+
+pub const CONTAINER_IMAGE_REPO_DIGESTS : String = "container.image.repo_digests"
+
+pub const CONTAINER_IMAGE_TAGS : String = "container.image.tags"
+
+pub const CONTAINER_LABEL : String = "container.label"
+
+pub const CONTAINER_NAME : String = "container.name"
+
+pub const CONTAINER_RUNTIME : String = "container.runtime"
+
+pub const DEPLOYMENT_ENVIRONMENT_NAME : String = "deployment.environment.name"
+
+pub const DEVICE_ID : String = "device.id"
+
+pub const DEVICE_MANUFACTURER : String = "device.manufacturer"
+
+pub const DEVICE_MODEL_IDENTIFIER : String = "device.model.identifier"
+
+pub const DEVICE_MODEL_NAME : String = "device.model.name"
+
+pub const FAAS_INSTANCE : String = "faas.instance"
+
+pub const FAAS_MAX_MEMORY : String = "faas.max_memory"
+
+pub const FAAS_NAME : String = "faas.name"
+
+pub const FAAS_VERSION : String = "faas.version"
+
+pub const GCP_APPHUB_APPLICATION_CONTAINER : String = "gcp.apphub.application.container"
+
+pub const GCP_APPHUB_APPLICATION_ID : String = "gcp.apphub.application.id"
+
+pub const GCP_APPHUB_APPLICATION_LOCATION : String = "gcp.apphub.application.location"
+
+pub const GCP_APPHUB_SERVICE_CRITICALITY_TYPE : String = "gcp.apphub.service.criticality_type"
+
+pub const GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE : String = "gcp.apphub.service.environment_type"
+
+pub const GCP_APPHUB_SERVICE_ID : String = "gcp.apphub.service.id"
+
+pub const GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE : String = "gcp.apphub.workload.criticality_type"
+
+pub const GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE : String = "gcp.apphub.workload.environment_type"
+
+pub const GCP_APPHUB_WORKLOAD_ID : String = "gcp.apphub.workload.id"
+
+pub const GCP_CLOUD_RUN_JOB_EXECUTION : String = "gcp.cloud_run.job.execution"
+
+pub const GCP_CLOUD_RUN_JOB_TASK_INDEX : String = "gcp.cloud_run.job.task_index"
+
+pub const GCP_GCE_INSTANCE_HOSTNAME : String = "gcp.gce.instance.hostname"
+
+pub const GCP_GCE_INSTANCE_NAME : String = "gcp.gce.instance.name"
+
+pub const HEROKU_APP_ID : String = "heroku.app.id"
+
+pub const HEROKU_RELEASE_COMMIT : String = "heroku.release.commit"
+
+pub const HEROKU_RELEASE_CREATION_TIMESTAMP : String = "heroku.release.creation_timestamp"
+
+pub const HOST_ARCH : String = "host.arch"
+
+pub const HOST_CPU_CACHE_L2_SIZE : String = "host.cpu.cache.l2.size"
+
+pub const HOST_CPU_FAMILY : String = "host.cpu.family"
+
+pub const HOST_CPU_MODEL_ID : String = "host.cpu.model.id"
+
+pub const HOST_CPU_MODEL_NAME : String = "host.cpu.model.name"
+
+pub const HOST_CPU_STEPPING : String = "host.cpu.stepping"
+
+pub const HOST_CPU_VENDOR_ID : String = "host.cpu.vendor.id"
+
+pub const HOST_ID : String = "host.id"
+
+pub const HOST_IMAGE_ID : String = "host.image.id"
+
+pub const HOST_IMAGE_NAME : String = "host.image.name"
+
+pub const HOST_IMAGE_VERSION : String = "host.image.version"
+
+pub const HOST_IP : String = "host.ip"
+
+pub const HOST_MAC : String = "host.mac"
+
+pub const HOST_NAME : String = "host.name"
+
+pub const HOST_TYPE : String = "host.type"
+
+pub const K8S_CLUSTER_NAME : String = "k8s.cluster.name"
+
+pub const K8S_CLUSTER_UID : String = "k8s.cluster.uid"
+
+pub const K8S_CONTAINER_NAME : String = "k8s.container.name"
+
+pub const K8S_CONTAINER_RESTART_COUNT : String = "k8s.container.restart_count"
+
+pub const K8S_CONTAINER_STATUS_LAST_TERMINATED_REASON : String = "k8s.container.status.last_terminated_reason"
+
+pub const K8S_CRONJOB_ANNOTATION : String = "k8s.cronjob.annotation"
+
+pub const K8S_CRONJOB_LABEL : String = "k8s.cronjob.label"
+
+pub const K8S_CRONJOB_NAME : String = "k8s.cronjob.name"
+
+pub const K8S_CRONJOB_UID : String = "k8s.cronjob.uid"
+
+pub const K8S_DAEMONSET_ANNOTATION : String = "k8s.daemonset.annotation"
+
+pub const K8S_DAEMONSET_LABEL : String = "k8s.daemonset.label"
+
+pub const K8S_DAEMONSET_NAME : String = "k8s.daemonset.name"
+
+pub const K8S_DAEMONSET_UID : String = "k8s.daemonset.uid"
+
+pub const K8S_DEPLOYMENT_ANNOTATION : String = "k8s.deployment.annotation"
+
+pub const K8S_DEPLOYMENT_LABEL : String = "k8s.deployment.label"
+
+pub const K8S_DEPLOYMENT_NAME : String = "k8s.deployment.name"
+
+pub const K8S_DEPLOYMENT_UID : String = "k8s.deployment.uid"
+
+pub const K8S_HPA_NAME : String = "k8s.hpa.name"
+
+pub const K8S_HPA_SCALETARGETREF_API_VERSION : String = "k8s.hpa.scaletargetref.api_version"
+
+pub const K8S_HPA_SCALETARGETREF_KIND : String = "k8s.hpa.scaletargetref.kind"
+
+pub const K8S_HPA_SCALETARGETREF_NAME : String = "k8s.hpa.scaletargetref.name"
+
+pub const K8S_HPA_UID : String = "k8s.hpa.uid"
+
+pub const K8S_JOB_ANNOTATION : String = "k8s.job.annotation"
+
+pub const K8S_JOB_LABEL : String = "k8s.job.label"
+
+pub const K8S_JOB_NAME : String = "k8s.job.name"
+
+pub const K8S_JOB_UID : String = "k8s.job.uid"
+
+pub const K8S_NAMESPACE_ANNOTATION : String = "k8s.namespace.annotation"
+
+pub const K8S_NAMESPACE_LABEL : String = "k8s.namespace.label"
+
+pub const K8S_NAMESPACE_NAME : String = "k8s.namespace.name"
+
+pub const K8S_NODE_ANNOTATION : String = "k8s.node.annotation"
+
+pub const K8S_NODE_LABEL : String = "k8s.node.label"
+
+pub const K8S_NODE_NAME : String = "k8s.node.name"
+
+pub const K8S_NODE_UID : String = "k8s.node.uid"
+
+pub const K8S_POD_ANNOTATION : String = "k8s.pod.annotation"
+
+pub const K8S_POD_LABEL : String = "k8s.pod.label"
+
+pub const K8S_POD_NAME : String = "k8s.pod.name"
+
+pub const K8S_POD_UID : String = "k8s.pod.uid"
+
+pub const K8S_REPLICASET_ANNOTATION : String = "k8s.replicaset.annotation"
+
+pub const K8S_REPLICASET_LABEL : String = "k8s.replicaset.label"
+
+pub const K8S_REPLICASET_NAME : String = "k8s.replicaset.name"
+
+pub const K8S_REPLICASET_UID : String = "k8s.replicaset.uid"
+
+pub const K8S_REPLICATIONCONTROLLER_NAME : String = "k8s.replicationcontroller.name"
+
+pub const K8S_REPLICATIONCONTROLLER_UID : String = "k8s.replicationcontroller.uid"
+
+pub const K8S_RESOURCEQUOTA_NAME : String = "k8s.resourcequota.name"
+
+pub const K8S_RESOURCEQUOTA_UID : String = "k8s.resourcequota.uid"
+
+pub const K8S_STATEFULSET_ANNOTATION : String = "k8s.statefulset.annotation"
+
+pub const K8S_STATEFULSET_LABEL : String = "k8s.statefulset.label"
+
+pub const K8S_STATEFULSET_NAME : String = "k8s.statefulset.name"
+
+pub const K8S_STATEFULSET_UID : String = "k8s.statefulset.uid"
+
+pub const MAINFRAME_LPAR_NAME : String = "mainframe.lpar.name"
+
+pub const OCI_MANIFEST_DIGEST : String = "oci.manifest.digest"
+
+pub const OS_BUILD_ID : String = "os.build_id"
+
+pub const OS_DESCRIPTION : String = "os.description"
+
+pub const OS_NAME : String = "os.name"
+
+pub const OS_TYPE : String = "os.type"
+
+pub const OS_VERSION : String = "os.version"
+
+pub const OTEL_SCOPE_NAME : String = "otel.scope.name"
+
+pub const OTEL_SCOPE_VERSION : String = "otel.scope.version"
+
+pub const PROCESS_COMMAND : String = "process.command"
+
+pub const PROCESS_COMMAND_ARGS : String = "process.command_args"
+
+pub const PROCESS_COMMAND_LINE : String = "process.command_line"
+
+pub const PROCESS_EXECUTABLE_NAME : String = "process.executable.name"
+
+pub const PROCESS_EXECUTABLE_PATH : String = "process.executable.path"
+
+pub const PROCESS_LINUX_CGROUP : String = "process.linux.cgroup"
+
+pub const PROCESS_OWNER : String = "process.owner"
+
+pub const PROCESS_PARENT_PID : String = "process.parent_pid"
+
+pub const PROCESS_PID : String = "process.pid"
+
+pub const PROCESS_RUNTIME_DESCRIPTION : String = "process.runtime.description"
+
+pub const PROCESS_RUNTIME_NAME : String = "process.runtime.name"
+
+pub const PROCESS_RUNTIME_VERSION : String = "process.runtime.version"
+
+pub const SERVICE_INSTANCE_ID : String = "service.instance.id"
+
+pub const SERVICE_NAME : String = "service.name"
+
+pub const SERVICE_NAMESPACE : String = "service.namespace"
+
+pub const SERVICE_VERSION : String = "service.version"
+
+pub const TELEMETRY_DISTRO_NAME : String = "telemetry.distro.name"
+
+pub const TELEMETRY_DISTRO_VERSION : String = "telemetry.distro.version"
+
+pub const TELEMETRY_SDK_LANGUAGE : String = "telemetry.sdk.language"
+
+pub const TELEMETRY_SDK_NAME : String = "telemetry.sdk.name"
+
+pub const TELEMETRY_SDK_VERSION : String = "telemetry.sdk.version"
+
+pub const USER_AGENT_ORIGINAL : String = "user_agent.original"
+
+pub const VCS_REF_HEAD_NAME : String = "vcs.ref.head.name"
+
+pub const VCS_REF_HEAD_REVISION : String = "vcs.ref.head.revision"
+
+pub const VCS_REF_TYPE : String = "vcs.ref.type"
+
+pub const VCS_REPOSITORY_NAME : String = "vcs.repository.name"
+
+pub const VCS_REPOSITORY_URL_FULL : String = "vcs.repository.url.full"
+
+pub const WEBENGINE_DESCRIPTION : String = "webengine.description"
+
+pub const WEBENGINE_NAME : String = "webengine.name"
+
+pub const WEBENGINE_VERSION : String = "webengine.version"
+
+pub const ZOS_SMF_ID : String = "zos.smf.id"
+
+pub const ZOS_SYSPLEX_NAME : String = "zos.sysplex.name"
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+

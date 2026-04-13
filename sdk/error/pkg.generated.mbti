@@ -1,0 +1,36 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/sdk/error"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn already_shutdown() -> Result[Unit, OTelSdkError]
+
+pub fn export_failure(String, String) -> Result[Unit, OTelSdkError]
+
+pub fn internal_failure(String) -> Result[Unit, OTelSdkError]
+
+pub fn invalid_argument(String) -> Result[Unit, OTelSdkError]
+
+pub fn ok() -> Result[Unit, OTelSdkError]
+
+pub fn timeout(Int) -> Result[Unit, OTelSdkError]
+
+// Errors
+
+// Types and methods
+pub(all) enum OTelSdkError {
+  AlreadyShutdown
+  Timeout(Int)
+  InvalidArgument(String)
+  InternalFailure(String)
+  ExportFailure(String, String)
+} derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+
+// Type aliases
+pub type OTelSdkResult = Result[Unit, OTelSdkError]
+
+// Traits
+

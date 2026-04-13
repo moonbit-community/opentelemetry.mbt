@@ -1,0 +1,32 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/protocol/resource/v1"
+
+import {
+  "moonbitlang/core/json",
+  "moonbitlang/protobuf",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct Resource {
+  mut attributes : Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue]
+  mut dropped_attributes_count : UInt
+  mut entity_refs : Array[@moonbit-community/opentelemetry/protocol/common/v1.EntityRef]
+} derive(Eq)
+pub fn Resource::new(Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt, Array[@moonbit-community/opentelemetry/protocol/common/v1.EntityRef]) -> Self
+pub impl Default for Resource
+pub impl ToJson for Resource
+pub impl @json.FromJson for Resource
+pub impl @protobuf.AsyncRead for Resource
+pub impl @protobuf.AsyncWrite for Resource
+pub impl @protobuf.Read for Resource
+pub impl @protobuf.Sized for Resource
+pub impl @protobuf.Write for Resource
+
+// Type aliases
+
+// Traits
+

@@ -1,0 +1,57 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/protocol/collector/trace/v1"
+
+import {
+  "moonbitlang/core/json",
+  "moonbitlang/protobuf",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct ExportTracePartialSuccess {
+  mut rejected_spans : Int64
+  mut error_message : String
+} derive(Eq)
+pub fn ExportTracePartialSuccess::new(Int64, String) -> Self
+pub impl Default for ExportTracePartialSuccess
+pub impl ToJson for ExportTracePartialSuccess
+pub impl @json.FromJson for ExportTracePartialSuccess
+pub impl @protobuf.AsyncRead for ExportTracePartialSuccess
+pub impl @protobuf.AsyncWrite for ExportTracePartialSuccess
+pub impl @protobuf.Read for ExportTracePartialSuccess
+pub impl @protobuf.Sized for ExportTracePartialSuccess
+pub impl @protobuf.Write for ExportTracePartialSuccess
+
+pub(all) struct ExportTraceServiceRequest {
+  mut resource_spans : Array[@moonbit-community/opentelemetry/protocol/trace/v1.ResourceSpans]
+} derive(Eq)
+pub fn ExportTraceServiceRequest::new(Array[@moonbit-community/opentelemetry/protocol/trace/v1.ResourceSpans]) -> Self
+pub impl Default for ExportTraceServiceRequest
+pub impl ToJson for ExportTraceServiceRequest
+pub impl @json.FromJson for ExportTraceServiceRequest
+pub impl @protobuf.AsyncRead for ExportTraceServiceRequest
+pub impl @protobuf.AsyncWrite for ExportTraceServiceRequest
+pub impl @protobuf.Read for ExportTraceServiceRequest
+pub impl @protobuf.Sized for ExportTraceServiceRequest
+pub impl @protobuf.Write for ExportTraceServiceRequest
+
+pub(all) struct ExportTraceServiceResponse {
+  mut partial_success : ExportTracePartialSuccess
+} derive(Eq)
+pub fn ExportTraceServiceResponse::new(ExportTracePartialSuccess) -> Self
+pub impl Default for ExportTraceServiceResponse
+pub impl ToJson for ExportTraceServiceResponse
+pub impl @json.FromJson for ExportTraceServiceResponse
+pub impl @protobuf.AsyncRead for ExportTraceServiceResponse
+pub impl @protobuf.AsyncWrite for ExportTraceServiceResponse
+pub impl @protobuf.Read for ExportTraceServiceResponse
+pub impl @protobuf.Sized for ExportTraceServiceResponse
+pub impl @protobuf.Write for ExportTraceServiceResponse
+
+// Type aliases
+
+// Traits
+

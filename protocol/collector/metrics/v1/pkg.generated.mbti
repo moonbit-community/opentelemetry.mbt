@@ -1,0 +1,57 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/protocol/collector/metrics/v1"
+
+import {
+  "moonbitlang/core/json",
+  "moonbitlang/protobuf",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct ExportMetricsPartialSuccess {
+  mut rejected_data_points : Int64
+  mut error_message : String
+} derive(Eq)
+pub fn ExportMetricsPartialSuccess::new(Int64, String) -> Self
+pub impl Default for ExportMetricsPartialSuccess
+pub impl ToJson for ExportMetricsPartialSuccess
+pub impl @json.FromJson for ExportMetricsPartialSuccess
+pub impl @protobuf.AsyncRead for ExportMetricsPartialSuccess
+pub impl @protobuf.AsyncWrite for ExportMetricsPartialSuccess
+pub impl @protobuf.Read for ExportMetricsPartialSuccess
+pub impl @protobuf.Sized for ExportMetricsPartialSuccess
+pub impl @protobuf.Write for ExportMetricsPartialSuccess
+
+pub(all) struct ExportMetricsServiceRequest {
+  mut resource_metrics : Array[@moonbit-community/opentelemetry/protocol/metrics/v1.ResourceMetrics]
+} derive(Eq)
+pub fn ExportMetricsServiceRequest::new(Array[@moonbit-community/opentelemetry/protocol/metrics/v1.ResourceMetrics]) -> Self
+pub impl Default for ExportMetricsServiceRequest
+pub impl ToJson for ExportMetricsServiceRequest
+pub impl @json.FromJson for ExportMetricsServiceRequest
+pub impl @protobuf.AsyncRead for ExportMetricsServiceRequest
+pub impl @protobuf.AsyncWrite for ExportMetricsServiceRequest
+pub impl @protobuf.Read for ExportMetricsServiceRequest
+pub impl @protobuf.Sized for ExportMetricsServiceRequest
+pub impl @protobuf.Write for ExportMetricsServiceRequest
+
+pub(all) struct ExportMetricsServiceResponse {
+  mut partial_success : ExportMetricsPartialSuccess
+} derive(Eq)
+pub fn ExportMetricsServiceResponse::new(ExportMetricsPartialSuccess) -> Self
+pub impl Default for ExportMetricsServiceResponse
+pub impl ToJson for ExportMetricsServiceResponse
+pub impl @json.FromJson for ExportMetricsServiceResponse
+pub impl @protobuf.AsyncRead for ExportMetricsServiceResponse
+pub impl @protobuf.AsyncWrite for ExportMetricsServiceResponse
+pub impl @protobuf.Read for ExportMetricsServiceResponse
+pub impl @protobuf.Sized for ExportMetricsServiceResponse
+pub impl @protobuf.Write for ExportMetricsServiceResponse
+
+// Type aliases
+
+// Traits
+

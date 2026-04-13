@@ -1,0 +1,118 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/protocol/common/v1"
+
+import {
+  "moonbitlang/core/json",
+  "moonbitlang/protobuf",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct AnyValue {
+  mut value : AnyValue_Value
+} derive(Eq)
+pub fn AnyValue::new(value? : AnyValue_Value) -> Self
+pub impl Default for AnyValue
+pub impl ToJson for AnyValue
+pub impl @json.FromJson for AnyValue
+pub impl @protobuf.AsyncRead for AnyValue
+pub impl @protobuf.AsyncWrite for AnyValue
+pub impl @protobuf.Read for AnyValue
+pub impl @protobuf.Sized for AnyValue
+pub impl @protobuf.Write for AnyValue
+
+pub(all) enum AnyValue_Value {
+  StringValue(String)
+  BoolValue(Bool)
+  IntValue(Int64)
+  DoubleValue(Double)
+  ArrayValue(ArrayValue)
+  KvlistValue(KeyValueList)
+  BytesValue(Bytes)
+  StringValueStrindex(Int)
+  NotSet
+} derive(Eq)
+pub impl Default for AnyValue_Value
+pub impl ToJson for AnyValue_Value
+pub impl @json.FromJson for AnyValue_Value
+
+pub(all) struct ArrayValue {
+  mut values : Array[AnyValue]
+} derive(Eq)
+pub fn ArrayValue::new(Array[AnyValue]) -> Self
+pub impl Default for ArrayValue
+pub impl ToJson for ArrayValue
+pub impl @json.FromJson for ArrayValue
+pub impl @protobuf.AsyncRead for ArrayValue
+pub impl @protobuf.AsyncWrite for ArrayValue
+pub impl @protobuf.Read for ArrayValue
+pub impl @protobuf.Sized for ArrayValue
+pub impl @protobuf.Write for ArrayValue
+
+pub(all) struct EntityRef {
+  mut schema_url : String
+  mut type_ : String
+  mut id_keys : Array[String]
+  mut description_keys : Array[String]
+} derive(Eq)
+pub fn EntityRef::new(String, String, Array[String], Array[String]) -> Self
+pub impl Default for EntityRef
+pub impl ToJson for EntityRef
+pub impl @json.FromJson for EntityRef
+pub impl @protobuf.AsyncRead for EntityRef
+pub impl @protobuf.AsyncWrite for EntityRef
+pub impl @protobuf.Read for EntityRef
+pub impl @protobuf.Sized for EntityRef
+pub impl @protobuf.Write for EntityRef
+
+pub(all) struct InstrumentationScope {
+  mut name : String
+  mut version : String
+  mut attributes : Array[KeyValue]
+  mut dropped_attributes_count : UInt
+} derive(Eq)
+pub fn InstrumentationScope::new(String, String, Array[KeyValue], UInt) -> Self
+pub impl Default for InstrumentationScope
+pub impl ToJson for InstrumentationScope
+pub impl @json.FromJson for InstrumentationScope
+pub impl @protobuf.AsyncRead for InstrumentationScope
+pub impl @protobuf.AsyncWrite for InstrumentationScope
+pub impl @protobuf.Read for InstrumentationScope
+pub impl @protobuf.Sized for InstrumentationScope
+pub impl @protobuf.Write for InstrumentationScope
+
+pub(all) struct KeyValue {
+  mut key : String
+  mut value : AnyValue
+  mut key_strindex : Int
+} derive(Eq)
+pub fn KeyValue::new(String, AnyValue, Int) -> Self
+pub impl Default for KeyValue
+pub impl ToJson for KeyValue
+pub impl @json.FromJson for KeyValue
+pub impl @protobuf.AsyncRead for KeyValue
+pub impl @protobuf.AsyncWrite for KeyValue
+pub impl @protobuf.Read for KeyValue
+pub impl @protobuf.Sized for KeyValue
+pub impl @protobuf.Write for KeyValue
+
+pub(all) struct KeyValueList {
+  mut values : Array[KeyValue]
+} derive(Eq)
+pub fn KeyValueList::new(Array[KeyValue]) -> Self
+pub impl Default for KeyValueList
+pub impl ToJson for KeyValueList
+pub impl @json.FromJson for KeyValueList
+pub impl @protobuf.AsyncRead for KeyValueList
+pub impl @protobuf.AsyncWrite for KeyValueList
+pub impl @protobuf.Read for KeyValueList
+pub impl @protobuf.Sized for KeyValueList
+pub impl @protobuf.Write for KeyValueList
+
+// Type aliases
+
+// Traits
+

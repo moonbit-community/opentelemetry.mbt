@@ -1,0 +1,17 @@
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/async",
+  "moonbitlang/core/env",
+  "moonbitlang/core/random",
+  "moonbitlang/core/string",
+  "moonbit-community/opentelemetry/internal/utils",
+  "moonbit-community/opentelemetry/interface/common",
+  "moonbit-community/opentelemetry/interface/context",
+  "moonbit-community/opentelemetry/interface/trace" @api,
+  "moonbit-community/opentelemetry/sdk/error",
+  "moonbit-community/opentelemetry/sdk/resource",
+}
+
+options(
+  backend: [ "native" ],
+)

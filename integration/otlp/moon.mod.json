@@ -1,0 +1,17 @@
+{
+  "name": "moonbit-community/opentelemetry-integration-otlp",
+  "version": "0.1.0",
+  "deps": {
+    "moonbit-community/opentelemetry": {
+      "path": "../.."
+    },
+    "moonbitlang/async": "0.17.1",
+    "moonbitlang/protobuf": "0.1.0"
+  },
+  "readme": "README.md",
+  "repository": "",
+  "license": "Apache-2.0",
+  "keywords": [],
+  "description": "Collector-backed OTLP integration tests for moonbit-community/opentelemetry",
+  "preferred-target": "native"
+}

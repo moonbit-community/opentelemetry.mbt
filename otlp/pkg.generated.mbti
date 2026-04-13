@@ -1,0 +1,177 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/otlp"
+
+import {
+  "moonbit-community/opentelemetry/sdk/error",
+  "moonbit-community/opentelemetry/sdk/logs",
+  "moonbit-community/opentelemetry/sdk/metrics",
+  "moonbit-community/opentelemetry/sdk/trace",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/ref",
+}
+
+// Values
+pub const OTEL_EXPORTER_OTLP_COMPRESSION : String = "OTEL_EXPORTER_OTLP_COMPRESSION"
+
+pub const OTEL_EXPORTER_OTLP_ENDPOINT : String = "OTEL_EXPORTER_OTLP_ENDPOINT"
+
+pub const OTEL_EXPORTER_OTLP_ENDPOINT_DEFAULT : String = "http://localhost:4318"
+
+pub const OTEL_EXPORTER_OTLP_HEADERS : String = "OTEL_EXPORTER_OTLP_HEADERS"
+
+pub const OTEL_EXPORTER_OTLP_LOGS_COMPRESSION : String = "OTEL_EXPORTER_OTLP_LOGS_COMPRESSION"
+
+pub const OTEL_EXPORTER_OTLP_LOGS_ENDPOINT : String = "OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"
+
+pub const OTEL_EXPORTER_OTLP_LOGS_HEADERS : String = "OTEL_EXPORTER_OTLP_LOGS_HEADERS"
+
+pub const OTEL_EXPORTER_OTLP_LOGS_TIMEOUT : String = "OTEL_EXPORTER_OTLP_LOGS_TIMEOUT"
+
+pub const OTEL_EXPORTER_OTLP_METRICS_COMPRESSION : String = "OTEL_EXPORTER_OTLP_METRICS_COMPRESSION"
+
+pub const OTEL_EXPORTER_OTLP_METRICS_ENDPOINT : String = "OTEL_EXPORTER_OTLP_METRICS_ENDPOINT"
+
+pub const OTEL_EXPORTER_OTLP_METRICS_HEADERS : String = "OTEL_EXPORTER_OTLP_METRICS_HEADERS"
+
+pub const OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE : String = "OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE"
+
+pub const OTEL_EXPORTER_OTLP_METRICS_TIMEOUT : String = "OTEL_EXPORTER_OTLP_METRICS_TIMEOUT"
+
+pub const OTEL_EXPORTER_OTLP_PROTOCOL : String = "OTEL_EXPORTER_OTLP_PROTOCOL"
+
+pub const OTEL_EXPORTER_OTLP_PROTOCOL_GRPC : String = "grpc"
+
+pub const OTEL_EXPORTER_OTLP_PROTOCOL_HTTP_JSON : String = "http/json"
+
+pub const OTEL_EXPORTER_OTLP_PROTOCOL_HTTP_PROTOBUF : String = "http/protobuf"
+
+pub const OTEL_EXPORTER_OTLP_TIMEOUT : String = "OTEL_EXPORTER_OTLP_TIMEOUT"
+
+pub const OTEL_EXPORTER_OTLP_TIMEOUT_DEFAULT : Int = 10000
+
+pub const OTEL_EXPORTER_OTLP_TRACES_COMPRESSION : String = "OTEL_EXPORTER_OTLP_TRACES_COMPRESSION"
+
+pub const OTEL_EXPORTER_OTLP_TRACES_ENDPOINT : String = "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"
+
+pub const OTEL_EXPORTER_OTLP_TRACES_HEADERS : String = "OTEL_EXPORTER_OTLP_TRACES_HEADERS"
+
+pub const OTEL_EXPORTER_OTLP_TRACES_TIMEOUT : String = "OTEL_EXPORTER_OTLP_TRACES_TIMEOUT"
+
+// Errors
+
+// Types and methods
+pub(all) enum Compression {
+  Gzip
+  Zstd
+} derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+
+pub(all) enum ExporterBuildError {
+  InvalidConfig(String, String)
+  UnsupportedProtocol(String)
+  UnsupportedCompressionAlgorithm(String)
+} derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+
+pub struct LogExporter {
+  state : @ref.Ref[SignalExporterState]
+  config : SignalConfig
+}
+pub fn LogExporter::builder() -> LogExporterBuilder
+pub async fn LogExporter::export_batch(Self, ArrayView[@logs.LogRecord]) -> Result[Unit, @error.OTelSdkError]
+pub async fn LogExporter::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn LogExporter::into_log_exporter(Self) -> @logs.LogExporter
+pub fn LogExporter::name(Self) -> String
+pub fn LogExporter::new() -> Result[Self, ExporterBuildError]
+pub async fn LogExporter::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub async fn LogExporter::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+
+pub struct LogExporterBuilder {
+  mut endpoint : String?
+  mut protocol : Protocol?
+  mut timeout_millis : Int?
+  mut headers : Map[String, String]
+  mut compression : Compression?
+}
+pub fn LogExporterBuilder::build(Self) -> Result[LogExporter, ExporterBuildError]
+pub fn LogExporterBuilder::with_compression(Self, Compression) -> Self
+pub fn LogExporterBuilder::with_endpoint(Self, StringView) -> Self
+pub fn LogExporterBuilder::with_headers(Self, Map[String, String]) -> Self
+pub fn LogExporterBuilder::with_http(Self) -> Self
+pub fn LogExporterBuilder::with_protocol(Self, Protocol) -> Self
+pub fn LogExporterBuilder::with_timeout(Self, Int) -> Self
+
+pub struct MetricExporter {
+  state : @ref.Ref[SignalExporterState]
+  config : SignalConfig
+  temporality : @metrics.Temporality
+}
+pub fn MetricExporter::builder() -> MetricExporterBuilder
+pub async fn MetricExporter::export_batch(Self, ArrayView[@metrics.MetricData]) -> Result[Unit, @error.OTelSdkError]
+pub async fn MetricExporter::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn MetricExporter::into_metric_exporter(Self) -> @metrics.MetricExporter
+pub fn MetricExporter::into_periodic_reader(Self, interval_millis? : Int) -> @metrics.PeriodicMetricReader
+pub fn MetricExporter::name(Self) -> String
+pub fn MetricExporter::new() -> Result[Self, ExporterBuildError]
+pub async fn MetricExporter::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub async fn MetricExporter::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub fn MetricExporter::temporality(Self) -> @metrics.Temporality
+
+pub struct MetricExporterBuilder {
+  mut endpoint : String?
+  mut protocol : Protocol?
+  mut timeout_millis : Int?
+  mut headers : Map[String, String]
+  mut compression : Compression?
+  mut temporality : @metrics.Temporality?
+}
+pub fn MetricExporterBuilder::build(Self) -> Result[MetricExporter, ExporterBuildError]
+pub fn MetricExporterBuilder::with_compression(Self, Compression) -> Self
+pub fn MetricExporterBuilder::with_endpoint(Self, StringView) -> Self
+pub fn MetricExporterBuilder::with_headers(Self, Map[String, String]) -> Self
+pub fn MetricExporterBuilder::with_http(Self) -> Self
+pub fn MetricExporterBuilder::with_protocol(Self, Protocol) -> Self
+pub fn MetricExporterBuilder::with_temporality(Self, @metrics.Temporality) -> Self
+pub fn MetricExporterBuilder::with_timeout(Self, Int) -> Self
+
+pub(all) enum Protocol {
+  Grpc
+  HttpBinary
+  HttpJson
+} derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub impl Default for Protocol
+
+type SignalConfig
+
+type SignalExporterState
+
+pub struct SpanExporter {
+  state : @ref.Ref[SignalExporterState]
+  config : SignalConfig
+}
+pub fn SpanExporter::builder() -> SpanExporterBuilder
+pub async fn SpanExporter::export_batch(Self, ArrayView[@trace.SpanData]) -> Result[Unit, @error.OTelSdkError]
+pub async fn SpanExporter::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn SpanExporter::into_span_exporter(Self) -> @trace.SpanExporter
+pub fn SpanExporter::name(Self) -> String
+pub fn SpanExporter::new() -> Result[Self, ExporterBuildError]
+pub async fn SpanExporter::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub async fn SpanExporter::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+
+pub struct SpanExporterBuilder {
+  mut endpoint : String?
+  mut protocol : Protocol?
+  mut timeout_millis : Int?
+  mut headers : Map[String, String]
+  mut compression : Compression?
+}
+pub fn SpanExporterBuilder::build(Self) -> Result[SpanExporter, ExporterBuildError]
+pub fn SpanExporterBuilder::with_compression(Self, Compression) -> Self
+pub fn SpanExporterBuilder::with_endpoint(Self, StringView) -> Self
+pub fn SpanExporterBuilder::with_headers(Self, Map[String, String]) -> Self
+pub fn SpanExporterBuilder::with_http(Self) -> Self
+pub fn SpanExporterBuilder::with_protocol(Self, Protocol) -> Self
+pub fn SpanExporterBuilder::with_timeout(Self, Int) -> Self
+
+// Type aliases
+
+// Traits
+

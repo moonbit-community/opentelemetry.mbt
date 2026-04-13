@@ -1,0 +1,7 @@
+import {
+  "moonbitlang/core/debug",
+  "moonbit-community/opentelemetry/sdk",
+  "moonbit-community/opentelemetry/semantics/attribute",
+  "moonbit-community/opentelemetry/semantics/resource",
+  "moonbit-community/opentelemetry/semantics/trace",
+} for "test"

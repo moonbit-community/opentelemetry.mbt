@@ -1,0 +1,15 @@
+import {
+  "moonbitlang/core/debug",
+  "moonbit-community/opentelemetry/interface/context",
+  "moonbit-community/opentelemetry/internal/utils",
+  "moonbit-community/opentelemetry/interface/common",
+}
+
+import {
+  "moonbitlang/async",
+  "moonbit-community/opentelemetry/sdk/trace" @sdktrace,
+} for "test"
+
+options(
+  backend: [ "native" ],
+)

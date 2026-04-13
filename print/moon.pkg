@@ -1,0 +1,18 @@
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/string",
+  "moonbit-community/opentelemetry/interface/common",
+  "moonbit-community/opentelemetry/sdk/error",
+  "moonbit-community/opentelemetry/sdk/logs" @sdklogs,
+  "moonbit-community/opentelemetry/sdk/metrics" @sdkmetrics,
+  "moonbit-community/opentelemetry/sdk/resource",
+  "moonbit-community/opentelemetry/sdk/trace" @sdktrace,
+}
+
+import {
+  "moonbitlang/async",
+} for "wbtest"
+
+options(
+  backend: [ "native" ],
+)
