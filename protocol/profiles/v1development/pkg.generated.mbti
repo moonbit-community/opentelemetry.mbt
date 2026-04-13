@@ -1,0 +1,240 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/protocol/profiles/v1development"
+
+import {
+  "moonbitlang/core/json",
+  "moonbitlang/protobuf",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct Function {
+  mut name_strindex : Int
+  mut system_name_strindex : Int
+  mut filename_strindex : Int
+  mut start_line : Int64
+} derive(Eq)
+pub fn Function::new(Int, Int, Int, Int64) -> Self
+pub impl Default for Function
+pub impl ToJson for Function
+pub impl @json.FromJson for Function
+pub impl @protobuf.AsyncRead for Function
+pub impl @protobuf.AsyncWrite for Function
+pub impl @protobuf.Read for Function
+pub impl @protobuf.Sized for Function
+pub impl @protobuf.Write for Function
+
+pub(all) struct KeyValueAndUnit {
+  mut key_strindex : Int
+  mut value : @moonbit-community/opentelemetry/protocol/common/v1.AnyValue
+  mut unit_strindex : Int
+} derive(Eq)
+pub fn KeyValueAndUnit::new(Int, @moonbit-community/opentelemetry/protocol/common/v1.AnyValue, Int) -> Self
+pub impl Default for KeyValueAndUnit
+pub impl ToJson for KeyValueAndUnit
+pub impl @json.FromJson for KeyValueAndUnit
+pub impl @protobuf.AsyncRead for KeyValueAndUnit
+pub impl @protobuf.AsyncWrite for KeyValueAndUnit
+pub impl @protobuf.Read for KeyValueAndUnit
+pub impl @protobuf.Sized for KeyValueAndUnit
+pub impl @protobuf.Write for KeyValueAndUnit
+
+pub(all) struct Line {
+  mut function_index : Int
+  mut line : Int64
+  mut column : Int64
+} derive(Eq)
+pub fn Line::new(Int, Int64, Int64) -> Self
+pub impl Default for Line
+pub impl ToJson for Line
+pub impl @json.FromJson for Line
+pub impl @protobuf.AsyncRead for Line
+pub impl @protobuf.AsyncWrite for Line
+pub impl @protobuf.Read for Line
+pub impl @protobuf.Sized for Line
+pub impl @protobuf.Write for Line
+
+pub(all) struct Link {
+  mut trace_id : Bytes
+  mut span_id : Bytes
+} derive(Eq)
+pub fn Link::new(Bytes, Bytes) -> Self
+pub impl Default for Link
+pub impl ToJson for Link
+pub impl @json.FromJson for Link
+pub impl @protobuf.AsyncRead for Link
+pub impl @protobuf.AsyncWrite for Link
+pub impl @protobuf.Read for Link
+pub impl @protobuf.Sized for Link
+pub impl @protobuf.Write for Link
+
+pub(all) struct Location {
+  mut mapping_index : Int
+  mut address : UInt64
+  mut lines : Array[Line]
+  mut attribute_indices : Array[Int]
+} derive(Eq)
+pub fn Location::new(Int, UInt64, Array[Line], Array[Int]) -> Self
+pub impl Default for Location
+pub impl ToJson for Location
+pub impl @json.FromJson for Location
+pub impl @protobuf.AsyncRead for Location
+pub impl @protobuf.AsyncWrite for Location
+pub impl @protobuf.Read for Location
+pub impl @protobuf.Sized for Location
+pub impl @protobuf.Write for Location
+
+pub(all) struct Mapping {
+  mut memory_start : UInt64
+  mut memory_limit : UInt64
+  mut file_offset : UInt64
+  mut filename_strindex : Int
+  mut attribute_indices : Array[Int]
+} derive(Eq)
+pub fn Mapping::new(UInt64, UInt64, UInt64, Int, Array[Int]) -> Self
+pub impl Default for Mapping
+pub impl ToJson for Mapping
+pub impl @json.FromJson for Mapping
+pub impl @protobuf.AsyncRead for Mapping
+pub impl @protobuf.AsyncWrite for Mapping
+pub impl @protobuf.Read for Mapping
+pub impl @protobuf.Sized for Mapping
+pub impl @protobuf.Write for Mapping
+
+pub(all) struct Profile {
+  mut sample_type : ValueType
+  mut samples : Array[Sample]
+  mut time_unix_nano : UInt64
+  mut duration_nano : UInt64
+  mut period_type : ValueType
+  mut period : Int64
+  mut profile_id : Bytes
+  mut dropped_attributes_count : UInt
+  mut original_payload_format : String
+  mut original_payload : Bytes
+  mut attribute_indices : Array[Int]
+} derive(Eq)
+pub fn Profile::new(ValueType, Array[Sample], UInt64, UInt64, ValueType, Int64, Bytes, UInt, String, Bytes, Array[Int]) -> Self
+pub impl Default for Profile
+pub impl ToJson for Profile
+pub impl @json.FromJson for Profile
+pub impl @protobuf.AsyncRead for Profile
+pub impl @protobuf.AsyncWrite for Profile
+pub impl @protobuf.Read for Profile
+pub impl @protobuf.Sized for Profile
+pub impl @protobuf.Write for Profile
+
+pub(all) struct ProfilesData {
+  mut resource_profiles : Array[ResourceProfiles]
+  mut dictionary : ProfilesDictionary
+} derive(Eq)
+pub fn ProfilesData::new(Array[ResourceProfiles], ProfilesDictionary) -> Self
+pub impl Default for ProfilesData
+pub impl ToJson for ProfilesData
+pub impl @json.FromJson for ProfilesData
+pub impl @protobuf.AsyncRead for ProfilesData
+pub impl @protobuf.AsyncWrite for ProfilesData
+pub impl @protobuf.Read for ProfilesData
+pub impl @protobuf.Sized for ProfilesData
+pub impl @protobuf.Write for ProfilesData
+
+pub(all) struct ProfilesDictionary {
+  mut mapping_table : Array[Mapping]
+  mut location_table : Array[Location]
+  mut function_table : Array[Function]
+  mut link_table : Array[Link]
+  mut string_table : Array[String]
+  mut attribute_table : Array[KeyValueAndUnit]
+  mut stack_table : Array[Stack]
+} derive(Eq)
+pub fn ProfilesDictionary::new(Array[Mapping], Array[Location], Array[Function], Array[Link], Array[String], Array[KeyValueAndUnit], Array[Stack]) -> Self
+pub impl Default for ProfilesDictionary
+pub impl ToJson for ProfilesDictionary
+pub impl @json.FromJson for ProfilesDictionary
+pub impl @protobuf.AsyncRead for ProfilesDictionary
+pub impl @protobuf.AsyncWrite for ProfilesDictionary
+pub impl @protobuf.Read for ProfilesDictionary
+pub impl @protobuf.Sized for ProfilesDictionary
+pub impl @protobuf.Write for ProfilesDictionary
+
+pub(all) struct ResourceProfiles {
+  mut resource : @moonbit-community/opentelemetry/protocol/resource/v1.Resource
+  mut scope_profiles : Array[ScopeProfiles]
+  mut schema_url : String
+} derive(Eq)
+pub fn ResourceProfiles::new(@moonbit-community/opentelemetry/protocol/resource/v1.Resource, Array[ScopeProfiles], String) -> Self
+pub impl Default for ResourceProfiles
+pub impl ToJson for ResourceProfiles
+pub impl @json.FromJson for ResourceProfiles
+pub impl @protobuf.AsyncRead for ResourceProfiles
+pub impl @protobuf.AsyncWrite for ResourceProfiles
+pub impl @protobuf.Read for ResourceProfiles
+pub impl @protobuf.Sized for ResourceProfiles
+pub impl @protobuf.Write for ResourceProfiles
+
+pub(all) struct Sample {
+  mut stack_index : Int
+  mut attribute_indices : Array[Int]
+  mut link_index : Int
+  mut values : Array[Int64]
+  mut timestamps_unix_nano : Array[UInt64]
+} derive(Eq)
+pub fn Sample::new(Int, Array[Int], Int, Array[Int64], Array[UInt64]) -> Self
+pub impl Default for Sample
+pub impl ToJson for Sample
+pub impl @json.FromJson for Sample
+pub impl @protobuf.AsyncRead for Sample
+pub impl @protobuf.AsyncWrite for Sample
+pub impl @protobuf.Read for Sample
+pub impl @protobuf.Sized for Sample
+pub impl @protobuf.Write for Sample
+
+pub(all) struct ScopeProfiles {
+  mut scope : @moonbit-community/opentelemetry/protocol/common/v1.InstrumentationScope
+  mut profiles : Array[Profile]
+  mut schema_url : String
+} derive(Eq)
+pub fn ScopeProfiles::new(@moonbit-community/opentelemetry/protocol/common/v1.InstrumentationScope, Array[Profile], String) -> Self
+pub impl Default for ScopeProfiles
+pub impl ToJson for ScopeProfiles
+pub impl @json.FromJson for ScopeProfiles
+pub impl @protobuf.AsyncRead for ScopeProfiles
+pub impl @protobuf.AsyncWrite for ScopeProfiles
+pub impl @protobuf.Read for ScopeProfiles
+pub impl @protobuf.Sized for ScopeProfiles
+pub impl @protobuf.Write for ScopeProfiles
+
+pub(all) struct Stack {
+  mut location_indices : Array[Int]
+} derive(Eq)
+pub fn Stack::new(Array[Int]) -> Self
+pub impl Default for Stack
+pub impl ToJson for Stack
+pub impl @json.FromJson for Stack
+pub impl @protobuf.AsyncRead for Stack
+pub impl @protobuf.AsyncWrite for Stack
+pub impl @protobuf.Read for Stack
+pub impl @protobuf.Sized for Stack
+pub impl @protobuf.Write for Stack
+
+pub(all) struct ValueType {
+  mut type_strindex : Int
+  mut unit_strindex : Int
+} derive(Eq)
+pub fn ValueType::new(Int, Int) -> Self
+pub impl Default for ValueType
+pub impl ToJson for ValueType
+pub impl @json.FromJson for ValueType
+pub impl @protobuf.AsyncRead for ValueType
+pub impl @protobuf.AsyncWrite for ValueType
+pub impl @protobuf.Read for ValueType
+pub impl @protobuf.Sized for ValueType
+pub impl @protobuf.Write for ValueType
+
+// Type aliases
+
+// Traits
+

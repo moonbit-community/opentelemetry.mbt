@@ -1,0 +1,58 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/protocol/collector/profiles/v1development"
+
+import {
+  "moonbitlang/core/json",
+  "moonbitlang/protobuf",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct ExportProfilesPartialSuccess {
+  mut rejected_profiles : Int64
+  mut error_message : String
+} derive(Eq)
+pub fn ExportProfilesPartialSuccess::new(Int64, String) -> Self
+pub impl Default for ExportProfilesPartialSuccess
+pub impl ToJson for ExportProfilesPartialSuccess
+pub impl @json.FromJson for ExportProfilesPartialSuccess
+pub impl @protobuf.AsyncRead for ExportProfilesPartialSuccess
+pub impl @protobuf.AsyncWrite for ExportProfilesPartialSuccess
+pub impl @protobuf.Read for ExportProfilesPartialSuccess
+pub impl @protobuf.Sized for ExportProfilesPartialSuccess
+pub impl @protobuf.Write for ExportProfilesPartialSuccess
+
+pub(all) struct ExportProfilesServiceRequest {
+  mut resource_profiles : Array[@moonbit-community/opentelemetry/protocol/profiles/v1development.ResourceProfiles]
+  mut dictionary : @moonbit-community/opentelemetry/protocol/profiles/v1development.ProfilesDictionary
+} derive(Eq)
+pub fn ExportProfilesServiceRequest::new(Array[@moonbit-community/opentelemetry/protocol/profiles/v1development.ResourceProfiles], @moonbit-community/opentelemetry/protocol/profiles/v1development.ProfilesDictionary) -> Self
+pub impl Default for ExportProfilesServiceRequest
+pub impl ToJson for ExportProfilesServiceRequest
+pub impl @json.FromJson for ExportProfilesServiceRequest
+pub impl @protobuf.AsyncRead for ExportProfilesServiceRequest
+pub impl @protobuf.AsyncWrite for ExportProfilesServiceRequest
+pub impl @protobuf.Read for ExportProfilesServiceRequest
+pub impl @protobuf.Sized for ExportProfilesServiceRequest
+pub impl @protobuf.Write for ExportProfilesServiceRequest
+
+pub(all) struct ExportProfilesServiceResponse {
+  mut partial_success : ExportProfilesPartialSuccess
+} derive(Eq)
+pub fn ExportProfilesServiceResponse::new(ExportProfilesPartialSuccess) -> Self
+pub impl Default for ExportProfilesServiceResponse
+pub impl ToJson for ExportProfilesServiceResponse
+pub impl @json.FromJson for ExportProfilesServiceResponse
+pub impl @protobuf.AsyncRead for ExportProfilesServiceResponse
+pub impl @protobuf.AsyncWrite for ExportProfilesServiceResponse
+pub impl @protobuf.Read for ExportProfilesServiceResponse
+pub impl @protobuf.Sized for ExportProfilesServiceResponse
+pub impl @protobuf.Write for ExportProfilesServiceResponse
+
+// Type aliases
+
+// Traits
+

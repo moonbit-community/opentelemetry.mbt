@@ -1,0 +1,57 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/protocol/collector/logs/v1"
+
+import {
+  "moonbitlang/core/json",
+  "moonbitlang/protobuf",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct ExportLogsPartialSuccess {
+  mut rejected_log_records : Int64
+  mut error_message : String
+} derive(Eq)
+pub fn ExportLogsPartialSuccess::new(Int64, String) -> Self
+pub impl Default for ExportLogsPartialSuccess
+pub impl ToJson for ExportLogsPartialSuccess
+pub impl @json.FromJson for ExportLogsPartialSuccess
+pub impl @protobuf.AsyncRead for ExportLogsPartialSuccess
+pub impl @protobuf.AsyncWrite for ExportLogsPartialSuccess
+pub impl @protobuf.Read for ExportLogsPartialSuccess
+pub impl @protobuf.Sized for ExportLogsPartialSuccess
+pub impl @protobuf.Write for ExportLogsPartialSuccess
+
+pub(all) struct ExportLogsServiceRequest {
+  mut resource_logs : Array[@moonbit-community/opentelemetry/protocol/logs/v1.ResourceLogs]
+} derive(Eq)
+pub fn ExportLogsServiceRequest::new(Array[@moonbit-community/opentelemetry/protocol/logs/v1.ResourceLogs]) -> Self
+pub impl Default for ExportLogsServiceRequest
+pub impl ToJson for ExportLogsServiceRequest
+pub impl @json.FromJson for ExportLogsServiceRequest
+pub impl @protobuf.AsyncRead for ExportLogsServiceRequest
+pub impl @protobuf.AsyncWrite for ExportLogsServiceRequest
+pub impl @protobuf.Read for ExportLogsServiceRequest
+pub impl @protobuf.Sized for ExportLogsServiceRequest
+pub impl @protobuf.Write for ExportLogsServiceRequest
+
+pub(all) struct ExportLogsServiceResponse {
+  mut partial_success : ExportLogsPartialSuccess
+} derive(Eq)
+pub fn ExportLogsServiceResponse::new(ExportLogsPartialSuccess) -> Self
+pub impl Default for ExportLogsServiceResponse
+pub impl ToJson for ExportLogsServiceResponse
+pub impl @json.FromJson for ExportLogsServiceResponse
+pub impl @protobuf.AsyncRead for ExportLogsServiceResponse
+pub impl @protobuf.AsyncWrite for ExportLogsServiceResponse
+pub impl @protobuf.Read for ExportLogsServiceResponse
+pub impl @protobuf.Sized for ExportLogsServiceResponse
+pub impl @protobuf.Write for ExportLogsServiceResponse
+
+// Type aliases
+
+// Traits
+

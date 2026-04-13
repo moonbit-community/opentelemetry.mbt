@@ -1,0 +1,5 @@
+import {
+  "moonbitlang/protobuf",
+  "moonbitlang/core/json",
+  "moonbit-community/opentelemetry/protocol/logs/v1" @v14,
+}

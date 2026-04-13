@@ -1,0 +1,92 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/protocol/tracez/v1"
+
+import {
+  "moonbitlang/core/json",
+  "moonbitlang/protobuf",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct ErrorData {
+  mut traceid : Bytes
+  mut spanid : Bytes
+  mut parentid : Bytes
+  mut starttime : UInt64
+  mut attributes : Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue]
+  mut events : Array[@moonbit-community/opentelemetry/protocol/trace/v1.Span_Event]
+  mut links : Array[@moonbit-community/opentelemetry/protocol/trace/v1.Span_Link]
+  mut status : @moonbit-community/opentelemetry/protocol/trace/v1.Status
+} derive(Eq)
+pub fn ErrorData::new(Bytes, Bytes, Bytes, UInt64, Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], Array[@moonbit-community/opentelemetry/protocol/trace/v1.Span_Event], Array[@moonbit-community/opentelemetry/protocol/trace/v1.Span_Link], @moonbit-community/opentelemetry/protocol/trace/v1.Status) -> Self
+pub impl Default for ErrorData
+pub impl ToJson for ErrorData
+pub impl @json.FromJson for ErrorData
+pub impl @protobuf.AsyncRead for ErrorData
+pub impl @protobuf.AsyncWrite for ErrorData
+pub impl @protobuf.Read for ErrorData
+pub impl @protobuf.Sized for ErrorData
+pub impl @protobuf.Write for ErrorData
+
+pub(all) struct LatencyData {
+  mut traceid : Bytes
+  mut spanid : Bytes
+  mut parentid : Bytes
+  mut starttime : UInt64
+  mut endtime : UInt64
+  mut attributes : Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue]
+  mut events : Array[@moonbit-community/opentelemetry/protocol/trace/v1.Span_Event]
+  mut links : Array[@moonbit-community/opentelemetry/protocol/trace/v1.Span_Link]
+} derive(Eq)
+pub fn LatencyData::new(Bytes, Bytes, Bytes, UInt64, UInt64, Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], Array[@moonbit-community/opentelemetry/protocol/trace/v1.Span_Event], Array[@moonbit-community/opentelemetry/protocol/trace/v1.Span_Link]) -> Self
+pub impl Default for LatencyData
+pub impl ToJson for LatencyData
+pub impl @json.FromJson for LatencyData
+pub impl @protobuf.AsyncRead for LatencyData
+pub impl @protobuf.AsyncWrite for LatencyData
+pub impl @protobuf.Read for LatencyData
+pub impl @protobuf.Sized for LatencyData
+pub impl @protobuf.Write for LatencyData
+
+pub(all) struct RunningData {
+  mut traceid : Bytes
+  mut spanid : Bytes
+  mut parentid : Bytes
+  mut starttime : UInt64
+  mut attributes : Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue]
+  mut events : Array[@moonbit-community/opentelemetry/protocol/trace/v1.Span_Event]
+  mut links : Array[@moonbit-community/opentelemetry/protocol/trace/v1.Span_Link]
+} derive(Eq)
+pub fn RunningData::new(Bytes, Bytes, Bytes, UInt64, Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], Array[@moonbit-community/opentelemetry/protocol/trace/v1.Span_Event], Array[@moonbit-community/opentelemetry/protocol/trace/v1.Span_Link]) -> Self
+pub impl Default for RunningData
+pub impl ToJson for RunningData
+pub impl @json.FromJson for RunningData
+pub impl @protobuf.AsyncRead for RunningData
+pub impl @protobuf.AsyncWrite for RunningData
+pub impl @protobuf.Read for RunningData
+pub impl @protobuf.Sized for RunningData
+pub impl @protobuf.Write for RunningData
+
+pub(all) struct TracezCounts {
+  mut spanname : String
+  mut latency : Array[UInt]
+  mut running : UInt
+  mut error : UInt
+} derive(Eq)
+pub fn TracezCounts::new(String, Array[UInt], UInt, UInt) -> Self
+pub impl Default for TracezCounts
+pub impl ToJson for TracezCounts
+pub impl @json.FromJson for TracezCounts
+pub impl @protobuf.AsyncRead for TracezCounts
+pub impl @protobuf.AsyncWrite for TracezCounts
+pub impl @protobuf.Read for TracezCounts
+pub impl @protobuf.Sized for TracezCounts
+pub impl @protobuf.Write for TracezCounts
+
+// Type aliases
+
+// Traits
+

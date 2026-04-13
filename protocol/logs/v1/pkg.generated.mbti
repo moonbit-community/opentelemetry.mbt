@@ -1,0 +1,128 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/protocol/logs/v1"
+
+import {
+  "moonbitlang/core/json",
+  "moonbitlang/protobuf",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct LogRecord {
+  mut time_unix_nano : UInt64
+  mut observed_time_unix_nano : UInt64
+  mut severity_number : SeverityNumber
+  mut severity_text : String
+  mut body : @moonbit-community/opentelemetry/protocol/common/v1.AnyValue
+  mut attributes : Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue]
+  mut dropped_attributes_count : UInt
+  mut flags : UInt
+  mut trace_id : Bytes
+  mut span_id : Bytes
+  mut event_name : String
+} derive(Eq)
+pub fn LogRecord::new(UInt64, UInt64, SeverityNumber, String, @moonbit-community/opentelemetry/protocol/common/v1.AnyValue, Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt, UInt, Bytes, Bytes, String) -> Self
+pub impl Default for LogRecord
+pub impl ToJson for LogRecord
+pub impl @json.FromJson for LogRecord
+pub impl @protobuf.AsyncRead for LogRecord
+pub impl @protobuf.AsyncWrite for LogRecord
+pub impl @protobuf.Read for LogRecord
+pub impl @protobuf.Sized for LogRecord
+pub impl @protobuf.Write for LogRecord
+
+pub(all) enum LogRecordFlags {
+  LOG_RECORD_FLAGS_DO_NOT_USE
+  LOG_RECORD_FLAGS_TRACE_FLAGS_MASK
+} derive(Eq)
+pub fn LogRecordFlags::from_enum(@protobuf.Enum) -> Self
+pub fn LogRecordFlags::to_enum(Self) -> @protobuf.Enum
+pub impl Default for LogRecordFlags
+pub impl ToJson for LogRecordFlags
+pub impl @json.FromJson for LogRecordFlags
+pub impl @protobuf.Sized for LogRecordFlags
+
+pub(all) struct LogsData {
+  mut resource_logs : Array[ResourceLogs]
+} derive(Eq)
+pub fn LogsData::new(Array[ResourceLogs]) -> Self
+pub impl Default for LogsData
+pub impl ToJson for LogsData
+pub impl @json.FromJson for LogsData
+pub impl @protobuf.AsyncRead for LogsData
+pub impl @protobuf.AsyncWrite for LogsData
+pub impl @protobuf.Read for LogsData
+pub impl @protobuf.Sized for LogsData
+pub impl @protobuf.Write for LogsData
+
+pub(all) struct ResourceLogs {
+  mut resource : @moonbit-community/opentelemetry/protocol/resource/v1.Resource
+  mut scope_logs : Array[ScopeLogs]
+  mut schema_url : String
+} derive(Eq)
+pub fn ResourceLogs::new(@moonbit-community/opentelemetry/protocol/resource/v1.Resource, Array[ScopeLogs], String) -> Self
+pub impl Default for ResourceLogs
+pub impl ToJson for ResourceLogs
+pub impl @json.FromJson for ResourceLogs
+pub impl @protobuf.AsyncRead for ResourceLogs
+pub impl @protobuf.AsyncWrite for ResourceLogs
+pub impl @protobuf.Read for ResourceLogs
+pub impl @protobuf.Sized for ResourceLogs
+pub impl @protobuf.Write for ResourceLogs
+
+pub(all) struct ScopeLogs {
+  mut scope : @moonbit-community/opentelemetry/protocol/common/v1.InstrumentationScope
+  mut log_records : Array[LogRecord]
+  mut schema_url : String
+} derive(Eq)
+pub fn ScopeLogs::new(@moonbit-community/opentelemetry/protocol/common/v1.InstrumentationScope, Array[LogRecord], String) -> Self
+pub impl Default for ScopeLogs
+pub impl ToJson for ScopeLogs
+pub impl @json.FromJson for ScopeLogs
+pub impl @protobuf.AsyncRead for ScopeLogs
+pub impl @protobuf.AsyncWrite for ScopeLogs
+pub impl @protobuf.Read for ScopeLogs
+pub impl @protobuf.Sized for ScopeLogs
+pub impl @protobuf.Write for ScopeLogs
+
+pub(all) enum SeverityNumber {
+  SEVERITY_NUMBER_UNSPECIFIED
+  SEVERITY_NUMBER_TRACE
+  SEVERITY_NUMBER_TRACE2
+  SEVERITY_NUMBER_TRACE3
+  SEVERITY_NUMBER_TRACE4
+  SEVERITY_NUMBER_DEBUG
+  SEVERITY_NUMBER_DEBUG2
+  SEVERITY_NUMBER_DEBUG3
+  SEVERITY_NUMBER_DEBUG4
+  SEVERITY_NUMBER_INFO
+  SEVERITY_NUMBER_INFO2
+  SEVERITY_NUMBER_INFO3
+  SEVERITY_NUMBER_INFO4
+  SEVERITY_NUMBER_WARN
+  SEVERITY_NUMBER_WARN2
+  SEVERITY_NUMBER_WARN3
+  SEVERITY_NUMBER_WARN4
+  SEVERITY_NUMBER_ERROR
+  SEVERITY_NUMBER_ERROR2
+  SEVERITY_NUMBER_ERROR3
+  SEVERITY_NUMBER_ERROR4
+  SEVERITY_NUMBER_FATAL
+  SEVERITY_NUMBER_FATAL2
+  SEVERITY_NUMBER_FATAL3
+  SEVERITY_NUMBER_FATAL4
+} derive(Eq)
+pub fn SeverityNumber::from_enum(@protobuf.Enum) -> Self
+pub fn SeverityNumber::to_enum(Self) -> @protobuf.Enum
+pub impl Default for SeverityNumber
+pub impl ToJson for SeverityNumber
+pub impl @json.FromJson for SeverityNumber
+pub impl @protobuf.Sized for SeverityNumber
+
+// Type aliases
+
+// Traits
+

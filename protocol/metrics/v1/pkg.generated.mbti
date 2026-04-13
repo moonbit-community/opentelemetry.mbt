@@ -1,0 +1,330 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/protocol/metrics/v1"
+
+import {
+  "moonbitlang/core/json",
+  "moonbitlang/protobuf",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) enum AggregationTemporality {
+  AGGREGATION_TEMPORALITY_UNSPECIFIED
+  AGGREGATION_TEMPORALITY_DELTA
+  AGGREGATION_TEMPORALITY_CUMULATIVE
+} derive(Eq)
+pub fn AggregationTemporality::from_enum(@protobuf.Enum) -> Self
+pub fn AggregationTemporality::to_enum(Self) -> @protobuf.Enum
+pub impl Default for AggregationTemporality
+pub impl ToJson for AggregationTemporality
+pub impl @json.FromJson for AggregationTemporality
+pub impl @protobuf.Sized for AggregationTemporality
+
+pub(all) enum DataPointFlags {
+  DATA_POINT_FLAGS_DO_NOT_USE
+  DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK
+} derive(Eq)
+pub fn DataPointFlags::from_enum(@protobuf.Enum) -> Self
+pub fn DataPointFlags::to_enum(Self) -> @protobuf.Enum
+pub impl Default for DataPointFlags
+pub impl ToJson for DataPointFlags
+pub impl @json.FromJson for DataPointFlags
+pub impl @protobuf.Sized for DataPointFlags
+
+pub(all) struct Exemplar {
+  mut filtered_attributes : Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue]
+  mut time_unix_nano : UInt64
+  mut span_id : Bytes
+  mut trace_id : Bytes
+  mut value : Exemplar_Value
+} derive(Eq)
+pub fn Exemplar::new(Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt64, Bytes, Bytes, value? : Exemplar_Value) -> Self
+pub impl Default for Exemplar
+pub impl ToJson for Exemplar
+pub impl @json.FromJson for Exemplar
+pub impl @protobuf.AsyncRead for Exemplar
+pub impl @protobuf.AsyncWrite for Exemplar
+pub impl @protobuf.Read for Exemplar
+pub impl @protobuf.Sized for Exemplar
+pub impl @protobuf.Write for Exemplar
+
+pub(all) enum Exemplar_Value {
+  AsDouble(Double)
+  AsInt(Int64)
+  NotSet
+} derive(Eq)
+pub impl Default for Exemplar_Value
+pub impl ToJson for Exemplar_Value
+pub impl @json.FromJson for Exemplar_Value
+
+pub(all) struct ExponentialHistogram {
+  mut data_points : Array[ExponentialHistogramDataPoint]
+  mut aggregation_temporality : AggregationTemporality
+} derive(Eq)
+pub fn ExponentialHistogram::new(Array[ExponentialHistogramDataPoint], AggregationTemporality) -> Self
+pub impl Default for ExponentialHistogram
+pub impl ToJson for ExponentialHistogram
+pub impl @json.FromJson for ExponentialHistogram
+pub impl @protobuf.AsyncRead for ExponentialHistogram
+pub impl @protobuf.AsyncWrite for ExponentialHistogram
+pub impl @protobuf.Read for ExponentialHistogram
+pub impl @protobuf.Sized for ExponentialHistogram
+pub impl @protobuf.Write for ExponentialHistogram
+
+pub(all) struct ExponentialHistogramDataPoint {
+  mut attributes : Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue]
+  mut start_time_unix_nano : UInt64
+  mut time_unix_nano : UInt64
+  mut count : UInt64
+  mut sum : Double?
+  mut scale : Int
+  mut zero_count : UInt64
+  mut positive : ExponentialHistogramDataPoint_Buckets
+  mut negative : ExponentialHistogramDataPoint_Buckets
+  mut flags : UInt
+  mut exemplars : Array[Exemplar]
+  mut min : Double?
+  mut max : Double?
+  mut zero_threshold : Double
+} derive(Eq)
+pub fn ExponentialHistogramDataPoint::new(Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt64, UInt64, UInt64, sum? : Double, Int, UInt64, ExponentialHistogramDataPoint_Buckets, ExponentialHistogramDataPoint_Buckets, UInt, Array[Exemplar], min? : Double, max? : Double, Double) -> Self
+pub impl Default for ExponentialHistogramDataPoint
+pub impl ToJson for ExponentialHistogramDataPoint
+pub impl @json.FromJson for ExponentialHistogramDataPoint
+pub impl @protobuf.AsyncRead for ExponentialHistogramDataPoint
+pub impl @protobuf.AsyncWrite for ExponentialHistogramDataPoint
+pub impl @protobuf.Read for ExponentialHistogramDataPoint
+pub impl @protobuf.Sized for ExponentialHistogramDataPoint
+pub impl @protobuf.Write for ExponentialHistogramDataPoint
+
+pub(all) struct ExponentialHistogramDataPoint_Buckets {
+  mut offset : Int
+  mut bucket_counts : Array[UInt64]
+} derive(Eq)
+pub fn ExponentialHistogramDataPoint_Buckets::new(Int, Array[UInt64]) -> Self
+pub impl Default for ExponentialHistogramDataPoint_Buckets
+pub impl ToJson for ExponentialHistogramDataPoint_Buckets
+pub impl @json.FromJson for ExponentialHistogramDataPoint_Buckets
+pub impl @protobuf.AsyncRead for ExponentialHistogramDataPoint_Buckets
+pub impl @protobuf.AsyncWrite for ExponentialHistogramDataPoint_Buckets
+pub impl @protobuf.Read for ExponentialHistogramDataPoint_Buckets
+pub impl @protobuf.Sized for ExponentialHistogramDataPoint_Buckets
+pub impl @protobuf.Write for ExponentialHistogramDataPoint_Buckets
+
+pub(all) struct Gauge {
+  mut data_points : Array[NumberDataPoint]
+} derive(Eq)
+pub fn Gauge::new(Array[NumberDataPoint]) -> Self
+pub impl Default for Gauge
+pub impl ToJson for Gauge
+pub impl @json.FromJson for Gauge
+pub impl @protobuf.AsyncRead for Gauge
+pub impl @protobuf.AsyncWrite for Gauge
+pub impl @protobuf.Read for Gauge
+pub impl @protobuf.Sized for Gauge
+pub impl @protobuf.Write for Gauge
+
+pub(all) struct Histogram {
+  mut data_points : Array[HistogramDataPoint]
+  mut aggregation_temporality : AggregationTemporality
+} derive(Eq)
+pub fn Histogram::new(Array[HistogramDataPoint], AggregationTemporality) -> Self
+pub impl Default for Histogram
+pub impl ToJson for Histogram
+pub impl @json.FromJson for Histogram
+pub impl @protobuf.AsyncRead for Histogram
+pub impl @protobuf.AsyncWrite for Histogram
+pub impl @protobuf.Read for Histogram
+pub impl @protobuf.Sized for Histogram
+pub impl @protobuf.Write for Histogram
+
+pub(all) struct HistogramDataPoint {
+  mut attributes : Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue]
+  mut start_time_unix_nano : UInt64
+  mut time_unix_nano : UInt64
+  mut count : UInt64
+  mut sum : Double?
+  mut bucket_counts : Array[UInt64]
+  mut explicit_bounds : Array[Double]
+  mut exemplars : Array[Exemplar]
+  mut flags : UInt
+  mut min : Double?
+  mut max : Double?
+} derive(Eq)
+pub fn HistogramDataPoint::new(Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt64, UInt64, UInt64, sum? : Double, Array[UInt64], Array[Double], Array[Exemplar], UInt, min? : Double, max? : Double) -> Self
+pub impl Default for HistogramDataPoint
+pub impl ToJson for HistogramDataPoint
+pub impl @json.FromJson for HistogramDataPoint
+pub impl @protobuf.AsyncRead for HistogramDataPoint
+pub impl @protobuf.AsyncWrite for HistogramDataPoint
+pub impl @protobuf.Read for HistogramDataPoint
+pub impl @protobuf.Sized for HistogramDataPoint
+pub impl @protobuf.Write for HistogramDataPoint
+
+pub(all) struct Metric {
+  mut name : String
+  mut description : String
+  mut unit : String
+  mut metadata : Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue]
+  mut data : Metric_Data
+} derive(Eq)
+pub fn Metric::new(String, String, String, Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], data? : Metric_Data) -> Self
+pub impl Default for Metric
+pub impl ToJson for Metric
+pub impl @json.FromJson for Metric
+pub impl @protobuf.AsyncRead for Metric
+pub impl @protobuf.AsyncWrite for Metric
+pub impl @protobuf.Read for Metric
+pub impl @protobuf.Sized for Metric
+pub impl @protobuf.Write for Metric
+
+pub(all) enum Metric_Data {
+  Gauge(Gauge)
+  Sum(Sum)
+  Histogram(Histogram)
+  ExponentialHistogram(ExponentialHistogram)
+  Summary(Summary)
+  NotSet
+} derive(Eq)
+pub impl Default for Metric_Data
+pub impl ToJson for Metric_Data
+pub impl @json.FromJson for Metric_Data
+
+pub(all) struct MetricsData {
+  mut resource_metrics : Array[ResourceMetrics]
+} derive(Eq)
+pub fn MetricsData::new(Array[ResourceMetrics]) -> Self
+pub impl Default for MetricsData
+pub impl ToJson for MetricsData
+pub impl @json.FromJson for MetricsData
+pub impl @protobuf.AsyncRead for MetricsData
+pub impl @protobuf.AsyncWrite for MetricsData
+pub impl @protobuf.Read for MetricsData
+pub impl @protobuf.Sized for MetricsData
+pub impl @protobuf.Write for MetricsData
+
+pub(all) struct NumberDataPoint {
+  mut attributes : Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue]
+  mut start_time_unix_nano : UInt64
+  mut time_unix_nano : UInt64
+  mut exemplars : Array[Exemplar]
+  mut flags : UInt
+  mut value : NumberDataPoint_Value
+} derive(Eq)
+pub fn NumberDataPoint::new(Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt64, UInt64, Array[Exemplar], UInt, value? : NumberDataPoint_Value) -> Self
+pub impl Default for NumberDataPoint
+pub impl ToJson for NumberDataPoint
+pub impl @json.FromJson for NumberDataPoint
+pub impl @protobuf.AsyncRead for NumberDataPoint
+pub impl @protobuf.AsyncWrite for NumberDataPoint
+pub impl @protobuf.Read for NumberDataPoint
+pub impl @protobuf.Sized for NumberDataPoint
+pub impl @protobuf.Write for NumberDataPoint
+
+pub(all) enum NumberDataPoint_Value {
+  AsDouble(Double)
+  AsInt(Int64)
+  NotSet
+} derive(Eq)
+pub impl Default for NumberDataPoint_Value
+pub impl ToJson for NumberDataPoint_Value
+pub impl @json.FromJson for NumberDataPoint_Value
+
+pub(all) struct ResourceMetrics {
+  mut resource : @moonbit-community/opentelemetry/protocol/resource/v1.Resource
+  mut scope_metrics : Array[ScopeMetrics]
+  mut schema_url : String
+} derive(Eq)
+pub fn ResourceMetrics::new(@moonbit-community/opentelemetry/protocol/resource/v1.Resource, Array[ScopeMetrics], String) -> Self
+pub impl Default for ResourceMetrics
+pub impl ToJson for ResourceMetrics
+pub impl @json.FromJson for ResourceMetrics
+pub impl @protobuf.AsyncRead for ResourceMetrics
+pub impl @protobuf.AsyncWrite for ResourceMetrics
+pub impl @protobuf.Read for ResourceMetrics
+pub impl @protobuf.Sized for ResourceMetrics
+pub impl @protobuf.Write for ResourceMetrics
+
+pub(all) struct ScopeMetrics {
+  mut scope : @moonbit-community/opentelemetry/protocol/common/v1.InstrumentationScope
+  mut metrics : Array[Metric]
+  mut schema_url : String
+} derive(Eq)
+pub fn ScopeMetrics::new(@moonbit-community/opentelemetry/protocol/common/v1.InstrumentationScope, Array[Metric], String) -> Self
+pub impl Default for ScopeMetrics
+pub impl ToJson for ScopeMetrics
+pub impl @json.FromJson for ScopeMetrics
+pub impl @protobuf.AsyncRead for ScopeMetrics
+pub impl @protobuf.AsyncWrite for ScopeMetrics
+pub impl @protobuf.Read for ScopeMetrics
+pub impl @protobuf.Sized for ScopeMetrics
+pub impl @protobuf.Write for ScopeMetrics
+
+pub(all) struct Sum {
+  mut data_points : Array[NumberDataPoint]
+  mut aggregation_temporality : AggregationTemporality
+  mut is_monotonic : Bool
+} derive(Eq)
+pub fn Sum::new(Array[NumberDataPoint], AggregationTemporality, Bool) -> Self
+pub impl Default for Sum
+pub impl ToJson for Sum
+pub impl @json.FromJson for Sum
+pub impl @protobuf.AsyncRead for Sum
+pub impl @protobuf.AsyncWrite for Sum
+pub impl @protobuf.Read for Sum
+pub impl @protobuf.Sized for Sum
+pub impl @protobuf.Write for Sum
+
+pub(all) struct Summary {
+  mut data_points : Array[SummaryDataPoint]
+} derive(Eq)
+pub fn Summary::new(Array[SummaryDataPoint]) -> Self
+pub impl Default for Summary
+pub impl ToJson for Summary
+pub impl @json.FromJson for Summary
+pub impl @protobuf.AsyncRead for Summary
+pub impl @protobuf.AsyncWrite for Summary
+pub impl @protobuf.Read for Summary
+pub impl @protobuf.Sized for Summary
+pub impl @protobuf.Write for Summary
+
+pub(all) struct SummaryDataPoint {
+  mut attributes : Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue]
+  mut start_time_unix_nano : UInt64
+  mut time_unix_nano : UInt64
+  mut count : UInt64
+  mut sum : Double
+  mut quantile_values : Array[SummaryDataPoint_ValueAtQuantile]
+  mut flags : UInt
+} derive(Eq)
+pub fn SummaryDataPoint::new(Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt64, UInt64, UInt64, Double, Array[SummaryDataPoint_ValueAtQuantile], UInt) -> Self
+pub impl Default for SummaryDataPoint
+pub impl ToJson for SummaryDataPoint
+pub impl @json.FromJson for SummaryDataPoint
+pub impl @protobuf.AsyncRead for SummaryDataPoint
+pub impl @protobuf.AsyncWrite for SummaryDataPoint
+pub impl @protobuf.Read for SummaryDataPoint
+pub impl @protobuf.Sized for SummaryDataPoint
+pub impl @protobuf.Write for SummaryDataPoint
+
+pub(all) struct SummaryDataPoint_ValueAtQuantile {
+  mut quantile : Double
+  mut value : Double
+} derive(Eq)
+pub fn SummaryDataPoint_ValueAtQuantile::new(Double, Double) -> Self
+pub impl Default for SummaryDataPoint_ValueAtQuantile
+pub impl ToJson for SummaryDataPoint_ValueAtQuantile
+pub impl @json.FromJson for SummaryDataPoint_ValueAtQuantile
+pub impl @protobuf.AsyncRead for SummaryDataPoint_ValueAtQuantile
+pub impl @protobuf.AsyncWrite for SummaryDataPoint_ValueAtQuantile
+pub impl @protobuf.Read for SummaryDataPoint_ValueAtQuantile
+pub impl @protobuf.Sized for SummaryDataPoint_ValueAtQuantile
+pub impl @protobuf.Write for SummaryDataPoint_ValueAtQuantile
+
+// Type aliases
+
+// Traits
+
