@@ -1,0 +1,122 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/sdk/logs"
+
+import {
+  "moonbit-community/opentelemetry/sdk/common",
+  "moonbit-community/opentelemetry/sdk/context",
+  "moonbit-community/opentelemetry/sdk/error",
+  "moonbit-community/opentelemetry/sdk/resource",
+  "moonbit-community/opentelemetry/sdk/trace",
+  "moonbitlang/async",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/ref",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct BatchLogProcessor {
+  inner : LogProcessor
+  state : @ref.Ref[BatchProcessorState]
+}
+pub fn BatchLogProcessor::into_log_processor(Self) -> LogProcessor
+pub fn BatchLogProcessor::new(LogExporter, config? : @trace.BatchConfig) -> Self
+pub async fn BatchLogProcessor::run(Self) -> Unit
+
+type BatchProcessorState
+
+pub struct InMemoryLogExporter {
+  state : @ref.Ref[InMemoryLogExporterState]
+}
+pub fn InMemoryLogExporter::finished_logs(Self) -> Array[LogRecord]
+pub fn InMemoryLogExporter::into_log_exporter(Self) -> LogExporter
+pub fn InMemoryLogExporter::new() -> Self
+pub fn InMemoryLogExporter::reset(Self) -> Unit
+
+type InMemoryLogExporterState
+
+pub struct LogExporter {
+  export_fn : (ArrayView[LogRecord]) -> Result[Unit, @error.OTelSdkError]
+  force_flush_fn : () -> Result[Unit, @error.OTelSdkError]
+  shutdown_fn : () -> Result[Unit, @error.OTelSdkError]
+  name_fn : () -> String
+}
+pub fn LogExporter::export_batch(Self, ArrayView[LogRecord]) -> Result[Unit, @error.OTelSdkError]
+pub fn LogExporter::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn LogExporter::name(Self) -> String
+pub fn LogExporter::new((ArrayView[LogRecord]) -> Result[Unit, @error.OTelSdkError], force_flush_fn? : () -> Result[Unit, @error.OTelSdkError], shutdown_fn? : () -> Result[Unit, @error.OTelSdkError], name_fn? : () -> String) -> Self
+pub fn LogExporter::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+
+pub struct LogProcessor {
+  emit_fn : (LogRecord) -> Unit
+  force_flush_fn : () -> Result[Unit, @error.OTelSdkError]
+  shutdown_fn : () -> Result[Unit, @error.OTelSdkError]
+}
+pub fn LogProcessor::emit(Self, LogRecord) -> Unit
+pub fn LogProcessor::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn LogProcessor::new(emit_fn? : (LogRecord) -> Unit, force_flush_fn? : () -> Result[Unit, @error.OTelSdkError], shutdown_fn? : () -> Result[Unit, @error.OTelSdkError]) -> Self
+pub fn LogProcessor::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+
+pub struct LogRecord {
+  body : @common.Value
+  timestamp_unix_nano : Int64
+  observed_timestamp_unix_nano : Int64
+  severity_number : SeverityNumber?
+  severity_text : String?
+  attributes : Array[@common.KeyValue]
+  trace_context : @common.SpanContext?
+  resource : @resource.Resource
+  instrumentation_scope : @common.InstrumentationScope
+} derive(Eq, ToJson, @debug.Debug)
+pub fn LogRecord::new(@common.Value, timestamp_unix_nano? : Int64, observed_timestamp_unix_nano? : Int64, severity_number? : SeverityNumber?, severity_text? : String?, attributes? : ArrayView[@common.KeyValue], trace_context? : @common.SpanContext?, resource? : @resource.Resource, instrumentation_scope? : @common.InstrumentationScope) -> Self
+
+type LoggerProviderState
+
+pub struct SdkLogger {
+  provider : SdkLoggerProvider
+  instrumentation_scope : @common.InstrumentationScope
+}
+pub fn SdkLogger::emit(Self, @common.Value, context? : @context.Context, severity_number? : SeverityNumber?, severity_text? : String?, attributes? : ArrayView[@common.KeyValue], timestamp_unix_nano? : Int64, observed_timestamp_unix_nano? : Int64) -> Unit
+
+pub struct SdkLoggerProvider {
+  state : @ref.Ref[LoggerProviderState]
+}
+pub fn SdkLoggerProvider::builder() -> SdkLoggerProviderBuilder
+pub fn SdkLoggerProvider::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn SdkLoggerProvider::logger(Self, StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> SdkLogger
+pub fn SdkLoggerProvider::resource(Self) -> @resource.Resource
+pub fn SdkLoggerProvider::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn SdkLoggerProvider::spawn_batch_processor_tasks(Self, @async.TaskGroup[Unit], allow_failure? : Bool) -> Unit
+
+pub struct SdkLoggerProviderBuilder {
+  mut resource : @resource.Resource
+  processors : Array[LogProcessor]
+  batch_processors : Array[BatchLogProcessor]
+}
+pub fn SdkLoggerProviderBuilder::build(Self) -> SdkLoggerProvider
+pub fn SdkLoggerProviderBuilder::with_batch_exporter(Self, LogExporter, config? : @trace.BatchConfig) -> Self
+pub fn SdkLoggerProviderBuilder::with_log_processor(Self, LogProcessor) -> Self
+pub fn SdkLoggerProviderBuilder::with_resource(Self, @resource.Resource) -> Self
+pub fn SdkLoggerProviderBuilder::with_simple_exporter(Self, LogExporter) -> Self
+
+pub(all) enum SeverityNumber {
+  Trace
+  Debug
+  Info
+  Warn
+  Error
+  Fatal
+} derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+
+pub struct SimpleLogProcessor {
+  inner : LogProcessor
+}
+pub fn SimpleLogProcessor::into_log_processor(Self) -> LogProcessor
+pub fn SimpleLogProcessor::new(LogExporter) -> Self
+
+// Type aliases
+
+// Traits
+

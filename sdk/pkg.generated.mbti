@@ -1,13 +1,179 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "moonbit-community/opentelemetry/sdk"
 
+import {
+  "moonbit-community/opentelemetry/sdk/common",
+  "moonbit-community/opentelemetry/sdk/context",
+  "moonbit-community/opentelemetry/sdk/error",
+  "moonbit-community/opentelemetry/sdk/logs",
+  "moonbit-community/opentelemetry/sdk/metrics",
+  "moonbit-community/opentelemetry/sdk/propagation",
+  "moonbit-community/opentelemetry/sdk/resource",
+  "moonbit-community/opentelemetry/sdk/trace",
+  "moonbitlang/async",
+}
+
 // Values
+pub fn logger(StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> @logs.SdkLogger
+
+pub fn logger_provider_builder() -> @logs.SdkLoggerProviderBuilder
+
+pub fn meter(StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> @metrics.SdkMeter
+
+pub fn meter_provider_builder() -> @metrics.SdkMeterProviderBuilder
+
+pub fn spawn_background_tasks(@async.TaskGroup[Unit], allow_failure? : Bool) -> Unit
+
+pub fn tracer(StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> @trace.SdkTracer
+
+pub fn tracer_provider_builder() -> @trace.SdkTracerProviderBuilder
 
 // Errors
 
 // Types and methods
 
 // Type aliases
+pub using @metrics {type Aggregation}
+
+pub type Baggage = Map[String, String]
+
+pub using @propagation {type BaggagePropagator}
+
+pub using @trace {type BatchConfig}
+
+pub using @logs {type BatchLogProcessor}
+
+pub using @trace {type BatchSpanProcessor}
+
+pub using @trace {type Config}
+
+pub using @context {type Context}
+
+pub using @metrics {type Counter}
+
+pub using @metrics {type CounterBuilder}
+
+pub using @metrics {type Gauge}
+
+pub using @metrics {type GaugeBuilder}
+
+pub using @metrics {type Histogram}
+
+pub using @metrics {type HistogramBuilder}
+
+pub using @metrics {type HistogramSummary}
+
+pub using @logs {type InMemoryLogExporter}
+
+pub using @metrics {type InMemoryMetricExporter}
+
+pub using @trace {type InMemorySpanExporter}
+
+pub using @metrics {type InstrumentKind}
+
+pub using @common {type InstrumentationScope}
+
+pub using @common {type Key}
+
+pub using @common {type KeyValue}
+
+pub using @logs {type LogExporter}
+
+pub using @logs {type LogProcessor}
+
+pub using @logs {type LogRecord}
+
+pub using @metrics {type ManualReader}
+
+pub using @metrics {type MetricData}
+
+pub using @metrics {type MetricExporter}
+
+pub using @metrics {type Number}
+
+pub using @error {type OTelSdkError}
+
+pub type OTelSdkResult = Result[Unit, @error.OTelSdkError]
+
+pub using @metrics {type PeriodicMetricReader}
+
+pub using @resource {type Resource}
+
+pub using @resource {type ResourceBuilder}
+
+pub using @resource {type ResourceDetector}
+
+pub using @trace {type Sampler}
+
+pub using @trace {type SamplingDecision}
+
+pub using @trace {type SamplingResult}
+
+pub using @logs {type SdkLogger}
+
+pub using @logs {type SdkLoggerProvider}
+
+pub using @logs {type SdkLoggerProviderBuilder}
+
+pub using @metrics {type SdkMeter}
+
+pub using @metrics {type SdkMeterProvider}
+
+pub using @metrics {type SdkMeterProviderBuilder}
+
+pub using @trace {type SdkTracer}
+
+pub using @trace {type SdkTracerProvider}
+
+pub using @trace {type SdkTracerProviderBuilder}
+
+pub using @logs {type SeverityNumber}
+
+pub using @logs {type SimpleLogProcessor}
+
+pub using @trace {type SimpleSpanProcessor}
+
+pub using @trace {type Span}
+
+pub using @common {type SpanContext}
+
+pub using @trace {type SpanData}
+
+pub using @trace {type SpanEvent}
+
+pub using @trace {type SpanExporter}
+
+pub using @common {type SpanId}
+
+pub using @trace {type SpanKind}
+
+pub using @trace {type SpanLimits}
+
+pub using @trace {type SpanLink}
+
+pub using @trace {type SpanProcessor}
+
+pub using @trace {type Status}
+
+pub using @trace {type StatusCode}
+
+pub using @propagation {type TextMapCompositePropagator}
+
+pub using @propagation {type TextMapPropagator}
+
+pub using @propagation {type TraceContextPropagator}
+
+pub using @common {type TraceFlags}
+
+pub using @common {type TraceId}
+
+pub using @common {type TraceState}
+
+pub using @metrics {type UpDownCounter}
+
+pub using @metrics {type UpDownCounterBuilder}
+
+pub using @common {type Value}
 
 // Traits
 

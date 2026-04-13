@@ -3,10 +3,6 @@ import {
   "moonbit-community/opentelemetry/sdk/common" @common,
   "moonbit-community/opentelemetry/sdk/context" @context,
   "moonbit-community/opentelemetry/sdk/error" @error,
-  "moonbit-community/opentelemetry/sdk/global" @global,
-  "moonbit-community/opentelemetry/sdk/logs" @logs,
-  "moonbit-community/opentelemetry/sdk/metrics" @metrics,
-  "moonbit-community/opentelemetry/sdk/propagation" @propagation,
   "moonbit-community/opentelemetry/sdk/resource" @resource,
   "moonbit-community/opentelemetry/sdk/trace" @trace,
 }

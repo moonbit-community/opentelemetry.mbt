@@ -1,0 +1,55 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/sdk/resource"
+
+import {
+  "moonbit-community/opentelemetry/sdk/common",
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn env_resource_detector() -> ResourceDetector
+
+pub fn sdk_provided_resource_detector() -> ResourceDetector
+
+pub fn telemetry_resource_detector() -> ResourceDetector
+
+// Errors
+
+// Types and methods
+pub struct Resource {
+  attributes : Map[String, @common.Value]
+  schema_url : String?
+} derive(Eq, ToJson, @debug.Debug)
+pub fn Resource::attributes(Self) -> Map[String, @common.Value]
+pub fn Resource::builder() -> ResourceBuilder
+pub fn Resource::builder_empty() -> ResourceBuilder
+pub fn Resource::empty() -> Self
+pub fn Resource::get(Self, StringView) -> @common.Value?
+pub fn Resource::is_empty(Self) -> Bool
+pub fn Resource::len(Self) -> Int
+pub fn Resource::merge(Self, Self) -> Self
+pub fn Resource::new(ArrayView[@common.KeyValue]) -> Self
+pub fn Resource::schema_url(Self) -> String?
+pub impl Default for Resource
+
+pub struct ResourceBuilder {
+  mut resource : Resource
+  detectors : Array[ResourceDetector]
+}
+pub fn ResourceBuilder::build(Self) -> Resource
+pub fn ResourceBuilder::with_attribute(Self, StringView, @common.Value) -> Self
+pub fn ResourceBuilder::with_attributes(Self, ArrayView[@common.KeyValue]) -> Self
+pub fn ResourceBuilder::with_detector(Self, ResourceDetector) -> Self
+pub fn ResourceBuilder::with_schema_url(Self, StringView) -> Self
+pub fn ResourceBuilder::with_service_name(Self, StringView) -> Self
+
+pub struct ResourceDetector {
+  detect_fn : () -> Resource
+}
+pub fn ResourceDetector::detect(Self) -> Resource
+pub fn ResourceDetector::new(() -> Resource) -> Self
+
+// Type aliases
+
+// Traits
+

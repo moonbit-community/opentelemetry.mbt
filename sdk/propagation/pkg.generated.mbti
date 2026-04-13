@@ -1,0 +1,60 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/sdk/propagation"
+
+import {
+  "moonbit-community/opentelemetry/sdk/context",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct BaggagePropagator {
+  inner : TextMapPropagator
+}
+pub fn BaggagePropagator::extract_with_context(Self, @context.Context, &Extractor) -> @context.Context
+pub fn BaggagePropagator::inject_context(Self, @context.Context, &Injector) -> Unit
+pub fn BaggagePropagator::into_text_map(Self) -> TextMapPropagator
+pub fn BaggagePropagator::new() -> Self
+
+pub struct TextMapCompositePropagator {
+  inner : TextMapPropagator
+}
+pub fn TextMapCompositePropagator::extract_with_context(Self, @context.Context, &Extractor) -> @context.Context
+pub fn TextMapCompositePropagator::inject_context(Self, @context.Context, &Injector) -> Unit
+pub fn TextMapCompositePropagator::into_text_map(Self) -> TextMapPropagator
+pub fn TextMapCompositePropagator::new(ArrayView[TextMapPropagator]) -> Self
+
+pub struct TextMapPropagator {
+  inject_fn : (@context.Context, &Injector) -> Unit
+  extract_fn : (@context.Context, &Extractor) -> @context.Context
+  fields_fn : () -> Array[String]
+}
+pub fn TextMapPropagator::extract_with_context(Self, @context.Context, &Extractor) -> @context.Context
+pub fn TextMapPropagator::fields(Self) -> Array[String]
+pub fn TextMapPropagator::from_functions((@context.Context, &Injector) -> Unit, (@context.Context, &Extractor) -> @context.Context, () -> Array[String]) -> Self
+pub fn TextMapPropagator::inject_context(Self, @context.Context, &Injector) -> Unit
+
+pub struct TraceContextPropagator {
+  inner : TextMapPropagator
+}
+pub fn TraceContextPropagator::extract_with_context(Self, @context.Context, &Extractor) -> @context.Context
+pub fn TraceContextPropagator::inject_context(Self, @context.Context, &Injector) -> Unit
+pub fn TraceContextPropagator::into_text_map(Self) -> TextMapPropagator
+pub fn TraceContextPropagator::new() -> Self
+
+// Type aliases
+
+// Traits
+pub(open) trait Extractor {
+  get(Self, StringView) -> String?
+  keys(Self) -> Array[String] = _
+}
+pub impl Extractor for Map[String, String]
+
+pub(open) trait Injector {
+  set(Self, String, String) -> Unit
+}
+pub impl Injector for Map[String, String]
+

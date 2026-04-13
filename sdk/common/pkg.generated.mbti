@@ -1,0 +1,130 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/sdk/common"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn basename(StringView) -> String
+
+pub fn getenv(StringView) -> String?
+
+pub fn now_unix_nano() -> Int64
+
+// Errors
+
+// Types and methods
+pub struct InstrumentationScope {
+  name : String
+  version : String?
+  schema_url : String?
+  attributes : Array[KeyValue]
+} derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn InstrumentationScope::attributes(Self) -> Array[KeyValue]
+pub fn InstrumentationScope::builder(StringView) -> InstrumentationScopeBuilder
+pub fn InstrumentationScope::name(Self) -> String
+pub fn InstrumentationScope::schema_url(Self) -> String?
+pub fn InstrumentationScope::version(Self) -> String?
+pub impl Default for InstrumentationScope
+
+pub struct InstrumentationScopeBuilder {
+  name : String
+  mut version : String?
+  mut schema_url : String?
+  mut attributes : Array[KeyValue]
+}
+pub fn InstrumentationScopeBuilder::build(Self) -> InstrumentationScope
+pub fn InstrumentationScopeBuilder::with_attributes(Self, ArrayView[KeyValue]) -> Self
+pub fn InstrumentationScopeBuilder::with_schema_url(Self, StringView) -> Self
+pub fn InstrumentationScopeBuilder::with_version(Self, StringView) -> Self
+
+pub struct Key {
+  name : String
+} derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn Key::as_string(Self) -> String
+pub fn Key::new(StringView) -> Self
+pub impl Default for Key
+
+pub struct KeyValue {
+  key : Key
+  value : Value
+} derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn KeyValue::new(StringView, Value) -> Self
+
+pub struct SpanContext {
+  trace_id : TraceId
+  span_id : SpanId
+  trace_flags : TraceFlags
+  is_remote : Bool
+  trace_state : TraceState
+} derive(Eq, ToJson, @debug.Debug)
+pub fn SpanContext::empty() -> Self
+pub fn SpanContext::is_remote(Self) -> Bool
+pub fn SpanContext::is_sampled(Self) -> Bool
+pub fn SpanContext::is_valid(Self) -> Bool
+pub fn SpanContext::new(TraceId, SpanId, trace_flags? : TraceFlags, is_remote? : Bool, trace_state? : TraceState) -> Self
+pub fn SpanContext::span_id(Self) -> SpanId
+pub fn SpanContext::trace_flags(Self) -> TraceFlags
+pub fn SpanContext::trace_id(Self) -> TraceId
+pub fn SpanContext::trace_state(Self) -> TraceState
+pub fn SpanContext::with_remote(Self, Bool) -> Self
+pub impl Default for SpanContext
+
+pub struct SpanId {
+  bytes : Bytes
+} derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn SpanId::bytes(Self) -> Bytes
+pub fn SpanId::from_bytes(Bytes) -> Self?
+pub fn SpanId::from_hex(StringView) -> Self?
+pub fn SpanId::invalid() -> Self
+pub fn SpanId::is_valid(Self) -> Bool
+pub fn SpanId::to_hex(Self) -> String
+pub impl Default for SpanId
+
+pub struct TraceFlags {
+  flags : UInt
+} derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn TraceFlags::from_hex(StringView) -> Self?
+pub fn TraceFlags::is_sampled(Self) -> Bool
+pub fn TraceFlags::new(UInt) -> Self
+pub fn TraceFlags::to_hex(Self) -> String
+pub fn TraceFlags::with_sampled(Self, Bool) -> Self
+pub impl Default for TraceFlags
+
+pub struct TraceId {
+  bytes : Bytes
+} derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn TraceId::bytes(Self) -> Bytes
+pub fn TraceId::from_bytes(Bytes) -> Self?
+pub fn TraceId::from_hex(StringView) -> Self?
+pub fn TraceId::invalid() -> Self
+pub fn TraceId::is_valid(Self) -> Bool
+pub fn TraceId::to_hex(Self) -> String
+pub impl Default for TraceId
+
+pub struct TraceState {
+  entries : Map[String, String]
+} derive(Eq, ToJson, @debug.Debug)
+pub fn TraceState::empty() -> Self
+pub fn TraceState::entries(Self) -> Map[String, String]
+pub fn TraceState::from_header(StringView) -> Self
+pub fn TraceState::get(Self, StringView) -> String?
+pub fn TraceState::new(Map[String, String]) -> Self
+pub fn TraceState::set(Self, StringView, StringView) -> Self
+pub fn TraceState::to_header(Self) -> String?
+pub impl Default for TraceState
+
+pub(all) enum Value {
+  Bool(Bool)
+  Int64(Int64)
+  Double(Double)
+  String(String)
+  Bytes(Bytes)
+  Array(Array[Value])
+} derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+
+// Type aliases
+
+// Traits
+

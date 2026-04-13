@@ -1,0 +1,253 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/sdk/trace"
+
+import {
+  "moonbit-community/opentelemetry/sdk/common",
+  "moonbit-community/opentelemetry/sdk/context",
+  "moonbit-community/opentelemetry/sdk/error",
+  "moonbit-community/opentelemetry/sdk/resource",
+  "moonbitlang/async",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/ref",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct BatchConfig {
+  max_queue_size : Int
+  max_export_batch_size : Int
+  scheduled_delay_millis : Int
+  export_timeout_millis : Int
+} derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn BatchConfig::new(max_queue_size? : Int, max_export_batch_size? : Int, scheduled_delay_millis? : Int, export_timeout_millis? : Int) -> Self
+pub impl Default for BatchConfig
+
+type BatchProcessorState
+
+pub struct BatchSpanProcessor {
+  inner : SpanProcessor
+  state : @ref.Ref[BatchProcessorState]
+}
+pub fn BatchSpanProcessor::into_span_processor(Self) -> SpanProcessor
+pub fn BatchSpanProcessor::new(SpanExporter, config? : BatchConfig) -> Self
+pub async fn BatchSpanProcessor::run(Self) -> Unit
+
+pub struct Config {
+  sampler : Sampler
+  id_generator : IdGenerator
+  span_limits : SpanLimits
+  resource : @resource.Resource
+}
+pub fn Config::new(sampler? : Sampler, id_generator? : IdGenerator, span_limits? : SpanLimits, resource? : @resource.Resource) -> Self
+pub impl Default for Config
+
+pub struct IdGenerator {
+  new_trace_id_fn : () -> @common.TraceId
+  new_span_id_fn : () -> @common.SpanId
+}
+pub fn IdGenerator::new(() -> @common.TraceId, () -> @common.SpanId) -> Self
+pub fn IdGenerator::new_span_id(Self) -> @common.SpanId
+pub fn IdGenerator::new_trace_id(Self) -> @common.TraceId
+
+pub struct InMemorySpanExporter {
+  state : @ref.Ref[InMemorySpanExporterState]
+}
+pub fn InMemorySpanExporter::finished_spans(Self) -> Array[SpanData]
+pub fn InMemorySpanExporter::into_span_exporter(Self) -> SpanExporter
+pub fn InMemorySpanExporter::is_shutdown(Self) -> Bool
+pub fn InMemorySpanExporter::new() -> Self
+pub fn InMemorySpanExporter::reset(Self) -> Unit
+
+type InMemorySpanExporterState
+
+type ProviderState
+
+pub struct RandomIdGenerator {
+  inner : IdGenerator
+}
+pub fn RandomIdGenerator::into_id_generator(Self) -> IdGenerator
+pub fn RandomIdGenerator::new() -> Self
+
+pub struct Sampler {
+  should_sample_fn : (SamplingParameters) -> SamplingResult
+  description_fn : () -> String
+}
+pub fn Sampler::always_off() -> Self
+pub fn Sampler::always_on() -> Self
+pub fn Sampler::description(Self) -> String
+pub fn Sampler::new((SamplingParameters) -> SamplingResult, () -> String) -> Self
+pub fn Sampler::parent_based(Self) -> Self
+pub fn Sampler::should_sample(Self, SamplingParameters) -> SamplingResult
+pub fn Sampler::trace_id_ratio(Double) -> Self
+pub impl Default for Sampler
+
+pub(all) enum SamplingDecision {
+  Drop
+  RecordOnly
+  RecordAndSample
+} derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+
+pub struct SamplingParameters {
+  parent_context : @context.Context
+  trace_id : @common.TraceId
+  name : String
+  kind : SpanKind
+  attributes : Array[@common.KeyValue]
+  links : Array[SpanLink]
+} derive(Eq, ToJson, @debug.Debug)
+
+pub struct SamplingResult {
+  decision : SamplingDecision
+  attributes : Array[@common.KeyValue]
+  trace_state : @common.TraceState
+} derive(Eq, ToJson, @debug.Debug)
+pub fn SamplingResult::new(SamplingDecision, attributes? : ArrayView[@common.KeyValue], trace_state? : @common.TraceState) -> Self
+
+pub struct SdkTracer {
+  provider : SdkTracerProvider
+  instrumentation_scope : @common.InstrumentationScope
+}
+pub fn SdkTracer::start(Self, StringView, parent_context? : @context.Context, kind? : SpanKind, attributes? : ArrayView[@common.KeyValue], links? : ArrayView[SpanLink], start_time_unix_nano? : Int64) -> Span
+
+pub struct SdkTracerProvider {
+  state : @ref.Ref[ProviderState]
+}
+pub fn SdkTracerProvider::builder() -> SdkTracerProviderBuilder
+pub fn SdkTracerProvider::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn SdkTracerProvider::resource(Self) -> @resource.Resource
+pub fn SdkTracerProvider::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn SdkTracerProvider::spawn_batch_processor_tasks(Self, @async.TaskGroup[Unit], allow_failure? : Bool) -> Unit
+pub fn SdkTracerProvider::tracer(Self, StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> SdkTracer
+
+pub struct SdkTracerProviderBuilder {
+  mut config : Config
+  processors : Array[SpanProcessor]
+  batch_processors : Array[BatchSpanProcessor]
+}
+pub fn SdkTracerProviderBuilder::build(Self) -> SdkTracerProvider
+pub fn SdkTracerProviderBuilder::with_batch_exporter(Self, SpanExporter, config? : BatchConfig) -> Self
+pub fn SdkTracerProviderBuilder::with_config(Self, Config) -> Self
+pub fn SdkTracerProviderBuilder::with_id_generator(Self, IdGenerator) -> Self
+pub fn SdkTracerProviderBuilder::with_resource(Self, @resource.Resource) -> Self
+pub fn SdkTracerProviderBuilder::with_sampler(Self, Sampler) -> Self
+pub fn SdkTracerProviderBuilder::with_simple_exporter(Self, SpanExporter) -> Self
+pub fn SdkTracerProviderBuilder::with_span_limits(Self, SpanLimits) -> Self
+pub fn SdkTracerProviderBuilder::with_span_processor(Self, SpanProcessor) -> Self
+
+pub struct SimpleSpanProcessor {
+  inner : SpanProcessor
+}
+pub fn SimpleSpanProcessor::into_span_processor(Self) -> SpanProcessor
+pub fn SimpleSpanProcessor::new(SpanExporter) -> Self
+
+pub struct Span {
+  state : @ref.Ref[SpanState]
+}
+pub fn Span::add_event(Self, StringView, attributes? : ArrayView[@common.KeyValue], timestamp_unix_nano? : Int64) -> Unit
+pub fn Span::add_link(Self, @common.SpanContext, attributes? : ArrayView[@common.KeyValue]) -> Unit
+pub fn Span::context(Self) -> @context.Context
+pub fn Span::end(Self, end_time_unix_nano? : Int64) -> Unit
+pub fn Span::has_ended(Self) -> Bool
+pub fn Span::is_recording(Self) -> Bool
+pub fn Span::set_attribute(Self, StringView, @common.Value) -> Unit
+pub fn Span::set_status(Self, Status) -> Unit
+pub fn Span::snapshot(Self) -> SpanData
+pub fn Span::span_context(Self) -> @common.SpanContext
+pub fn Span::update_name(Self, StringView) -> Unit
+
+pub struct SpanData {
+  name : String
+  span_context : @common.SpanContext
+  parent_span_context : @common.SpanContext?
+  kind : SpanKind
+  start_time_unix_nano : Int64
+  end_time_unix_nano : Int64?
+  attributes : Array[@common.KeyValue]
+  dropped_attributes_count : Int
+  events : Array[SpanEvent]
+  dropped_events_count : Int
+  links : Array[SpanLink]
+  dropped_links_count : Int
+  status : Status
+  resource : @resource.Resource
+  instrumentation_scope : @common.InstrumentationScope
+} derive(Eq, ToJson, @debug.Debug)
+
+pub struct SpanEvent {
+  name : String
+  timestamp_unix_nano : Int64
+  attributes : Array[@common.KeyValue]
+} derive(Eq, ToJson, @debug.Debug)
+pub fn SpanEvent::new(StringView, attributes? : ArrayView[@common.KeyValue], timestamp_unix_nano? : Int64) -> Self
+
+pub struct SpanExporter {
+  export_fn : (ArrayView[SpanData]) -> Result[Unit, @error.OTelSdkError]
+  force_flush_fn : () -> Result[Unit, @error.OTelSdkError]
+  shutdown_fn : () -> Result[Unit, @error.OTelSdkError]
+  name_fn : () -> String
+}
+pub fn SpanExporter::export_batch(Self, ArrayView[SpanData]) -> Result[Unit, @error.OTelSdkError]
+pub fn SpanExporter::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn SpanExporter::name(Self) -> String
+pub fn SpanExporter::new((ArrayView[SpanData]) -> Result[Unit, @error.OTelSdkError], force_flush_fn? : () -> Result[Unit, @error.OTelSdkError], shutdown_fn? : () -> Result[Unit, @error.OTelSdkError], name_fn? : () -> String) -> Self
+pub fn SpanExporter::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+
+pub(all) enum SpanKind {
+  Internal
+  Client
+  Server
+  Producer
+  Consumer
+} derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+
+pub struct SpanLimits {
+  max_attributes_per_span : Int
+  max_events_per_span : Int
+  max_links_per_span : Int
+} derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn SpanLimits::new(max_attributes_per_span? : Int, max_events_per_span? : Int, max_links_per_span? : Int) -> Self
+pub impl Default for SpanLimits
+
+pub struct SpanLink {
+  span_context : @common.SpanContext
+  attributes : Array[@common.KeyValue]
+} derive(Eq, ToJson, @debug.Debug)
+pub fn SpanLink::new(@common.SpanContext, attributes? : ArrayView[@common.KeyValue]) -> Self
+
+pub struct SpanProcessor {
+  on_start_fn : (@context.Context, SpanData) -> Unit
+  on_end_fn : (SpanData) -> Unit
+  force_flush_fn : () -> Result[Unit, @error.OTelSdkError]
+  shutdown_fn : () -> Result[Unit, @error.OTelSdkError]
+}
+pub fn SpanProcessor::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn SpanProcessor::new(on_start_fn? : (@context.Context, SpanData) -> Unit, on_end_fn? : (SpanData) -> Unit, force_flush_fn? : () -> Result[Unit, @error.OTelSdkError], shutdown_fn? : () -> Result[Unit, @error.OTelSdkError]) -> Self
+pub fn SpanProcessor::on_end(Self, SpanData) -> Unit
+pub fn SpanProcessor::on_start(Self, @context.Context, SpanData) -> Unit
+pub fn SpanProcessor::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+
+type SpanState
+
+pub struct Status {
+  code : StatusCode
+  description : String?
+} derive(Eq, ToJson, @debug.Debug)
+pub fn Status::error(description? : String?) -> Self
+pub fn Status::new(StatusCode, description? : String?) -> Self
+pub fn Status::ok() -> Self
+pub fn Status::unset() -> Self
+pub impl Default for Status
+
+pub(all) enum StatusCode {
+  Unset
+  Ok
+  Error
+} derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+
+// Type aliases
+
+// Traits
+

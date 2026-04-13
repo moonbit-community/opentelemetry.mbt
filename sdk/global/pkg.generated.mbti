@@ -1,0 +1,51 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/sdk/global"
+
+import {
+  "moonbit-community/opentelemetry/sdk/common",
+  "moonbit-community/opentelemetry/sdk/logs",
+  "moonbit-community/opentelemetry/sdk/metrics",
+  "moonbit-community/opentelemetry/sdk/propagation",
+  "moonbit-community/opentelemetry/sdk/trace",
+  "moonbitlang/async",
+}
+
+// Values
+pub fn force_flush() -> Unit
+
+pub fn logger(StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> @logs.SdkLogger
+
+pub fn logger_provider() -> @logs.SdkLoggerProvider
+
+pub fn meter(StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> @metrics.SdkMeter
+
+pub fn meter_provider() -> @metrics.SdkMeterProvider
+
+pub fn reset_for_test() -> Unit
+
+pub fn set_logger_provider(@logs.SdkLoggerProvider) -> Unit
+
+pub fn set_meter_provider(@metrics.SdkMeterProvider) -> Unit
+
+pub fn set_text_map_propagator(@propagation.TextMapPropagator) -> Unit
+
+pub fn set_tracer_provider(@trace.SdkTracerProvider) -> Unit
+
+pub fn shutdown() -> Unit
+
+pub fn spawn_background_tasks(@async.TaskGroup[Unit], allow_failure? : Bool) -> Unit
+
+pub fn text_map_propagator() -> @propagation.TextMapPropagator
+
+pub fn tracer(StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> @trace.SdkTracer
+
+pub fn tracer_provider() -> @trace.SdkTracerProvider
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+

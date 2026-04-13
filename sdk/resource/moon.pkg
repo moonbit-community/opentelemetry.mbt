@@ -1,0 +1,9 @@
+import {
+  "moonbitlang/core/env",
+  "moonbitlang/core/string",
+  "moonbit-community/opentelemetry/sdk/common" @common,
+}
+
+options(
+  backend: [ "native" ],
+)
