@@ -1,0 +1,378 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/semantics/trace"
+
+// Values
+pub const ANDROID_APP_STATE : String = "android.app.state"
+
+pub const APP_SCREEN_COORDINATE_X : String = "app.screen.coordinate.x"
+
+pub const APP_SCREEN_COORDINATE_Y : String = "app.screen.coordinate.y"
+
+pub const APP_WIDGET_ID : String = "app.widget.id"
+
+pub const APP_WIDGET_NAME : String = "app.widget.name"
+
+pub const AWS_BEDROCK_GUARDRAIL_ID : String = "aws.bedrock.guardrail.id"
+
+pub const AWS_BEDROCK_KNOWLEDGE_BASE_ID : String = "aws.bedrock.knowledge_base.id"
+
+pub const AWS_DYNAMODB_ATTRIBUTES_TO_GET : String = "aws.dynamodb.attributes_to_get"
+
+pub const AWS_DYNAMODB_ATTRIBUTE_DEFINITIONS : String = "aws.dynamodb.attribute_definitions"
+
+pub const AWS_DYNAMODB_CONSISTENT_READ : String = "aws.dynamodb.consistent_read"
+
+pub const AWS_DYNAMODB_CONSUMED_CAPACITY : String = "aws.dynamodb.consumed_capacity"
+
+pub const AWS_DYNAMODB_COUNT : String = "aws.dynamodb.count"
+
+pub const AWS_DYNAMODB_EXCLUSIVE_START_TABLE : String = "aws.dynamodb.exclusive_start_table"
+
+pub const AWS_DYNAMODB_GLOBAL_SECONDARY_INDEXES : String = "aws.dynamodb.global_secondary_indexes"
+
+pub const AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES : String = "aws.dynamodb.global_secondary_index_updates"
+
+pub const AWS_DYNAMODB_INDEX_NAME : String = "aws.dynamodb.index_name"
+
+pub const AWS_DYNAMODB_ITEM_COLLECTION_METRICS : String = "aws.dynamodb.item_collection_metrics"
+
+pub const AWS_DYNAMODB_LIMIT : String = "aws.dynamodb.limit"
+
+pub const AWS_DYNAMODB_LOCAL_SECONDARY_INDEXES : String = "aws.dynamodb.local_secondary_indexes"
+
+pub const AWS_DYNAMODB_PROJECTION : String = "aws.dynamodb.projection"
+
+pub const AWS_DYNAMODB_PROVISIONED_READ_CAPACITY : String = "aws.dynamodb.provisioned_read_capacity"
+
+pub const AWS_DYNAMODB_PROVISIONED_WRITE_CAPACITY : String = "aws.dynamodb.provisioned_write_capacity"
+
+pub const AWS_DYNAMODB_SCANNED_COUNT : String = "aws.dynamodb.scanned_count"
+
+pub const AWS_DYNAMODB_SCAN_FORWARD : String = "aws.dynamodb.scan_forward"
+
+pub const AWS_DYNAMODB_SEGMENT : String = "aws.dynamodb.segment"
+
+pub const AWS_DYNAMODB_SELECT : String = "aws.dynamodb.select"
+
+pub const AWS_DYNAMODB_TABLE_COUNT : String = "aws.dynamodb.table_count"
+
+pub const AWS_DYNAMODB_TABLE_NAMES : String = "aws.dynamodb.table_names"
+
+pub const AWS_DYNAMODB_TOTAL_SEGMENTS : String = "aws.dynamodb.total_segments"
+
+pub const AWS_EXTENDED_REQUEST_ID : String = "aws.extended_request_id"
+
+pub const AWS_LAMBDA_INVOKED_ARN : String = "aws.lambda.invoked_arn"
+
+pub const AWS_LAMBDA_RESOURCE_MAPPING_ID : String = "aws.lambda.resource_mapping.id"
+
+pub const AWS_REQUEST_ID : String = "aws.request_id"
+
+pub const AWS_S3_BUCKET : String = "aws.s3.bucket"
+
+pub const AWS_S3_COPY_SOURCE : String = "aws.s3.copy_source"
+
+pub const AWS_S3_DELETE : String = "aws.s3.delete"
+
+pub const AWS_S3_KEY : String = "aws.s3.key"
+
+pub const AWS_S3_PART_NUMBER : String = "aws.s3.part_number"
+
+pub const AWS_S3_UPLOAD_ID : String = "aws.s3.upload_id"
+
+pub const AZURE_CLIENT_ID : String = "azure.client.id"
+
+pub const AZURE_COSMOSDB_CONNECTION_MODE : String = "azure.cosmosdb.connection.mode"
+
+pub const AZURE_COSMOSDB_CONSISTENCY_LEVEL : String = "azure.cosmosdb.consistency.level"
+
+pub const AZURE_COSMOSDB_OPERATION_CONTACTED_REGIONS : String = "azure.cosmosdb.operation.contacted_regions"
+
+pub const AZURE_COSMOSDB_OPERATION_REQUEST_CHARGE : String = "azure.cosmosdb.operation.request_charge"
+
+pub const AZURE_COSMOSDB_REQUEST_BODY_SIZE : String = "azure.cosmosdb.request.body.size"
+
+pub const AZURE_COSMOSDB_RESPONSE_SUB_STATUS_CODE : String = "azure.cosmosdb.response.sub_status_code"
+
+pub const AZURE_RESOURCE_PROVIDER_NAMESPACE : String = "azure.resource_provider.namespace"
+
+pub const AZURE_SERVICE_REQUEST_ID : String = "azure.service.request.id"
+
+pub const AZ_SERVICE_REQUEST_ID : String = "az.service_request_id"
+
+pub const CASSANDRA_CONSISTENCY_LEVEL : String = "cassandra.consistency.level"
+
+pub const CASSANDRA_COORDINATOR_DC : String = "cassandra.coordinator.dc"
+
+pub const CASSANDRA_COORDINATOR_ID : String = "cassandra.coordinator.id"
+
+pub const CASSANDRA_PAGE_SIZE : String = "cassandra.page.size"
+
+pub const CASSANDRA_QUERY_IDEMPOTENT : String = "cassandra.query.idempotent"
+
+pub const CASSANDRA_SPECULATIVE_EXECUTION_COUNT : String = "cassandra.speculative_execution.count"
+
+pub const CICD_PIPELINE_ACTION_NAME : String = "cicd.pipeline.action.name"
+
+pub const CICD_PIPELINE_RESULT : String = "cicd.pipeline.result"
+
+pub const CICD_PIPELINE_TASK_NAME : String = "cicd.pipeline.task.name"
+
+pub const CICD_PIPELINE_TASK_RUN_ID : String = "cicd.pipeline.task.run.id"
+
+pub const CICD_PIPELINE_TASK_RUN_RESULT : String = "cicd.pipeline.task.run.result"
+
+pub const CICD_PIPELINE_TASK_RUN_URL_FULL : String = "cicd.pipeline.task.run.url.full"
+
+pub const CLIENT_ADDRESS : String = "client.address"
+
+pub const CLIENT_PORT : String = "client.port"
+
+pub const CLOUD_REGION : String = "cloud.region"
+
+pub const CLOUD_RESOURCE_ID : String = "cloud.resource_id"
+
+pub const DB_COLLECTION_NAME : String = "db.collection.name"
+
+pub const DB_NAMESPACE : String = "db.namespace"
+
+pub const DB_OPERATION_BATCH_SIZE : String = "db.operation.batch.size"
+
+pub const DB_OPERATION_NAME : String = "db.operation.name"
+
+pub const DB_OPERATION_PARAMETER : String = "db.operation.parameter"
+
+pub const DB_QUERY_PARAMETER : String = "db.query.parameter"
+
+pub const DB_QUERY_SUMMARY : String = "db.query.summary"
+
+pub const DB_QUERY_TEXT : String = "db.query.text"
+
+pub const DB_RESPONSE_RETURNED_ROWS : String = "db.response.returned_rows"
+
+pub const DB_RESPONSE_STATUS_CODE : String = "db.response.status_code"
+
+pub const DB_STORED_PROCEDURE_NAME : String = "db.stored_procedure.name"
+
+pub const DB_SYSTEM_NAME : String = "db.system.name"
+
+pub const DNS_ANSWERS : String = "dns.answers"
+
+pub const DNS_QUESTION_NAME : String = "dns.question.name"
+
+pub const ELASTICSEARCH_NODE_NAME : String = "elasticsearch.node.name"
+
+pub const ERROR_MESSAGE : String = "error.message"
+
+pub const ERROR_TYPE : String = "error.type"
+
+pub const EXCEPTION_ESCAPED : String = "exception.escaped"
+
+pub const EXCEPTION_MESSAGE : String = "exception.message"
+
+pub const EXCEPTION_STACKTRACE : String = "exception.stacktrace"
+
+pub const EXCEPTION_TYPE : String = "exception.type"
+
+pub const FAAS_COLDSTART : String = "faas.coldstart"
+
+pub const FAAS_CRON : String = "faas.cron"
+
+pub const FAAS_DOCUMENT_COLLECTION : String = "faas.document.collection"
+
+pub const FAAS_DOCUMENT_NAME : String = "faas.document.name"
+
+pub const FAAS_DOCUMENT_OPERATION : String = "faas.document.operation"
+
+pub const FAAS_DOCUMENT_TIME : String = "faas.document.time"
+
+pub const FAAS_INVOKED_NAME : String = "faas.invoked_name"
+
+pub const FAAS_INVOKED_PROVIDER : String = "faas.invoked_provider"
+
+pub const FAAS_INVOKED_REGION : String = "faas.invoked_region"
+
+pub const FAAS_TIME : String = "faas.time"
+
+pub const FAAS_TRIGGER : String = "faas.trigger"
+
+pub const FEATURE_FLAG_CONTEXT_ID : String = "feature_flag.context.id"
+
+pub const FEATURE_FLAG_KEY : String = "feature_flag.key"
+
+pub const FEATURE_FLAG_PROVIDER_NAME : String = "feature_flag.provider.name"
+
+pub const FEATURE_FLAG_RESULT_REASON : String = "feature_flag.result.reason"
+
+pub const FEATURE_FLAG_RESULT_VALUE : String = "feature_flag.result.value"
+
+pub const FEATURE_FLAG_RESULT_VARIANT : String = "feature_flag.result.variant"
+
+pub const FEATURE_FLAG_SET_ID : String = "feature_flag.set.id"
+
+pub const FEATURE_FLAG_VERSION : String = "feature_flag.version"
+
+pub const GEN_AI_AGENT_DESCRIPTION : String = "gen_ai.agent.description"
+
+pub const GEN_AI_AGENT_ID : String = "gen_ai.agent.id"
+
+pub const GEN_AI_AGENT_NAME : String = "gen_ai.agent.name"
+
+pub const GEN_AI_CONVERSATION_ID : String = "gen_ai.conversation.id"
+
+pub const GEN_AI_DATA_SOURCE_ID : String = "gen_ai.data_source.id"
+
+pub const GEN_AI_OPENAI_REQUEST_SERVICE_TIER : String = "gen_ai.openai.request.service_tier"
+
+pub const GEN_AI_OPENAI_RESPONSE_SERVICE_TIER : String = "gen_ai.openai.response.service_tier"
+
+pub const GEN_AI_OPENAI_RESPONSE_SYSTEM_FINGERPRINT : String = "gen_ai.openai.response.system_fingerprint"
+
+pub const GEN_AI_OPERATION_NAME : String = "gen_ai.operation.name"
+
+pub const GEN_AI_OUTPUT_TYPE : String = "gen_ai.output.type"
+
+pub const GEN_AI_REQUEST_CHOICE_COUNT : String = "gen_ai.request.choice.count"
+
+pub const GEN_AI_REQUEST_ENCODING_FORMATS : String = "gen_ai.request.encoding_formats"
+
+pub const GEN_AI_REQUEST_FREQUENCY_PENALTY : String = "gen_ai.request.frequency_penalty"
+
+pub const GEN_AI_REQUEST_MAX_TOKENS : String = "gen_ai.request.max_tokens"
+
+pub const GEN_AI_REQUEST_MODEL : String = "gen_ai.request.model"
+
+pub const GEN_AI_REQUEST_PRESENCE_PENALTY : String = "gen_ai.request.presence_penalty"
+
+pub const GEN_AI_REQUEST_SEED : String = "gen_ai.request.seed"
+
+pub const GEN_AI_REQUEST_STOP_SEQUENCES : String = "gen_ai.request.stop_sequences"
+
+pub const GEN_AI_REQUEST_TEMPERATURE : String = "gen_ai.request.temperature"
+
+pub const GEN_AI_REQUEST_TOP_K : String = "gen_ai.request.top_k"
+
+pub const GEN_AI_REQUEST_TOP_P : String = "gen_ai.request.top_p"
+
+pub const GEN_AI_RESPONSE_FINISH_REASONS : String = "gen_ai.response.finish_reasons"
+
+pub const GEN_AI_RESPONSE_ID : String = "gen_ai.response.id"
+
+pub const GEN_AI_RESPONSE_MODEL : String = "gen_ai.response.model"
+
+pub const GEN_AI_SYSTEM : String = "gen_ai.system"
+
+pub const GEN_AI_TOOL_CALL_ID : String = "gen_ai.tool.call.id"
+
+pub const GEN_AI_TOOL_DESCRIPTION : String = "gen_ai.tool.description"
+
+pub const GEN_AI_TOOL_NAME : String = "gen_ai.tool.name"
+
+pub const GEN_AI_USAGE_INPUT_TOKENS : String = "gen_ai.usage.input_tokens"
+
+pub const GEN_AI_USAGE_OUTPUT_TOKENS : String = "gen_ai.usage.output_tokens"
+
+pub const GRAPHQL_DOCUMENT : String = "graphql.document"
+
+pub const GRAPHQL_OPERATION_NAME : String = "graphql.operation.name"
+
+pub const GRAPHQL_OPERATION_TYPE : String = "graphql.operation.type"
+
+pub const HTTP_REQUEST_BODY_SIZE : String = "http.request.body.size"
+
+pub const HTTP_REQUEST_HEADER : String = "http.request.header"
+
+pub const HTTP_REQUEST_METHOD : String = "http.request.method"
+
+pub const HTTP_REQUEST_METHOD_ORIGINAL : String = "http.request.method_original"
+
+pub const HTTP_REQUEST_RESEND_COUNT : String = "http.request.resend_count"
+
+pub const HTTP_REQUEST_SIZE : String = "http.request.size"
+
+pub const HTTP_RESPONSE_BODY_SIZE : String = "http.response.body.size"
+
+pub const HTTP_RESPONSE_HEADER : String = "http.response.header"
+
+pub const HTTP_RESPONSE_SIZE : String = "http.response.size"
+
+pub const HTTP_RESPONSE_STATUS_CODE : String = "http.response.status_code"
+
+pub const HTTP_ROUTE : String = "http.route"
+
+pub const IOS_APP_STATE : String = "ios.app.state"
+
+pub const NETWORK_LOCAL_ADDRESS : String = "network.local.address"
+
+pub const NETWORK_LOCAL_PORT : String = "network.local.port"
+
+pub const NETWORK_PEER_ADDRESS : String = "network.peer.address"
+
+pub const NETWORK_PEER_PORT : String = "network.peer.port"
+
+pub const NETWORK_PROTOCOL_NAME : String = "network.protocol.name"
+
+pub const NETWORK_PROTOCOL_VERSION : String = "network.protocol.version"
+
+pub const NETWORK_TRANSPORT : String = "network.transport"
+
+pub const NETWORK_TYPE : String = "network.type"
+
+pub const PROCESS_COMMAND_ARGS : String = "process.command_args"
+
+pub const PROCESS_EXECUTABLE_NAME : String = "process.executable.name"
+
+pub const PROCESS_EXECUTABLE_PATH : String = "process.executable.path"
+
+pub const PROCESS_EXIT_CODE : String = "process.exit.code"
+
+pub const PROCESS_PID : String = "process.pid"
+
+pub const RPC_MESSAGE_COMPRESSED_SIZE : String = "rpc.message.compressed_size"
+
+pub const RPC_MESSAGE_ID : String = "rpc.message.id"
+
+pub const RPC_MESSAGE_TYPE : String = "rpc.message.type"
+
+pub const RPC_MESSAGE_UNCOMPRESSED_SIZE : String = "rpc.message.uncompressed_size"
+
+pub const RPC_METHOD : String = "rpc.method"
+
+pub const RPC_SERVICE : String = "rpc.service"
+
+pub const RPC_SYSTEM : String = "rpc.system"
+
+pub const SERVER_ADDRESS : String = "server.address"
+
+pub const SERVER_PORT : String = "server.port"
+
+pub const SESSION_ID : String = "session.id"
+
+pub const SESSION_PREVIOUS_ID : String = "session.previous_id"
+
+pub const TLS_PROTOCOL_NAME : String = "tls.protocol.name"
+
+pub const TLS_PROTOCOL_VERSION : String = "tls.protocol.version"
+
+pub const URL_FULL : String = "url.full"
+
+pub const URL_PATH : String = "url.path"
+
+pub const URL_QUERY : String = "url.query"
+
+pub const URL_SCHEME : String = "url.scheme"
+
+pub const URL_TEMPLATE : String = "url.template"
+
+pub const USER_AGENT_ORIGINAL : String = "user_agent.original"
+
+pub const USER_AGENT_SYNTHETIC_TYPE : String = "user_agent.synthetic.type"
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+

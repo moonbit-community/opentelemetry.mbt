@@ -1,0 +1,6 @@
+import {
+  "moonbit-community/opentelemetry/semantics/attribute" @attribute,
+  "moonbit-community/opentelemetry/semantics/metric" @metric,
+  "moonbit-community/opentelemetry/semantics/resource" @resource,
+  "moonbit-community/opentelemetry/semantics/trace" @trace,
+} for "test"

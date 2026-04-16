@@ -1,0 +1,14 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/semantics"
+
+// Values
+pub const SCHEMA_URL : String = "https://opentelemetry.io/schemas/1.36.0"
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+
