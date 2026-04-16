@@ -4,9 +4,12 @@ import {
   "moonbit-community/opentelemetry/metrics" @metrics,
   "moonbit-community/opentelemetry/propagation" @propagation,
   "moonbit-community/opentelemetry/sdk/common" @common,
-  "moonbit-community/opentelemetry/sdk/trace" @sdktrace,
   "moonbit-community/opentelemetry/trace" @trace,
 }
+
+import {
+  "moonbit-community/opentelemetry/sdk/trace" @sdktrace,
+} for "test"
 
 options(
   backend: [ "native" ],
