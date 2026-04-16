@@ -54,6 +54,15 @@ pub struct BatchLogProcessor {
 }
 
 ///|
+/// Configuration for batch log processing.
+pub struct BatchConfig {
+  max_queue_size : Int
+  max_export_batch_size : Int
+  scheduled_delay_millis : Int
+  export_timeout_millis : Int
+} derive(Eq, Compare, Hash, ToJson, Debug)
+
+///|
 struct InMemoryLogExporterState {
   finished_logs : Array[LogRecord]
   is_shutdown : Bool
@@ -68,7 +77,7 @@ pub struct InMemoryLogExporter {
 ///|
 struct BatchProcessorState {
   exporter : LogExporter
-  config : @trace.BatchConfig
+  config : BatchConfig
   queue : Array[LogRecord]
   is_shutdown : Bool
 }
@@ -129,6 +138,73 @@ pub fn LogRecord::new(
 }
 
 ///|
+fn parse_env_int(key : StringView) -> Int? {
+  match @common.getenv(key) {
+    Some(value) => {
+      let value = value.trim()
+      if value == "" {
+        None
+      } else {
+        Some(@string.parse_int(value.to_string()) catch { _ => return None })
+      }
+    }
+    None => None
+  }
+}
+
+///|
+fn env_or(key : StringView, fallback : Int) -> Int {
+  match parse_env_int(key) {
+    Some(value) => value
+    None => fallback
+  }
+}
+
+///|
+/// Creates normalized batch log processor configuration.
+pub fn BatchConfig::new(
+  max_queue_size? : Int = 2048,
+  max_export_batch_size? : Int = 512,
+  scheduled_delay_millis? : Int = 1000,
+  export_timeout_millis? : Int = 30000,
+) -> BatchConfig {
+  let max_queue_size = if max_queue_size <= 0 { 1 } else { max_queue_size }
+  let max_export_batch_size = if max_export_batch_size <= 0 {
+    1
+  } else if max_export_batch_size > max_queue_size {
+    max_queue_size
+  } else {
+    max_export_batch_size
+  }
+  let scheduled_delay_millis = if scheduled_delay_millis <= 0 {
+    1
+  } else {
+    scheduled_delay_millis
+  }
+  let export_timeout_millis = if export_timeout_millis <= 0 {
+    1
+  } else {
+    export_timeout_millis
+  }
+  {
+    max_queue_size,
+    max_export_batch_size,
+    scheduled_delay_millis,
+    export_timeout_millis,
+  }
+}
+
+///|
+pub impl Default for BatchConfig with default() -> BatchConfig {
+  BatchConfig::new(
+    max_queue_size=env_or("OTEL_BLRP_MAX_QUEUE_SIZE", 2048),
+    max_export_batch_size=env_or("OTEL_BLRP_MAX_EXPORT_BATCH_SIZE", 512),
+    scheduled_delay_millis=env_or("OTEL_BLRP_SCHEDULE_DELAY", 1000),
+    export_timeout_millis=env_or("OTEL_BLRP_EXPORT_TIMEOUT", 30000),
+  )
+}
+
+///|
 /// Builds a log exporter from callbacks.
 pub fn LogExporter::new(
   export_fn : (ArrayView[LogRecord]) -> @error.OTelSdkResult,
@@ -155,9 +231,19 @@ pub fn LogExporter::force_flush(self : LogExporter) -> @error.OTelSdkResult {
 }
 
 ///|
+/// Requests exporter shutdown with an optional timeout budget in milliseconds.
+pub fn LogExporter::shutdown_with_timeout(
+  self : LogExporter,
+  timeout_millis : Int,
+) -> @error.OTelSdkResult {
+  ignore(timeout_millis)
+  (self.shutdown_fn)()
+}
+
+///|
 /// Requests exporter shutdown.
 pub fn LogExporter::shutdown(self : LogExporter) -> @error.OTelSdkResult {
-  (self.shutdown_fn)()
+  self.shutdown_with_timeout(5000)
 }
 
 ///|
@@ -189,9 +275,19 @@ pub fn LogProcessor::force_flush(self : LogProcessor) -> @error.OTelSdkResult {
 }
 
 ///|
+/// Requests processor shutdown with an optional timeout budget in milliseconds.
+pub fn LogProcessor::shutdown_with_timeout(
+  self : LogProcessor,
+  timeout_millis : Int,
+) -> @error.OTelSdkResult {
+  ignore(timeout_millis)
+  (self.shutdown_fn)()
+}
+
+///|
 /// Requests processor shutdown.
 pub fn LogProcessor::shutdown(self : LogProcessor) -> @error.OTelSdkResult {
-  (self.shutdown_fn)()
+  self.shutdown_with_timeout(5000)
 }
 
 ///|
@@ -292,7 +388,7 @@ fn flush_log_queue(state : Ref[BatchProcessorState]) -> @error.OTelSdkResult {
 /// Creates a batch log processor with a bounded queue.
 pub fn BatchLogProcessor::new(
   exporter : LogExporter,
-  config? : @trace.BatchConfig = Default::default(),
+  config? : BatchConfig = Default::default(),
 ) -> BatchLogProcessor {
   let state : Ref[BatchProcessorState] = Ref::new({
     exporter,
@@ -328,7 +424,10 @@ pub fn BatchLogProcessor::new(
         let result = flush_log_queue(state)
         state.val = { ..state.val, is_shutdown: true }
         match result {
-          Ok(_) => state.val.exporter.shutdown()
+          Ok(_) =>
+            state.val.exporter.shutdown_with_timeout(
+              state.val.config.export_timeout_millis,
+            )
           Err(err) => Err(err)
         }
       },
@@ -405,7 +504,7 @@ pub fn SdkLoggerProviderBuilder::with_simple_exporter(
 pub fn SdkLoggerProviderBuilder::with_batch_exporter(
   self : SdkLoggerProviderBuilder,
   exporter : LogExporter,
-  config? : @trace.BatchConfig = Default::default(),
+  config? : BatchConfig = Default::default(),
 ) -> SdkLoggerProviderBuilder {
   let batch_processor = BatchLogProcessor::new(exporter, config~)
   self.batch_processors.push(batch_processor)
@@ -488,20 +587,29 @@ pub fn SdkLoggerProvider::force_flush(
 
 ///|
 /// Shuts down every configured processor and marks the provider unusable.
-pub fn SdkLoggerProvider::shutdown(
+pub fn SdkLoggerProvider::shutdown_with_timeout(
   self : SdkLoggerProvider,
+  timeout_millis : Int,
 ) -> @error.OTelSdkResult {
   if self.state.val.is_shutdown {
     return @error.already_shutdown()
   }
-  for processor in self.state.val.processors {
-    match processor.shutdown() {
+  let processors = self.state.val.processors.copy()
+  self.state.val = { ..self.state.val, is_shutdown: true }
+  for processor in processors {
+    match processor.shutdown_with_timeout(timeout_millis) {
       Ok(_) => ()
       Err(err) => return Err(err)
     }
   }
-  self.state.val = { ..self.state.val, is_shutdown: true }
   @error.ok()
+}
+
+///|
+pub fn SdkLoggerProvider::shutdown(
+  self : SdkLoggerProvider,
+) -> @error.OTelSdkResult {
+  self.shutdown_with_timeout(5000)
 }
 
 ///|

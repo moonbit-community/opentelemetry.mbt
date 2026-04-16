@@ -6,7 +6,6 @@ import {
   "moonbit-community/opentelemetry/sdk/context",
   "moonbit-community/opentelemetry/sdk/error",
   "moonbit-community/opentelemetry/sdk/resource",
-  "moonbit-community/opentelemetry/sdk/trace",
   "moonbitlang/async",
   "moonbitlang/core/debug",
   "moonbitlang/core/ref",
@@ -17,12 +16,21 @@ import {
 // Errors
 
 // Types and methods
+pub struct BatchConfig {
+  max_queue_size : Int
+  max_export_batch_size : Int
+  scheduled_delay_millis : Int
+  export_timeout_millis : Int
+} derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn BatchConfig::new(max_queue_size? : Int, max_export_batch_size? : Int, scheduled_delay_millis? : Int, export_timeout_millis? : Int) -> Self
+pub impl Default for BatchConfig
+
 pub struct BatchLogProcessor {
   inner : LogProcessor
   state : @ref.Ref[BatchProcessorState]
 }
 pub fn BatchLogProcessor::into_log_processor(Self) -> LogProcessor
-pub fn BatchLogProcessor::new(LogExporter, config? : @trace.BatchConfig) -> Self
+pub fn BatchLogProcessor::new(LogExporter, config? : BatchConfig) -> Self
 pub async fn BatchLogProcessor::run(Self) -> Unit
 
 type BatchProcessorState
@@ -48,6 +56,7 @@ pub fn LogExporter::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
 pub fn LogExporter::name(Self) -> String
 pub fn LogExporter::new((ArrayView[LogRecord]) -> Result[Unit, @error.OTelSdkError], force_flush_fn? : () -> Result[Unit, @error.OTelSdkError], shutdown_fn? : () -> Result[Unit, @error.OTelSdkError], name_fn? : () -> String) -> Self
 pub fn LogExporter::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn LogExporter::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
 
 pub struct LogProcessor {
   emit_fn : (LogRecord) -> Unit
@@ -58,6 +67,7 @@ pub fn LogProcessor::emit(Self, LogRecord) -> Unit
 pub fn LogProcessor::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
 pub fn LogProcessor::new(emit_fn? : (LogRecord) -> Unit, force_flush_fn? : () -> Result[Unit, @error.OTelSdkError], shutdown_fn? : () -> Result[Unit, @error.OTelSdkError]) -> Self
 pub fn LogProcessor::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn LogProcessor::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
 
 pub struct LogRecord {
   body : @common.Value
@@ -88,6 +98,7 @@ pub fn SdkLoggerProvider::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
 pub fn SdkLoggerProvider::logger(Self, StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> SdkLogger
 pub fn SdkLoggerProvider::resource(Self) -> @resource.Resource
 pub fn SdkLoggerProvider::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn SdkLoggerProvider::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
 pub fn SdkLoggerProvider::spawn_batch_processor_tasks(Self, @async.TaskGroup[Unit], allow_failure? : Bool) -> Unit
 
 pub struct SdkLoggerProviderBuilder {
@@ -96,7 +107,7 @@ pub struct SdkLoggerProviderBuilder {
   batch_processors : Array[BatchLogProcessor]
 }
 pub fn SdkLoggerProviderBuilder::build(Self) -> SdkLoggerProvider
-pub fn SdkLoggerProviderBuilder::with_batch_exporter(Self, LogExporter, config? : @trace.BatchConfig) -> Self
+pub fn SdkLoggerProviderBuilder::with_batch_exporter(Self, LogExporter, config? : BatchConfig) -> Self
 pub fn SdkLoggerProviderBuilder::with_log_processor(Self, LogProcessor) -> Self
 pub fn SdkLoggerProviderBuilder::with_resource(Self, @resource.Resource) -> Self
 pub fn SdkLoggerProviderBuilder::with_simple_exporter(Self, LogExporter) -> Self

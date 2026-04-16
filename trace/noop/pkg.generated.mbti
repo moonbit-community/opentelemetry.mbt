@@ -1,0 +1,22 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/trace/noop"
+
+import {
+  "moonbit-community/opentelemetry/trace",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct NoopTracerProvider {
+}
+pub fn NoopTracerProvider::into_tracer_provider(Self) -> @trace.TracerProvider
+pub fn NoopTracerProvider::new() -> Self
+pub fn NoopTracerProvider::tracer(Self, StringView) -> @trace.Tracer
+
+// Type aliases
+
+// Traits
+

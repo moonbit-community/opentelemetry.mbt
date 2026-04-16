@@ -1,0 +1,21 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/logs/noop"
+
+import {
+  "moonbit-community/opentelemetry/logs",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct NoopLoggerProvider {
+}
+pub fn NoopLoggerProvider::into_logger_provider(Self) -> @logs.LoggerProvider
+pub fn NoopLoggerProvider::new() -> Self
+
+// Type aliases
+
+// Traits
+

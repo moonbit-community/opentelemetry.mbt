@@ -1,11 +1,9 @@
 ///|
-/// Outbound text carrier writer.
 pub(open) trait Injector {
   set(Self, String, String) -> Unit
 }
 
 ///|
-/// Inbound text carrier reader.
 pub(open) trait Extractor {
   get(Self, StringView) -> String?
   keys(Self) -> Array[String] = _
@@ -17,13 +15,22 @@ impl Extractor with keys(_) {
 }
 
 ///|
+fn normalize_ascii_lower(value : StringView) -> String {
+  let builder = StringBuilder::new()
+  for _, ch in value {
+    builder.write_char(ch.to_ascii_lowercase())
+  }
+  builder.to_string()
+}
+
+///|
 pub impl Injector for Map[String, String] with set(self, key, value) {
-  self[key] = value
+  self[normalize_ascii_lower(key)] = value
 }
 
 ///|
 pub impl Extractor for Map[String, String] with get(self, key) {
-  self.get_from_string(key)
+  self.get_from_string(normalize_ascii_lower(key))
 }
 
 ///|
@@ -32,7 +39,6 @@ pub impl Extractor for Map[String, String] with keys(self) {
 }
 
 ///|
-/// Signal-agnostic text map propagator.
 pub struct TextMapPropagator {
   inject_fn : (@context.Context, &Injector) -> Unit
   extract_fn : (@context.Context, &Extractor) -> @context.Context
@@ -40,7 +46,21 @@ pub struct TextMapPropagator {
 }
 
 ///|
-/// Builds a text map propagator from inject, extract, and field callbacks.
+pub struct BaggagePropagator {
+  inner : TextMapPropagator
+}
+
+///|
+pub struct TraceContextPropagator {
+  inner : TextMapPropagator
+}
+
+///|
+pub struct TextMapCompositePropagator {
+  inner : TextMapPropagator
+}
+
+///|
 pub fn TextMapPropagator::from_functions(
   inject_fn : (@context.Context, &Injector) -> Unit,
   extract_fn : (@context.Context, &Extractor) -> @context.Context,
@@ -50,7 +70,6 @@ pub fn TextMapPropagator::from_functions(
 }
 
 ///|
-/// Injects context values into an outbound carrier.
 pub fn TextMapPropagator::inject_context(
   self : TextMapPropagator,
   context : @context.Context,
@@ -60,8 +79,6 @@ pub fn TextMapPropagator::inject_context(
 }
 
 ///|
-/// Extracts context values from an inbound carrier and merges them into the
-/// provided context.
 pub fn TextMapPropagator::extract_with_context(
   self : TextMapPropagator,
   context : @context.Context,
@@ -71,63 +88,16 @@ pub fn TextMapPropagator::extract_with_context(
 }
 
 ///|
-/// Returns the header fields this propagator reads or writes.
 pub fn TextMapPropagator::fields(self : TextMapPropagator) -> Array[String] {
   (self.fields_fn)()
 }
 
 ///|
-/// Propagates the OpenTelemetry `baggage` header.
-pub struct BaggagePropagator {
-  inner : TextMapPropagator
-}
-
-///|
-/// Propagates W3C `traceparent` and `tracestate` headers.
-pub struct TraceContextPropagator {
-  inner : TextMapPropagator
-}
-
-///|
-/// Chains multiple text map propagators in order.
-pub struct TextMapCompositePropagator {
-  inner : TextMapPropagator
-}
-
-///|
 fn hex_digit(value : Int) -> String {
-  if value == 0 {
-    "0"
-  } else if value == 1 {
-    "1"
-  } else if value == 2 {
-    "2"
-  } else if value == 3 {
-    "3"
-  } else if value == 4 {
-    "4"
-  } else if value == 5 {
-    "5"
-  } else if value == 6 {
-    "6"
-  } else if value == 7 {
-    "7"
-  } else if value == 8 {
-    "8"
-  } else if value == 9 {
-    "9"
-  } else if value == 10 {
-    "A"
-  } else if value == 11 {
-    "B"
-  } else if value == 12 {
-    "C"
-  } else if value == 13 {
-    "D"
-  } else if value == 14 {
-    "E"
+  if value < 10 {
+    value.to_string()
   } else {
-    "F"
+    (value - 10 + 'A'.to_int()).unsafe_to_char().to_string()
   }
 }
 
@@ -167,28 +137,12 @@ fn encode_baggage_component(value : StringView) -> String {
 
 ///|
 fn is_hex_digit(value : StringView) -> Bool {
-  value == "0" ||
-  value == "1" ||
-  value == "2" ||
-  value == "3" ||
-  value == "4" ||
-  value == "5" ||
-  value == "6" ||
-  value == "7" ||
-  value == "8" ||
-  value == "9" ||
-  value == "a" ||
-  value == "b" ||
-  value == "c" ||
-  value == "d" ||
-  value == "e" ||
-  value == "f" ||
-  value == "A" ||
-  value == "B" ||
-  value == "C" ||
-  value == "D" ||
-  value == "E" ||
-  value == "F"
+  value.length() == 1 &&
+  (
+    (value >= "0" && value <= "9") ||
+    (value >= "a" && value <= "f") ||
+    (value >= "A" && value <= "F")
+  )
 }
 
 ///|
@@ -209,28 +163,26 @@ fn decode_baggage_component(value : StringView) -> String {
           None => builder.write_string(value[index:index + 3].to_string())
         }
       } else {
-        builder.write_string(ch.to_string())
-        builder.write_string(value[index + 1:index + 2].to_string())
-        builder.write_string(value[index + 2:index + 3].to_string())
+        builder.write_string(value[index:index + 3].to_string())
       }
-      index = index + 3
-      continue
+      index += 3
+    } else {
+      builder.write_string(ch.to_string())
+      index += 1
     }
-    builder.write_string(ch.to_string())
-    index = index + 1
   }
   builder.to_string()
 }
 
 ///|
-fn encode_baggage(baggage : @context.Baggage) -> String? {
+fn encode_baggage(baggage : @baggage.Baggage) -> String? {
   if baggage.is_empty() {
     return None
   }
   let builder = StringBuilder::new()
   let mut is_first = true
-  for key, value in baggage {
-    let key = key.trim()
+  for entry in baggage.entries() {
+    let key = entry.key.as_string().trim()
     if key == "" {
       continue
     }
@@ -240,31 +192,40 @@ fn encode_baggage(baggage : @context.Baggage) -> String? {
     is_first = false
     builder.write_string(encode_baggage_component(key))
     builder.write_char('=')
-    builder.write_string(encode_baggage_component(value.trim()))
+    builder.write_string(encode_baggage_component(entry.value.trim()))
+    let metadata = entry.metadata.as_string()
+    if metadata != "" {
+      builder.write_char(';')
+      builder.write_string(metadata)
+    }
   }
   Some(builder.to_string())
 }
 
 ///|
-fn decode_baggage(header : StringView) -> @context.Baggage {
-  let baggage : @context.Baggage = {}
+fn decode_baggage(header : StringView) -> @baggage.Baggage {
+  let mut baggage : @baggage.Baggage = Default::default()
   for item in header.split(",") {
     let item = item.trim()
     if item.is_empty() {
       continue
     }
-    let item = match item.find(";") {
-      Some(index) => item[:index]
-      None => item
+    let baggage_item = match item.find(";") {
+      Some(index) => (item[:index], item[index + 1:])
+      None => (item, "")
     }
-    guard item.find("=") is Some(index)
-    let key = decode_baggage_component(item[:index].trim()).trim().to_string()
-    let value = decode_baggage_component(item[index + 1:].trim())
+    guard baggage_item.0.find("=") is Some(index)
+    let key = decode_baggage_component(baggage_item.0[:index].trim())
       .trim()
       .to_string()
-    if key != "" {
-      baggage[key] = value
-    }
+    let value = decode_baggage_component(baggage_item.0[index + 1:].trim())
+      .trim()
+      .to_string()
+    baggage = baggage.insert_with_metadata(
+      key,
+      value,
+      @baggage.BaggageMetadata::new(baggage_item.1),
+    )
   }
   baggage
 }
@@ -304,15 +265,14 @@ fn extract_span_context(extractor : &Extractor) -> @common.SpanContext? {
     return None
   }
   let trace_id_part = parts[1]
-  if trace_id_part.length() != 32 || !is_lower_hex(trace_id_part) {
-    return None
-  }
   let span_id_part = parts[2]
-  if span_id_part.length() != 16 || !is_lower_hex(span_id_part) {
-    return None
-  }
   let trace_flags_part = parts[3]
-  if trace_flags_part.length() != 2 || !is_lower_hex(trace_flags_part) {
+  if trace_id_part.length() != 32 ||
+    span_id_part.length() != 16 ||
+    trace_flags_part.length() != 2 ||
+    !is_lower_hex(trace_id_part) ||
+    !is_lower_hex(span_id_part) ||
+    !is_lower_hex(trace_flags_part) {
     return None
   }
   guard @common.TraceId::from_hex(trace_id_part) is Some(trace_id) else {
@@ -343,16 +303,15 @@ fn extract_span_context(extractor : &Extractor) -> @common.SpanContext? {
 }
 
 ///|
-/// Creates a baggage propagator. Empty baggage is not injected.
 pub fn BaggagePropagator::new() -> BaggagePropagator {
   {
     inner: TextMapPropagator::from_functions(
-      (context : @context.Context, injector : &Injector) => {
+      (context, injector) => {
         if encode_baggage(context.baggage()) is Some(header) {
           injector.set("baggage", header)
         }
       },
-      (context : @context.Context, extractor : &Extractor) => {
+      (context, extractor) => {
         if extractor.get("baggage") is Some(header) {
           context.with_baggage(decode_baggage(header))
         } else {
@@ -365,7 +324,6 @@ pub fn BaggagePropagator::new() -> BaggagePropagator {
 }
 
 ///|
-/// Injects baggage into the outbound carrier.
 pub fn BaggagePropagator::inject_context(
   self : BaggagePropagator,
   context : @context.Context,
@@ -375,7 +333,6 @@ pub fn BaggagePropagator::inject_context(
 }
 
 ///|
-/// Extracts baggage from the inbound carrier.
 pub fn BaggagePropagator::extract_with_context(
   self : BaggagePropagator,
   context : @context.Context,
@@ -385,7 +342,6 @@ pub fn BaggagePropagator::extract_with_context(
 }
 
 ///|
-/// Erases the concrete baggage propagator type into `TextMapPropagator`.
 pub fn BaggagePropagator::into_text_map(
   self : BaggagePropagator,
 ) -> TextMapPropagator {
@@ -393,18 +349,16 @@ pub fn BaggagePropagator::into_text_map(
 }
 
 ///|
-/// Creates a trace context propagator. Invalid headers are ignored and leave
-/// the input context unchanged.
 pub fn TraceContextPropagator::new() -> TraceContextPropagator {
   {
     inner: TextMapPropagator::from_functions(
-      (context : @context.Context, injector : &Injector) => {
+      (context, injector) => {
         match context.span_context() {
           Some(span_context) if span_context.is_valid() => {
-            // The current implementation always emits version `00` and uses the
-            // canonical lowercase hexadecimal identifiers from the span context.
-            let traceparent = "00-\{span_context.trace_id().to_hex()}-\{span_context.span_id().to_hex()}-\{span_context.trace_flags().to_hex()}"
-            injector.set("traceparent", traceparent)
+            injector.set(
+              "traceparent",
+              "00-\{span_context.trace_id().to_hex()}-\{span_context.span_id().to_hex()}-\{span_context.trace_flags().to_hex()}",
+            )
             if span_context.trace_state().to_header() is Some(tracestate) {
               injector.set("tracestate", tracestate)
             }
@@ -412,7 +366,7 @@ pub fn TraceContextPropagator::new() -> TraceContextPropagator {
           _ => ()
         }
       },
-      (context : @context.Context, extractor : &Extractor) => {
+      (context, extractor) => {
         match extract_span_context(extractor) {
           Some(span_context) => context.with_remote_span_context(span_context)
           None => context
@@ -424,7 +378,6 @@ pub fn TraceContextPropagator::new() -> TraceContextPropagator {
 }
 
 ///|
-/// Injects trace context into the outbound carrier.
 pub fn TraceContextPropagator::inject_context(
   self : TraceContextPropagator,
   context : @context.Context,
@@ -434,7 +387,6 @@ pub fn TraceContextPropagator::inject_context(
 }
 
 ///|
-/// Extracts trace context from the inbound carrier.
 pub fn TraceContextPropagator::extract_with_context(
   self : TraceContextPropagator,
   context : @context.Context,
@@ -444,7 +396,6 @@ pub fn TraceContextPropagator::extract_with_context(
 }
 
 ///|
-/// Erases the concrete trace context propagator type into `TextMapPropagator`.
 pub fn TraceContextPropagator::into_text_map(
   self : TraceContextPropagator,
 ) -> TextMapPropagator {
@@ -452,20 +403,18 @@ pub fn TraceContextPropagator::into_text_map(
 }
 
 ///|
-/// Creates a propagator that runs each propagator in order for injection and
-/// extraction.
 pub fn TextMapCompositePropagator::new(
   propagators : ArrayView[TextMapPropagator],
 ) -> TextMapCompositePropagator {
   let propagators = propagators.to_array()
   {
     inner: TextMapPropagator::from_functions(
-      (context : @context.Context, injector : &Injector) => {
+      (context, injector) => {
         for propagator in propagators {
           propagator.inject_context(context, injector)
         }
       },
-      (context : @context.Context, extractor : &Extractor) => {
+      (context, extractor) => {
         let mut current = context
         for propagator in propagators {
           current = propagator.extract_with_context(current, extractor)
@@ -473,18 +422,19 @@ pub fn TextMapCompositePropagator::new(
         current
       },
       () => {
-        let fields = []
+        let fields : Map[String, Unit] = {}
         for propagator in propagators {
-          fields.append(propagator.fields())
+          for field in propagator.fields() {
+            fields[field] = ()
+          }
         }
-        fields
+        fields.keys().to_array()
       },
     ),
   }
 }
 
 ///|
-/// Injects context with all child propagators.
 pub fn TextMapCompositePropagator::inject_context(
   self : TextMapCompositePropagator,
   context : @context.Context,
@@ -494,7 +444,6 @@ pub fn TextMapCompositePropagator::inject_context(
 }
 
 ///|
-/// Extracts context with all child propagators in sequence.
 pub fn TextMapCompositePropagator::extract_with_context(
   self : TextMapCompositePropagator,
   context : @context.Context,
@@ -504,7 +453,6 @@ pub fn TextMapCompositePropagator::extract_with_context(
 }
 
 ///|
-/// Erases the concrete composite propagator type into `TextMapPropagator`.
 pub fn TextMapCompositePropagator::into_text_map(
   self : TextMapCompositePropagator,
 ) -> TextMapPropagator {

@@ -119,6 +119,7 @@ pub fn SdkTracerProvider::builder() -> SdkTracerProviderBuilder
 pub fn SdkTracerProvider::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
 pub fn SdkTracerProvider::resource(Self) -> @resource.Resource
 pub fn SdkTracerProvider::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn SdkTracerProvider::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
 pub fn SdkTracerProvider::spawn_batch_processor_tasks(Self, @async.TaskGroup[Unit], allow_failure? : Bool) -> Unit
 pub fn SdkTracerProvider::tracer(Self, StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> SdkTracer
 
@@ -194,6 +195,7 @@ pub fn SpanExporter::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
 pub fn SpanExporter::name(Self) -> String
 pub fn SpanExporter::new((ArrayView[SpanData]) -> Result[Unit, @error.OTelSdkError], force_flush_fn? : () -> Result[Unit, @error.OTelSdkError], shutdown_fn? : () -> Result[Unit, @error.OTelSdkError], name_fn? : () -> String) -> Self
 pub fn SpanExporter::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn SpanExporter::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
 
 pub(all) enum SpanKind {
   Internal
@@ -228,6 +230,7 @@ pub fn SpanProcessor::new(on_start_fn? : (@context.Context, SpanData) -> Unit, o
 pub fn SpanProcessor::on_end(Self, SpanData) -> Unit
 pub fn SpanProcessor::on_start(Self, @context.Context, SpanData) -> Unit
 pub fn SpanProcessor::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn SpanProcessor::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
 
 type SpanState
 

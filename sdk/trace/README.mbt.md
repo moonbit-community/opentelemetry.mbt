@@ -22,6 +22,12 @@ matches the common SDK default in OpenTelemetry implementations.
 `Sampler::trace_id_ratio(ratio)` samples by comparing the high 32 bits of the
 trace ID against a threshold derived from `ratio`.
 
+`Config::default()` also reads the common OpenTelemetry sampler environment
+variables:
+
+- `OTEL_TRACES_SAMPLER`
+- `OTEL_TRACES_SAMPLER_ARG`
+
 ## Limits
 
 `SpanLimits` currently bound:
@@ -38,3 +44,10 @@ count is incremented in `SpanData`.
 `BatchSpanProcessor` keeps a bounded in-memory queue. It flushes synchronously
 when the queue reaches the export batch size, or periodically when `run()` is
 spawned in the background.
+
+`BatchConfig::default()` reads:
+
+- `OTEL_BSP_SCHEDULE_DELAY`
+- `OTEL_BSP_MAX_QUEUE_SIZE`
+- `OTEL_BSP_MAX_EXPORT_BATCH_SIZE`
+- `OTEL_BSP_EXPORT_TIMEOUT`

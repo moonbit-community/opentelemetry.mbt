@@ -1,0 +1,100 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/trace"
+
+import {
+  "moonbit-community/opentelemetry/context",
+  "moonbit-community/opentelemetry/sdk/common",
+  "moonbit-community/opentelemetry/sdk/error",
+  "moonbitlang/async",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/ref",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct Event {
+  name : String
+  timestamp_unix_nano : Int64
+  attributes : Array[@common.KeyValue]
+  dropped_attributes_count : Int
+} derive(Eq, ToJson, @debug.Debug)
+pub fn Event::new(StringView, timestamp_unix_nano? : Int64, attributes? : ArrayView[@common.KeyValue], dropped_attributes_count? : Int) -> Self
+
+pub struct Link {
+  span_context : @common.SpanContext
+  attributes : Array[@common.KeyValue]
+  dropped_attributes_count : Int
+} derive(Eq, ToJson, @debug.Debug)
+pub fn Link::new(@common.SpanContext, attributes? : ArrayView[@common.KeyValue], dropped_attributes_count? : Int) -> Self
+
+pub struct Span {
+  sdk_span : @moonbit-community/opentelemetry/sdk/trace.Span?
+  propagated_span_context : @common.SpanContext
+  noop_ended : @ref.Ref[Bool]
+  context : @context.Context
+}
+pub fn Span::add_event(Self, StringView, attributes? : ArrayView[@common.KeyValue]) -> Unit
+pub fn Span::add_event_with_timestamp(Self, StringView, Int64, attributes? : ArrayView[@common.KeyValue]) -> Unit
+pub fn Span::add_link(Self, @common.SpanContext, attributes? : ArrayView[@common.KeyValue]) -> Unit
+pub fn Span::context(Self) -> @context.Context
+pub fn Span::end(Self) -> Unit
+pub fn Span::end_with_timestamp(Self, Int64) -> Unit
+pub fn Span::has_ended(Self) -> Bool
+pub fn Span::is_recording(Self) -> Bool
+pub fn Span::record_error(Self, StringView) -> Unit
+pub fn Span::set_attribute(Self, @common.KeyValue) -> Unit
+pub fn Span::set_attributes(Self, ArrayView[@common.KeyValue]) -> Unit
+pub fn Span::set_status(Self, @moonbit-community/opentelemetry/sdk/trace.Status) -> Unit
+pub fn Span::span_context(Self) -> @common.SpanContext
+pub fn Span::update_name(Self, StringView) -> Unit
+
+pub struct SpanBuilder {
+  span_kind : @moonbit-community/opentelemetry/sdk/trace.SpanKind?
+  name : String
+  start_time_unix_nano : Int64?
+  attributes : Array[@common.KeyValue]
+  events : Array[Event]
+  links : Array[Link]
+} derive(Eq, ToJson, @debug.Debug)
+pub fn SpanBuilder::from_name(StringView) -> Self
+pub fn SpanBuilder::with_attributes(Self, ArrayView[@common.KeyValue]) -> Self
+pub fn SpanBuilder::with_events(Self, ArrayView[Event]) -> Self
+pub fn SpanBuilder::with_kind(Self, @moonbit-community/opentelemetry/sdk/trace.SpanKind) -> Self
+pub fn SpanBuilder::with_links(Self, ArrayView[Link]) -> Self
+pub fn SpanBuilder::with_start_time(Self, Int64) -> Self
+
+pub struct Tracer {
+  sdk_tracer : @moonbit-community/opentelemetry/sdk/trace.SdkTracer?
+}
+pub fn Tracer::build(Self, SpanBuilder) -> Span
+pub fn Tracer::build_with_context(Self, SpanBuilder, @context.Context) -> Span
+pub fn[T] Tracer::in_span(Self, StringView, (@context.Context) -> T) -> T
+pub fn[T] Tracer::in_span_with_builder(Self, SpanBuilder, @context.Context, (@context.Context) -> T) -> T
+pub fn[T] Tracer::in_span_with_context(Self, StringView, @context.Context, (@context.Context) -> T) -> T
+pub fn Tracer::span_builder(Self, StringView) -> SpanBuilder
+pub fn Tracer::start(Self, StringView) -> Span
+pub fn Tracer::start_with_context(Self, StringView, @context.Context) -> Span
+
+pub struct TracerProvider {
+  sdk_provider : @moonbit-community/opentelemetry/sdk/trace.SdkTracerProvider?
+}
+pub fn TracerProvider::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn TracerProvider::from_sdk(@moonbit-community/opentelemetry/sdk/trace.SdkTracerProvider) -> Self
+pub fn TracerProvider::noop() -> Self
+pub fn TracerProvider::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn TracerProvider::spawn_batch_processor_tasks(Self, @async.TaskGroup[Unit], allow_failure? : Bool) -> Unit
+pub fn TracerProvider::tracer(Self, StringView) -> Tracer
+pub fn TracerProvider::tracer_with_scope(Self, @common.InstrumentationScope) -> Tracer
+
+// Type aliases
+pub using @moonbit-community/opentelemetry/sdk/trace {type SpanKind}
+
+pub using @moonbit-community/opentelemetry/sdk/trace {type Status}
+
+pub using @moonbit-community/opentelemetry/sdk/trace {type StatusCode}
+
+// Traits
+

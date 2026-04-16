@@ -1,0 +1,10 @@
+import {
+  "moonbitlang/core/string",
+  "moonbit-community/opentelemetry/baggage" @baggage,
+  "moonbit-community/opentelemetry/context" @context,
+  "moonbit-community/opentelemetry/sdk/common" @common,
+}
+
+options(
+  backend: [ "native" ],
+)

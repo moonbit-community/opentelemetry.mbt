@@ -1,0 +1,46 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/baggage"
+
+import {
+  "moonbit-community/opentelemetry/sdk/common",
+  "moonbitlang/core/debug",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct Baggage {
+  entries : Map[String, KeyValueMetadata]
+  kv_content_len : Int
+} derive(Eq, ToJson, @debug.Debug)
+pub fn Baggage::entries(Self) -> Array[KeyValueMetadata]
+pub fn Baggage::get(Self, StringView) -> String?
+pub fn Baggage::get_with_metadata(Self, StringView) -> (String, BaggageMetadata)?
+pub fn Baggage::insert(Self, StringView, StringView) -> Self
+pub fn Baggage::insert_with_metadata(Self, StringView, StringView, BaggageMetadata) -> Self
+pub fn Baggage::is_empty(Self) -> Bool
+pub fn Baggage::len(Self) -> Int
+pub fn Baggage::new() -> Self
+pub fn Baggage::remove(Self, StringView) -> Self
+pub impl Default for Baggage
+
+pub struct BaggageMetadata {
+  metadata : String
+} derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn BaggageMetadata::as_string(Self) -> String
+pub fn BaggageMetadata::new(StringView) -> Self
+pub impl Default for BaggageMetadata
+
+pub struct KeyValueMetadata {
+  key : @common.Key
+  value : String
+  metadata : BaggageMetadata
+} derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn KeyValueMetadata::new(StringView, StringView, metadata? : BaggageMetadata) -> Self
+
+// Type aliases
+
+// Traits
+

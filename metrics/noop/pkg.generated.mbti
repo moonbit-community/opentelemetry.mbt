@@ -1,0 +1,21 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/metrics/noop"
+
+import {
+  "moonbit-community/opentelemetry/metrics",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct NoopMeterProvider {
+}
+pub fn NoopMeterProvider::into_meter_provider(Self) -> @metrics.MeterProvider
+pub fn NoopMeterProvider::new() -> Self
+
+// Type aliases
+
+// Traits
+

@@ -1,0 +1,13 @@
+import {
+  "moonbitlang/async",
+  "moonbit-community/opentelemetry/logs" @logs,
+  "moonbit-community/opentelemetry/metrics" @metrics,
+  "moonbit-community/opentelemetry/propagation" @propagation,
+  "moonbit-community/opentelemetry/sdk/common" @common,
+  "moonbit-community/opentelemetry/sdk/trace" @sdktrace,
+  "moonbit-community/opentelemetry/trace" @trace,
+}
+
+options(
+  backend: [ "native" ],
+)

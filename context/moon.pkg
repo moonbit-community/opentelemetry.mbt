@@ -1,0 +1,8 @@
+import {
+  "moonbit-community/opentelemetry/baggage" @baggage,
+  "moonbit-community/opentelemetry/sdk/common" @common,
+}
+
+options(
+  backend: [ "native" ],
+)

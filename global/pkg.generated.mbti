@@ -1,0 +1,57 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/global"
+
+import {
+  "moonbit-community/opentelemetry/logs",
+  "moonbit-community/opentelemetry/metrics",
+  "moonbit-community/opentelemetry/propagation",
+  "moonbit-community/opentelemetry/sdk/common",
+  "moonbit-community/opentelemetry/trace",
+  "moonbitlang/async",
+}
+
+// Values
+pub fn force_flush() -> Unit
+
+pub fn[T] get_text_map_propagator((@propagation.TextMapPropagator) -> T) -> T
+
+pub fn logger(StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> @logs.Logger
+
+pub fn logger_provider() -> @logs.LoggerProvider
+
+pub fn logger_with_scope(@common.InstrumentationScope) -> @logs.Logger
+
+pub fn meter(StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> @metrics.Meter
+
+pub fn meter_provider() -> @metrics.MeterProvider
+
+pub fn meter_with_scope(@common.InstrumentationScope) -> @metrics.Meter
+
+pub fn reset_for_test() -> Unit
+
+pub fn set_logger_provider(@logs.LoggerProvider) -> Unit
+
+pub fn set_meter_provider(@metrics.MeterProvider) -> Unit
+
+pub fn set_text_map_propagator(@propagation.TextMapPropagator) -> Unit
+
+pub fn set_tracer_provider(@trace.TracerProvider) -> Unit
+
+pub fn shutdown() -> Unit
+
+pub fn spawn_background_tasks(@async.TaskGroup[Unit], allow_failure? : Bool) -> Unit
+
+pub fn tracer(StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> @trace.Tracer
+
+pub fn tracer_provider() -> @trace.TracerProvider
+
+pub fn tracer_with_scope(@common.InstrumentationScope) -> @trace.Tracer
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+

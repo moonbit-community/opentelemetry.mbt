@@ -35,11 +35,16 @@ and baggage propagation, matching the common OpenTelemetry startup behavior.
 
 ## Environment variables
 
-The current MoonBit implementation reads the resource-related environment
-variables below through `sdk/resource`:
+The current MoonBit implementation reads these environment variables:
 
-- `OTEL_SERVICE_NAME`
-- `OTEL_RESOURCE_ATTRIBUTES`
-
-Signal-specific sampler and processor environment variables from the Rust SDK
-are not implemented yet in this package.
+- Resource: `OTEL_SERVICE_NAME`, `OTEL_RESOURCE_ATTRIBUTES`
+- Trace config: `OTEL_TRACES_SAMPLER`, `OTEL_TRACES_SAMPLER_ARG`
+- Trace limits: `OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT`,
+  `OTEL_SPAN_EVENT_COUNT_LIMIT`, `OTEL_SPAN_LINK_COUNT_LIMIT`
+- Batch span processor: `OTEL_BSP_SCHEDULE_DELAY`,
+  `OTEL_BSP_MAX_QUEUE_SIZE`, `OTEL_BSP_MAX_EXPORT_BATCH_SIZE`,
+  `OTEL_BSP_EXPORT_TIMEOUT`
+- Batch log processor: `OTEL_BLRP_SCHEDULE_DELAY`,
+  `OTEL_BLRP_MAX_QUEUE_SIZE`, `OTEL_BLRP_MAX_EXPORT_BATCH_SIZE`,
+  `OTEL_BLRP_EXPORT_TIMEOUT`
+- Periodic metrics export: `OTEL_METRIC_EXPORT_INTERVAL`

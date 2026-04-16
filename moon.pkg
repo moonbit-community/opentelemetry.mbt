@@ -1,0 +1,14 @@
+import {
+  "moonbit-community/opentelemetry/baggage" @baggage,
+  "moonbit-community/opentelemetry/context" @context,
+  "moonbit-community/opentelemetry/global" @global,
+  "moonbit-community/opentelemetry/logs" @logs,
+  "moonbit-community/opentelemetry/metrics" @metrics,
+  "moonbit-community/opentelemetry/propagation" @propagation,
+  "moonbit-community/opentelemetry/trace" @trace,
+  "moonbit-community/opentelemetry/sdk/common" @common,
+}
+
+options(
+  backend: [ "native" ],
+)

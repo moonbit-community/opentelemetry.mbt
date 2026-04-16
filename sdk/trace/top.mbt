@@ -383,6 +383,118 @@ fn trace_id_prefix(trace_id : @common.TraceId) -> Int {
 }
 
 ///|
+fn parse_env_int(key : StringView) -> Int? {
+  match @common.getenv(key) {
+    Some(value) => {
+      let value = value.trim()
+      if value == "" {
+        None
+      } else {
+        Some(@string.parse_int(value.to_string()) catch { _ => return None })
+      }
+    }
+    None => None
+  }
+}
+
+///|
+fn parse_decimal(value : StringView) -> Double? {
+  let value = value.trim()
+  if value == "" {
+    return None
+  }
+  let mut whole = 0.0
+  let mut fraction = 0.0
+  let mut divisor = 1.0
+  let mut seen_digit = false
+  let mut seen_dot = false
+  for _, ch in value {
+    if ch == '.' {
+      if seen_dot {
+        return None
+      }
+      seen_dot = true
+      continue
+    }
+    if ch < '0' || ch > '9' {
+      return None
+    }
+    seen_digit = true
+    let digit = Double::from_int(ch.to_int() - '0'.to_int())
+    if seen_dot {
+      divisor = divisor * 10.0
+      fraction = fraction + digit / divisor
+    } else {
+      whole = whole * 10.0 + digit
+    }
+  }
+  if !seen_digit {
+    None
+  } else {
+    Some(whole + fraction)
+  }
+}
+
+///|
+fn parse_env_ratio(key : StringView) -> Double? {
+  match @common.getenv(key) {
+    Some(value) => parse_decimal(value)
+    None => None
+  }
+}
+
+///|
+fn env_or(key : StringView, fallback : Int) -> Int {
+  match parse_env_int(key) {
+    Some(value) => value
+    None => fallback
+  }
+}
+
+///|
+fn ratio_arg_or_default() -> Double {
+  match parse_env_ratio("OTEL_TRACES_SAMPLER_ARG") {
+    Some(ratio) => ratio
+    None => 1.0
+  }
+}
+
+///|
+fn sampler_from_env() -> Sampler {
+  let default_sampler = Sampler::parent_based(Sampler::always_on())
+  match @common.getenv("OTEL_TRACES_SAMPLER") {
+    Some(value) => {
+      let value = value.trim()
+      if value == "always_on" {
+        Sampler::always_on()
+      } else if value == "always_off" {
+        Sampler::always_off()
+      } else if value == "traceidratio" {
+        Sampler::trace_id_ratio(ratio_arg_or_default())
+      } else if value == "parentbased_always_on" {
+        Sampler::parent_based(Sampler::always_on())
+      } else if value == "parentbased_always_off" {
+        Sampler::parent_based(Sampler::always_off())
+      } else if value == "parentbased_traceidratio" {
+        Sampler::parent_based(Sampler::trace_id_ratio(ratio_arg_or_default()))
+      } else {
+        default_sampler
+      }
+    }
+    None => default_sampler
+  }
+}
+
+///|
+fn span_limits_from_env() -> SpanLimits {
+  SpanLimits::new(
+    max_attributes_per_span=env_or("OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT", 128),
+    max_events_per_span=env_or("OTEL_SPAN_EVENT_COUNT_LIMIT", 128),
+    max_links_per_span=env_or("OTEL_SPAN_LINK_COUNT_LIMIT", 128),
+  )
+}
+
+///|
 /// Sampler that records and samples according to a trace ID ratio.
 pub fn Sampler::trace_id_ratio(ratio : Double) -> Sampler {
   let ratio = clamp_ratio(ratio)
@@ -513,6 +625,16 @@ pub fn BatchConfig::new(
   } else {
     max_export_batch_size
   }
+  let scheduled_delay_millis = if scheduled_delay_millis <= 0 {
+    1
+  } else {
+    scheduled_delay_millis
+  }
+  let export_timeout_millis = if export_timeout_millis <= 0 {
+    1
+  } else {
+    export_timeout_millis
+  }
   {
     max_queue_size,
     max_export_batch_size,
@@ -523,7 +645,12 @@ pub fn BatchConfig::new(
 
 ///|
 pub impl Default for BatchConfig with default() -> BatchConfig {
-  BatchConfig::new()
+  BatchConfig::new(
+    max_queue_size=env_or("OTEL_BSP_MAX_QUEUE_SIZE", 2048),
+    max_export_batch_size=env_or("OTEL_BSP_MAX_EXPORT_BATCH_SIZE", 512),
+    scheduled_delay_millis=env_or("OTEL_BSP_SCHEDULE_DELAY", 5000),
+    export_timeout_millis=env_or("OTEL_BSP_EXPORT_TIMEOUT", 30000),
+  )
 }
 
 ///|
@@ -539,7 +666,7 @@ pub fn Config::new(
 
 ///|
 pub impl Default for Config with default() -> Config {
-  Config::new()
+  Config::new(sampler=sampler_from_env(), span_limits=span_limits_from_env())
 }
 
 ///|
@@ -569,9 +696,19 @@ pub fn SpanExporter::force_flush(self : SpanExporter) -> @error.OTelSdkResult {
 }
 
 ///|
+/// Requests exporter shutdown with an optional timeout budget in milliseconds.
+pub fn SpanExporter::shutdown_with_timeout(
+  self : SpanExporter,
+  timeout_millis : Int,
+) -> @error.OTelSdkResult {
+  ignore(timeout_millis)
+  (self.shutdown_fn)()
+}
+
+///|
 /// Requests exporter shutdown.
 pub fn SpanExporter::shutdown(self : SpanExporter) -> @error.OTelSdkResult {
-  (self.shutdown_fn)()
+  self.shutdown_with_timeout(5000)
 }
 
 ///|
@@ -617,9 +754,19 @@ pub fn SpanProcessor::force_flush(self : SpanProcessor) -> @error.OTelSdkResult 
 }
 
 ///|
+/// Requests processor shutdown with an optional timeout budget in milliseconds.
+pub fn SpanProcessor::shutdown_with_timeout(
+  self : SpanProcessor,
+  timeout_millis : Int,
+) -> @error.OTelSdkResult {
+  ignore(timeout_millis)
+  (self.shutdown_fn)()
+}
+
+///|
 /// Requests processor shutdown.
 pub fn SpanProcessor::shutdown(self : SpanProcessor) -> @error.OTelSdkResult {
-  (self.shutdown_fn)()
+  self.shutdown_with_timeout(5000)
 }
 
 ///|
@@ -772,7 +919,10 @@ pub fn BatchSpanProcessor::new(
         let result = flush_span_queue(state)
         state.val = { ..state.val, is_shutdown: true }
         match result {
-          Ok(_) => state.val.exporter.shutdown()
+          Ok(_) =>
+            state.val.exporter.shutdown_with_timeout(
+              state.val.config.export_timeout_millis,
+            )
           Err(err) => Err(err)
         }
       },
@@ -1152,20 +1302,29 @@ pub fn SdkTracerProvider::force_flush(
 
 ///|
 /// Shuts down every configured span processor and marks the provider unusable.
-pub fn SdkTracerProvider::shutdown(
+pub fn SdkTracerProvider::shutdown_with_timeout(
   self : SdkTracerProvider,
+  timeout_millis : Int,
 ) -> @error.OTelSdkResult {
   if self.state.val.is_shutdown {
     return @error.already_shutdown()
   }
-  for processor in self.state.val.processors {
-    match processor.shutdown() {
+  let processors = self.state.val.processors.copy()
+  self.state.val = { ..self.state.val, is_shutdown: true }
+  for processor in processors {
+    match processor.shutdown_with_timeout(timeout_millis) {
       Ok(_) => ()
       Err(err) => return Err(err)
     }
   }
-  self.state.val = { ..self.state.val, is_shutdown: true }
   @error.ok()
+}
+
+///|
+pub fn SdkTracerProvider::shutdown(
+  self : SdkTracerProvider,
+) -> @error.OTelSdkResult {
+  self.shutdown_with_timeout(5000)
 }
 
 ///|

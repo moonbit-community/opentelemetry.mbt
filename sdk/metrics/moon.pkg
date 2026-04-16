@@ -1,5 +1,7 @@
 import {
   "moonbitlang/async",
+  "moonbitlang/core/env",
+  "moonbitlang/core/string",
   "moonbit-community/opentelemetry/sdk/common" @common,
   "moonbit-community/opentelemetry/sdk/error" @error,
   "moonbit-community/opentelemetry/sdk/resource" @resource,

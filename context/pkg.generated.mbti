@@ -1,0 +1,36 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/context"
+
+import {
+  "moonbit-community/opentelemetry/baggage",
+  "moonbit-community/opentelemetry/sdk/common",
+  "moonbitlang/core/debug",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct Context {
+  span_context : @common.SpanContext?
+  baggage : @baggage.Baggage
+  suppress_telemetry : Bool
+} derive(Eq, ToJson, @debug.Debug)
+pub fn Context::baggage(Self) -> @baggage.Baggage
+pub fn Context::empty() -> Self
+pub fn Context::has_active_span(Self) -> Bool
+pub fn Context::is_telemetry_suppressed(Self) -> Bool
+pub fn Context::new() -> Self
+pub fn Context::span_context(Self) -> @common.SpanContext?
+pub fn Context::with_baggage(Self, @baggage.Baggage) -> Self
+pub fn Context::with_baggage_item(Self, StringView, StringView, metadata? : @baggage.BaggageMetadata) -> Self
+pub fn Context::with_remote_span_context(Self, @common.SpanContext) -> Self
+pub fn Context::with_span_context(Self, @common.SpanContext) -> Self
+pub fn Context::with_telemetry_suppressed(Self, suppressed? : Bool) -> Self
+pub impl Default for Context
+
+// Type aliases
+
+// Traits
+

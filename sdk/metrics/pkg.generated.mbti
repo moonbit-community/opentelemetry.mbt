@@ -36,6 +36,36 @@ pub fn CounterBuilder::build(Self) -> Counter
 pub fn CounterBuilder::with_description(Self, StringView) -> Self
 pub fn CounterBuilder::with_unit(Self, StringView) -> Self
 
+pub struct DoubleCounter {
+  state : @ref.Ref[SyncInstrumentState]
+}
+pub fn DoubleCounter::add(Self, Double, attributes? : ArrayView[@common.KeyValue]) -> Unit
+
+pub struct DoubleCounterBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+}
+pub fn DoubleCounterBuilder::build(Self) -> DoubleCounter
+pub fn DoubleCounterBuilder::with_description(Self, StringView) -> Self
+pub fn DoubleCounterBuilder::with_unit(Self, StringView) -> Self
+
+pub struct DoubleUpDownCounter {
+  state : @ref.Ref[SyncInstrumentState]
+}
+pub fn DoubleUpDownCounter::add(Self, Double, attributes? : ArrayView[@common.KeyValue]) -> Unit
+
+pub struct DoubleUpDownCounterBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+}
+pub fn DoubleUpDownCounterBuilder::build(Self) -> DoubleUpDownCounter
+pub fn DoubleUpDownCounterBuilder::with_description(Self, StringView) -> Self
+pub fn DoubleUpDownCounterBuilder::with_unit(Self, StringView) -> Self
+
 pub struct Gauge {
   state : @ref.Ref[SyncInstrumentState]
 }
@@ -83,19 +113,40 @@ pub fn InMemoryMetricExporter::reset(Self) -> Unit
 
 type InMemoryMetricExporterState
 
+pub struct Instrument {
+  name : String
+  description : String?
+  unit : String?
+  kind : InstrumentKind
+  instrumentation_scope : @common.InstrumentationScope
+} derive(Eq, ToJson, @debug.Debug)
+
 pub(all) enum InstrumentKind {
   Counter
   UpDownCounter
   Histogram
   Gauge
+  ObservableCounter
+  ObservableUpDownCounter
+  ObservableGauge
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
 
 pub struct ManualReader {
-  provider : SdkMeterProvider
+  state : @ref.Ref[ManualReaderState]
 }
+pub fn ManualReader::builder() -> ManualReaderBuilder
 pub fn ManualReader::collect(Self) -> Array[MetricData]
 pub fn ManualReader::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
 pub fn ManualReader::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn ManualReader::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+
+pub struct ManualReaderBuilder {
+  mut temporality : Temporality
+}
+pub fn ManualReaderBuilder::build(Self) -> ManualReader
+pub fn ManualReaderBuilder::with_temporality(Self, Temporality) -> Self
+
+type ManualReaderState
 
 type MeterProviderState
 
@@ -122,28 +173,133 @@ pub fn MetricExporter::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
 pub fn MetricExporter::name(Self) -> String
 pub fn MetricExporter::new((ArrayView[MetricData]) -> Result[Unit, @error.OTelSdkError], force_flush_fn? : () -> Result[Unit, @error.OTelSdkError], shutdown_fn? : () -> Result[Unit, @error.OTelSdkError], name_fn? : () -> String) -> Self
 pub fn MetricExporter::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn MetricExporter::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
 
 pub(all) enum Number {
   Int64(Int64)
   Double(Double)
 } derive(Eq, ToJson, @debug.Debug)
 
-pub struct PeriodicMetricReader {
-  provider : SdkMeterProvider
-  exporter : MetricExporter
-  interval_millis : Int
+pub struct ObservableCounter {
+  state : @ref.Ref[SyncInstrumentState]
 }
-pub async fn PeriodicMetricReader::run(Self) -> Unit
+pub fn ObservableCounter::observe(Self, Int64, attributes? : ArrayView[@common.KeyValue]) -> Unit
 
-type PeriodicMetricReaderConfig
+pub struct ObservableCounterBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+  callbacks : Array[(ObservableCounter) -> Unit]
+}
+pub fn ObservableCounterBuilder::build(Self) -> ObservableCounter
+pub fn ObservableCounterBuilder::with_callback(Self, (ObservableCounter) -> Unit) -> Self
+pub fn ObservableCounterBuilder::with_description(Self, StringView) -> Self
+pub fn ObservableCounterBuilder::with_unit(Self, StringView) -> Self
+
+pub struct ObservableDoubleCounter {
+  state : @ref.Ref[SyncInstrumentState]
+}
+pub fn ObservableDoubleCounter::observe(Self, Double, attributes? : ArrayView[@common.KeyValue]) -> Unit
+
+pub struct ObservableDoubleCounterBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+  callbacks : Array[(ObservableDoubleCounter) -> Unit]
+}
+pub fn ObservableDoubleCounterBuilder::build(Self) -> ObservableDoubleCounter
+pub fn ObservableDoubleCounterBuilder::with_callback(Self, (ObservableDoubleCounter) -> Unit) -> Self
+pub fn ObservableDoubleCounterBuilder::with_description(Self, StringView) -> Self
+pub fn ObservableDoubleCounterBuilder::with_unit(Self, StringView) -> Self
+
+pub struct ObservableDoubleUpDownCounter {
+  state : @ref.Ref[SyncInstrumentState]
+}
+pub fn ObservableDoubleUpDownCounter::observe(Self, Double, attributes? : ArrayView[@common.KeyValue]) -> Unit
+
+pub struct ObservableDoubleUpDownCounterBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+  callbacks : Array[(ObservableDoubleUpDownCounter) -> Unit]
+}
+pub fn ObservableDoubleUpDownCounterBuilder::build(Self) -> ObservableDoubleUpDownCounter
+pub fn ObservableDoubleUpDownCounterBuilder::with_callback(Self, (ObservableDoubleUpDownCounter) -> Unit) -> Self
+pub fn ObservableDoubleUpDownCounterBuilder::with_description(Self, StringView) -> Self
+pub fn ObservableDoubleUpDownCounterBuilder::with_unit(Self, StringView) -> Self
+
+pub struct ObservableGauge {
+  state : @ref.Ref[SyncInstrumentState]
+}
+pub fn ObservableGauge::observe(Self, Double, attributes? : ArrayView[@common.KeyValue]) -> Unit
+
+pub struct ObservableGaugeBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+  callbacks : Array[(ObservableGauge) -> Unit]
+}
+pub fn ObservableGaugeBuilder::build(Self) -> ObservableGauge
+pub fn ObservableGaugeBuilder::with_callback(Self, (ObservableGauge) -> Unit) -> Self
+pub fn ObservableGaugeBuilder::with_description(Self, StringView) -> Self
+pub fn ObservableGaugeBuilder::with_unit(Self, StringView) -> Self
+
+pub struct ObservableUpDownCounter {
+  state : @ref.Ref[SyncInstrumentState]
+}
+pub fn ObservableUpDownCounter::observe(Self, Int64, attributes? : ArrayView[@common.KeyValue]) -> Unit
+
+pub struct ObservableUpDownCounterBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+  callbacks : Array[(ObservableUpDownCounter) -> Unit]
+}
+pub fn ObservableUpDownCounterBuilder::build(Self) -> ObservableUpDownCounter
+pub fn ObservableUpDownCounterBuilder::with_callback(Self, (ObservableUpDownCounter) -> Unit) -> Self
+pub fn ObservableUpDownCounterBuilder::with_description(Self, StringView) -> Self
+pub fn ObservableUpDownCounterBuilder::with_unit(Self, StringView) -> Self
+
+pub struct PeriodicMetricReader {
+  state : @ref.Ref[PeriodicMetricReaderState]
+}
+pub fn PeriodicMetricReader::builder(MetricExporter) -> PeriodicMetricReaderBuilder
+pub fn PeriodicMetricReader::collect(Self) -> Array[MetricData]
+pub fn PeriodicMetricReader::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub async fn PeriodicMetricReader::run(Self) -> Unit
+pub fn PeriodicMetricReader::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn PeriodicMetricReader::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+
+pub struct PeriodicMetricReaderBuilder {
+  exporter : MetricExporter
+  mut interval_millis : Int
+  mut temporality : Temporality
+}
+pub fn PeriodicMetricReaderBuilder::build(Self) -> PeriodicMetricReader
+pub fn PeriodicMetricReaderBuilder::with_interval(Self, Int) -> Self
+pub fn PeriodicMetricReaderBuilder::with_temporality(Self, Temporality) -> Self
+
+type PeriodicMetricReaderState
 
 pub struct SdkMeter {
   provider : SdkMeterProvider
   instrumentation_scope : @common.InstrumentationScope
 }
 pub fn SdkMeter::counter(Self, StringView) -> CounterBuilder
+pub fn SdkMeter::f64_counter(Self, StringView) -> DoubleCounterBuilder
+pub fn SdkMeter::f64_observable_counter(Self, StringView) -> ObservableDoubleCounterBuilder
+pub fn SdkMeter::f64_observable_up_down_counter(Self, StringView) -> ObservableDoubleUpDownCounterBuilder
+pub fn SdkMeter::f64_up_down_counter(Self, StringView) -> DoubleUpDownCounterBuilder
 pub fn SdkMeter::gauge(Self, StringView) -> GaugeBuilder
 pub fn SdkMeter::histogram(Self, StringView) -> HistogramBuilder
+pub fn SdkMeter::observable_counter(Self, StringView) -> ObservableCounterBuilder
+pub fn SdkMeter::observable_gauge(Self, StringView) -> ObservableGaugeBuilder
+pub fn SdkMeter::observable_up_down_counter(Self, StringView) -> ObservableUpDownCounterBuilder
 pub fn SdkMeter::up_down_counter(Self, StringView) -> UpDownCounterBuilder
 
 pub struct SdkMeterProvider {
@@ -156,19 +312,65 @@ pub fn SdkMeterProvider::manual_reader(Self) -> ManualReader
 pub fn SdkMeterProvider::meter(Self, StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> SdkMeter
 pub fn SdkMeterProvider::resource(Self) -> @resource.Resource
 pub fn SdkMeterProvider::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn SdkMeterProvider::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
 pub fn SdkMeterProvider::spawn_periodic_readers(Self, @async.TaskGroup[Unit], allow_failure? : Bool) -> Unit
 
 pub struct SdkMeterProviderBuilder {
   mut resource : @resource.Resource
   exporters : Array[MetricExporter]
-  periodic_reader_configs : Array[PeriodicMetricReaderConfig]
+  manual_readers : Array[ManualReader]
+  periodic_readers : Array[PeriodicMetricReader]
+  views : Array[(Instrument) -> Stream?]
 }
 pub fn SdkMeterProviderBuilder::build(Self) -> SdkMeterProvider
 pub fn SdkMeterProviderBuilder::with_exporter(Self, MetricExporter) -> Self
 pub fn SdkMeterProviderBuilder::with_periodic_exporter(Self, MetricExporter, interval_millis? : Int) -> Self
+pub fn SdkMeterProviderBuilder::with_periodic_reader(Self, PeriodicMetricReader) -> Self
+pub fn SdkMeterProviderBuilder::with_reader(Self, ManualReader) -> Self
 pub fn SdkMeterProviderBuilder::with_resource(Self, @resource.Resource) -> Self
+pub fn SdkMeterProviderBuilder::with_view(Self, (Instrument) -> Stream?) -> Self
+
+pub struct Stream {
+  name : String?
+  description : String?
+  unit : String?
+  aggregation : StreamAggregation?
+  allowed_attribute_keys : Array[String]?
+  cardinality_limit : Int?
+} derive(Eq, ToJson, @debug.Debug)
+pub fn Stream::builder() -> StreamBuilder
+
+pub(all) enum StreamAggregation {
+  Default
+  Drop
+  Sum
+  LastValue
+  Histogram
+} derive(Eq, ToJson, @debug.Debug)
+
+pub struct StreamBuilder {
+  mut name : String?
+  mut description : String?
+  mut unit : String?
+  mut aggregation : StreamAggregation?
+  mut allowed_attribute_keys : Array[String]?
+  mut cardinality_limit : Int?
+}
+pub fn StreamBuilder::build(Self) -> Stream
+pub fn StreamBuilder::with_aggregation(Self, StreamAggregation) -> Self
+pub fn StreamBuilder::with_allowed_attribute_keys(Self, ArrayView[StringView]) -> Self
+pub fn StreamBuilder::with_cardinality_limit(Self, Int) -> Self
+pub fn StreamBuilder::with_description(Self, StringView) -> Self
+pub fn StreamBuilder::with_name(Self, StringView) -> Self
+pub fn StreamBuilder::with_unit(Self, StringView) -> Self
 
 type SyncInstrumentState
+
+pub(all) enum Temporality {
+  Cumulative
+  Delta
+  LowMemory
+} derive(Compare, Eq, Hash, ToJson, @debug.Debug)
 
 pub struct UpDownCounter {
   state : @ref.Ref[SyncInstrumentState]
@@ -186,6 +388,7 @@ pub fn UpDownCounterBuilder::with_description(Self, StringView) -> Self
 pub fn UpDownCounterBuilder::with_unit(Self, StringView) -> Self
 
 // Type aliases
+pub type View = (Instrument) -> Stream?
 
 // Traits
 

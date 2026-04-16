@@ -1,0 +1,53 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry"
+
+import {
+  "moonbit-community/opentelemetry/baggage",
+  "moonbit-community/opentelemetry/context",
+  "moonbit-community/opentelemetry/logs",
+  "moonbit-community/opentelemetry/metrics",
+  "moonbit-community/opentelemetry/propagation",
+  "moonbit-community/opentelemetry/sdk/common",
+  "moonbit-community/opentelemetry/trace",
+}
+
+// Values
+pub fn[T] get_text_map_propagator((@propagation.TextMapPropagator) -> T) -> T
+
+pub fn logger(StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> @logs.Logger
+
+pub fn meter(StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> @metrics.Meter
+
+pub fn tracer(StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> @trace.Tracer
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+pub using @baggage {type Baggage}
+
+pub using @baggage {type BaggageMetadata}
+
+pub using @context {type Context}
+
+pub using @common {type InstrumentationScope}
+
+pub using @common {type Key}
+
+pub using @common {type KeyValue}
+
+pub using @baggage {type KeyValueMetadata}
+
+pub using @common {type SpanId}
+
+pub using @common {type TraceFlags}
+
+pub using @common {type TraceId}
+
+pub using @common {type TraceState}
+
+pub using @common {type Value}
+
+// Traits
+

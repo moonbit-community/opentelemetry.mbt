@@ -1,10 +1,13 @@
 ///|
-/// Supported synchronous instrument kinds.
+/// Supported metric instrument kinds.
 pub(all) enum InstrumentKind {
   Counter
   UpDownCounter
   Histogram
   Gauge
+  ObservableCounter
+  ObservableUpDownCounter
+  ObservableGauge
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
@@ -32,6 +35,24 @@ pub(all) enum Aggregation {
 } derive(Eq, ToJson, Debug)
 
 ///|
+/// Aggregation selection used by metric views.
+pub(all) enum StreamAggregation {
+  Default
+  Drop
+  Sum
+  LastValue
+  Histogram
+} derive(Eq, ToJson, Debug)
+
+///|
+/// Defines the time window used when readers report aggregated measurements.
+pub(all) enum Temporality {
+  Cumulative
+  Delta
+  LowMemory
+} derive(Eq, Compare, Hash, ToJson, Debug)
+
+///|
 /// Immutable metric data item exported from a meter provider.
 pub struct MetricData {
   name : String
@@ -44,6 +65,38 @@ pub struct MetricData {
   resource : @resource.Resource
   instrumentation_scope : @common.InstrumentationScope
 } derive(Eq, ToJson, Debug)
+
+///|
+/// Instrument metadata used by views to match and transform streams.
+pub struct Instrument {
+  name : String
+  description : String?
+  unit : String?
+  kind : InstrumentKind
+  instrumentation_scope : @common.InstrumentationScope
+} derive(Eq, ToJson, Debug)
+
+///|
+/// Stream configuration returned by a view.
+pub struct Stream {
+  name : String?
+  description : String?
+  unit : String?
+  aggregation : StreamAggregation?
+  allowed_attribute_keys : Array[String]?
+  cardinality_limit : Int?
+} derive(Eq, ToJson, Debug)
+
+///|
+/// Builder for stream transformations.
+pub struct StreamBuilder {
+  mut name : String?
+  mut description : String?
+  mut unit : String?
+  mut aggregation : StreamAggregation?
+  mut allowed_attribute_keys : Array[String]?
+  mut cardinality_limit : Int?
+}
 
 ///|
 /// Exporter callback wrapper for metric batches.
@@ -69,21 +122,59 @@ pub struct InMemoryMetricExporter {
 ///|
 /// Pull-based metric reader that snapshots the provider on demand.
 pub struct ManualReader {
-  provider : SdkMeterProvider
+  state : Ref[ManualReaderState]
 }
+
+///|
+struct ManualReaderState {
+  provider : SdkMeterProvider?
+  temporality : Temporality
+  last_metrics : Map[String, Aggregation]
+  is_shutdown : Bool
+}
+
+///|
+/// Builder for `ManualReader`.
+pub struct ManualReaderBuilder {
+  mut temporality : Temporality
+}
+
+///|
+/// View callback used to transform metric streams during instrument creation.
+pub type View = (Instrument) -> Stream?
 
 ///|
 /// Push-style metric reader that exports snapshots on an interval.
 pub struct PeriodicMetricReader {
-  provider : SdkMeterProvider
-  exporter : MetricExporter
-  interval_millis : Int
+  state : Ref[PeriodicMetricReaderState]
 }
 
 ///|
-struct PeriodicMetricReaderConfig {
+struct PeriodicMetricReaderState {
+  provider : SdkMeterProvider?
   exporter : MetricExporter
   interval_millis : Int
+  temporality : Temporality
+  last_metrics : Map[String, Aggregation]
+  is_shutdown : Bool
+}
+
+///|
+priv struct MetricStreamState {
+  descriptor : InstrumentDescriptor
+  instrumentation_scope : @common.InstrumentationScope
+  resource : @resource.Resource
+  aggregation : StreamAggregation
+  allowed_attribute_keys : Array[String]?
+  cardinality_limit : Int
+  points : Map[String, PointState]
+}
+
+///|
+pub struct PeriodicMetricReaderBuilder {
+  exporter : MetricExporter
+  mut interval_millis : Int
+  mut temporality : Temporality
 }
 
 ///|
@@ -102,14 +193,12 @@ priv struct PointState {
 
 ///|
 struct SyncInstrumentState {
-  descriptor : InstrumentDescriptor
-  instrumentation_scope : @common.InstrumentationScope
-  resource : @resource.Resource
-  points : Map[String, PointState]
+  streams : Array[Ref[MetricStreamState]]
 }
 
 ///|
 priv struct MetricCollector {
+  prepare_fn : () -> Unit
   collect_fn : () -> Array[MetricData]
 }
 
@@ -119,6 +208,7 @@ struct MeterProviderState {
   collectors : Array[MetricCollector]
   exporters : Array[MetricExporter]
   periodic_readers : Array[PeriodicMetricReader]
+  views : Array[View]
   is_shutdown : Bool
 }
 
@@ -133,7 +223,9 @@ pub struct SdkMeterProvider {
 pub struct SdkMeterProviderBuilder {
   mut resource : @resource.Resource
   exporters : Array[MetricExporter]
-  periodic_reader_configs : Array[PeriodicMetricReaderConfig]
+  manual_readers : Array[ManualReader]
+  periodic_readers : Array[PeriodicMetricReader]
+  views : Array[View]
 }
 
 ///|
@@ -153,8 +245,26 @@ pub struct CounterBuilder {
 }
 
 ///|
+/// Builder for a monotonic floating-point counter instrument.
+pub struct DoubleCounterBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+}
+
+///|
 /// Builder for a signed counter instrument.
 pub struct UpDownCounterBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+}
+
+///|
+/// Builder for a signed floating-point counter instrument.
+pub struct DoubleUpDownCounterBuilder {
   meter : SdkMeter
   name : String
   mut description : String?
@@ -180,14 +290,76 @@ pub struct GaugeBuilder {
 }
 
 ///|
+/// Builder for an observable monotonic counter instrument.
+pub struct ObservableCounterBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+  callbacks : Array[(ObservableCounter) -> Unit]
+}
+
+///|
+/// Builder for an observable monotonic floating-point counter instrument.
+pub struct ObservableDoubleCounterBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+  callbacks : Array[(ObservableDoubleCounter) -> Unit]
+}
+
+///|
+/// Builder for an observable signed counter instrument.
+pub struct ObservableUpDownCounterBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+  callbacks : Array[(ObservableUpDownCounter) -> Unit]
+}
+
+///|
+/// Builder for an observable signed floating-point counter instrument.
+pub struct ObservableDoubleUpDownCounterBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+  callbacks : Array[(ObservableDoubleUpDownCounter) -> Unit]
+}
+
+///|
+/// Builder for an observable gauge instrument.
+pub struct ObservableGaugeBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+  callbacks : Array[(ObservableGauge) -> Unit]
+}
+
+///|
 /// Counter instrument handle.
 pub struct Counter {
   state : Ref[SyncInstrumentState]
 }
 
 ///|
+/// Floating-point counter instrument handle.
+pub struct DoubleCounter {
+  state : Ref[SyncInstrumentState]
+}
+
+///|
 /// Up-down counter instrument handle.
 pub struct UpDownCounter {
+  state : Ref[SyncInstrumentState]
+}
+
+///|
+/// Floating-point up-down counter instrument handle.
+pub struct DoubleUpDownCounter {
   state : Ref[SyncInstrumentState]
 }
 
@@ -200,6 +372,36 @@ pub struct Histogram {
 ///|
 /// Gauge instrument handle.
 pub struct Gauge {
+  state : Ref[SyncInstrumentState]
+}
+
+///|
+/// Observable counter instrument handle passed to callbacks.
+pub struct ObservableCounter {
+  state : Ref[SyncInstrumentState]
+}
+
+///|
+/// Observable floating-point counter instrument handle passed to callbacks.
+pub struct ObservableDoubleCounter {
+  state : Ref[SyncInstrumentState]
+}
+
+///|
+/// Observable up-down counter instrument handle passed to callbacks.
+pub struct ObservableUpDownCounter {
+  state : Ref[SyncInstrumentState]
+}
+
+///|
+/// Observable floating-point up-down counter instrument handle passed to callbacks.
+pub struct ObservableDoubleUpDownCounter {
+  state : Ref[SyncInstrumentState]
+}
+
+///|
+/// Observable gauge instrument handle passed to callbacks.
+pub struct ObservableGauge {
   state : Ref[SyncInstrumentState]
 }
 
@@ -232,9 +434,19 @@ pub fn MetricExporter::force_flush(
 }
 
 ///|
+/// Requests exporter shutdown with an optional timeout budget in milliseconds.
+pub fn MetricExporter::shutdown_with_timeout(
+  self : MetricExporter,
+  timeout_millis : Int,
+) -> @error.OTelSdkResult {
+  ignore(timeout_millis)
+  (self.shutdown_fn)()
+}
+
+///|
 /// Requests exporter shutdown.
 pub fn MetricExporter::shutdown(self : MetricExporter) -> @error.OTelSdkResult {
-  (self.shutdown_fn)()
+  self.shutdown_with_timeout(5000)
 }
 
 ///|
@@ -261,6 +473,190 @@ pub fn InMemoryMetricExporter::finished_metrics(
 /// Clears the in-memory metric buffer.
 pub fn InMemoryMetricExporter::reset(self : InMemoryMetricExporter) -> Unit {
   self.state.val = { ..self.state.val, finished_metrics: [] }
+}
+
+///|
+fn parse_env_int(key : StringView) -> Int? {
+  match @common.getenv(key) {
+    Some(value) => {
+      let value = value.trim()
+      if value == "" {
+        None
+      } else {
+        Some(@string.parse_int(value.to_string()) catch { _ => return None })
+      }
+    }
+    None => None
+  }
+}
+
+///|
+fn default_metric_export_interval_millis() -> Int {
+  match parse_env_int("OTEL_METRIC_EXPORT_INTERVAL") {
+    Some(value) if value > 0 => value
+    _ => 60000
+  }
+}
+
+///|
+/// Creates an empty stream builder.
+pub fn Stream::builder() -> StreamBuilder {
+  {
+    name: None,
+    description: None,
+    unit: None,
+    aggregation: None,
+    allowed_attribute_keys: None,
+    cardinality_limit: None,
+  }
+}
+
+///|
+pub fn StreamBuilder::with_name(
+  self : StreamBuilder,
+  name : StringView,
+) -> StreamBuilder {
+  self.name = Some(name.to_string())
+  self
+}
+
+///|
+pub fn StreamBuilder::with_description(
+  self : StreamBuilder,
+  description : StringView,
+) -> StreamBuilder {
+  self.description = Some(description.to_string())
+  self
+}
+
+///|
+pub fn StreamBuilder::with_unit(
+  self : StreamBuilder,
+  unit : StringView,
+) -> StreamBuilder {
+  self.unit = Some(unit.to_string())
+  self
+}
+
+///|
+pub fn StreamBuilder::with_aggregation(
+  self : StreamBuilder,
+  aggregation : StreamAggregation,
+) -> StreamBuilder {
+  self.aggregation = Some(aggregation)
+  self
+}
+
+///|
+pub fn StreamBuilder::with_allowed_attribute_keys(
+  self : StreamBuilder,
+  keys : ArrayView[StringView],
+) -> StreamBuilder {
+  let allowed_attribute_keys = []
+  for key in keys {
+    allowed_attribute_keys.push(key.to_string())
+  }
+  self.allowed_attribute_keys = Some(allowed_attribute_keys)
+  self
+}
+
+///|
+pub fn StreamBuilder::with_cardinality_limit(
+  self : StreamBuilder,
+  limit : Int,
+) -> StreamBuilder {
+  self.cardinality_limit = Some(limit)
+  self
+}
+
+///|
+pub fn StreamBuilder::build(self : StreamBuilder) -> Stream {
+  let cardinality_limit = match self.cardinality_limit {
+    Some(limit) if limit <= 0 => Some(1)
+    _ => self.cardinality_limit
+  }
+  {
+    name: self.name,
+    description: self.description,
+    unit: self.unit,
+    aggregation: self.aggregation,
+    allowed_attribute_keys: self.allowed_attribute_keys,
+    cardinality_limit,
+  }
+}
+
+///|
+/// Creates a detached manual reader that can later be registered with a
+/// provider using `SdkMeterProviderBuilder::with_reader()`.
+pub fn ManualReader::builder() -> ManualReaderBuilder {
+  { temporality: Temporality::Cumulative }
+}
+
+///|
+pub fn ManualReaderBuilder::with_temporality(
+  self : ManualReaderBuilder,
+  temporality : Temporality,
+) -> ManualReaderBuilder {
+  self.temporality = temporality
+  self
+}
+
+///|
+pub fn ManualReaderBuilder::build(self : ManualReaderBuilder) -> ManualReader {
+  {
+    state: Ref::new({
+      provider: None,
+      temporality: self.temporality,
+      last_metrics: {},
+      is_shutdown: false,
+    }),
+  }
+}
+
+///|
+/// Creates a detached periodic reader around the supplied exporter.
+pub fn PeriodicMetricReader::builder(
+  exporter : MetricExporter,
+) -> PeriodicMetricReaderBuilder {
+  {
+    exporter,
+    interval_millis: default_metric_export_interval_millis(),
+    temporality: Temporality::Cumulative,
+  }
+}
+
+///|
+pub fn PeriodicMetricReaderBuilder::with_interval(
+  self : PeriodicMetricReaderBuilder,
+  interval_millis : Int,
+) -> PeriodicMetricReaderBuilder {
+  self.interval_millis = if interval_millis <= 0 { 1 } else { interval_millis }
+  self
+}
+
+///|
+pub fn PeriodicMetricReaderBuilder::with_temporality(
+  self : PeriodicMetricReaderBuilder,
+  temporality : Temporality,
+) -> PeriodicMetricReaderBuilder {
+  self.temporality = temporality
+  self
+}
+
+///|
+pub fn PeriodicMetricReaderBuilder::build(
+  self : PeriodicMetricReaderBuilder,
+) -> PeriodicMetricReader {
+  {
+    state: Ref::new({
+      provider: None,
+      exporter: self.exporter,
+      interval_millis: self.interval_millis,
+      temporality: self.temporality,
+      last_metrics: {},
+      is_shutdown: false,
+    }),
+  }
 }
 
 ///|
@@ -312,9 +708,202 @@ fn encode_attributes(attributes : ArrayView[@common.KeyValue]) -> String {
 }
 
 ///|
-/// Materializes the current point map of one instrument into exportable metric
-/// data.
-fn collect_metrics(state : Ref[SyncInstrumentState]) -> Array[MetricData] {
+fn normalize_cardinality_limit(limit : Int?) -> Int {
+  match limit {
+    Some(limit) if limit <= 0 => 1
+    Some(limit) => limit
+    None => 2000
+  }
+}
+
+///|
+fn default_stream_aggregation(kind : InstrumentKind) -> StreamAggregation {
+  match kind {
+    InstrumentKind::Counter => StreamAggregation::Sum
+    InstrumentKind::UpDownCounter => StreamAggregation::Sum
+    InstrumentKind::Histogram => StreamAggregation::Histogram
+    InstrumentKind::Gauge => StreamAggregation::LastValue
+    InstrumentKind::ObservableCounter => StreamAggregation::Sum
+    InstrumentKind::ObservableUpDownCounter => StreamAggregation::Sum
+    InstrumentKind::ObservableGauge => StreamAggregation::LastValue
+  }
+}
+
+///|
+priv struct TemporalityResult {
+  last_metrics : Map[String, Aggregation]
+  metrics : Array[MetricData]
+}
+
+///|
+fn use_delta_temporality(
+  kind : InstrumentKind,
+  temporality : Temporality,
+) -> Bool {
+  match temporality {
+    Temporality::Cumulative => false
+    Temporality::Delta =>
+      match kind {
+        InstrumentKind::Counter => true
+        InstrumentKind::Histogram => true
+        InstrumentKind::ObservableCounter => true
+        InstrumentKind::Gauge => true
+        InstrumentKind::ObservableGauge => true
+        _ => false
+      }
+    Temporality::LowMemory =>
+      match kind {
+        InstrumentKind::Counter => true
+        InstrumentKind::Histogram => true
+        _ => false
+      }
+  }
+}
+
+///|
+fn metric_identity(metric : MetricData) -> String {
+  let builder = StringBuilder::new()
+  builder.write_string(metric.name)
+  builder.write_char('|')
+  builder.write_string(metric.kind.to_json().stringify())
+  builder.write_char('|')
+  builder.write_string(metric.instrumentation_scope.to_json().stringify())
+  builder.write_char('|')
+  builder.write_string(encode_attributes(metric.attributes))
+  builder.to_string()
+}
+
+///|
+fn delta_histogram(
+  current : HistogramSummary,
+  previous : HistogramSummary?,
+) -> HistogramSummary {
+  match previous {
+    Some(previous) => {
+      let count = current.count - previous.count
+      let sum = current.sum - previous.sum
+      if count <= 0 {
+        { count: 0, sum: 0.0, min: None, max: None }
+      } else {
+        { count, sum, min: current.min, max: current.max }
+      }
+    }
+    None => current
+  }
+}
+
+///|
+fn delta_aggregation(
+  metric : MetricData,
+  previous : Aggregation?,
+) -> Aggregation {
+  if !use_delta_temporality(metric.kind, Temporality::Delta) {
+    return metric.aggregation
+  }
+  match metric.aggregation {
+    Aggregation::Sum(Number::Int64(value)) =>
+      match previous {
+        Some(Aggregation::Sum(Number::Int64(previous_value))) =>
+          Aggregation::Sum(Number::Int64(value - previous_value))
+        _ => metric.aggregation
+      }
+    Aggregation::Sum(Number::Double(value)) =>
+      match previous {
+        Some(Aggregation::Sum(Number::Double(previous_value))) =>
+          Aggregation::Sum(Number::Double(value - previous_value))
+        _ => metric.aggregation
+      }
+    Aggregation::Histogram(summary) =>
+      match previous {
+        Some(Aggregation::Histogram(previous_summary)) =>
+          Aggregation::Histogram(
+            delta_histogram(summary, Some(previous_summary)),
+          )
+        _ => metric.aggregation
+      }
+    _ => metric.aggregation
+  }
+}
+
+///|
+fn apply_temporality(
+  temporality : Temporality,
+  previous : Map[String, Aggregation],
+  metrics : Array[MetricData],
+) -> TemporalityResult {
+  if temporality == Temporality::Cumulative {
+    let last_metrics = {}
+    for metric in metrics {
+      last_metrics[metric_identity(metric)] = metric.aggregation
+    }
+    return { last_metrics, metrics }
+  }
+
+  let last_metrics = {}
+  let transformed = []
+  for metric in metrics {
+    let identity = metric_identity(metric)
+    let aggregation = if use_delta_temporality(metric.kind, temporality) {
+      delta_aggregation(metric, previous.get(identity))
+    } else {
+      metric.aggregation
+    }
+    transformed.push({ ..metric, aggregation, })
+    last_metrics[identity] = metric.aggregation
+  }
+  { last_metrics, metrics: transformed }
+}
+
+///|
+fn resolve_stream_aggregation(
+  configured : StreamAggregation?,
+  kind : InstrumentKind,
+) -> StreamAggregation {
+  match configured {
+    Some(StreamAggregation::Default) => default_stream_aggregation(kind)
+    Some(aggregation) => aggregation
+    None => default_stream_aggregation(kind)
+  }
+}
+
+///|
+fn matches_allowed_attribute_key(
+  allowed_attribute_keys : Array[String],
+  key : StringView,
+) -> Bool {
+  let key = key.to_string()
+  for allowed_key in allowed_attribute_keys {
+    if allowed_key == key {
+      return true
+    }
+  }
+  false
+}
+
+///|
+fn filter_attributes(
+  allowed_attribute_keys : Array[String]?,
+  attributes : ArrayView[@common.KeyValue],
+) -> Array[@common.KeyValue] {
+  match allowed_attribute_keys {
+    None => attributes.to_array()
+    Some(allowed_attribute_keys) => {
+      let filtered = []
+      for attribute in attributes {
+        if matches_allowed_attribute_key(
+            allowed_attribute_keys,
+            attribute.key.as_string(),
+          ) {
+          filtered.push(attribute)
+        }
+      }
+      filtered
+    }
+  }
+}
+
+///|
+fn collect_stream_metrics(state : Ref[MetricStreamState]) -> Array[MetricData] {
   let metrics = []
   for _, point in state.val.points {
     metrics.push({
@@ -333,6 +922,134 @@ fn collect_metrics(state : Ref[SyncInstrumentState]) -> Array[MetricData] {
 }
 
 ///|
+/// Materializes the current point map of one instrument into exportable metric
+/// data.
+fn collect_metrics(state : Ref[SyncInstrumentState]) -> Array[MetricData] {
+  let metrics = []
+  for stream in state.val.streams {
+    metrics.append(collect_stream_metrics(stream))
+  }
+  metrics
+}
+
+///|
+fn resolve_stream_state(
+  meter : SdkMeter,
+  descriptor : InstrumentDescriptor,
+) -> Array[Ref[MetricStreamState]] {
+  let instrument = {
+    name: descriptor.name,
+    description: descriptor.description,
+    unit: descriptor.unit,
+    kind: descriptor.kind,
+    instrumentation_scope: meter.instrumentation_scope,
+  }
+  let streams = []
+  let mut matched_view = false
+  for view in meter.provider.state.val.views {
+    match view(instrument) {
+      Some(stream) => {
+        matched_view = true
+        let aggregation = resolve_stream_aggregation(
+          stream.aggregation,
+          descriptor.kind,
+        )
+        if aggregation == StreamAggregation::Drop {
+          continue
+        }
+        let resolved_descriptor = {
+          name: match stream.name {
+            Some(name) => name
+            None => descriptor.name
+          },
+          description: match stream.description {
+            Some(description) => Some(description)
+            None => descriptor.description
+          },
+          unit: match stream.unit {
+            Some(unit) => Some(unit)
+            None => descriptor.unit
+          },
+          kind: descriptor.kind,
+        }
+        streams.push(
+          Ref::new({
+            descriptor: resolved_descriptor,
+            instrumentation_scope: meter.instrumentation_scope,
+            resource: meter.provider.state.val.resource,
+            aggregation,
+            allowed_attribute_keys: stream.allowed_attribute_keys,
+            cardinality_limit: normalize_cardinality_limit(
+              stream.cardinality_limit,
+            ),
+            points: {},
+          }),
+        )
+      }
+      None => ()
+    }
+  }
+  if !matched_view {
+    streams.push(
+      Ref::new({
+        descriptor,
+        instrumentation_scope: meter.instrumentation_scope,
+        resource: meter.provider.state.val.resource,
+        aggregation: default_stream_aggregation(descriptor.kind),
+        allowed_attribute_keys: None,
+        cardinality_limit: 2000,
+        points: {},
+      }),
+    )
+  }
+  streams
+}
+
+///|
+fn clear_metrics(state : Ref[SyncInstrumentState]) -> Unit {
+  for stream in state.val.streams {
+    stream.val = { ..stream.val, points: {} }
+  }
+}
+
+///|
+fn register_manual_reader(
+  reader : ManualReader,
+  provider : SdkMeterProvider,
+) -> Unit {
+  if reader.state.val.is_shutdown {
+    return
+  }
+  match reader.state.val.provider {
+    Some(_) => ()
+    None => reader.state.val = { ..reader.state.val, provider: Some(provider) }
+  }
+}
+
+///|
+fn register_periodic_reader(
+  reader : PeriodicMetricReader,
+  provider : SdkMeterProvider,
+) -> Unit {
+  if reader.state.val.is_shutdown {
+    return
+  }
+  match reader.state.val.provider {
+    Some(_) => ()
+    None => reader.state.val = { ..reader.state.val, provider: Some(provider) }
+  }
+}
+
+///|
+fn collect_with_temporality(
+  provider : SdkMeterProvider,
+  temporality : Temporality,
+  previous : Map[String, Aggregation],
+) -> TemporalityResult {
+  apply_temporality(temporality, previous, provider.collect())
+}
+
+///|
 /// Registers an instrument with the provider so later collections can snapshot
 /// its current points.
 fn register_instrument(
@@ -340,19 +1057,36 @@ fn register_instrument(
   descriptor : InstrumentDescriptor,
 ) -> Ref[SyncInstrumentState] {
   let state : Ref[SyncInstrumentState] = Ref::new({
-    descriptor,
-    instrumentation_scope: meter.instrumentation_scope,
-    resource: meter.provider.state.val.resource,
-    points: {},
+    streams: resolve_stream_state(meter, descriptor),
   })
   if !meter.provider.state.val.is_shutdown {
-    // Instruments created after shutdown still exist as handles, but they are
-    // not collected by the provider anymore.
     meter.provider.state.val.collectors.push({
+      prepare_fn: () => (),
       collect_fn: () => collect_metrics(state),
     })
   }
   state
+}
+
+///|
+fn register_observable_instrument(
+  meter : SdkMeter,
+  descriptor : InstrumentDescriptor,
+  state : Ref[SyncInstrumentState],
+  callbacks : Array[() -> Unit],
+) -> Unit {
+  state.val = { streams: resolve_stream_state(meter, descriptor) }
+  if !meter.provider.state.val.is_shutdown {
+    meter.provider.state.val.collectors.push({
+      prepare_fn: () => {
+        clear_metrics(state)
+        for callback in callbacks {
+          callback()
+        }
+      },
+      collect_fn: () => collect_metrics(state),
+    })
+  }
 }
 
 ///|
@@ -364,25 +1098,119 @@ fn create_builder(
 }
 
 ///|
+fn histogram_aggregation(current : Aggregation?, value : Double) -> Aggregation {
+  match current {
+    Some(Aggregation::Histogram(summary)) => {
+      let min = match summary.min {
+        Some(current) => Some(if value < current { value } else { current })
+        None => Some(value)
+      }
+      let max = match summary.max {
+        Some(current) => Some(if value > current { value } else { current })
+        None => Some(value)
+      }
+      Aggregation::Histogram({
+        count: summary.count + 1,
+        sum: summary.sum + value,
+        min,
+        max,
+      })
+    }
+    _ =>
+      Aggregation::Histogram({
+        count: 1,
+        sum: value,
+        min: Some(value),
+        max: Some(value),
+      })
+  }
+}
+
+///|
+fn update_sum_stream(
+  state : Ref[MetricStreamState],
+  attributes : ArrayView[@common.KeyValue],
+  delta : Int64,
+) -> Unit {
+  let attributes = filter_attributes(
+    state.val.allowed_attribute_keys,
+    attributes,
+  )
+  let key = encode_attributes(attributes)
+  let points = state.val.points.copy()
+  let current = points.get(key).map(fn(point) { point.aggregation })
+  if current is None && points.length() >= state.val.cardinality_limit {
+    return
+  }
+  let aggregation = match state.val.aggregation {
+    StreamAggregation::Sum =>
+      match current {
+        Some(Aggregation::Sum(Number::Int64(current))) =>
+          Aggregation::Sum(Number::Int64(current + delta))
+        _ => Aggregation::Sum(Number::Int64(delta))
+      }
+    StreamAggregation::LastValue => Aggregation::Gauge(Number::Int64(delta))
+    StreamAggregation::Histogram =>
+      histogram_aggregation(current, delta.to_double())
+    _ => Aggregation::Sum(Number::Int64(delta))
+  }
+  points[key] = { attributes, aggregation }
+  state.val = { ..state.val, points, }
+}
+
+///|
+fn update_double_stream(
+  state : Ref[MetricStreamState],
+  attributes : ArrayView[@common.KeyValue],
+  value : Double,
+) -> Unit {
+  let attributes = filter_attributes(
+    state.val.allowed_attribute_keys,
+    attributes,
+  )
+  let key = encode_attributes(attributes)
+  let points = state.val.points.copy()
+  let current = points.get(key).map(fn(point) { point.aggregation })
+  if current is None && points.length() >= state.val.cardinality_limit {
+    return
+  }
+  let aggregation = match state.val.aggregation {
+    StreamAggregation::Sum =>
+      match current {
+        Some(Aggregation::Sum(Number::Double(current))) =>
+          Aggregation::Sum(Number::Double(current + value))
+        _ => Aggregation::Sum(Number::Double(value))
+      }
+    StreamAggregation::LastValue => Aggregation::Gauge(Number::Double(value))
+    StreamAggregation::Histogram => histogram_aggregation(current, value)
+    _ => Aggregation::Gauge(Number::Double(value))
+  }
+  points[key] = { attributes, aggregation }
+  state.val = { ..state.val, points, }
+}
+
+///|
 /// Updates a sum aggregation for the supplied attribute set.
 fn update_sum(
   state : Ref[SyncInstrumentState],
   attributes : ArrayView[@common.KeyValue],
   delta : Int64,
 ) -> Unit {
-  let key = encode_attributes(attributes)
-  let points = state.val.points.copy()
-  let aggregation = match points.get(key) {
-    Some(point) =>
-      match point.aggregation {
-        Aggregation::Sum(Number::Int64(current)) =>
-          Aggregation::Sum(Number::Int64(current + delta))
-        _ => Aggregation::Sum(Number::Int64(delta))
-      }
-    None => Aggregation::Sum(Number::Int64(delta))
+  for stream in state.val.streams {
+    update_sum_stream(stream, attributes, delta)
   }
-  points[key] = { attributes: attributes.to_array(), aggregation }
-  state.val = { ..state.val, points, }
+}
+
+///|
+/// Updates a floating-point sum aggregation for the supplied attribute set.
+fn update_double_sum(
+  state : Ref[SyncInstrumentState],
+  attributes : ArrayView[@common.KeyValue],
+  delta : Double,
+) -> Unit {
+  for stream in state.val.streams {
+    update_double_stream(stream, attributes, delta)
+  }
 }
 
 ///|
@@ -392,45 +1220,9 @@ fn update_histogram(
   attributes : ArrayView[@common.KeyValue],
   value : Double,
 ) -> Unit {
-  let key = encode_attributes(attributes)
-  let points = state.val.points.copy()
-  let aggregation = match points.get(key) {
-    Some(point) =>
-      match point.aggregation {
-        Aggregation::Histogram(summary) => {
-          let min = match summary.min {
-            Some(current) => Some(if value < current { value } else { current })
-            None => Some(value)
-          }
-          let max = match summary.max {
-            Some(current) => Some(if value > current { value } else { current })
-            None => Some(value)
-          }
-          Aggregation::Histogram({
-            count: summary.count + 1,
-            sum: summary.sum + value,
-            min,
-            max,
-          })
-        }
-        _ =>
-          Aggregation::Histogram({
-            count: 1,
-            sum: value,
-            min: Some(value),
-            max: Some(value),
-          })
-      }
-    None =>
-      Aggregation::Histogram({
-        count: 1,
-        sum: value,
-        min: Some(value),
-        max: Some(value),
-      })
+  for stream in state.val.streams {
+    update_double_stream(stream, attributes, value)
   }
-  points[key] = { attributes: attributes.to_array(), aggregation }
-  state.val = { ..state.val, points, }
 }
 
 ///|
@@ -440,13 +1232,9 @@ fn update_gauge(
   attributes : ArrayView[@common.KeyValue],
   value : Double,
 ) -> Unit {
-  let key = encode_attributes(attributes)
-  let points = state.val.points.copy()
-  points[key] = {
-    attributes: attributes.to_array(),
-    aggregation: Aggregation::Gauge(Number::Double(value)),
+  for stream in state.val.streams {
+    update_double_stream(stream, attributes, value)
   }
-  state.val = { ..state.val, points, }
 }
 
 ///|
@@ -455,7 +1243,9 @@ pub fn SdkMeterProvider::builder() -> SdkMeterProviderBuilder {
   {
     resource: @resource.Resource::builder().build(),
     exporters: [],
-    periodic_reader_configs: [],
+    manual_readers: [],
+    periodic_readers: [],
+    views: [],
   }
 }
 
@@ -480,21 +1270,54 @@ pub fn SdkMeterProviderBuilder::with_exporter(
 }
 
 ///|
+/// Registers a manual reader with the provider.
+pub fn SdkMeterProviderBuilder::with_reader(
+  self : SdkMeterProviderBuilder,
+  reader : ManualReader,
+) -> SdkMeterProviderBuilder {
+  self.manual_readers.push(reader)
+  self
+}
+
+///|
+/// Registers a periodic reader with the provider.
+pub fn SdkMeterProviderBuilder::with_periodic_reader(
+  self : SdkMeterProviderBuilder,
+  reader : PeriodicMetricReader,
+) -> SdkMeterProviderBuilder {
+  self.periodic_readers.push(reader)
+  self
+}
+
+///|
+/// Adds a view that can rename or reshape future metric streams.
+pub fn SdkMeterProviderBuilder::with_view(
+  self : SdkMeterProviderBuilder,
+  view : View,
+) -> SdkMeterProviderBuilder {
+  self.views.push(view)
+  self
+}
+
+///|
 /// Registers an exporter and a periodic reader for background exports.
 pub fn SdkMeterProviderBuilder::with_periodic_exporter(
   self : SdkMeterProviderBuilder,
   exporter : MetricExporter,
-  interval_millis? : Int = 60000,
+  interval_millis? : Int = -1,
 ) -> SdkMeterProviderBuilder {
-  self.exporters.push(exporter)
-  self.periodic_reader_configs.push({
-    exporter,
-    interval_millis: if interval_millis <= 0 {
-      1
-    } else {
-      interval_millis
-    },
-  })
+  let interval_millis = if interval_millis < 0 {
+    default_metric_export_interval_millis()
+  } else if interval_millis == 0 {
+    1
+  } else {
+    interval_millis
+  }
+  self.periodic_readers.push(
+    PeriodicMetricReader::builder(exporter)
+    .with_interval(interval_millis)
+    .build(),
+  )
   self
 }
 
@@ -508,16 +1331,17 @@ pub fn SdkMeterProviderBuilder::build(
     collectors: [],
     exporters: self.exporters.copy(),
     periodic_readers: [],
+    views: self.views.copy(),
     is_shutdown: false,
   })
   let provider : SdkMeterProvider = { state, }
+  for reader in self.manual_readers {
+    register_manual_reader(reader, provider)
+  }
   let periodic_readers = []
-  for config in self.periodic_reader_configs {
-    periodic_readers.push({
-      provider,
-      exporter: config.exporter,
-      interval_millis: config.interval_millis,
-    })
+  for reader in self.periodic_readers {
+    register_periodic_reader(reader, provider)
+    periodic_readers.push(reader)
   }
   state.val = { ..state.val, periodic_readers, }
   provider
@@ -561,6 +1385,7 @@ pub fn SdkMeterProvider::collect(self : SdkMeterProvider) -> Array[MetricData] {
     return metrics
   }
   for collector in self.state.val.collectors {
+    (collector.prepare_fn)()
     metrics.append((collector.collect_fn)())
   }
   metrics
@@ -569,7 +1394,9 @@ pub fn SdkMeterProvider::collect(self : SdkMeterProvider) -> Array[MetricData] {
 ///|
 /// Creates a pull-based reader over this provider.
 pub fn SdkMeterProvider::manual_reader(self : SdkMeterProvider) -> ManualReader {
-  { provider: self }
+  let reader = ManualReader::builder().build()
+  register_manual_reader(reader, self)
+  reader
 }
 
 ///|
@@ -593,6 +1420,12 @@ pub fn SdkMeterProvider::force_flush(
       Err(err) => return Err(err)
     }
   }
+  for reader in self.state.val.periodic_readers {
+    match reader.force_flush() {
+      Ok(_) => ()
+      Err(err) => return Err(err)
+    }
+  }
   @error.ok()
 }
 
@@ -610,55 +1443,187 @@ pub fn SdkMeterProvider::spawn_periodic_readers(
 
 ///|
 /// Flushes exporters, then shuts them down and marks the provider unusable.
-pub fn SdkMeterProvider::shutdown(
+pub fn SdkMeterProvider::shutdown_with_timeout(
   self : SdkMeterProvider,
+  timeout_millis : Int,
 ) -> @error.OTelSdkResult {
   if self.state.val.is_shutdown {
     return @error.already_shutdown()
   }
-  match self.force_flush() {
-    Ok(_) => ()
-    Err(err) => return Err(err)
+  let exporters = self.state.val.exporters.copy()
+  let metrics = self.collect()
+  for exporter in exporters {
+    match exporter.export_batch(metrics) {
+      Ok(_) => ()
+      Err(err) => return Err(err)
+    }
   }
-  for exporter in self.state.val.exporters {
-    match exporter.shutdown() {
+  for exporter in exporters {
+    match exporter.force_flush() {
+      Ok(_) => ()
+      Err(err) => return Err(err)
+    }
+  }
+  for reader in self.state.val.periodic_readers {
+    match reader.force_flush() {
       Ok(_) => ()
       Err(err) => return Err(err)
     }
   }
   self.state.val = { ..self.state.val, is_shutdown: true }
+  for exporter in exporters {
+    match exporter.shutdown_with_timeout(timeout_millis) {
+      Ok(_) => ()
+      Err(err) => return Err(err)
+    }
+  }
+  for reader in self.state.val.periodic_readers {
+    match reader.shutdown_with_timeout(timeout_millis) {
+      Ok(_) => ()
+      Err(err) => return Err(err)
+    }
+  }
   @error.ok()
+}
+
+///|
+pub fn SdkMeterProvider::shutdown(
+  self : SdkMeterProvider,
+) -> @error.OTelSdkResult {
+  self.shutdown_with_timeout(5000)
 }
 
 ///|
 /// Pulls a metric snapshot from the provider.
 pub fn ManualReader::collect(self : ManualReader) -> Array[MetricData] {
-  self.provider.collect()
+  if self.state.val.is_shutdown {
+    return []
+  }
+  match self.state.val.provider {
+    Some(provider) => {
+      let result = collect_with_temporality(
+        provider,
+        self.state.val.temporality,
+        self.state.val.last_metrics,
+      )
+      self.state.val = { ..self.state.val, last_metrics: result.last_metrics }
+      result.metrics
+    }
+    None => []
+  }
 }
 
 ///|
-/// Flushes the underlying provider.
+/// Manual readers do not own exporters, so force_flush is a no-op.
 pub fn ManualReader::force_flush(self : ManualReader) -> @error.OTelSdkResult {
-  self.provider.force_flush()
+  if self.state.val.is_shutdown {
+    return @error.already_shutdown()
+  }
+  @error.ok()
 }
 
 ///|
-/// Shuts down the underlying provider.
+/// Detaches the reader from the provider.
+pub fn ManualReader::shutdown_with_timeout(
+  self : ManualReader,
+  timeout_millis : Int,
+) -> @error.OTelSdkResult {
+  ignore(timeout_millis)
+  if self.state.val.is_shutdown {
+    return @error.already_shutdown()
+  }
+  self.state.val = {
+    provider: None,
+    temporality: self.state.val.temporality,
+    last_metrics: {},
+    is_shutdown: true,
+  }
+  @error.ok()
+}
+
+///|
 pub fn ManualReader::shutdown(self : ManualReader) -> @error.OTelSdkResult {
-  self.provider.shutdown()
+  self.shutdown_with_timeout(5000)
+}
+
+///|
+/// Collects one snapshot for this reader and applies its temporality policy.
+pub fn PeriodicMetricReader::collect(
+  self : PeriodicMetricReader,
+) -> Array[MetricData] {
+  if self.state.val.is_shutdown {
+    return []
+  }
+  match self.state.val.provider {
+    Some(provider) => {
+      let result = collect_with_temporality(
+        provider,
+        self.state.val.temporality,
+        self.state.val.last_metrics,
+      )
+      self.state.val = { ..self.state.val, last_metrics: result.last_metrics }
+      result.metrics
+    }
+    None => []
+  }
+}
+
+///|
+/// Exports one temporality-adjusted snapshot immediately.
+pub fn PeriodicMetricReader::force_flush(
+  self : PeriodicMetricReader,
+) -> @error.OTelSdkResult {
+  if self.state.val.is_shutdown {
+    return @error.already_shutdown()
+  }
+  if self.state.val.provider is None {
+    return @error.internal_failure("reader is not registered".to_string())
+  }
+  let metrics = self.collect()
+  match self.state.val.exporter.export_batch(metrics) {
+    Ok(_) => self.state.val.exporter.force_flush()
+    Err(err) => Err(err)
+  }
+}
+
+///|
+/// Shuts down the periodic reader and its exporter.
+pub fn PeriodicMetricReader::shutdown_with_timeout(
+  self : PeriodicMetricReader,
+  timeout_millis : Int,
+) -> @error.OTelSdkResult {
+  if self.state.val.is_shutdown {
+    return @error.already_shutdown()
+  }
+  self.state.val = {
+    ..self.state.val,
+    provider: None,
+    last_metrics: {},
+    is_shutdown: true,
+  }
+  self.state.val.exporter.shutdown_with_timeout(timeout_millis)
+}
+
+///|
+pub fn PeriodicMetricReader::shutdown(
+  self : PeriodicMetricReader,
+) -> @error.OTelSdkResult {
+  self.shutdown_with_timeout(5000)
 }
 
 ///|
 /// Background loop for periodic metric collection and export.
 pub async fn PeriodicMetricReader::run(self : PeriodicMetricReader) -> Unit {
-  while !self.provider.state.val.is_shutdown {
-    @async.sleep(self.interval_millis)
-    if self.provider.state.val.is_shutdown {
+  while !self.state.val.is_shutdown {
+    @async.sleep(self.state.val.interval_millis)
+    if self.state.val.is_shutdown {
       return
     }
-    let metrics = self.provider.collect()
-    ignore(self.exporter.export_batch(metrics))
-    ignore(self.exporter.force_flush())
+    match self.state.val.provider {
+      Some(provider) if provider.state.val.is_shutdown => return
+      Some(_) => ignore(self.force_flush())
+      None => return
+    }
   }
 }
 
@@ -670,11 +1635,31 @@ pub fn SdkMeter::counter(self : SdkMeter, name : StringView) -> CounterBuilder {
 }
 
 ///|
+/// Starts building a floating-point counter instrument.
+pub fn SdkMeter::f64_counter(
+  self : SdkMeter,
+  name : StringView,
+) -> DoubleCounterBuilder {
+  let (meter, name, description, unit) = create_builder(self, name)
+  { meter, name, description, unit }
+}
+
+///|
 /// Starts building an up-down counter instrument.
 pub fn SdkMeter::up_down_counter(
   self : SdkMeter,
   name : StringView,
 ) -> UpDownCounterBuilder {
+  let (meter, name, description, unit) = create_builder(self, name)
+  { meter, name, description, unit }
+}
+
+///|
+/// Starts building a floating-point up-down counter instrument.
+pub fn SdkMeter::f64_up_down_counter(
+  self : SdkMeter,
+  name : StringView,
+) -> DoubleUpDownCounterBuilder {
   let (meter, name, description, unit) = create_builder(self, name)
   { meter, name, description, unit }
 }
@@ -694,6 +1679,56 @@ pub fn SdkMeter::histogram(
 pub fn SdkMeter::gauge(self : SdkMeter, name : StringView) -> GaugeBuilder {
   let (meter, name, description, unit) = create_builder(self, name)
   { meter, name, description, unit }
+}
+
+///|
+/// Starts building an observable counter instrument.
+pub fn SdkMeter::observable_counter(
+  self : SdkMeter,
+  name : StringView,
+) -> ObservableCounterBuilder {
+  let (meter, name, description, unit) = create_builder(self, name)
+  { meter, name, description, unit, callbacks: [] }
+}
+
+///|
+/// Starts building an observable floating-point counter instrument.
+pub fn SdkMeter::f64_observable_counter(
+  self : SdkMeter,
+  name : StringView,
+) -> ObservableDoubleCounterBuilder {
+  let (meter, name, description, unit) = create_builder(self, name)
+  { meter, name, description, unit, callbacks: [] }
+}
+
+///|
+/// Starts building an observable up-down counter instrument.
+pub fn SdkMeter::observable_up_down_counter(
+  self : SdkMeter,
+  name : StringView,
+) -> ObservableUpDownCounterBuilder {
+  let (meter, name, description, unit) = create_builder(self, name)
+  { meter, name, description, unit, callbacks: [] }
+}
+
+///|
+/// Starts building an observable floating-point up-down counter instrument.
+pub fn SdkMeter::f64_observable_up_down_counter(
+  self : SdkMeter,
+  name : StringView,
+) -> ObservableDoubleUpDownCounterBuilder {
+  let (meter, name, description, unit) = create_builder(self, name)
+  { meter, name, description, unit, callbacks: [] }
+}
+
+///|
+/// Starts building an observable gauge instrument.
+pub fn SdkMeter::observable_gauge(
+  self : SdkMeter,
+  name : StringView,
+) -> ObservableGaugeBuilder {
+  let (meter, name, description, unit) = create_builder(self, name)
+  { meter, name, description, unit, callbacks: [] }
 }
 
 ///|
@@ -717,6 +1752,16 @@ pub fn CounterBuilder::with_description(
 }
 
 ///|
+/// Sets the instrument description.
+pub fn DoubleCounterBuilder::with_description(
+  self : DoubleCounterBuilder,
+  description : StringView,
+) -> DoubleCounterBuilder {
+  self.description = Some(description.to_string())
+  self
+}
+
+///|
 /// Sets the instrument unit.
 pub fn CounterBuilder::with_unit(
   self : CounterBuilder,
@@ -727,8 +1772,36 @@ pub fn CounterBuilder::with_unit(
 }
 
 ///|
+/// Sets the instrument unit.
+pub fn DoubleCounterBuilder::with_unit(
+  self : DoubleCounterBuilder,
+  unit : StringView,
+) -> DoubleCounterBuilder {
+  self.unit = Some(unit.to_string())
+  self
+}
+
+///|
 /// Builds the counter instrument and registers it with the provider.
 pub fn CounterBuilder::build(self : CounterBuilder) -> Counter {
+  {
+    state: register_instrument(
+      self.meter,
+      descriptor(
+        self.name,
+        self.description,
+        self.unit,
+        InstrumentKind::Counter,
+      ),
+    ),
+  }
+}
+
+///|
+/// Builds the floating-point counter instrument and registers it with the provider.
+pub fn DoubleCounterBuilder::build(
+  self : DoubleCounterBuilder,
+) -> DoubleCounter {
   {
     state: register_instrument(
       self.meter,
@@ -753,6 +1826,16 @@ pub fn UpDownCounterBuilder::with_description(
 }
 
 ///|
+/// Sets the instrument description.
+pub fn DoubleUpDownCounterBuilder::with_description(
+  self : DoubleUpDownCounterBuilder,
+  description : StringView,
+) -> DoubleUpDownCounterBuilder {
+  self.description = Some(description.to_string())
+  self
+}
+
+///|
 /// Sets the instrument unit.
 pub fn UpDownCounterBuilder::with_unit(
   self : UpDownCounterBuilder,
@@ -763,10 +1846,38 @@ pub fn UpDownCounterBuilder::with_unit(
 }
 
 ///|
+/// Sets the instrument unit.
+pub fn DoubleUpDownCounterBuilder::with_unit(
+  self : DoubleUpDownCounterBuilder,
+  unit : StringView,
+) -> DoubleUpDownCounterBuilder {
+  self.unit = Some(unit.to_string())
+  self
+}
+
+///|
 /// Builds the up-down counter instrument and registers it with the provider.
 pub fn UpDownCounterBuilder::build(
   self : UpDownCounterBuilder,
 ) -> UpDownCounter {
+  {
+    state: register_instrument(
+      self.meter,
+      descriptor(
+        self.name,
+        self.description,
+        self.unit,
+        InstrumentKind::UpDownCounter,
+      ),
+    ),
+  }
+}
+
+///|
+/// Builds the floating-point up-down counter instrument and registers it with the provider.
+pub fn DoubleUpDownCounterBuilder::build(
+  self : DoubleUpDownCounterBuilder,
+) -> DoubleUpDownCounter {
   {
     state: register_instrument(
       self.meter,
@@ -848,13 +1959,284 @@ pub fn GaugeBuilder::build(self : GaugeBuilder) -> Gauge {
 }
 
 ///|
+pub fn ObservableCounterBuilder::with_description(
+  self : ObservableCounterBuilder,
+  description : StringView,
+) -> ObservableCounterBuilder {
+  self.description = Some(description.to_string())
+  self
+}
+
+///|
+pub fn ObservableCounterBuilder::with_unit(
+  self : ObservableCounterBuilder,
+  unit : StringView,
+) -> ObservableCounterBuilder {
+  self.unit = Some(unit.to_string())
+  self
+}
+
+///|
+pub fn ObservableCounterBuilder::with_callback(
+  self : ObservableCounterBuilder,
+  callback : (ObservableCounter) -> Unit,
+) -> ObservableCounterBuilder {
+  self.callbacks.push(callback)
+  self
+}
+
+///|
+pub fn ObservableDoubleCounterBuilder::with_description(
+  self : ObservableDoubleCounterBuilder,
+  description : StringView,
+) -> ObservableDoubleCounterBuilder {
+  self.description = Some(description.to_string())
+  self
+}
+
+///|
+pub fn ObservableDoubleCounterBuilder::with_unit(
+  self : ObservableDoubleCounterBuilder,
+  unit : StringView,
+) -> ObservableDoubleCounterBuilder {
+  self.unit = Some(unit.to_string())
+  self
+}
+
+///|
+pub fn ObservableDoubleCounterBuilder::with_callback(
+  self : ObservableDoubleCounterBuilder,
+  callback : (ObservableDoubleCounter) -> Unit,
+) -> ObservableDoubleCounterBuilder {
+  self.callbacks.push(callback)
+  self
+}
+
+///|
+pub fn ObservableCounterBuilder::build(
+  self : ObservableCounterBuilder,
+) -> ObservableCounter {
+  let state : Ref[SyncInstrumentState] = Ref::new({ streams: [] })
+  let instrument : ObservableCounter = { state, }
+  let callbacks = []
+  for callback in self.callbacks {
+    callbacks.push(() => callback(instrument))
+  }
+  register_observable_instrument(
+    self.meter,
+    descriptor(
+      self.name,
+      self.description,
+      self.unit,
+      InstrumentKind::ObservableCounter,
+    ),
+    state,
+    callbacks,
+  )
+  instrument
+}
+
+///|
+pub fn ObservableDoubleCounterBuilder::build(
+  self : ObservableDoubleCounterBuilder,
+) -> ObservableDoubleCounter {
+  let state : Ref[SyncInstrumentState] = Ref::new({ streams: [] })
+  let instrument : ObservableDoubleCounter = { state, }
+  let callbacks = []
+  for callback in self.callbacks {
+    callbacks.push(() => callback(instrument))
+  }
+  register_observable_instrument(
+    self.meter,
+    descriptor(
+      self.name,
+      self.description,
+      self.unit,
+      InstrumentKind::ObservableCounter,
+    ),
+    state,
+    callbacks,
+  )
+  instrument
+}
+
+///|
+pub fn ObservableUpDownCounterBuilder::with_description(
+  self : ObservableUpDownCounterBuilder,
+  description : StringView,
+) -> ObservableUpDownCounterBuilder {
+  self.description = Some(description.to_string())
+  self
+}
+
+///|
+pub fn ObservableDoubleUpDownCounterBuilder::with_description(
+  self : ObservableDoubleUpDownCounterBuilder,
+  description : StringView,
+) -> ObservableDoubleUpDownCounterBuilder {
+  self.description = Some(description.to_string())
+  self
+}
+
+///|
+pub fn ObservableUpDownCounterBuilder::with_unit(
+  self : ObservableUpDownCounterBuilder,
+  unit : StringView,
+) -> ObservableUpDownCounterBuilder {
+  self.unit = Some(unit.to_string())
+  self
+}
+
+///|
+pub fn ObservableDoubleUpDownCounterBuilder::with_unit(
+  self : ObservableDoubleUpDownCounterBuilder,
+  unit : StringView,
+) -> ObservableDoubleUpDownCounterBuilder {
+  self.unit = Some(unit.to_string())
+  self
+}
+
+///|
+pub fn ObservableUpDownCounterBuilder::with_callback(
+  self : ObservableUpDownCounterBuilder,
+  callback : (ObservableUpDownCounter) -> Unit,
+) -> ObservableUpDownCounterBuilder {
+  self.callbacks.push(callback)
+  self
+}
+
+///|
+pub fn ObservableDoubleUpDownCounterBuilder::with_callback(
+  self : ObservableDoubleUpDownCounterBuilder,
+  callback : (ObservableDoubleUpDownCounter) -> Unit,
+) -> ObservableDoubleUpDownCounterBuilder {
+  self.callbacks.push(callback)
+  self
+}
+
+///|
+pub fn ObservableUpDownCounterBuilder::build(
+  self : ObservableUpDownCounterBuilder,
+) -> ObservableUpDownCounter {
+  let state : Ref[SyncInstrumentState] = Ref::new({ streams: [] })
+  let instrument : ObservableUpDownCounter = { state, }
+  let callbacks = []
+  for callback in self.callbacks {
+    callbacks.push(() => callback(instrument))
+  }
+  register_observable_instrument(
+    self.meter,
+    descriptor(
+      self.name,
+      self.description,
+      self.unit,
+      InstrumentKind::ObservableUpDownCounter,
+    ),
+    state,
+    callbacks,
+  )
+  instrument
+}
+
+///|
+pub fn ObservableDoubleUpDownCounterBuilder::build(
+  self : ObservableDoubleUpDownCounterBuilder,
+) -> ObservableDoubleUpDownCounter {
+  let state : Ref[SyncInstrumentState] = Ref::new({ streams: [] })
+  let instrument : ObservableDoubleUpDownCounter = { state, }
+  let callbacks = []
+  for callback in self.callbacks {
+    callbacks.push(() => callback(instrument))
+  }
+  register_observable_instrument(
+    self.meter,
+    descriptor(
+      self.name,
+      self.description,
+      self.unit,
+      InstrumentKind::ObservableUpDownCounter,
+    ),
+    state,
+    callbacks,
+  )
+  instrument
+}
+
+///|
+pub fn ObservableGaugeBuilder::with_description(
+  self : ObservableGaugeBuilder,
+  description : StringView,
+) -> ObservableGaugeBuilder {
+  self.description = Some(description.to_string())
+  self
+}
+
+///|
+pub fn ObservableGaugeBuilder::with_unit(
+  self : ObservableGaugeBuilder,
+  unit : StringView,
+) -> ObservableGaugeBuilder {
+  self.unit = Some(unit.to_string())
+  self
+}
+
+///|
+pub fn ObservableGaugeBuilder::with_callback(
+  self : ObservableGaugeBuilder,
+  callback : (ObservableGauge) -> Unit,
+) -> ObservableGaugeBuilder {
+  self.callbacks.push(callback)
+  self
+}
+
+///|
+pub fn ObservableGaugeBuilder::build(
+  self : ObservableGaugeBuilder,
+) -> ObservableGauge {
+  let state : Ref[SyncInstrumentState] = Ref::new({ streams: [] })
+  let instrument : ObservableGauge = { state, }
+  let callbacks = []
+  for callback in self.callbacks {
+    callbacks.push(() => callback(instrument))
+  }
+  register_observable_instrument(
+    self.meter,
+    descriptor(
+      self.name,
+      self.description,
+      self.unit,
+      InstrumentKind::ObservableGauge,
+    ),
+    state,
+    callbacks,
+  )
+  instrument
+}
+
+///|
 /// Adds a delta to the counter for one attribute set.
 pub fn Counter::add(
   self : Counter,
   value : Int64,
   attributes? : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
+  if value < 0 {
+    return
+  }
   update_sum(self.state, attributes, value)
+}
+
+///|
+/// Adds a floating-point delta to the counter for one attribute set.
+pub fn DoubleCounter::add(
+  self : DoubleCounter,
+  value : Double,
+  attributes? : ArrayView[@common.KeyValue] = [],
+) -> Unit {
+  if value < 0.0 {
+    return
+  }
+  update_double_sum(self.state, attributes, value)
 }
 
 ///|
@@ -865,6 +2247,16 @@ pub fn UpDownCounter::add(
   attributes? : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   update_sum(self.state, attributes, value)
+}
+
+///|
+/// Adds a floating-point delta to the up-down counter for one attribute set.
+pub fn DoubleUpDownCounter::add(
+  self : DoubleUpDownCounter,
+  value : Double,
+  attributes? : ArrayView[@common.KeyValue] = [],
+) -> Unit {
+  update_double_sum(self.state, attributes, value)
 }
 
 ///|
@@ -881,6 +2273,64 @@ pub fn Histogram::record(
 /// Records the latest gauge value for an attribute set.
 pub fn Gauge::record(
   self : Gauge,
+  value : Double,
+  attributes? : ArrayView[@common.KeyValue] = [],
+) -> Unit {
+  update_gauge(self.state, attributes, value)
+}
+
+///|
+/// Observes one value for an observable counter during callback execution.
+pub fn ObservableCounter::observe(
+  self : ObservableCounter,
+  value : Int64,
+  attributes? : ArrayView[@common.KeyValue] = [],
+) -> Unit {
+  if value < 0 {
+    return
+  }
+  update_sum(self.state, attributes, value)
+}
+
+///|
+/// Observes one floating-point value for an observable counter during callback execution.
+pub fn ObservableDoubleCounter::observe(
+  self : ObservableDoubleCounter,
+  value : Double,
+  attributes? : ArrayView[@common.KeyValue] = [],
+) -> Unit {
+  if value < 0.0 {
+    return
+  }
+  update_double_sum(self.state, attributes, value)
+}
+
+///|
+/// Observes one value for an observable up-down counter during callback
+/// execution.
+pub fn ObservableUpDownCounter::observe(
+  self : ObservableUpDownCounter,
+  value : Int64,
+  attributes? : ArrayView[@common.KeyValue] = [],
+) -> Unit {
+  update_sum(self.state, attributes, value)
+}
+
+///|
+/// Observes one floating-point value for an observable up-down counter during
+/// callback execution.
+pub fn ObservableDoubleUpDownCounter::observe(
+  self : ObservableDoubleUpDownCounter,
+  value : Double,
+  attributes? : ArrayView[@common.KeyValue] = [],
+) -> Unit {
+  update_double_sum(self.state, attributes, value)
+}
+
+///|
+/// Observes one value for an observable gauge during callback execution.
+pub fn ObservableGauge::observe(
+  self : ObservableGauge,
   value : Double,
   attributes? : ArrayView[@common.KeyValue] = [],
 ) -> Unit {

@@ -1,0 +1,153 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/metrics"
+
+import {
+  "moonbit-community/opentelemetry/sdk/common",
+  "moonbit-community/opentelemetry/sdk/error",
+  "moonbitlang/async",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct Counter[T] {
+  add_fn : (T, ArrayView[@common.KeyValue]) -> Unit
+}
+pub fn[T] Counter::add(Self[T], T, attributes? : ArrayView[@common.KeyValue]) -> Unit
+
+pub struct CounterBuilder[T] {
+  mut description : String?
+  mut unit : String?
+  create_fn : (String?, String?) -> Counter[T]
+}
+pub fn[T] CounterBuilder::build(Self[T]) -> Counter[T]
+pub fn[T] CounterBuilder::with_description(Self[T], StringView) -> Self[T]
+pub fn[T] CounterBuilder::with_unit(Self[T], StringView) -> Self[T]
+
+pub struct Gauge[T] {
+  record_fn : (T, ArrayView[@common.KeyValue]) -> Unit
+}
+pub fn[T] Gauge::record(Self[T], T, attributes? : ArrayView[@common.KeyValue]) -> Unit
+
+pub struct GaugeBuilder[T] {
+  mut description : String?
+  mut unit : String?
+  create_fn : (String?, String?) -> Gauge[T]
+}
+pub fn[T] GaugeBuilder::build(Self[T]) -> Gauge[T]
+pub fn[T] GaugeBuilder::with_description(Self[T], StringView) -> Self[T]
+pub fn[T] GaugeBuilder::with_unit(Self[T], StringView) -> Self[T]
+
+pub struct Histogram[T] {
+  record_fn : (T, ArrayView[@common.KeyValue]) -> Unit
+}
+pub fn[T] Histogram::record(Self[T], T, attributes? : ArrayView[@common.KeyValue]) -> Unit
+
+pub struct HistogramBuilder[T] {
+  mut description : String?
+  mut unit : String?
+  create_fn : (String?, String?) -> Histogram[T]
+}
+pub fn[T] HistogramBuilder::build(Self[T]) -> Histogram[T]
+pub fn[T] HistogramBuilder::with_description(Self[T], StringView) -> Self[T]
+pub fn[T] HistogramBuilder::with_unit(Self[T], StringView) -> Self[T]
+
+pub struct Meter {
+  sdk_meter : @moonbit-community/opentelemetry/sdk/metrics.SdkMeter?
+}
+pub fn Meter::f64_counter(Self, StringView) -> CounterBuilder[Double]
+pub fn Meter::f64_gauge(Self, StringView) -> GaugeBuilder[Double]
+pub fn Meter::f64_histogram(Self, StringView) -> HistogramBuilder[Double]
+pub fn Meter::f64_observable_counter(Self, StringView) -> ObservableCounterBuilder[Double]
+pub fn Meter::f64_observable_gauge(Self, StringView) -> ObservableGaugeBuilder[Double]
+pub fn Meter::f64_observable_up_down_counter(Self, StringView) -> ObservableUpDownCounterBuilder[Double]
+pub fn Meter::f64_up_down_counter(Self, StringView) -> UpDownCounterBuilder[Double]
+pub fn Meter::i64_gauge(Self, StringView) -> GaugeBuilder[Int64]
+pub fn Meter::i64_observable_gauge(Self, StringView) -> ObservableGaugeBuilder[Int64]
+pub fn Meter::i64_observable_up_down_counter(Self, StringView) -> ObservableUpDownCounterBuilder[Int64]
+pub fn Meter::i64_up_down_counter(Self, StringView) -> UpDownCounterBuilder[Int64]
+pub fn Meter::u64_counter(Self, StringView) -> CounterBuilder[UInt64]
+pub fn Meter::u64_gauge(Self, StringView) -> GaugeBuilder[UInt64]
+pub fn Meter::u64_histogram(Self, StringView) -> HistogramBuilder[UInt64]
+pub fn Meter::u64_observable_counter(Self, StringView) -> ObservableCounterBuilder[UInt64]
+pub fn Meter::u64_observable_gauge(Self, StringView) -> ObservableGaugeBuilder[UInt64]
+
+pub struct MeterProvider {
+  sdk_provider : @moonbit-community/opentelemetry/sdk/metrics.SdkMeterProvider?
+}
+pub fn MeterProvider::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn MeterProvider::from_sdk(@moonbit-community/opentelemetry/sdk/metrics.SdkMeterProvider) -> Self
+pub fn MeterProvider::meter(Self, StringView) -> Meter
+pub fn MeterProvider::meter_with_scope(Self, @common.InstrumentationScope) -> Meter
+pub fn MeterProvider::noop() -> Self
+pub fn MeterProvider::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn MeterProvider::spawn_periodic_readers(Self, @async.TaskGroup[Unit], allow_failure? : Bool) -> Unit
+
+pub struct ObservableCounter[T] {
+  observe_fn : (T, ArrayView[@common.KeyValue]) -> Unit
+}
+pub fn[T] ObservableCounter::observe(Self[T], T, attributes? : ArrayView[@common.KeyValue]) -> Unit
+
+pub struct ObservableCounterBuilder[T] {
+  mut description : String?
+  mut unit : String?
+  callbacks : Array[(ObservableCounter[T]) -> Unit]
+  create_fn : (String?, String?, Array[(ObservableCounter[T]) -> Unit]) -> ObservableCounter[T]
+}
+pub fn[T] ObservableCounterBuilder::build(Self[T]) -> ObservableCounter[T]
+pub fn[T] ObservableCounterBuilder::with_callback(Self[T], (ObservableCounter[T]) -> Unit) -> Self[T]
+pub fn[T] ObservableCounterBuilder::with_description(Self[T], StringView) -> Self[T]
+pub fn[T] ObservableCounterBuilder::with_unit(Self[T], StringView) -> Self[T]
+
+pub struct ObservableGauge[T] {
+  observe_fn : (T, ArrayView[@common.KeyValue]) -> Unit
+}
+pub fn[T] ObservableGauge::observe(Self[T], T, attributes? : ArrayView[@common.KeyValue]) -> Unit
+
+pub struct ObservableGaugeBuilder[T] {
+  mut description : String?
+  mut unit : String?
+  callbacks : Array[(ObservableGauge[T]) -> Unit]
+  create_fn : (String?, String?, Array[(ObservableGauge[T]) -> Unit]) -> ObservableGauge[T]
+}
+pub fn[T] ObservableGaugeBuilder::build(Self[T]) -> ObservableGauge[T]
+pub fn[T] ObservableGaugeBuilder::with_callback(Self[T], (ObservableGauge[T]) -> Unit) -> Self[T]
+pub fn[T] ObservableGaugeBuilder::with_description(Self[T], StringView) -> Self[T]
+pub fn[T] ObservableGaugeBuilder::with_unit(Self[T], StringView) -> Self[T]
+
+pub struct ObservableUpDownCounter[T] {
+  observe_fn : (T, ArrayView[@common.KeyValue]) -> Unit
+}
+pub fn[T] ObservableUpDownCounter::observe(Self[T], T, attributes? : ArrayView[@common.KeyValue]) -> Unit
+
+pub struct ObservableUpDownCounterBuilder[T] {
+  mut description : String?
+  mut unit : String?
+  callbacks : Array[(ObservableUpDownCounter[T]) -> Unit]
+  create_fn : (String?, String?, Array[(ObservableUpDownCounter[T]) -> Unit]) -> ObservableUpDownCounter[T]
+}
+pub fn[T] ObservableUpDownCounterBuilder::build(Self[T]) -> ObservableUpDownCounter[T]
+pub fn[T] ObservableUpDownCounterBuilder::with_callback(Self[T], (ObservableUpDownCounter[T]) -> Unit) -> Self[T]
+pub fn[T] ObservableUpDownCounterBuilder::with_description(Self[T], StringView) -> Self[T]
+pub fn[T] ObservableUpDownCounterBuilder::with_unit(Self[T], StringView) -> Self[T]
+
+pub struct UpDownCounter[T] {
+  add_fn : (T, ArrayView[@common.KeyValue]) -> Unit
+}
+pub fn[T] UpDownCounter::add(Self[T], T, attributes? : ArrayView[@common.KeyValue]) -> Unit
+
+pub struct UpDownCounterBuilder[T] {
+  mut description : String?
+  mut unit : String?
+  create_fn : (String?, String?) -> UpDownCounter[T]
+}
+pub fn[T] UpDownCounterBuilder::build(Self[T]) -> UpDownCounter[T]
+pub fn[T] UpDownCounterBuilder::with_description(Self[T], StringView) -> Self[T]
+pub fn[T] UpDownCounterBuilder::with_unit(Self[T], StringView) -> Self[T]
+
+// Type aliases
+
+// Traits
+
