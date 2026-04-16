@@ -77,12 +77,12 @@ pub fn Meter::u64_observable_gauge(Self, StringView) -> ObservableGaugeBuilder[U
 pub struct MeterProvider {
   sdk_provider : @moonbit-community/opentelemetry/sdk/metrics.SdkMeterProvider?
 }
-pub fn MeterProvider::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub async fn MeterProvider::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
 pub fn MeterProvider::from_sdk(@moonbit-community/opentelemetry/sdk/metrics.SdkMeterProvider) -> Self
 pub fn MeterProvider::meter(Self, StringView) -> Meter
 pub fn MeterProvider::meter_with_scope(Self, @common.InstrumentationScope) -> Meter
 pub fn MeterProvider::noop() -> Self
-pub fn MeterProvider::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub async fn MeterProvider::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
 pub fn MeterProvider::spawn_periodic_readers(Self, @async.TaskGroup[Unit], allow_failure? : Bool) -> Unit
 
 pub struct ObservableCounter[T] {

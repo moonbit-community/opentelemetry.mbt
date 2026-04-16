@@ -116,10 +116,10 @@ pub struct SdkTracerProvider {
   state : @ref.Ref[ProviderState]
 }
 pub fn SdkTracerProvider::builder() -> SdkTracerProviderBuilder
-pub fn SdkTracerProvider::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub async fn SdkTracerProvider::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
 pub fn SdkTracerProvider::resource(Self) -> @resource.Resource
-pub fn SdkTracerProvider::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
-pub fn SdkTracerProvider::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub async fn SdkTracerProvider::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub async fn SdkTracerProvider::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
 pub fn SdkTracerProvider::spawn_batch_processor_tasks(Self, @async.TaskGroup[Unit], allow_failure? : Bool) -> Unit
 pub fn SdkTracerProvider::tracer(Self, StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> SdkTracer
 
@@ -150,7 +150,7 @@ pub struct Span {
 pub fn Span::add_event(Self, StringView, attributes? : ArrayView[@common.KeyValue], timestamp_unix_nano? : Int64) -> Unit
 pub fn Span::add_link(Self, @common.SpanContext, attributes? : ArrayView[@common.KeyValue]) -> Unit
 pub fn Span::context(Self) -> @context.Context
-pub fn Span::end(Self, end_time_unix_nano? : Int64) -> Unit
+pub async fn Span::end(Self, end_time_unix_nano? : Int64) -> Unit
 pub fn Span::has_ended(Self) -> Bool
 pub fn Span::is_recording(Self) -> Bool
 pub fn Span::set_attribute(Self, StringView, @common.Value) -> Unit
@@ -185,17 +185,17 @@ pub struct SpanEvent {
 pub fn SpanEvent::new(StringView, attributes? : ArrayView[@common.KeyValue], timestamp_unix_nano? : Int64) -> Self
 
 pub struct SpanExporter {
-  export_fn : (ArrayView[SpanData]) -> Result[Unit, @error.OTelSdkError]
-  force_flush_fn : () -> Result[Unit, @error.OTelSdkError]
-  shutdown_fn : () -> Result[Unit, @error.OTelSdkError]
+  export_fn : async (ArrayView[SpanData]) -> Result[Unit, @error.OTelSdkError]
+  force_flush_fn : async () -> Result[Unit, @error.OTelSdkError]
+  shutdown_fn : async () -> Result[Unit, @error.OTelSdkError]
   name_fn : () -> String
 }
-pub fn SpanExporter::export_batch(Self, ArrayView[SpanData]) -> Result[Unit, @error.OTelSdkError]
-pub fn SpanExporter::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub async fn SpanExporter::export_batch(Self, ArrayView[SpanData]) -> Result[Unit, @error.OTelSdkError]
+pub async fn SpanExporter::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
 pub fn SpanExporter::name(Self) -> String
-pub fn SpanExporter::new((ArrayView[SpanData]) -> Result[Unit, @error.OTelSdkError], force_flush_fn? : () -> Result[Unit, @error.OTelSdkError], shutdown_fn? : () -> Result[Unit, @error.OTelSdkError], name_fn? : () -> String) -> Self
-pub fn SpanExporter::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
-pub fn SpanExporter::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub fn SpanExporter::new(async (ArrayView[SpanData]) -> Result[Unit, @error.OTelSdkError], force_flush_fn? : async () -> Result[Unit, @error.OTelSdkError], shutdown_fn? : async () -> Result[Unit, @error.OTelSdkError], name_fn? : () -> String) -> Self
+pub async fn SpanExporter::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub async fn SpanExporter::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
 
 pub(all) enum SpanKind {
   Internal
@@ -221,16 +221,16 @@ pub fn SpanLink::new(@common.SpanContext, attributes? : ArrayView[@common.KeyVal
 
 pub struct SpanProcessor {
   on_start_fn : (@context.Context, SpanData) -> Unit
-  on_end_fn : (SpanData) -> Unit
-  force_flush_fn : () -> Result[Unit, @error.OTelSdkError]
-  shutdown_fn : () -> Result[Unit, @error.OTelSdkError]
+  on_end_fn : async (SpanData) -> Unit
+  force_flush_fn : async () -> Result[Unit, @error.OTelSdkError]
+  shutdown_fn : async () -> Result[Unit, @error.OTelSdkError]
 }
-pub fn SpanProcessor::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
-pub fn SpanProcessor::new(on_start_fn? : (@context.Context, SpanData) -> Unit, on_end_fn? : (SpanData) -> Unit, force_flush_fn? : () -> Result[Unit, @error.OTelSdkError], shutdown_fn? : () -> Result[Unit, @error.OTelSdkError]) -> Self
-pub fn SpanProcessor::on_end(Self, SpanData) -> Unit
+pub async fn SpanProcessor::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn SpanProcessor::new(on_start_fn? : (@context.Context, SpanData) -> Unit, on_end_fn? : async (SpanData) -> Unit, force_flush_fn? : async () -> Result[Unit, @error.OTelSdkError], shutdown_fn? : async () -> Result[Unit, @error.OTelSdkError]) -> Self
+pub async fn SpanProcessor::on_end(Self, SpanData) -> Unit
 pub fn SpanProcessor::on_start(Self, @context.Context, SpanData) -> Unit
-pub fn SpanProcessor::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
-pub fn SpanProcessor::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub async fn SpanProcessor::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub async fn SpanProcessor::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
 
 type SpanState
 

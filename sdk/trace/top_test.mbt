@@ -7,7 +7,7 @@ fn restore_env_var(key : String, value : String?) -> Unit {
 }
 
 ///|
-test "simple processor exports parent child spans" {
+async test "simple processor exports parent child spans" {
   let exporter = InMemorySpanExporter::new()
   let provider = SdkTracerProvider::builder()
     .with_simple_exporter(exporter.into_span_exporter())
@@ -36,7 +36,7 @@ test "simple processor exports parent child spans" {
 }
 
 ///|
-test "batch processor flushes queued spans" {
+async test "batch processor flushes queued spans" {
   let exporter = InMemorySpanExporter::new()
   let provider = SdkTracerProvider::builder()
     .with_batch_exporter(
@@ -124,7 +124,7 @@ async test "batch processor flushes on scheduled delay in background" {
 }
 
 ///|
-test "provider shutdown with timeout marks provider unavailable" {
+async test "provider shutdown with timeout marks provider unavailable" {
   let exporter = InMemorySpanExporter::new()
   let provider = SdkTracerProvider::builder()
     .with_batch_exporter(exporter.into_span_exporter())

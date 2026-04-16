@@ -51,18 +51,18 @@ pub struct Logger {
   sdk_logger : @moonbit-community/opentelemetry/sdk/logs.SdkLogger?
 }
 pub fn Logger::create_log_record(Self) -> LogRecord
-pub fn Logger::emit(Self, LogRecord) -> Unit
+pub async fn Logger::emit(Self, LogRecord) -> Unit
 pub fn Logger::event_enabled(Self, Severity, StringView, name? : String?) -> Bool
 
 pub struct LoggerProvider {
   sdk_provider : @moonbit-community/opentelemetry/sdk/logs.SdkLoggerProvider?
 }
-pub fn LoggerProvider::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub async fn LoggerProvider::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
 pub fn LoggerProvider::from_sdk(@moonbit-community/opentelemetry/sdk/logs.SdkLoggerProvider) -> Self
 pub fn LoggerProvider::logger(Self, StringView) -> Logger
 pub fn LoggerProvider::logger_with_scope(Self, @common.InstrumentationScope) -> Logger
 pub fn LoggerProvider::noop() -> Self
-pub fn LoggerProvider::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub async fn LoggerProvider::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
 pub fn LoggerProvider::spawn_batch_processor_tasks(Self, @async.TaskGroup[Unit], allow_failure? : Bool) -> Unit
 
 pub(all) enum Severity {

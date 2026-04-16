@@ -1,0 +1,29 @@
+import {
+  "moonbitlang/async" @async,
+  "moonbitlang/async/http" @http,
+  "moonbitlang/async/io" @io,
+  "moonbitlang/async/socket" @socket,
+  "moonbitlang/core/buffer" @buffer,
+  "moonbitlang/core/debug",
+  "moonbitlang/core/env" @env,
+  "moonbitlang/core/string",
+  "moonbitlang/protobuf" @protobuf,
+  "moonbit-community/opentelemetry/protocol/collector/logs/v1" @collectorlogs,
+  "moonbit-community/opentelemetry/protocol/collector/metrics/v1" @collectormetrics,
+  "moonbit-community/opentelemetry/protocol/collector/trace/v1" @collectortrace,
+  "moonbit-community/opentelemetry/protocol/common/v1" @otlpcommon,
+  "moonbit-community/opentelemetry/protocol/logs/v1" @otlplogs,
+  "moonbit-community/opentelemetry/protocol/metrics/v1" @otlpmetrics,
+  "moonbit-community/opentelemetry/protocol/resource/v1" @otlpresource,
+  "moonbit-community/opentelemetry/protocol/trace/v1" @otlptrace,
+  "moonbit-community/opentelemetry/sdk/common" @common,
+  "moonbit-community/opentelemetry/sdk/error" @error,
+  "moonbit-community/opentelemetry/sdk/logs" @sdklogs,
+  "moonbit-community/opentelemetry/sdk/metrics" @sdkmetrics,
+  "moonbit-community/opentelemetry/sdk/resource" @resource,
+  "moonbit-community/opentelemetry/sdk/trace" @sdktrace,
+}
+
+options(
+  backend: [ "native" ],
+)

@@ -67,7 +67,7 @@ fn metric_count(metrics : Array[MetricData], name : StringView) -> Int {
 }
 
 ///|
-test "manual reader collects metric snapshots" {
+async test "manual reader collects metric snapshots" {
   let exporter = InMemoryMetricExporter::new()
   let provider = SdkMeterProvider::builder()
     .with_exporter(exporter.into_metric_exporter())
@@ -257,7 +257,7 @@ test "views can drop matching streams" {
 }
 
 ///|
-test "builder-registered periodic reader force flush honors delta temporality" {
+async test "builder-registered periodic reader force flush honors delta temporality" {
   let exporter = InMemoryMetricExporter::new()
   let reader = PeriodicMetricReader::builder(exporter.into_metric_exporter())
     .with_interval(10)

@@ -1,5 +1,5 @@
 ///|
-test "global tracer provider can be replaced from sdk-backed wrapper" {
+async test "global tracer provider can be replaced from sdk-backed wrapper" {
   reset_for_test()
 
   let exporter = @sdktrace.InMemorySpanExporter::new()

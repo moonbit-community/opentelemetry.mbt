@@ -1,5 +1,5 @@
 ///|
-test "logger record maps severity and body into sdk log pipeline" {
+async test "logger record maps severity and body into sdk log pipeline" {
   let exporter = @sdklogs.InMemoryLogExporter::new()
   let provider = LoggerProvider::from_sdk(
     @sdklogs.SdkLoggerProvider::builder()

@@ -135,9 +135,9 @@ pub struct SpanData {
 ///|
 /// Exporter callback wrapper for finished span batches.
 pub struct SpanExporter {
-  export_fn : (ArrayView[SpanData]) -> @error.OTelSdkResult
-  force_flush_fn : () -> @error.OTelSdkResult
-  shutdown_fn : () -> @error.OTelSdkResult
+  export_fn : async (ArrayView[SpanData]) -> @error.OTelSdkResult
+  force_flush_fn : async () -> @error.OTelSdkResult
+  shutdown_fn : async () -> @error.OTelSdkResult
   name_fn : () -> String
 }
 
@@ -145,13 +145,13 @@ pub struct SpanExporter {
 /// Processing hook interface around span start and end.
 pub struct SpanProcessor {
   on_start_fn : (@context.Context, SpanData) -> Unit
-  on_end_fn : (SpanData) -> Unit
-  force_flush_fn : () -> @error.OTelSdkResult
-  shutdown_fn : () -> @error.OTelSdkResult
+  on_end_fn : async (SpanData) -> Unit
+  force_flush_fn : async () -> @error.OTelSdkResult
+  shutdown_fn : async () -> @error.OTelSdkResult
 }
 
 ///|
-/// Processor that exports spans synchronously on end.
+/// Processor that exports spans immediately when `Span::end()` is awaited.
 pub struct SimpleSpanProcessor {
   inner : SpanProcessor
 }
@@ -672,9 +672,9 @@ pub impl Default for Config with default() -> Config {
 ///|
 /// Builds a span exporter from callbacks.
 pub fn SpanExporter::new(
-  export_fn : (ArrayView[SpanData]) -> @error.OTelSdkResult,
-  force_flush_fn? : () -> @error.OTelSdkResult = @error.ok,
-  shutdown_fn? : () -> @error.OTelSdkResult = @error.ok,
+  export_fn : async (ArrayView[SpanData]) -> @error.OTelSdkResult,
+  force_flush_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
+  shutdown_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
   name_fn? : () -> String = () => "custom",
 ) -> SpanExporter {
   { export_fn, force_flush_fn, shutdown_fn, name_fn }
@@ -682,7 +682,7 @@ pub fn SpanExporter::new(
 
 ///|
 /// Exports one batch of finished spans.
-pub fn SpanExporter::export_batch(
+pub async fn SpanExporter::export_batch(
   self : SpanExporter,
   batch : ArrayView[SpanData],
 ) -> @error.OTelSdkResult {
@@ -691,13 +691,15 @@ pub fn SpanExporter::export_batch(
 
 ///|
 /// Requests exporter flush.
-pub fn SpanExporter::force_flush(self : SpanExporter) -> @error.OTelSdkResult {
+pub async fn SpanExporter::force_flush(
+  self : SpanExporter,
+) -> @error.OTelSdkResult {
   (self.force_flush_fn)()
 }
 
 ///|
 /// Requests exporter shutdown with an optional timeout budget in milliseconds.
-pub fn SpanExporter::shutdown_with_timeout(
+pub async fn SpanExporter::shutdown_with_timeout(
   self : SpanExporter,
   timeout_millis : Int,
 ) -> @error.OTelSdkResult {
@@ -707,7 +709,9 @@ pub fn SpanExporter::shutdown_with_timeout(
 
 ///|
 /// Requests exporter shutdown.
-pub fn SpanExporter::shutdown(self : SpanExporter) -> @error.OTelSdkResult {
+pub async fn SpanExporter::shutdown(
+  self : SpanExporter,
+) -> @error.OTelSdkResult {
   self.shutdown_with_timeout(5000)
 }
 
@@ -721,9 +725,9 @@ pub fn SpanExporter::name(self : SpanExporter) -> String {
 /// Builds a span processor from callbacks.
 pub fn SpanProcessor::new(
   on_start_fn? : (@context.Context, SpanData) -> Unit = (_, _) => (),
-  on_end_fn? : (SpanData) -> Unit = _ => (),
-  force_flush_fn? : () -> @error.OTelSdkResult = @error.ok,
-  shutdown_fn? : () -> @error.OTelSdkResult = @error.ok,
+  on_end_fn? : async (SpanData) -> Unit = _ => (),
+  force_flush_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
+  shutdown_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
 ) -> SpanProcessor {
   { on_start_fn, on_end_fn, force_flush_fn, shutdown_fn }
 }
@@ -740,7 +744,7 @@ pub fn SpanProcessor::on_start(
 
 ///|
 /// Invokes the processor end hook.
-pub fn SpanProcessor::on_end(
+pub async fn SpanProcessor::on_end(
   self : SpanProcessor,
   span_data : SpanData,
 ) -> Unit {
@@ -749,13 +753,15 @@ pub fn SpanProcessor::on_end(
 
 ///|
 /// Requests processor flush.
-pub fn SpanProcessor::force_flush(self : SpanProcessor) -> @error.OTelSdkResult {
+pub async fn SpanProcessor::force_flush(
+  self : SpanProcessor,
+) -> @error.OTelSdkResult {
   (self.force_flush_fn)()
 }
 
 ///|
 /// Requests processor shutdown with an optional timeout budget in milliseconds.
-pub fn SpanProcessor::shutdown_with_timeout(
+pub async fn SpanProcessor::shutdown_with_timeout(
   self : SpanProcessor,
   timeout_millis : Int,
 ) -> @error.OTelSdkResult {
@@ -765,7 +771,9 @@ pub fn SpanProcessor::shutdown_with_timeout(
 
 ///|
 /// Requests processor shutdown.
-pub fn SpanProcessor::shutdown(self : SpanProcessor) -> @error.OTelSdkResult {
+pub async fn SpanProcessor::shutdown(
+  self : SpanProcessor,
+) -> @error.OTelSdkResult {
   self.shutdown_with_timeout(5000)
 }
 
@@ -855,7 +863,9 @@ struct BatchProcessorState {
 
 ///|
 /// Flushes queued spans to the exporter in batch-sized chunks.
-fn flush_span_queue(state : Ref[BatchProcessorState]) -> @error.OTelSdkResult {
+async fn flush_span_queue(
+  state : Ref[BatchProcessorState],
+) -> @error.OTelSdkResult {
   if state.val.is_shutdown {
     return @error.already_shutdown()
   }
@@ -1115,7 +1125,7 @@ pub fn Span::snapshot(self : Span) -> SpanData {
 ///|
 /// Ends the span once and forwards the final snapshot to processors when the
 /// span is recording.
-pub fn Span::end(
+pub async fn Span::end(
   self : Span,
   end_time_unix_nano? : Int64 = @common.now_unix_nano(),
 ) -> Unit {
@@ -1285,7 +1295,7 @@ pub fn SdkTracerProvider::tracer(
 
 ///|
 /// Flushes every configured span processor.
-pub fn SdkTracerProvider::force_flush(
+pub async fn SdkTracerProvider::force_flush(
   self : SdkTracerProvider,
 ) -> @error.OTelSdkResult {
   if self.state.val.is_shutdown {
@@ -1302,7 +1312,7 @@ pub fn SdkTracerProvider::force_flush(
 
 ///|
 /// Shuts down every configured span processor and marks the provider unusable.
-pub fn SdkTracerProvider::shutdown_with_timeout(
+pub async fn SdkTracerProvider::shutdown_with_timeout(
   self : SdkTracerProvider,
   timeout_millis : Int,
 ) -> @error.OTelSdkResult {
@@ -1321,7 +1331,7 @@ pub fn SdkTracerProvider::shutdown_with_timeout(
 }
 
 ///|
-pub fn SdkTracerProvider::shutdown(
+pub async fn SdkTracerProvider::shutdown(
   self : SdkTracerProvider,
 ) -> @error.OTelSdkResult {
   self.shutdown_with_timeout(5000)

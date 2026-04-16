@@ -136,9 +136,9 @@ pub struct ManualReader {
 }
 pub fn ManualReader::builder() -> ManualReaderBuilder
 pub fn ManualReader::collect(Self) -> Array[MetricData]
-pub fn ManualReader::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
-pub fn ManualReader::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
-pub fn ManualReader::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub async fn ManualReader::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub async fn ManualReader::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub async fn ManualReader::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
 
 pub struct ManualReaderBuilder {
   mut temporality : Temporality
@@ -163,17 +163,17 @@ pub struct MetricData {
 } derive(Eq, ToJson, @debug.Debug)
 
 pub struct MetricExporter {
-  export_fn : (ArrayView[MetricData]) -> Result[Unit, @error.OTelSdkError]
-  force_flush_fn : () -> Result[Unit, @error.OTelSdkError]
-  shutdown_fn : () -> Result[Unit, @error.OTelSdkError]
+  export_fn : async (ArrayView[MetricData]) -> Result[Unit, @error.OTelSdkError]
+  force_flush_fn : async () -> Result[Unit, @error.OTelSdkError]
+  shutdown_fn : async () -> Result[Unit, @error.OTelSdkError]
   name_fn : () -> String
 }
-pub fn MetricExporter::export_batch(Self, ArrayView[MetricData]) -> Result[Unit, @error.OTelSdkError]
-pub fn MetricExporter::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub async fn MetricExporter::export_batch(Self, ArrayView[MetricData]) -> Result[Unit, @error.OTelSdkError]
+pub async fn MetricExporter::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
 pub fn MetricExporter::name(Self) -> String
-pub fn MetricExporter::new((ArrayView[MetricData]) -> Result[Unit, @error.OTelSdkError], force_flush_fn? : () -> Result[Unit, @error.OTelSdkError], shutdown_fn? : () -> Result[Unit, @error.OTelSdkError], name_fn? : () -> String) -> Self
-pub fn MetricExporter::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
-pub fn MetricExporter::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub fn MetricExporter::new(async (ArrayView[MetricData]) -> Result[Unit, @error.OTelSdkError], force_flush_fn? : async () -> Result[Unit, @error.OTelSdkError], shutdown_fn? : async () -> Result[Unit, @error.OTelSdkError], name_fn? : () -> String) -> Self
+pub async fn MetricExporter::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub async fn MetricExporter::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
 
 pub(all) enum Number {
   Int64(Int64)
@@ -270,10 +270,10 @@ pub struct PeriodicMetricReader {
 }
 pub fn PeriodicMetricReader::builder(MetricExporter) -> PeriodicMetricReaderBuilder
 pub fn PeriodicMetricReader::collect(Self) -> Array[MetricData]
-pub fn PeriodicMetricReader::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub async fn PeriodicMetricReader::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
 pub async fn PeriodicMetricReader::run(Self) -> Unit
-pub fn PeriodicMetricReader::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
-pub fn PeriodicMetricReader::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub async fn PeriodicMetricReader::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub async fn PeriodicMetricReader::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
 
 pub struct PeriodicMetricReaderBuilder {
   exporter : MetricExporter
@@ -307,12 +307,12 @@ pub struct SdkMeterProvider {
 }
 pub fn SdkMeterProvider::builder() -> SdkMeterProviderBuilder
 pub fn SdkMeterProvider::collect(Self) -> Array[MetricData]
-pub fn SdkMeterProvider::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub async fn SdkMeterProvider::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
 pub fn SdkMeterProvider::manual_reader(Self) -> ManualReader
 pub fn SdkMeterProvider::meter(Self, StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> SdkMeter
 pub fn SdkMeterProvider::resource(Self) -> @resource.Resource
-pub fn SdkMeterProvider::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
-pub fn SdkMeterProvider::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub async fn SdkMeterProvider::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub async fn SdkMeterProvider::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
 pub fn SdkMeterProvider::spawn_periodic_readers(Self, @async.TaskGroup[Unit], allow_failure? : Bool) -> Unit
 
 pub struct SdkMeterProviderBuilder {

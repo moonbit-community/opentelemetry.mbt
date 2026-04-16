@@ -8,6 +8,10 @@ import {
   "moonbit-community/opentelemetry/sdk/trace" @sdktrace,
 }
 
+import {
+  "moonbitlang/async",
+} for "wbtest"
+
 options(
   backend: [ "native" ],
 )

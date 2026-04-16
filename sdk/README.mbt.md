@@ -20,7 +20,7 @@ The root package follows the same lifecycle shape as the Rust SDK:
 2. Optionally register it into `sdk/global`.
 3. Spawn background tasks when using batch span/log processors or periodic
    metric readers.
-4. Call `force_flush()` and `shutdown()` during application teardown.
+4. Call async `force_flush()` and `shutdown()` during application teardown.
 
 Batch span processors, batch log processors, and periodic metric readers do not
 start their loops automatically. They are activated by

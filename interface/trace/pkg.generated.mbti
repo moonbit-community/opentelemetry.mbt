@@ -40,8 +40,8 @@ pub fn Span::add_event(Self, StringView, attributes? : ArrayView[@common.KeyValu
 pub fn Span::add_event_with_timestamp(Self, StringView, Int64, attributes? : ArrayView[@common.KeyValue]) -> Unit
 pub fn Span::add_link(Self, @common.SpanContext, attributes? : ArrayView[@common.KeyValue]) -> Unit
 pub fn Span::context(Self) -> @context.Context
-pub fn Span::end(Self) -> Unit
-pub fn Span::end_with_timestamp(Self, Int64) -> Unit
+pub async fn Span::end(Self) -> Unit
+pub async fn Span::end_with_timestamp(Self, Int64) -> Unit
 pub fn Span::has_ended(Self) -> Bool
 pub fn Span::is_recording(Self) -> Bool
 pub fn Span::record_error(Self, StringView) -> Unit
@@ -71,9 +71,9 @@ pub struct Tracer {
 }
 pub fn Tracer::build(Self, SpanBuilder) -> Span
 pub fn Tracer::build_with_context(Self, SpanBuilder, @context.Context) -> Span
-pub fn[T] Tracer::in_span(Self, StringView, (@context.Context) -> T) -> T
-pub fn[T] Tracer::in_span_with_builder(Self, SpanBuilder, @context.Context, (@context.Context) -> T) -> T
-pub fn[T] Tracer::in_span_with_context(Self, StringView, @context.Context, (@context.Context) -> T) -> T
+pub async fn[T] Tracer::in_span(Self, StringView, async (@context.Context) -> T) -> T
+pub async fn[T] Tracer::in_span_with_builder(Self, SpanBuilder, @context.Context, async (@context.Context) -> T) -> T
+pub async fn[T] Tracer::in_span_with_context(Self, StringView, @context.Context, async (@context.Context) -> T) -> T
 pub fn Tracer::span_builder(Self, StringView) -> SpanBuilder
 pub fn Tracer::start(Self, StringView) -> Span
 pub fn Tracer::start_with_context(Self, StringView, @context.Context) -> Span
@@ -81,10 +81,10 @@ pub fn Tracer::start_with_context(Self, StringView, @context.Context) -> Span
 pub struct TracerProvider {
   sdk_provider : @moonbit-community/opentelemetry/sdk/trace.SdkTracerProvider?
 }
-pub fn TracerProvider::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub async fn TracerProvider::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
 pub fn TracerProvider::from_sdk(@moonbit-community/opentelemetry/sdk/trace.SdkTracerProvider) -> Self
 pub fn TracerProvider::noop() -> Self
-pub fn TracerProvider::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
+pub async fn TracerProvider::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
 pub fn TracerProvider::spawn_batch_processor_tasks(Self, @async.TaskGroup[Unit], allow_failure? : Bool) -> Unit
 pub fn TracerProvider::tracer(Self, StringView) -> Tracer
 pub fn TracerProvider::tracer_with_scope(Self, @common.InstrumentationScope) -> Tracer

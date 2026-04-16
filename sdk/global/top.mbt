@@ -124,7 +124,7 @@ pub fn spawn_background_tasks(
 
 ///|
 /// Flushes all globally registered providers, ignoring individual errors.
-pub fn force_flush() -> Unit {
+pub async fn force_flush() -> Unit {
   ignore(tracer_provider_ref.val.force_flush())
   ignore(logger_provider_ref.val.force_flush())
   ignore(meter_provider_ref.val.force_flush())
@@ -132,7 +132,7 @@ pub fn force_flush() -> Unit {
 
 ///|
 /// Shuts down all globally registered providers, ignoring individual errors.
-pub fn shutdown() -> Unit {
+pub async fn shutdown() -> Unit {
   ignore(tracer_provider_ref.val.shutdown())
   ignore(logger_provider_ref.val.shutdown())
   ignore(meter_provider_ref.val.shutdown())

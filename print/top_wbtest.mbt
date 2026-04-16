@@ -39,7 +39,7 @@ fn sample_span_context(
 }
 
 ///|
-fn sample_span_data() -> @sdktrace.SpanData {
+async fn sample_span_data() -> @sdktrace.SpanData {
   let exporter = @sdktrace.InMemorySpanExporter::new()
   let provider = @sdktrace.SdkTracerProvider::builder()
     .with_resource(sample_resource())
@@ -134,7 +134,7 @@ fn counter_sum(
 }
 
 ///|
-test "render span batch includes resource scope event and link" {
+async test "render span batch includes resource scope event and link" {
   let rendered = render_span_batch([sample_span_data()], true)
   assert_true(rendered.contains("Spans"))
   assert_true(rendered.contains("Resource"))
@@ -171,7 +171,7 @@ test "render metric batch includes aggregation details" {
 }
 
 ///|
-test "sdk exporters reject exports after shutdown" {
+async test "sdk exporters reject exports after shutdown" {
   let span_exporter = SpanExporter::new().into_span_exporter()
   guard span_exporter.shutdown() is Ok(_) else {
     fail("expected span exporter shutdown to succeed")

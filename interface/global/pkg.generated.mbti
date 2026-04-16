@@ -11,7 +11,7 @@ import {
 }
 
 // Values
-pub fn force_flush() -> Unit
+pub async fn force_flush() -> Unit
 
 pub fn[T] get_text_map_propagator((@propagation.TextMapPropagator) -> T) -> T
 
@@ -37,7 +37,7 @@ pub fn set_text_map_propagator(@propagation.TextMapPropagator) -> Unit
 
 pub fn set_tracer_provider(@trace.TracerProvider) -> Unit
 
-pub fn shutdown() -> Unit
+pub async fn shutdown() -> Unit
 
 pub fn spawn_background_tasks(@async.TaskGroup[Unit], allow_failure? : Bool) -> Unit
 

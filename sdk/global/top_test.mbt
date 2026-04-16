@@ -1,5 +1,5 @@
 ///|
-test "global tracer provider can be replaced" {
+async test "global tracer provider can be replaced" {
   reset_for_test()
 
   let exporter = @trace.InMemorySpanExporter::new()

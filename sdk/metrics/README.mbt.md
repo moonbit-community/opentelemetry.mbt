@@ -48,7 +48,7 @@ Both reader builders support `with_temporality()`:
 - `Temporality::Delta`
 - `Temporality::LowMemory`
 
-`force_flush()` collects a fresh snapshot, exports it through every registered
+Async `force_flush()` collects a fresh snapshot, exports it through every registered
 exporter, and then asks each exporter to flush.
 
 `PeriodicMetricReader::run()` performs the same collection/export cycle on a

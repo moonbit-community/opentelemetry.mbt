@@ -383,7 +383,9 @@ pub fn MeterProvider::meter_with_scope(
 }
 
 ///|
-pub fn MeterProvider::force_flush(self : MeterProvider) -> @error.OTelSdkResult {
+pub async fn MeterProvider::force_flush(
+  self : MeterProvider,
+) -> @error.OTelSdkResult {
   match self.sdk_provider {
     Some(provider) => provider.force_flush()
     None => @error.ok()
@@ -391,7 +393,9 @@ pub fn MeterProvider::force_flush(self : MeterProvider) -> @error.OTelSdkResult 
 }
 
 ///|
-pub fn MeterProvider::shutdown(self : MeterProvider) -> @error.OTelSdkResult {
+pub async fn MeterProvider::shutdown(
+  self : MeterProvider,
+) -> @error.OTelSdkResult {
   match self.sdk_provider {
     Some(provider) => provider.shutdown()
     None => @error.ok()

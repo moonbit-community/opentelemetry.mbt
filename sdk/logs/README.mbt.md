@@ -16,7 +16,7 @@ records.
 
 ## Processing model
 
-`SdkLogger::emit()` snapshots the current provider resource and
+Async `SdkLogger::emit()` snapshots the current provider resource and
 instrumentation scope into a `LogRecord`, then forwards that record through
 every configured processor.
 

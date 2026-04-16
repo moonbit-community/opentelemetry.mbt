@@ -322,7 +322,7 @@ pub fn LoggerProvider::logger_with_scope(
 }
 
 ///|
-pub fn LoggerProvider::force_flush(
+pub async fn LoggerProvider::force_flush(
   self : LoggerProvider,
 ) -> @error.OTelSdkResult {
   match self.sdk_provider {
@@ -332,7 +332,9 @@ pub fn LoggerProvider::force_flush(
 }
 
 ///|
-pub fn LoggerProvider::shutdown(self : LoggerProvider) -> @error.OTelSdkResult {
+pub async fn LoggerProvider::shutdown(
+  self : LoggerProvider,
+) -> @error.OTelSdkResult {
   match self.sdk_provider {
     Some(provider) => provider.shutdown()
     None => @error.ok()
@@ -359,7 +361,7 @@ pub fn Logger::create_log_record(self : Logger) -> LogRecord {
 }
 
 ///|
-pub fn Logger::emit(self : Logger, record : LogRecord) -> Unit {
+pub async fn Logger::emit(self : Logger, record : LogRecord) -> Unit {
   match self.sdk_logger {
     Some(logger) => {
       let severity_text = match record.severity_text {

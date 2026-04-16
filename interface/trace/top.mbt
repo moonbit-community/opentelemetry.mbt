@@ -257,7 +257,7 @@ pub fn TracerProvider::tracer_with_scope(
 }
 
 ///|
-pub fn TracerProvider::force_flush(
+pub async fn TracerProvider::force_flush(
   self : TracerProvider,
 ) -> @error.OTelSdkResult {
   match self.sdk_provider {
@@ -267,7 +267,9 @@ pub fn TracerProvider::force_flush(
 }
 
 ///|
-pub fn TracerProvider::shutdown(self : TracerProvider) -> @error.OTelSdkResult {
+pub async fn TracerProvider::shutdown(
+  self : TracerProvider,
+) -> @error.OTelSdkResult {
   match self.sdk_provider {
     Some(provider) => provider.shutdown()
     None => @error.ok()
@@ -325,30 +327,30 @@ pub fn Tracer::build_with_context(
 }
 
 ///|
-pub fn[T] Tracer::in_span(
+pub async fn[T] Tracer::in_span(
   self : Tracer,
   name : StringView,
-  f : (@context.Context) -> T,
+  f : async (@context.Context) -> T,
 ) -> T {
   self.in_span_with_context(name, Default::default(), f)
 }
 
 ///|
-pub fn[T] Tracer::in_span_with_context(
+pub async fn[T] Tracer::in_span_with_context(
   self : Tracer,
   name : StringView,
   parent_context : @context.Context,
-  f : (@context.Context) -> T,
+  f : async (@context.Context) -> T,
 ) -> T {
   self.in_span_with_builder(SpanBuilder::from_name(name), parent_context, f)
 }
 
 ///|
-pub fn[T] Tracer::in_span_with_builder(
+pub async fn[T] Tracer::in_span_with_builder(
   self : Tracer,
   builder : SpanBuilder,
   parent_context : @context.Context,
-  f : (@context.Context) -> T,
+  f : async (@context.Context) -> T,
 ) -> T {
   let span = self.build_with_context(builder, parent_context)
   let context = span.context()
@@ -465,12 +467,12 @@ pub fn Span::add_link(
 }
 
 ///|
-pub fn Span::end(self : Span) -> Unit {
+pub async fn Span::end(self : Span) -> Unit {
   self.end_with_timestamp(@common.now_unix_nano())
 }
 
 ///|
-pub fn Span::end_with_timestamp(
+pub async fn Span::end_with_timestamp(
   self : Span,
   timestamp_unix_nano : Int64,
 ) -> Unit {

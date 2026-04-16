@@ -7,7 +7,7 @@ fn restore_env_var(key : String, value : String?) -> Unit {
 }
 
 ///|
-test "logger exports trace-aware log records" {
+async test "logger exports trace-aware log records" {
   guard @common.TraceId::from_hex("4bf92f3577b34da6a3ce929d0e0e4736")
     is Some(trace_id) else {
     fail("expected trace id")
@@ -95,7 +95,7 @@ test "default batch log config reads environment variables" {
 }
 
 ///|
-test "logger provider shutdown with timeout marks provider unavailable" {
+async test "logger provider shutdown with timeout marks provider unavailable" {
   let exporter = InMemoryLogExporter::new()
   let provider = SdkLoggerProvider::builder()
     .with_batch_exporter(exporter.into_log_exporter())

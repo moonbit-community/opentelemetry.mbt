@@ -26,18 +26,18 @@ pub struct LogRecord {
 ///|
 /// Exporter callback wrapper for log batches.
 pub struct LogExporter {
-  export_fn : (ArrayView[LogRecord]) -> @error.OTelSdkResult
-  force_flush_fn : () -> @error.OTelSdkResult
-  shutdown_fn : () -> @error.OTelSdkResult
+  export_fn : async (ArrayView[LogRecord]) -> @error.OTelSdkResult
+  force_flush_fn : async () -> @error.OTelSdkResult
+  shutdown_fn : async () -> @error.OTelSdkResult
   name_fn : () -> String
 }
 
 ///|
 /// Processing hook interface for logs.
 pub struct LogProcessor {
-  emit_fn : (LogRecord) -> Unit
-  force_flush_fn : () -> @error.OTelSdkResult
-  shutdown_fn : () -> @error.OTelSdkResult
+  emit_fn : async (LogRecord) -> Unit
+  force_flush_fn : async () -> @error.OTelSdkResult
+  shutdown_fn : async () -> @error.OTelSdkResult
 }
 
 ///|
@@ -207,9 +207,9 @@ pub impl Default for BatchConfig with default() -> BatchConfig {
 ///|
 /// Builds a log exporter from callbacks.
 pub fn LogExporter::new(
-  export_fn : (ArrayView[LogRecord]) -> @error.OTelSdkResult,
-  force_flush_fn? : () -> @error.OTelSdkResult = @error.ok,
-  shutdown_fn? : () -> @error.OTelSdkResult = @error.ok,
+  export_fn : async (ArrayView[LogRecord]) -> @error.OTelSdkResult,
+  force_flush_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
+  shutdown_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
   name_fn? : () -> String = () => "custom",
 ) -> LogExporter {
   { export_fn, force_flush_fn, shutdown_fn, name_fn }
@@ -217,7 +217,7 @@ pub fn LogExporter::new(
 
 ///|
 /// Exports one batch of log records.
-pub fn LogExporter::export_batch(
+pub async fn LogExporter::export_batch(
   self : LogExporter,
   batch : ArrayView[LogRecord],
 ) -> @error.OTelSdkResult {
@@ -226,13 +226,15 @@ pub fn LogExporter::export_batch(
 
 ///|
 /// Requests exporter flush.
-pub fn LogExporter::force_flush(self : LogExporter) -> @error.OTelSdkResult {
+pub async fn LogExporter::force_flush(
+  self : LogExporter,
+) -> @error.OTelSdkResult {
   (self.force_flush_fn)()
 }
 
 ///|
 /// Requests exporter shutdown with an optional timeout budget in milliseconds.
-pub fn LogExporter::shutdown_with_timeout(
+pub async fn LogExporter::shutdown_with_timeout(
   self : LogExporter,
   timeout_millis : Int,
 ) -> @error.OTelSdkResult {
@@ -242,7 +244,7 @@ pub fn LogExporter::shutdown_with_timeout(
 
 ///|
 /// Requests exporter shutdown.
-pub fn LogExporter::shutdown(self : LogExporter) -> @error.OTelSdkResult {
+pub async fn LogExporter::shutdown(self : LogExporter) -> @error.OTelSdkResult {
   self.shutdown_with_timeout(5000)
 }
 
@@ -255,28 +257,33 @@ pub fn LogExporter::name(self : LogExporter) -> String {
 ///|
 /// Builds a log processor from callbacks.
 pub fn LogProcessor::new(
-  emit_fn? : (LogRecord) -> Unit = _ => (),
-  force_flush_fn? : () -> @error.OTelSdkResult = @error.ok,
-  shutdown_fn? : () -> @error.OTelSdkResult = @error.ok,
+  emit_fn? : async (LogRecord) -> Unit = _ => (),
+  force_flush_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
+  shutdown_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
 ) -> LogProcessor {
   { emit_fn, force_flush_fn, shutdown_fn }
 }
 
 ///|
 /// Processes one log record.
-pub fn LogProcessor::emit(self : LogProcessor, record : LogRecord) -> Unit {
+pub async fn LogProcessor::emit(
+  self : LogProcessor,
+  record : LogRecord,
+) -> Unit {
   (self.emit_fn)(record)
 }
 
 ///|
 /// Requests processor flush.
-pub fn LogProcessor::force_flush(self : LogProcessor) -> @error.OTelSdkResult {
+pub async fn LogProcessor::force_flush(
+  self : LogProcessor,
+) -> @error.OTelSdkResult {
   (self.force_flush_fn)()
 }
 
 ///|
 /// Requests processor shutdown with an optional timeout budget in milliseconds.
-pub fn LogProcessor::shutdown_with_timeout(
+pub async fn LogProcessor::shutdown_with_timeout(
   self : LogProcessor,
   timeout_millis : Int,
 ) -> @error.OTelSdkResult {
@@ -286,7 +293,9 @@ pub fn LogProcessor::shutdown_with_timeout(
 
 ///|
 /// Requests processor shutdown.
-pub fn LogProcessor::shutdown(self : LogProcessor) -> @error.OTelSdkResult {
+pub async fn LogProcessor::shutdown(
+  self : LogProcessor,
+) -> @error.OTelSdkResult {
   self.shutdown_with_timeout(5000)
 }
 
@@ -360,7 +369,9 @@ pub fn SimpleLogProcessor::into_log_processor(
 
 ///|
 /// Flushes the in-memory queue to the exporter in batch-sized chunks.
-fn flush_log_queue(state : Ref[BatchProcessorState]) -> @error.OTelSdkResult {
+async fn flush_log_queue(
+  state : Ref[BatchProcessorState],
+) -> @error.OTelSdkResult {
   if state.val.is_shutdown {
     return @error.already_shutdown()
   }
@@ -570,7 +581,7 @@ pub fn SdkLoggerProvider::logger(
 
 ///|
 /// Flushes every configured processor.
-pub fn SdkLoggerProvider::force_flush(
+pub async fn SdkLoggerProvider::force_flush(
   self : SdkLoggerProvider,
 ) -> @error.OTelSdkResult {
   if self.state.val.is_shutdown {
@@ -587,7 +598,7 @@ pub fn SdkLoggerProvider::force_flush(
 
 ///|
 /// Shuts down every configured processor and marks the provider unusable.
-pub fn SdkLoggerProvider::shutdown_with_timeout(
+pub async fn SdkLoggerProvider::shutdown_with_timeout(
   self : SdkLoggerProvider,
   timeout_millis : Int,
 ) -> @error.OTelSdkResult {
@@ -606,7 +617,7 @@ pub fn SdkLoggerProvider::shutdown_with_timeout(
 }
 
 ///|
-pub fn SdkLoggerProvider::shutdown(
+pub async fn SdkLoggerProvider::shutdown(
   self : SdkLoggerProvider,
 ) -> @error.OTelSdkResult {
   self.shutdown_with_timeout(5000)
@@ -626,7 +637,7 @@ fn trace_context_from_context(
 
 ///|
 /// Emits one log record through the provider pipeline.
-pub fn SdkLogger::emit(
+pub async fn SdkLogger::emit(
   self : SdkLogger,
   body : @common.Value,
   context? : @context.Context = Default::default(),

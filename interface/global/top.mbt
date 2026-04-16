@@ -151,14 +151,14 @@ pub fn spawn_background_tasks(
 }
 
 ///|
-pub fn force_flush() -> Unit {
+pub async fn force_flush() -> Unit {
   ignore(tracer_provider_ref.val.force_flush())
   ignore(logger_provider_ref.val.force_flush())
   ignore(meter_provider_ref.val.force_flush())
 }
 
 ///|
-pub fn shutdown() -> Unit {
+pub async fn shutdown() -> Unit {
   ignore(tracer_provider_ref.val.shutdown())
   ignore(logger_provider_ref.val.shutdown())
   ignore(meter_provider_ref.val.shutdown())

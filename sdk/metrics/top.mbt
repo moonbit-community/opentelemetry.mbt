@@ -101,9 +101,9 @@ pub struct StreamBuilder {
 ///|
 /// Exporter callback wrapper for metric batches.
 pub struct MetricExporter {
-  export_fn : (ArrayView[MetricData]) -> @error.OTelSdkResult
-  force_flush_fn : () -> @error.OTelSdkResult
-  shutdown_fn : () -> @error.OTelSdkResult
+  export_fn : async (ArrayView[MetricData]) -> @error.OTelSdkResult
+  force_flush_fn : async () -> @error.OTelSdkResult
+  shutdown_fn : async () -> @error.OTelSdkResult
   name_fn : () -> String
 }
 
@@ -408,9 +408,9 @@ pub struct ObservableGauge {
 ///|
 /// Builds a metric exporter from callbacks.
 pub fn MetricExporter::new(
-  export_fn : (ArrayView[MetricData]) -> @error.OTelSdkResult,
-  force_flush_fn? : () -> @error.OTelSdkResult = @error.ok,
-  shutdown_fn? : () -> @error.OTelSdkResult = @error.ok,
+  export_fn : async (ArrayView[MetricData]) -> @error.OTelSdkResult,
+  force_flush_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
+  shutdown_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
   name_fn? : () -> String = () => "custom",
 ) -> MetricExporter {
   { export_fn, force_flush_fn, shutdown_fn, name_fn }
@@ -418,7 +418,7 @@ pub fn MetricExporter::new(
 
 ///|
 /// Exports one batch of metrics.
-pub fn MetricExporter::export_batch(
+pub async fn MetricExporter::export_batch(
   self : MetricExporter,
   batch : ArrayView[MetricData],
 ) -> @error.OTelSdkResult {
@@ -427,7 +427,7 @@ pub fn MetricExporter::export_batch(
 
 ///|
 /// Requests exporter flush.
-pub fn MetricExporter::force_flush(
+pub async fn MetricExporter::force_flush(
   self : MetricExporter,
 ) -> @error.OTelSdkResult {
   (self.force_flush_fn)()
@@ -435,7 +435,7 @@ pub fn MetricExporter::force_flush(
 
 ///|
 /// Requests exporter shutdown with an optional timeout budget in milliseconds.
-pub fn MetricExporter::shutdown_with_timeout(
+pub async fn MetricExporter::shutdown_with_timeout(
   self : MetricExporter,
   timeout_millis : Int,
 ) -> @error.OTelSdkResult {
@@ -445,7 +445,9 @@ pub fn MetricExporter::shutdown_with_timeout(
 
 ///|
 /// Requests exporter shutdown.
-pub fn MetricExporter::shutdown(self : MetricExporter) -> @error.OTelSdkResult {
+pub async fn MetricExporter::shutdown(
+  self : MetricExporter,
+) -> @error.OTelSdkResult {
   self.shutdown_with_timeout(5000)
 }
 
@@ -1401,7 +1403,7 @@ pub fn SdkMeterProvider::manual_reader(self : SdkMeterProvider) -> ManualReader 
 
 ///|
 /// Collects and exports a fresh metric snapshot through every exporter.
-pub fn SdkMeterProvider::force_flush(
+pub async fn SdkMeterProvider::force_flush(
   self : SdkMeterProvider,
 ) -> @error.OTelSdkResult {
   if self.state.val.is_shutdown {
@@ -1443,7 +1445,7 @@ pub fn SdkMeterProvider::spawn_periodic_readers(
 
 ///|
 /// Flushes exporters, then shuts them down and marks the provider unusable.
-pub fn SdkMeterProvider::shutdown_with_timeout(
+pub async fn SdkMeterProvider::shutdown_with_timeout(
   self : SdkMeterProvider,
   timeout_millis : Int,
 ) -> @error.OTelSdkResult {
@@ -1487,7 +1489,7 @@ pub fn SdkMeterProvider::shutdown_with_timeout(
 }
 
 ///|
-pub fn SdkMeterProvider::shutdown(
+pub async fn SdkMeterProvider::shutdown(
   self : SdkMeterProvider,
 ) -> @error.OTelSdkResult {
   self.shutdown_with_timeout(5000)
@@ -1515,7 +1517,9 @@ pub fn ManualReader::collect(self : ManualReader) -> Array[MetricData] {
 
 ///|
 /// Manual readers do not own exporters, so force_flush is a no-op.
-pub fn ManualReader::force_flush(self : ManualReader) -> @error.OTelSdkResult {
+pub async fn ManualReader::force_flush(
+  self : ManualReader,
+) -> @error.OTelSdkResult {
   if self.state.val.is_shutdown {
     return @error.already_shutdown()
   }
@@ -1524,7 +1528,7 @@ pub fn ManualReader::force_flush(self : ManualReader) -> @error.OTelSdkResult {
 
 ///|
 /// Detaches the reader from the provider.
-pub fn ManualReader::shutdown_with_timeout(
+pub async fn ManualReader::shutdown_with_timeout(
   self : ManualReader,
   timeout_millis : Int,
 ) -> @error.OTelSdkResult {
@@ -1542,7 +1546,9 @@ pub fn ManualReader::shutdown_with_timeout(
 }
 
 ///|
-pub fn ManualReader::shutdown(self : ManualReader) -> @error.OTelSdkResult {
+pub async fn ManualReader::shutdown(
+  self : ManualReader,
+) -> @error.OTelSdkResult {
   self.shutdown_with_timeout(5000)
 }
 
@@ -1570,7 +1576,7 @@ pub fn PeriodicMetricReader::collect(
 
 ///|
 /// Exports one temporality-adjusted snapshot immediately.
-pub fn PeriodicMetricReader::force_flush(
+pub async fn PeriodicMetricReader::force_flush(
   self : PeriodicMetricReader,
 ) -> @error.OTelSdkResult {
   if self.state.val.is_shutdown {
@@ -1588,7 +1594,7 @@ pub fn PeriodicMetricReader::force_flush(
 
 ///|
 /// Shuts down the periodic reader and its exporter.
-pub fn PeriodicMetricReader::shutdown_with_timeout(
+pub async fn PeriodicMetricReader::shutdown_with_timeout(
   self : PeriodicMetricReader,
   timeout_millis : Int,
 ) -> @error.OTelSdkResult {
@@ -1605,7 +1611,7 @@ pub fn PeriodicMetricReader::shutdown_with_timeout(
 }
 
 ///|
-pub fn PeriodicMetricReader::shutdown(
+pub async fn PeriodicMetricReader::shutdown(
   self : PeriodicMetricReader,
 ) -> @error.OTelSdkResult {
   self.shutdown_with_timeout(5000)
