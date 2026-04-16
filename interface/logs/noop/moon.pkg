@@ -1,0 +1,7 @@
+import {
+  "moonbit-community/opentelemetry/interface/logs" @logs,
+}
+
+options(
+  backend: [ "native" ],
+)

@@ -1,8 +1,8 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "moonbit-community/opentelemetry/context"
+package "moonbit-community/opentelemetry/interface/context"
 
 import {
-  "moonbit-community/opentelemetry/baggage",
+  "moonbit-community/opentelemetry/interface/baggage",
   "moonbit-community/opentelemetry/sdk/common",
   "moonbitlang/core/debug",
 }

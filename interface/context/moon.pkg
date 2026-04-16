@@ -1,5 +1,5 @@
 import {
-  "moonbit-community/opentelemetry/baggage" @baggage,
+  "moonbit-community/opentelemetry/interface/baggage" @baggage,
   "moonbit-community/opentelemetry/sdk/common" @common,
 }
 

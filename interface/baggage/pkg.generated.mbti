@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "moonbit-community/opentelemetry/baggage"
+package "moonbit-community/opentelemetry/interface/baggage"
 
 import {
   "moonbit-community/opentelemetry/sdk/common",

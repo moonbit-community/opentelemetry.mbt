@@ -1,0 +1,7 @@
+import {
+  "moonbit-community/opentelemetry/interface/trace" @trace,
+}
+
+options(
+  backend: [ "native" ],
+)

@@ -1,8 +1,8 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "moonbit-community/opentelemetry/propagation"
+package "moonbit-community/opentelemetry/interface/propagation"
 
 import {
-  "moonbit-community/opentelemetry/context",
+  "moonbit-community/opentelemetry/interface/context",
 }
 
 // Values

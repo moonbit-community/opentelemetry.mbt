@@ -1,8 +1,8 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "moonbit-community/opentelemetry/metrics/noop"
+package "moonbit-community/opentelemetry/interface/metrics/noop"
 
 import {
-  "moonbit-community/opentelemetry/metrics",
+  "moonbit-community/opentelemetry/interface/metrics",
 }
 
 // Values

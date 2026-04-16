@@ -1,0 +1,7 @@
+import {
+  "moonbit-community/opentelemetry/interface/metrics" @metrics,
+}
+
+options(
+  backend: [ "native" ],
+)
