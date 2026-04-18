@@ -1496,22 +1496,48 @@ pub async fn SdkMeterProvider::shutdown(
 }
 
 ///|
-/// Pulls a metric snapshot from the provider.
-pub fn ManualReader::collect(self : ManualReader) -> Array[MetricData] {
-  if self.state.val.is_shutdown {
-    return []
+fn manual_reader_collect_result(
+  reader : ManualReader,
+) -> Result[Array[MetricData], @error.OTelSdkError] {
+  if reader.state.val.is_shutdown {
+    return Err(@error.OTelSdkError::AlreadyShutdown)
   }
-  match self.state.val.provider {
+  match reader.state.val.provider {
     Some(provider) => {
       let result = collect_with_temporality(
         provider,
-        self.state.val.temporality,
-        self.state.val.last_metrics,
+        reader.state.val.temporality,
+        reader.state.val.last_metrics,
       )
-      self.state.val = { ..self.state.val, last_metrics: result.last_metrics }
-      result.metrics
+      reader.state.val = {
+        ..reader.state.val,
+        last_metrics: result.last_metrics,
+      }
+      Ok(result.metrics)
     }
-    None => []
+    None =>
+      Err(
+        @error.OTelSdkError::InternalFailure(
+          "reader is not registered".to_string(),
+        ),
+      )
+  }
+}
+
+///|
+/// Pulls a metric snapshot from the provider and returns lifecycle failures.
+pub fn ManualReader::collect_result(
+  self : ManualReader,
+) -> Result[Array[MetricData], @error.OTelSdkError] {
+  manual_reader_collect_result(self)
+}
+
+///|
+/// Pulls a metric snapshot from the provider.
+pub fn ManualReader::collect(self : ManualReader) -> Array[MetricData] {
+  match self.collect_result() {
+    Ok(metrics) => metrics
+    Err(_) => []
   }
 }
 
@@ -1521,9 +1547,7 @@ pub fn ManualReader::collect(self : ManualReader) -> Array[MetricData] {
 pub async fn ManualReader::force_flush(
   self : ManualReader,
 ) -> @error.OTelSdkResult {
-  if self.state.val.is_shutdown {
-    return @error.already_shutdown()
-  }
+  ignore(self)
   @error.ok()
 }
 

@@ -120,6 +120,67 @@ test "builder-registered manual reader collects metrics" {
 }
 
 ///|
+test "manual reader collect_result reports detached readers" {
+  let reader = ManualReader::builder().build()
+
+  guard reader.collect_result()
+    is Err(@error.OTelSdkError::InternalFailure(message)) else {
+    fail("expected detached manual reader collect_result to fail")
+  }
+  assert_eq(message, "reader is not registered")
+}
+
+///|
+test "manual reader collect_result succeeds before shutdown" {
+  let reader = ManualReader::builder().build()
+  let provider = SdkMeterProvider::builder().with_reader(reader).build()
+  let counter = provider
+    .meter("metrics-reader-result")
+    .counter("requests")
+    .build()
+  counter.add(9)
+
+  guard reader.collect_result() is Ok(metrics) else {
+    fail("expected registered manual reader collect_result to succeed")
+  }
+  assert_eq(counter_sum(metrics, "requests"), Some(9))
+}
+
+///|
+async test "manual reader collect_result reports shutdown" {
+  let reader = ManualReader::builder().build()
+  let provider = SdkMeterProvider::builder().with_reader(reader).build()
+  let counter = provider
+    .meter("metrics-reader-shutdown")
+    .counter("requests")
+    .build()
+  counter.add(3)
+
+  guard reader.shutdown() is Ok(_) else {
+    fail("expected manual reader shutdown to succeed")
+  }
+  guard reader.collect_result() is Err(@error.OTelSdkError::AlreadyShutdown) else {
+    fail("expected manual reader collect_result to report shutdown")
+  }
+}
+
+///|
+async test "manual reader collect stays convenience-oriented after shutdown" {
+  let reader = ManualReader::builder().build()
+  let provider = SdkMeterProvider::builder().with_reader(reader).build()
+  let counter = provider
+    .meter("metrics-reader-convenience")
+    .counter("requests")
+    .build()
+  counter.add(5)
+
+  guard reader.shutdown() is Ok(_) else {
+    fail("expected manual reader shutdown to succeed")
+  }
+  assert_eq(reader.collect().length(), 0)
+}
+
+///|
 test "manual reader delta temporality reports counter deltas" {
   let reader = ManualReader::builder()
     .with_temporality(Temporality::Delta)
@@ -254,6 +315,20 @@ test "views can drop matching streams" {
 
   let metrics = provider.manual_reader().collect()
   assert_true(!has_metric(metrics, "drop.me"))
+}
+
+///|
+async test "manual reader force flush is ok after shutdown" {
+  let reader = ManualReader::builder().build()
+  let provider = SdkMeterProvider::builder().with_reader(reader).build()
+
+  guard reader.shutdown() is Ok(_) else {
+    fail("expected manual reader shutdown to succeed")
+  }
+  guard reader.force_flush() is Ok(_) else {
+    fail("expected manual reader force_flush to remain a no-op")
+  }
+  ignore(provider)
 }
 
 ///|

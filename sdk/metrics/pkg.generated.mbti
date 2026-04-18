@@ -136,6 +136,7 @@ pub struct ManualReader {
 }
 pub fn ManualReader::builder() -> ManualReaderBuilder
 pub fn ManualReader::collect(Self) -> Array[MetricData]
+pub fn ManualReader::collect_result(Self) -> Result[Array[MetricData], @error.OTelSdkError]
 pub async fn ManualReader::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
 pub async fn ManualReader::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
 pub async fn ManualReader::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]

@@ -38,6 +38,16 @@ boundaries.
 remains as a convenience for creating a reader directly from an existing
 provider.
 
+`ManualReader::collect_result()` is the lifecycle-aware pull API. It returns an
+error after shutdown and also reports detached readers that were never
+registered with a provider.
+
+`ManualReader::collect()` remains the convenience wrapper. It returns `[]` when
+collection is unavailable, including after shutdown.
+
+`ManualReader::force_flush()` is a no-op and always succeeds because the reader
+does not own exporters or background work.
+
 `PeriodicMetricReader::builder(exporter)` creates a detached push reader that
 can be registered with `SdkMeterProviderBuilder::with_periodic_reader()`.
 `with_periodic_exporter()` remains as the convenience shortcut.
@@ -48,8 +58,8 @@ Both reader builders support `with_temporality()`:
 - `Temporality::Delta`
 - `Temporality::LowMemory`
 
-Async `force_flush()` collects a fresh snapshot, exports it through every registered
-exporter, and then asks each exporter to flush.
+`SdkMeterProvider::force_flush()` collects a fresh snapshot, exports it through
+every registered exporter, and then asks each exporter to flush.
 
 `PeriodicMetricReader::run()` performs the same collection/export cycle on a
 timer. Like the trace and log batch processors, it must be spawned explicitly.
