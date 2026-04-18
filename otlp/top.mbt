@@ -1610,6 +1610,7 @@ pub async fn MetricExporter::export_batch(
 }
 
 ///|
+#warnings("-unused_async")
 pub async fn SpanExporter::force_flush(
   self : SpanExporter,
 ) -> @error.OTelSdkResult {
@@ -1621,6 +1622,7 @@ pub async fn SpanExporter::force_flush(
 }
 
 ///|
+#warnings("-unused_async")
 pub async fn LogExporter::force_flush(
   self : LogExporter,
 ) -> @error.OTelSdkResult {
@@ -1632,6 +1634,7 @@ pub async fn LogExporter::force_flush(
 }
 
 ///|
+#warnings("-unused_async")
 pub async fn MetricExporter::force_flush(
   self : MetricExporter,
 ) -> @error.OTelSdkResult {
@@ -1643,6 +1646,7 @@ pub async fn MetricExporter::force_flush(
 }
 
 ///|
+#warnings("-unused_async")
 pub async fn SpanExporter::shutdown_with_timeout(
   self : SpanExporter,
   timeout_millis : Int,
@@ -1656,6 +1660,7 @@ pub async fn SpanExporter::shutdown_with_timeout(
 }
 
 ///|
+#warnings("-unused_async")
 pub async fn LogExporter::shutdown_with_timeout(
   self : LogExporter,
   timeout_millis : Int,
@@ -1669,6 +1674,7 @@ pub async fn LogExporter::shutdown_with_timeout(
 }
 
 ///|
+#warnings("-unused_async")
 pub async fn MetricExporter::shutdown_with_timeout(
   self : MetricExporter,
   timeout_millis : Int,

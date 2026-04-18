@@ -1517,6 +1517,7 @@ pub fn ManualReader::collect(self : ManualReader) -> Array[MetricData] {
 
 ///|
 /// Manual readers do not own exporters, so force_flush is a no-op.
+#warnings("-unused_async")
 pub async fn ManualReader::force_flush(
   self : ManualReader,
 ) -> @error.OTelSdkResult {
@@ -1528,6 +1529,7 @@ pub async fn ManualReader::force_flush(
 
 ///|
 /// Detaches the reader from the provider.
+#warnings("-unused_async")
 pub async fn ManualReader::shutdown_with_timeout(
   self : ManualReader,
   timeout_millis : Int,
