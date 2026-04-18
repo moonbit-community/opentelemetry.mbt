@@ -250,6 +250,29 @@ test "metric exporter resolves temporality preference" {
 }
 
 ///|
+test "span exporter builder resolves http json protocol" {
+  let original = @env.get_env_var(OTEL_EXPORTER_OTLP_PROTOCOL)
+  defer restore_env_var(OTEL_EXPORTER_OTLP_PROTOCOL, original)
+
+  @env.set_env_var(OTEL_EXPORTER_OTLP_PROTOCOL, "http/json")
+  guard SpanExporter::builder().build() is Ok(env_exporter) else {
+    fail("expected http/json env protocol to build")
+  }
+  assert_true(env_exporter.config.protocol == Protocol::HttpJson)
+
+  guard SpanExporter::builder().with_http().build() is Ok(binary_exporter) else {
+    fail("expected with_http to force binary protocol")
+  }
+  assert_true(binary_exporter.config.protocol == Protocol::HttpBinary)
+
+  guard SpanExporter::builder().with_protocol(Protocol::HttpJson).build()
+    is Ok(json_exporter) else {
+    fail("expected explicit http/json protocol to build")
+  }
+  assert_true(json_exporter.config.protocol == Protocol::HttpJson)
+}
+
+///|
 async test "trace request encodes span data" {
   let request = build_trace_request([sample_span_data()])
   assert_eq(request.resource_spans.length(), 1)
@@ -276,6 +299,18 @@ async test "trace request encodes span data" {
 }
 
 ///|
+async test "trace request json roundtrips" {
+  let encoded = encode_json_message(build_trace_request([sample_span_data()]))
+  let request : @collectortrace.ExportTraceServiceRequest = match
+    decode_json_message(encoded) {
+    Ok(request) => request
+    Err(message) => fail("expected valid trace json payload: \{message}")
+  }
+  assert_eq(request.resource_spans.length(), 1)
+  assert_eq(request.resource_spans[0].scope_spans[0].spans[0].name, "request")
+}
+
+///|
 test "logs request encodes severity and trace context" {
   let request = build_logs_request([sample_log_record()])
   assert_eq(request.resource_logs.length(), 1)
@@ -292,6 +327,19 @@ test "logs request encodes severity and trace context" {
     fail("expected log body to be encoded as string")
   }
   assert_eq(body, "request failed")
+}
+
+///|
+test "logs request json roundtrips" {
+  let encoded = encode_json_message(build_logs_request([sample_log_record()]))
+  let request : @collectorlogs.ExportLogsServiceRequest = match
+    decode_json_message(encoded) {
+    Ok(request) => request
+    Err(message) => fail("expected valid logs json payload: \{message}")
+  }
+  let record = request.resource_logs[0].scope_logs[0].log_records[0]
+  assert_eq(record.severity_text, "ERROR")
+  assert_eq(record.attributes.length(), 1)
 }
 
 ///|
@@ -329,6 +377,94 @@ test "metrics request encodes sums and histograms" {
   assert_eq(histogram.data_points[0].sum, Some(12.5))
   assert_eq(histogram.data_points[0].min, Some(1.0))
   assert_eq(histogram.data_points[0].max, Some(8.0))
+}
+
+///|
+test "metrics request json roundtrips" {
+  let encoded = encode_json_message(
+    build_metrics_request(
+      [sample_counter_metric(), sample_histogram_metric()],
+      @sdkmetrics.Temporality::LowMemory,
+    ),
+  )
+  let request : @collectormetrics.ExportMetricsServiceRequest = match
+    decode_json_message(encoded) {
+    Ok(request) => request
+    Err(message) => fail("expected valid metrics json payload: \{message}")
+  }
+  assert_eq(request.resource_metrics.length(), 2)
+  assert_eq(
+    request.resource_metrics[0].scope_metrics[0].metrics[0].name,
+    "requests",
+  )
+}
+
+///|
+test "json response validation handles success and partial success" {
+  guard validate_trace_response(
+      Protocol::HttpJson,
+      encode_json_message(@collectortrace.ExportTraceServiceResponse::default()),
+    )
+    is Ok(_) else {
+    fail("expected empty trace json response to validate")
+  }
+  guard validate_logs_response(
+      Protocol::HttpJson,
+      encode_json_message(@collectorlogs.ExportLogsServiceResponse::default()),
+    )
+    is Ok(_) else {
+    fail("expected empty logs json response to validate")
+  }
+  guard validate_metrics_response(
+      Protocol::HttpJson,
+      encode_json_message(
+        @collectormetrics.ExportMetricsServiceResponse::default(),
+      ),
+    )
+    is Ok(_) else {
+    fail("expected empty metrics json response to validate")
+  }
+
+  guard validate_trace_response(
+      Protocol::HttpJson,
+      encode_json_message(
+        @collectortrace.ExportTraceServiceResponse::new(
+          @collectortrace.ExportTracePartialSuccess::new(1L, "trace failed"),
+        ),
+      ),
+    )
+    is Err(trace_message) else {
+    fail("expected trace partial success to fail validation")
+  }
+  assert_true(trace_message.contains("rejected_spans=1"))
+
+  guard validate_logs_response(
+      Protocol::HttpJson,
+      encode_json_message(
+        @collectorlogs.ExportLogsServiceResponse::new(
+          @collectorlogs.ExportLogsPartialSuccess::new(2L, "logs failed"),
+        ),
+      ),
+    )
+    is Err(logs_message) else {
+    fail("expected logs partial success to fail validation")
+  }
+  assert_true(logs_message.contains("rejected_log_records=2"))
+
+  guard validate_metrics_response(
+      Protocol::HttpJson,
+      encode_json_message(
+        @collectormetrics.ExportMetricsServiceResponse::new(
+          @collectormetrics.ExportMetricsPartialSuccess::new(
+            3L, "metrics failed",
+          ),
+        ),
+      ),
+    )
+    is Err(metrics_message) else {
+    fail("expected metrics partial success to fail validation")
+  }
+  assert_true(metrics_message.contains("rejected_data_points=3"))
 }
 
 ///|
@@ -373,6 +509,57 @@ async test "async span exporter posts protobuf to collector" {
     decode_trace_request(received_body.val) {
     Ok(request) => request
     Err(message) => fail("expected valid protobuf body: \{message}")
+  }
+  assert_eq(request.resource_spans.length(), 1)
+}
+
+///|
+async test "async span exporter posts json to collector" {
+  let received_path = Ref::new("")
+  let received_content_type = Ref::new("")
+  let received_body = Ref::new(b"")
+
+  @async.with_task_group(group => {
+    let server = @http.Server(@socket.Addr::parse("127.0.0.1:0"))
+    let port = server.addr.port()
+    group.spawn_bg(no_wait=true, () => {
+      server.run_forever(
+        (request, body, conn) => {
+          received_path.val = request.path
+          for key, value in request.headers {
+            if normalize_ascii_lower(key) == "content-type" {
+              received_content_type.val = value
+            }
+          }
+          received_body.val = body.read_all().binary()
+          conn.send_response(200, "OK", extra_headers={
+            "content-type": "application/json",
+          })
+          conn.write("{}" |> @utf8.encode)
+          conn.end_response()
+        },
+        max_connections=1,
+      )
+    })
+
+    guard SpanExporter::builder()
+      .with_endpoint("http://127.0.0.1:\{port}/custom/traces")
+      .with_protocol(Protocol::HttpJson)
+      .build()
+      is Ok(exporter) else {
+      fail("expected json exporter build to succeed")
+    }
+    guard exporter.export_batch([sample_span_data()]) is Ok(_) else {
+      fail("expected json export to succeed")
+    }
+  })
+
+  assert_eq(received_path.val, "/custom/traces")
+  assert_eq(received_content_type.val, "application/json")
+  let request : @collectortrace.ExportTraceServiceRequest = match
+    decode_json_message(received_body.val) {
+    Ok(request) => request
+    Err(message) => fail("expected valid json body: \{message}")
   }
   assert_eq(request.resource_spans.length(), 1)
 }

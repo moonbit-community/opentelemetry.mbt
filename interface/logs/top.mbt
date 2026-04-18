@@ -1,4 +1,8 @@
 ///|
+/// Log body/attribute value accepted by the public logging API.
+///
+/// Maps are serialized to JSON strings when bridged into the SDK because the
+/// shared attribute model does not carry nested map values directly.
 pub(all) enum AnyValue {
   Int(Int64)
   Double(Double)
@@ -10,6 +14,11 @@ pub(all) enum AnyValue {
 } derive(Eq, ToJson, Debug)
 
 ///|
+/// Public severity ladder matching the OpenTelemetry log data model.
+///
+/// `Trace2`..`Trace4`, `Debug2`..`Debug4`, and similar variants preserve the
+/// original 24-slot severity scale while still collapsing to the broader
+/// severity family in the SDK.
 pub(all) enum Severity {
   Trace
   Trace2
@@ -38,6 +47,9 @@ pub(all) enum Severity {
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
+/// Mutable log record builder used by `Logger::emit()`.
+///
+/// Event name and target are stored as synthetic attributes during export.
 pub struct LogRecord {
   mut event_name : String?
   mut target : String?
@@ -51,16 +63,23 @@ pub struct LogRecord {
 } derive(Eq, ToJson, Debug)
 
 ///|
+/// Public logger handle.
+///
+/// When backed by a no-op provider, all emissions are silently dropped.
 pub struct Logger {
   sdk_logger : @sdklogs.SdkLogger?
 }
 
 ///|
+/// Public logger provider wrapper around the SDK provider.
+///
+/// A provider with `sdk_provider = None` behaves as a no-op provider.
 pub struct LoggerProvider {
   sdk_provider : @sdklogs.SdkLoggerProvider?
 }
 
 ///|
+/// Returns the canonical uppercase text form for one severity variant.
 pub fn Severity::name(self : Severity) -> String {
   match self {
     Severity::Trace => "TRACE"
@@ -175,6 +194,7 @@ fn sdk_attributes(record : LogRecord) -> Array[@common.KeyValue] {
 }
 
 ///|
+/// Creates an empty mutable log record.
 pub fn LogRecord::new() -> LogRecord {
   {
     event_name: None,
@@ -190,16 +210,23 @@ pub fn LogRecord::new() -> LogRecord {
 }
 
 ///|
+/// Sets the event name that will later be exported as the `log.event_name`
+/// attribute.
 pub fn LogRecord::set_event_name(self : LogRecord, name : StringView) -> Unit {
   self.event_name = Some(name.to_string())
 }
 
 ///|
+/// Sets the log target that will later be exported as the `log.target`
+/// attribute.
 pub fn LogRecord::set_target(self : LogRecord, target : StringView) -> Unit {
   self.target = Some(target.to_string())
 }
 
 ///|
+/// Sets the event timestamp in Unix nanoseconds.
+///
+/// When omitted, `Logger::emit()` uses the current time.
 pub fn LogRecord::set_timestamp(
   self : LogRecord,
   timestamp_unix_nano : Int64,
@@ -208,6 +235,9 @@ pub fn LogRecord::set_timestamp(
 }
 
 ///|
+/// Sets the observed timestamp in Unix nanoseconds.
+///
+/// When omitted, `Logger::emit()` uses the current time.
 pub fn LogRecord::set_observed_timestamp(
   self : LogRecord,
   observed_timestamp_unix_nano : Int64,
@@ -216,6 +246,10 @@ pub fn LogRecord::set_observed_timestamp(
 }
 
 ///|
+/// Sets the exact severity text to export.
+///
+/// If this is not set but a severity number is present, `Logger::emit()`
+/// derives the text from `Severity::name()`.
 pub fn LogRecord::set_severity_text(
   self : LogRecord,
   severity_text : StringView,
@@ -224,6 +258,7 @@ pub fn LogRecord::set_severity_text(
 }
 
 ///|
+/// Sets the structured severity number to export.
 pub fn LogRecord::set_severity_number(
   self : LogRecord,
   severity_number : Severity,
@@ -232,11 +267,15 @@ pub fn LogRecord::set_severity_number(
 }
 
 ///|
+/// Sets the log body.
+///
+/// If no body is set, `Logger::emit()` exports an empty string body.
 pub fn LogRecord::set_body(self : LogRecord, body : AnyValue) -> Unit {
   self.body = Some(body)
 }
 
 ///|
+/// Adds one attribute to the log record.
 pub fn LogRecord::add_attribute(
   self : LogRecord,
   key : StringView,
@@ -248,6 +287,7 @@ pub fn LogRecord::add_attribute(
 }
 
 ///|
+/// Appends multiple pre-built attributes to the log record.
 pub fn LogRecord::add_attributes(
   self : LogRecord,
   attributes : ArrayView[@common.KeyValue],
@@ -256,6 +296,9 @@ pub fn LogRecord::add_attributes(
 }
 
 ///|
+/// Stores explicit trace correlation fields on the record.
+///
+/// When `trace_flags` is omitted, the trace flags default to zero.
 pub fn LogRecord::set_trace_context(
   self : LogRecord,
   trace_id : @common.TraceId,
@@ -280,6 +323,7 @@ pub impl Default for LogRecord with default() -> LogRecord {
 }
 
 ///|
+/// Wraps an SDK logger provider in the public API type.
 pub fn LoggerProvider::from_sdk(
   provider : @sdklogs.SdkLoggerProvider,
 ) -> LoggerProvider {
@@ -287,11 +331,15 @@ pub fn LoggerProvider::from_sdk(
 }
 
 ///|
+/// Returns a no-op logger provider.
 pub fn LoggerProvider::noop() -> LoggerProvider {
   { sdk_provider: None }
 }
 
 ///|
+/// Returns a logger for one instrumentation name.
+///
+/// If the provider is no-op, the returned logger is also no-op.
 pub fn LoggerProvider::logger(
   self : LoggerProvider,
   name : StringView,
@@ -303,6 +351,10 @@ pub fn LoggerProvider::logger(
 }
 
 ///|
+/// Returns a logger for a fully constructed instrumentation scope.
+///
+/// The scope name, version, schema URL, and attributes are forwarded to the
+/// SDK provider as-is.
 pub fn LoggerProvider::logger_with_scope(
   self : LoggerProvider,
   scope : @common.InstrumentationScope,
@@ -322,6 +374,9 @@ pub fn LoggerProvider::logger_with_scope(
 }
 
 ///|
+/// Flushes the underlying SDK provider.
+///
+/// No-op providers report success.
 pub async fn LoggerProvider::force_flush(
   self : LoggerProvider,
 ) -> @error.OTelSdkResult {
@@ -332,6 +387,9 @@ pub async fn LoggerProvider::force_flush(
 }
 
 ///|
+/// Shuts down the underlying SDK provider.
+///
+/// No-op providers report success.
 pub async fn LoggerProvider::shutdown(
   self : LoggerProvider,
 ) -> @error.OTelSdkResult {
@@ -342,6 +400,9 @@ pub async fn LoggerProvider::shutdown(
 }
 
 ///|
+/// Spawns background loops for batch log processors owned by this provider.
+///
+/// No-op providers do nothing.
 pub fn LoggerProvider::spawn_batch_processor_tasks(
   self : LoggerProvider,
   group : @async.TaskGroup[Unit],
@@ -355,12 +416,20 @@ pub fn LoggerProvider::spawn_batch_processor_tasks(
 }
 
 ///|
+/// Creates a fresh mutable `LogRecord`.
+///
+/// The returned record is not pre-populated with scope or provider data.
 pub fn Logger::create_log_record(self : Logger) -> LogRecord {
   ignore(self)
   LogRecord::new()
 }
 
 ///|
+/// Emits one log record through the underlying SDK logger.
+///
+/// Missing timestamps default to the current time. Missing severity text is
+/// derived from the severity number, and missing bodies are exported as empty
+/// strings. No-op loggers drop the record silently.
 pub async fn Logger::emit(self : Logger, record : LogRecord) -> Unit {
   match self.sdk_logger {
     Some(logger) => {
@@ -392,6 +461,10 @@ pub async fn Logger::emit(self : Logger, record : LogRecord) -> Unit {
 }
 
 ///|
+/// Returns whether log emission is currently enabled for this logger.
+///
+/// The current implementation only checks whether a real SDK logger exists; it
+/// does not apply severity-, target-, or name-based filtering yet.
 pub fn Logger::event_enabled(
   self : Logger,
   severity : Severity,

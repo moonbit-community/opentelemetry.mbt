@@ -5,11 +5,15 @@ let max_key_value_pairs = 64
 let max_len_of_all_pairs = 8192
 
 ///|
+/// Metadata attached to one baggage entry.
+///
+/// The stored text is trimmed when constructed.
 pub struct BaggageMetadata {
   metadata : String
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
+/// One baggage entry together with its metadata payload.
 pub struct KeyValueMetadata {
   key : @common.Key
   value : String
@@ -17,17 +21,25 @@ pub struct KeyValueMetadata {
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
+/// Immutable baggage map used for cross-process propagation.
+///
+/// The implementation enforces OpenTelemetry-style limits on key count and
+/// serialized size. Updates that violate those limits leave the baggage
+/// unchanged.
 pub struct Baggage {
   entries : Map[String, KeyValueMetadata]
   kv_content_len : Int
 } derive(Eq, ToJson, Debug)
 
 ///|
+/// Creates metadata from one text fragment after trimming surrounding
+/// whitespace.
 pub fn BaggageMetadata::new(metadata : StringView) -> BaggageMetadata {
   { metadata: metadata.trim().to_string() }
 }
 
 ///|
+/// Returns the stored metadata text.
 pub fn BaggageMetadata::as_string(self : BaggageMetadata) -> String {
   self.metadata
 }
@@ -38,6 +50,10 @@ pub impl Default for BaggageMetadata with default() -> BaggageMetadata {
 }
 
 ///|
+/// Creates one baggage entry description.
+///
+/// This only packages the data. Validation happens when the entry is inserted
+/// into a `Baggage`.
 pub fn KeyValueMetadata::new(
   key : StringView,
   value : StringView,
@@ -47,6 +63,7 @@ pub fn KeyValueMetadata::new(
 }
 
 ///|
+/// Returns an empty baggage value.
 pub fn Baggage::new() -> Baggage {
   { entries: {}, kv_content_len: 0 }
 }
@@ -123,6 +140,10 @@ fn baggage_with_entries(entries : Map[String, KeyValueMetadata]) -> Baggage {
 }
 
 ///|
+/// Inserts one baggage item with empty metadata.
+///
+/// Invalid keys or values, entry-count overflow, and total-size overflow leave
+/// the baggage unchanged.
 pub fn Baggage::insert(
   self : Baggage,
   key : StringView,
@@ -132,6 +153,10 @@ pub fn Baggage::insert(
 }
 
 ///|
+/// Inserts or replaces one baggage item together with explicit metadata.
+///
+/// Keys are trimmed before validation. Invalid data or limit violations return
+/// the original baggage unchanged.
 pub fn Baggage::insert_with_metadata(
   self : Baggage,
   key : StringView,
@@ -168,6 +193,10 @@ pub fn Baggage::insert_with_metadata(
 }
 
 ///|
+/// Returns a new baggage value without `key`.
+///
+/// Removing a missing key still returns a fresh baggage value with the same
+/// contents.
 pub fn Baggage::remove(self : Baggage, key : StringView) -> Baggage {
   let entries = self.entries.copy()
   ignore(entries.remove(key.to_string()))
@@ -175,11 +204,13 @@ pub fn Baggage::remove(self : Baggage, key : StringView) -> Baggage {
 }
 
 ///|
+/// Looks up the string value for `key`.
 pub fn Baggage::get(self : Baggage, key : StringView) -> String? {
   self.entries.get(key.to_string()).map(entry => entry.value)
 }
 
 ///|
+/// Looks up the value and metadata for `key`.
 pub fn Baggage::get_with_metadata(
   self : Baggage,
   key : StringView,
@@ -188,6 +219,9 @@ pub fn Baggage::get_with_metadata(
 }
 
 ///|
+/// Returns all baggage entries as an array.
+///
+/// The returned array is detached from the internal map.
 pub fn Baggage::entries(self : Baggage) -> Array[KeyValueMetadata] {
   let entries = []
   for _, entry in self.entries {
@@ -197,11 +231,13 @@ pub fn Baggage::entries(self : Baggage) -> Array[KeyValueMetadata] {
 }
 
 ///|
+/// Returns the current number of baggage entries.
 pub fn Baggage::len(self : Baggage) -> Int {
   self.entries.length()
 }
 
 ///|
+/// Returns whether the baggage contains no entries.
 pub fn Baggage::is_empty(self : Baggage) -> Bool {
   self.entries.is_empty()
 }

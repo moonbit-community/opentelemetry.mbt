@@ -1,9 +1,11 @@
 ///|
+/// Write side of a text-map carrier used for outbound propagation.
 pub(open) trait Injector {
   set(Self, String, String) -> Unit
 }
 
 ///|
+/// Read side of a text-map carrier used for inbound propagation.
 pub(open) trait Extractor {
   get(Self, StringView) -> String?
   keys(Self) -> Array[String] = _
@@ -39,6 +41,7 @@ pub impl Extractor for Map[String, String] with keys(self) {
 }
 
 ///|
+/// Erased text-map propagator built from inject/extract callbacks.
 pub struct TextMapPropagator {
   inject_fn : (@context.Context, &Injector) -> Unit
   extract_fn : (@context.Context, &Extractor) -> @context.Context
@@ -46,21 +49,25 @@ pub struct TextMapPropagator {
 }
 
 ///|
+/// W3C baggage propagator wrapper.
 pub struct BaggagePropagator {
   inner : TextMapPropagator
 }
 
 ///|
+/// W3C trace-context propagator wrapper.
 pub struct TraceContextPropagator {
   inner : TextMapPropagator
 }
 
 ///|
+/// Composite propagator that applies multiple propagators in sequence.
 pub struct TextMapCompositePropagator {
   inner : TextMapPropagator
 }
 
 ///|
+/// Creates a custom text-map propagator from inject/extract/fields callbacks.
 pub fn TextMapPropagator::from_functions(
   inject_fn : (@context.Context, &Injector) -> Unit,
   extract_fn : (@context.Context, &Extractor) -> @context.Context,
@@ -70,6 +77,7 @@ pub fn TextMapPropagator::from_functions(
 }
 
 ///|
+/// Injects values from `context` into the supplied carrier.
 pub fn TextMapPropagator::inject_context(
   self : TextMapPropagator,
   context : @context.Context,
@@ -79,6 +87,7 @@ pub fn TextMapPropagator::inject_context(
 }
 
 ///|
+/// Extracts values from the carrier and returns an updated context.
 pub fn TextMapPropagator::extract_with_context(
   self : TextMapPropagator,
   context : @context.Context,
@@ -88,6 +97,7 @@ pub fn TextMapPropagator::extract_with_context(
 }
 
 ///|
+/// Returns the header names this propagator may read or write.
 pub fn TextMapPropagator::fields(self : TextMapPropagator) -> Array[String] {
   (self.fields_fn)()
 }
@@ -303,6 +313,10 @@ fn extract_span_context(extractor : &Extractor) -> @common.SpanContext? {
 }
 
 ///|
+/// Creates a baggage propagator that reads and writes the `baggage` header.
+///
+/// Extraction is forgiving: malformed entries are ignored and valid entries are
+/// merged into the provided context.
 pub fn BaggagePropagator::new() -> BaggagePropagator {
   {
     inner: TextMapPropagator::from_functions(
@@ -324,6 +338,7 @@ pub fn BaggagePropagator::new() -> BaggagePropagator {
 }
 
 ///|
+/// Injects baggage from `context` into the carrier.
 pub fn BaggagePropagator::inject_context(
   self : BaggagePropagator,
   context : @context.Context,
@@ -333,6 +348,7 @@ pub fn BaggagePropagator::inject_context(
 }
 
 ///|
+/// Extracts baggage from the carrier and returns an updated context.
 pub fn BaggagePropagator::extract_with_context(
   self : BaggagePropagator,
   context : @context.Context,
@@ -342,6 +358,7 @@ pub fn BaggagePropagator::extract_with_context(
 }
 
 ///|
+/// Erases the concrete baggage propagator type into `TextMapPropagator`.
 pub fn BaggagePropagator::into_text_map(
   self : BaggagePropagator,
 ) -> TextMapPropagator {
@@ -349,6 +366,10 @@ pub fn BaggagePropagator::into_text_map(
 }
 
 ///|
+/// Creates a trace-context propagator that reads and writes `traceparent` and
+/// `tracestate`.
+///
+/// Invalid headers are ignored and leave the incoming context unchanged.
 pub fn TraceContextPropagator::new() -> TraceContextPropagator {
   {
     inner: TextMapPropagator::from_functions(
@@ -378,6 +399,7 @@ pub fn TraceContextPropagator::new() -> TraceContextPropagator {
 }
 
 ///|
+/// Injects the current span context into the carrier when it is valid.
 pub fn TraceContextPropagator::inject_context(
   self : TraceContextPropagator,
   context : @context.Context,
@@ -387,6 +409,7 @@ pub fn TraceContextPropagator::inject_context(
 }
 
 ///|
+/// Extracts a remote span context from the carrier when the headers are valid.
 pub fn TraceContextPropagator::extract_with_context(
   self : TraceContextPropagator,
   context : @context.Context,
@@ -396,6 +419,7 @@ pub fn TraceContextPropagator::extract_with_context(
 }
 
 ///|
+/// Erases the concrete trace-context propagator type into `TextMapPropagator`.
 pub fn TraceContextPropagator::into_text_map(
   self : TraceContextPropagator,
 ) -> TextMapPropagator {
@@ -403,6 +427,10 @@ pub fn TraceContextPropagator::into_text_map(
 }
 
 ///|
+/// Creates a propagator that runs multiple propagators in order.
+///
+/// Injection runs every propagator. Extraction threads the context through the
+/// propagators from left to right. Reported fields are de-duplicated.
 pub fn TextMapCompositePropagator::new(
   propagators : ArrayView[TextMapPropagator],
 ) -> TextMapCompositePropagator {
@@ -435,6 +463,7 @@ pub fn TextMapCompositePropagator::new(
 }
 
 ///|
+/// Injects using every child propagator in order.
 pub fn TextMapCompositePropagator::inject_context(
   self : TextMapCompositePropagator,
   context : @context.Context,
@@ -444,6 +473,7 @@ pub fn TextMapCompositePropagator::inject_context(
 }
 
 ///|
+/// Extracts using every child propagator in order.
 pub fn TextMapCompositePropagator::extract_with_context(
   self : TextMapCompositePropagator,
   context : @context.Context,
@@ -453,6 +483,7 @@ pub fn TextMapCompositePropagator::extract_with_context(
 }
 
 ///|
+/// Erases the concrete composite propagator type into `TextMapPropagator`.
 pub fn TextMapCompositePropagator::into_text_map(
   self : TextMapCompositePropagator,
 ) -> TextMapPropagator {

@@ -68,6 +68,10 @@ pub const OTEL_EXPORTER_OTLP_LOGS_HEADERS : String = "OTEL_EXPORTER_OTLP_LOGS_HE
 pub const OTEL_EXPORTER_OTLP_LOGS_COMPRESSION : String = "OTEL_EXPORTER_OTLP_LOGS_COMPRESSION"
 
 ///|
+/// OTLP transport protocol selection.
+///
+/// The current exporter implementation supports the HTTP transports. `Grpc` is
+/// kept for API parity but rejected during exporter construction.
 pub(all) enum Protocol {
   Grpc
   HttpBinary
@@ -80,12 +84,17 @@ pub impl Default for Protocol with default() -> Protocol {
 }
 
 ///|
+/// Requested payload compression algorithm.
+///
+/// Compression is not implemented yet; setting it currently causes exporter
+/// construction to fail with `UnsupportedCompressionAlgorithm`.
 pub(all) enum Compression {
   Gzip
   Zstd
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
+/// Error returned when exporter configuration cannot be resolved.
 pub(all) enum ExporterBuildError {
   InvalidConfig(String, String)
   UnsupportedProtocol(String)
@@ -96,6 +105,7 @@ pub(all) enum ExporterBuildError {
 struct SignalConfig {
   signal_name : String
   endpoint : String
+  protocol : Protocol
   timeout_millis : Int
   headers : Map[String, String]
 }
@@ -106,6 +116,7 @@ struct SignalExporterState {
 }
 
 ///|
+/// Builder for OTLP span exporters.
 pub struct SpanExporterBuilder {
   mut endpoint : String?
   mut protocol : Protocol?
@@ -115,6 +126,7 @@ pub struct SpanExporterBuilder {
 }
 
 ///|
+/// Builder for OTLP log exporters.
 pub struct LogExporterBuilder {
   mut endpoint : String?
   mut protocol : Protocol?
@@ -124,6 +136,7 @@ pub struct LogExporterBuilder {
 }
 
 ///|
+/// Builder for OTLP metric exporters.
 pub struct MetricExporterBuilder {
   mut endpoint : String?
   mut protocol : Protocol?
@@ -134,18 +147,21 @@ pub struct MetricExporterBuilder {
 }
 
 ///|
+/// OTLP span exporter.
 pub struct SpanExporter {
   state : Ref[SignalExporterState]
   config : SignalConfig
 }
 
 ///|
+/// OTLP log exporter.
 pub struct LogExporter {
   state : Ref[SignalExporterState]
   config : SignalConfig
 }
 
 ///|
+/// OTLP metric exporter.
 pub struct MetricExporter {
   state : Ref[SignalExporterState]
   config : SignalConfig
@@ -377,10 +393,10 @@ fn resolve_protocol(
         None => Protocol::HttpBinary
       }
   }
-  if protocol == Protocol::HttpBinary {
-    Ok(protocol)
-  } else {
-    Err(ExporterBuildError::UnsupportedProtocol(protocol_to_string(protocol)))
+  match protocol {
+    Protocol::HttpBinary | Protocol::HttpJson => Ok(protocol)
+    Protocol::Grpc =>
+      Err(ExporterBuildError::UnsupportedProtocol(protocol_to_string(protocol)))
   }
 }
 
@@ -591,26 +607,25 @@ fn build_signal_config(
   headers : Map[String, String],
   compression : Compression?,
 ) -> Result[SignalConfig, ExporterBuildError] {
-  match resolve_protocol(protocol) {
-    Ok(_) => ()
-    Err(err) => return Err(err)
-  }
+  let protocol = resolve_protocol(protocol)
   match resolve_compression(signal_compression_var, compression) {
     Ok(_) => ()
     Err(err) => return Err(err)
   }
   let endpoint = resolve_endpoint(signal_endpoint_var, signal_path, endpoint)
   let timeout_millis = resolve_timeout(signal_timeout_var, timeout_millis)
-  match (endpoint, timeout_millis) {
-    (Ok(endpoint), Ok(timeout_millis)) =>
+  match (protocol, endpoint, timeout_millis) {
+    (Ok(protocol), Ok(endpoint), Ok(timeout_millis)) =>
       Ok({
         signal_name,
         endpoint,
+        protocol,
         timeout_millis,
         headers: resolve_headers(signal_headers_var, headers),
       })
-    (Err(err), _) => Err(err)
-    (_, Err(err)) => Err(err)
+    (Err(err), _, _) => Err(err)
+    (_, Err(err), _) => Err(err)
+    (_, _, Err(err)) => Err(err)
   }
 }
 
@@ -994,6 +1009,27 @@ fn[T : @protobuf.Write] encode_protobuf(message : T) -> Result[Bytes, String] {
 }
 
 ///|
+fn[T : ToJson] encode_json_message(message : T) -> Bytes {
+  message.to_json().stringify() |> @utf8.encode
+}
+
+///|
+fn[T : @json.FromJson] decode_json_message(bytes : Bytes) -> Result[T, String] {
+  let text = @utf8.decode(bytes) catch {
+    _ => return Err("response body is not valid utf-8")
+  }
+  let json = @json.parse(text) catch {
+    _ => return Err("response body is not valid json")
+  }
+  try {
+    let message : T = @json.from_json(json)
+    Ok(message)
+  } catch {
+    _ => Err("response body does not match OTLP json schema")
+  }
+}
+
+///|
 fn decode_trace_response(
   bytes : Bytes,
 ) -> Result[@collectortrace.ExportTraceServiceResponse, String] {
@@ -1123,12 +1159,13 @@ fn format_http_failure(
 }
 
 ///|
-async fn post_protobuf(
+async fn post_payload(
   config : SignalConfig,
   payload : Bytes,
+  content_type : String,
 ) -> Result[Bytes, String] {
   let headers = config.headers.copy()
-  headers["content-type"] = "application/x-protobuf"
+  headers["content-type"] = content_type
   guard @async.with_timeout_opt(config.timeout_millis, () => {
       @http.post(config.endpoint, payload, headers~)
     })
@@ -1144,13 +1181,26 @@ async fn post_protobuf(
 }
 
 ///|
-fn validate_trace_response(body : Bytes) -> Result[Unit, String] {
+fn validate_trace_response(
+  protocol : Protocol,
+  body : Bytes,
+) -> Result[Unit, String] {
   if body.length() == 0 {
     return Ok(())
   }
-  let response = match decode_trace_response(body) {
-    Ok(response) => response
-    Err(err) => return Err(err)
+  let response : @collectortrace.ExportTraceServiceResponse = match protocol {
+    Protocol::HttpBinary =>
+      match decode_trace_response(body) {
+        Ok(response) => response
+        Err(err) => return Err(err)
+      }
+    Protocol::HttpJson =>
+      match decode_json_message(body) {
+        Ok(response) => response
+        Err(err) => return Err(err)
+      }
+    Protocol::Grpc =>
+      return Err("grpc transport is not supported by HTTP exporters")
   }
   let partial_success = response.partial_success
   if partial_success.rejected_spans > 0L || partial_success.error_message != "" {
@@ -1163,13 +1213,26 @@ fn validate_trace_response(body : Bytes) -> Result[Unit, String] {
 }
 
 ///|
-fn validate_logs_response(body : Bytes) -> Result[Unit, String] {
+fn validate_logs_response(
+  protocol : Protocol,
+  body : Bytes,
+) -> Result[Unit, String] {
   if body.length() == 0 {
     return Ok(())
   }
-  let response = match decode_logs_response(body) {
-    Ok(response) => response
-    Err(err) => return Err(err)
+  let response : @collectorlogs.ExportLogsServiceResponse = match protocol {
+    Protocol::HttpBinary =>
+      match decode_logs_response(body) {
+        Ok(response) => response
+        Err(err) => return Err(err)
+      }
+    Protocol::HttpJson =>
+      match decode_json_message(body) {
+        Ok(response) => response
+        Err(err) => return Err(err)
+      }
+    Protocol::Grpc =>
+      return Err("grpc transport is not supported by HTTP exporters")
   }
   let partial_success = response.partial_success
   if partial_success.rejected_log_records > 0L ||
@@ -1183,13 +1246,27 @@ fn validate_logs_response(body : Bytes) -> Result[Unit, String] {
 }
 
 ///|
-fn validate_metrics_response(body : Bytes) -> Result[Unit, String] {
+fn validate_metrics_response(
+  protocol : Protocol,
+  body : Bytes,
+) -> Result[Unit, String] {
   if body.length() == 0 {
     return Ok(())
   }
-  let response = match decode_metrics_response(body) {
-    Ok(response) => response
-    Err(err) => return Err(err)
+  let response : @collectormetrics.ExportMetricsServiceResponse = match
+    protocol {
+    Protocol::HttpBinary =>
+      match decode_metrics_response(body) {
+        Ok(response) => response
+        Err(err) => return Err(err)
+      }
+    Protocol::HttpJson =>
+      match decode_json_message(body) {
+        Ok(response) => response
+        Err(err) => return Err(err)
+      }
+    Protocol::Grpc =>
+      return Err("grpc transport is not supported by HTTP exporters")
   }
   let partial_success = response.partial_success
   if partial_success.rejected_data_points > 0L ||
@@ -1203,6 +1280,7 @@ fn validate_metrics_response(body : Bytes) -> Result[Unit, String] {
 }
 
 ///|
+/// Starts building a span exporter.
 pub fn SpanExporter::builder() -> SpanExporterBuilder {
   {
     endpoint: None,
@@ -1214,6 +1292,7 @@ pub fn SpanExporter::builder() -> SpanExporterBuilder {
 }
 
 ///|
+/// Starts building a log exporter.
 pub fn LogExporter::builder() -> LogExporterBuilder {
   {
     endpoint: None,
@@ -1225,6 +1304,7 @@ pub fn LogExporter::builder() -> LogExporterBuilder {
 }
 
 ///|
+/// Starts building a metric exporter.
 pub fn MetricExporter::builder() -> MetricExporterBuilder {
   {
     endpoint: None,
@@ -1237,21 +1317,25 @@ pub fn MetricExporter::builder() -> MetricExporterBuilder {
 }
 
 ///|
+/// Builds a span exporter from defaults plus environment variables.
 pub fn SpanExporter::new() -> Result[SpanExporter, ExporterBuildError] {
   SpanExporter::builder().build()
 }
 
 ///|
+/// Builds a log exporter from defaults plus environment variables.
 pub fn LogExporter::new() -> Result[LogExporter, ExporterBuildError] {
   LogExporter::builder().build()
 }
 
 ///|
+/// Builds a metric exporter from defaults plus environment variables.
 pub fn MetricExporter::new() -> Result[MetricExporter, ExporterBuildError] {
   MetricExporter::builder().build()
 }
 
 ///|
+/// Selects HTTP protobuf transport explicitly.
 pub fn SpanExporterBuilder::with_http(
   self : SpanExporterBuilder,
 ) -> SpanExporterBuilder {
@@ -1260,6 +1344,7 @@ pub fn SpanExporterBuilder::with_http(
 }
 
 ///|
+/// Selects HTTP protobuf transport explicitly.
 pub fn LogExporterBuilder::with_http(
   self : LogExporterBuilder,
 ) -> LogExporterBuilder {
@@ -1268,6 +1353,7 @@ pub fn LogExporterBuilder::with_http(
 }
 
 ///|
+/// Selects HTTP protobuf transport explicitly.
 pub fn MetricExporterBuilder::with_http(
   self : MetricExporterBuilder,
 ) -> MetricExporterBuilder {
@@ -1276,6 +1362,9 @@ pub fn MetricExporterBuilder::with_http(
 }
 
 ///|
+/// Sets an explicit OTLP endpoint for the span exporter.
+///
+/// This value overrides any endpoint derived from the environment.
 pub fn SpanExporterBuilder::with_endpoint(
   self : SpanExporterBuilder,
   endpoint : StringView,
@@ -1285,6 +1374,9 @@ pub fn SpanExporterBuilder::with_endpoint(
 }
 
 ///|
+/// Sets an explicit OTLP endpoint for the log exporter.
+///
+/// This value overrides any endpoint derived from the environment.
 pub fn LogExporterBuilder::with_endpoint(
   self : LogExporterBuilder,
   endpoint : StringView,
@@ -1294,6 +1386,9 @@ pub fn LogExporterBuilder::with_endpoint(
 }
 
 ///|
+/// Sets an explicit OTLP endpoint for the metric exporter.
+///
+/// This value overrides any endpoint derived from the environment.
 pub fn MetricExporterBuilder::with_endpoint(
   self : MetricExporterBuilder,
   endpoint : StringView,
@@ -1303,6 +1398,9 @@ pub fn MetricExporterBuilder::with_endpoint(
 }
 
 ///|
+/// Sets the OTLP protocol for the span exporter.
+///
+/// `Protocol::Grpc` is currently rejected during `build()`.
 pub fn SpanExporterBuilder::with_protocol(
   self : SpanExporterBuilder,
   protocol : Protocol,
@@ -1312,6 +1410,9 @@ pub fn SpanExporterBuilder::with_protocol(
 }
 
 ///|
+/// Sets the OTLP protocol for the log exporter.
+///
+/// `Protocol::Grpc` is currently rejected during `build()`.
 pub fn LogExporterBuilder::with_protocol(
   self : LogExporterBuilder,
   protocol : Protocol,
@@ -1321,6 +1422,9 @@ pub fn LogExporterBuilder::with_protocol(
 }
 
 ///|
+/// Sets the OTLP protocol for the metric exporter.
+///
+/// `Protocol::Grpc` is currently rejected during `build()`.
 pub fn MetricExporterBuilder::with_protocol(
   self : MetricExporterBuilder,
   protocol : Protocol,
@@ -1330,6 +1434,9 @@ pub fn MetricExporterBuilder::with_protocol(
 }
 
 ///|
+/// Sets the request timeout in milliseconds for the span exporter.
+///
+/// The value must be greater than zero.
 pub fn SpanExporterBuilder::with_timeout(
   self : SpanExporterBuilder,
   timeout_millis : Int,
@@ -1339,6 +1446,9 @@ pub fn SpanExporterBuilder::with_timeout(
 }
 
 ///|
+/// Sets the request timeout in milliseconds for the log exporter.
+///
+/// The value must be greater than zero.
 pub fn LogExporterBuilder::with_timeout(
   self : LogExporterBuilder,
   timeout_millis : Int,
@@ -1348,6 +1458,9 @@ pub fn LogExporterBuilder::with_timeout(
 }
 
 ///|
+/// Sets the request timeout in milliseconds for the metric exporter.
+///
+/// The value must be greater than zero.
 pub fn MetricExporterBuilder::with_timeout(
   self : MetricExporterBuilder,
   timeout_millis : Int,
@@ -1357,6 +1470,10 @@ pub fn MetricExporterBuilder::with_timeout(
 }
 
 ///|
+/// Adds explicit headers for the span exporter.
+///
+/// Header names are normalized to lowercase and override environment-derived
+/// headers with the same name.
 pub fn SpanExporterBuilder::with_headers(
   self : SpanExporterBuilder,
   headers : Map[String, String],
@@ -1366,6 +1483,10 @@ pub fn SpanExporterBuilder::with_headers(
 }
 
 ///|
+/// Adds explicit headers for the log exporter.
+///
+/// Header names are normalized to lowercase and override environment-derived
+/// headers with the same name.
 pub fn LogExporterBuilder::with_headers(
   self : LogExporterBuilder,
   headers : Map[String, String],
@@ -1375,6 +1496,10 @@ pub fn LogExporterBuilder::with_headers(
 }
 
 ///|
+/// Adds explicit headers for the metric exporter.
+///
+/// Header names are normalized to lowercase and override environment-derived
+/// headers with the same name.
 pub fn MetricExporterBuilder::with_headers(
   self : MetricExporterBuilder,
   headers : Map[String, String],
@@ -1384,6 +1509,9 @@ pub fn MetricExporterBuilder::with_headers(
 }
 
 ///|
+/// Requests compression for the span exporter.
+///
+/// Compression is not implemented yet, so `build()` will fail when this is set.
 pub fn SpanExporterBuilder::with_compression(
   self : SpanExporterBuilder,
   compression : Compression,
@@ -1393,6 +1521,9 @@ pub fn SpanExporterBuilder::with_compression(
 }
 
 ///|
+/// Requests compression for the log exporter.
+///
+/// Compression is not implemented yet, so `build()` will fail when this is set.
 pub fn LogExporterBuilder::with_compression(
   self : LogExporterBuilder,
   compression : Compression,
@@ -1402,6 +1533,9 @@ pub fn LogExporterBuilder::with_compression(
 }
 
 ///|
+/// Requests compression for the metric exporter.
+///
+/// Compression is not implemented yet, so `build()` will fail when this is set.
 pub fn MetricExporterBuilder::with_compression(
   self : MetricExporterBuilder,
   compression : Compression,
@@ -1411,6 +1545,7 @@ pub fn MetricExporterBuilder::with_compression(
 }
 
 ///|
+/// Sets the temporality preference used when exporting metrics.
 pub fn MetricExporterBuilder::with_temporality(
   self : MetricExporterBuilder,
   temporality : @sdkmetrics.Temporality,
@@ -1420,6 +1555,9 @@ pub fn MetricExporterBuilder::with_temporality(
 }
 
 ///|
+/// Resolves configuration and builds a span exporter.
+///
+/// Explicit builder options override environment-derived defaults.
 pub fn SpanExporterBuilder::build(
   self : SpanExporterBuilder,
 ) -> Result[SpanExporter, ExporterBuildError] {
@@ -1443,6 +1581,9 @@ pub fn SpanExporterBuilder::build(
 }
 
 ///|
+/// Resolves configuration and builds a log exporter.
+///
+/// Explicit builder options override environment-derived defaults.
 pub fn LogExporterBuilder::build(
   self : LogExporterBuilder,
 ) -> Result[LogExporter, ExporterBuildError] {
@@ -1466,6 +1607,9 @@ pub fn LogExporterBuilder::build(
 }
 
 ///|
+/// Resolves configuration and builds a metric exporter.
+///
+/// Explicit builder options override environment-derived defaults.
 pub fn MetricExporterBuilder::build(
   self : MetricExporterBuilder,
 ) -> Result[MetricExporter, ExporterBuildError] {
@@ -1492,6 +1636,7 @@ pub fn MetricExporterBuilder::build(
 }
 
 ///|
+/// Returns the temporality chosen for metric export.
 pub fn MetricExporter::temporality(
   self : MetricExporter,
 ) -> @sdkmetrics.Temporality {
@@ -1499,24 +1644,31 @@ pub fn MetricExporter::temporality(
 }
 
 ///|
+/// Returns the exporter name reported to the SDK.
 pub fn SpanExporter::name(self : SpanExporter) -> String {
   ignore(self)
   "otlp"
 }
 
 ///|
+/// Returns the exporter name reported to the SDK.
 pub fn LogExporter::name(self : LogExporter) -> String {
   ignore(self)
   "otlp"
 }
 
 ///|
+/// Returns the exporter name reported to the SDK.
 pub fn MetricExporter::name(self : MetricExporter) -> String {
   ignore(self)
   "otlp"
 }
 
 ///|
+/// Exports one batch of finished spans.
+///
+/// Empty batches succeed immediately. After shutdown, the call returns
+/// `AlreadyShutdown`.
 pub async fn SpanExporter::export_batch(
   self : SpanExporter,
   batch : ArrayView[@sdktrace.SpanData],
@@ -1528,18 +1680,27 @@ pub async fn SpanExporter::export_batch(
     return @error.ok()
   }
   let request = build_trace_request(batch)
-  let payload = match encode_protobuf(request) {
-    Ok(payload) => payload
-    Err(message) =>
+  let (payload, content_type) = match self.config.protocol {
+    Protocol::HttpBinary =>
+      match encode_protobuf(request) {
+        Ok(payload) => (payload, "application/x-protobuf")
+        Err(message) =>
+          return @error.export_failure(
+            self.name(),
+            "failed to encode trace request: \{message}",
+          )
+      }
+    Protocol::HttpJson => (encode_json_message(request), "application/json")
+    Protocol::Grpc =>
       return @error.export_failure(
         self.name(),
-        "failed to encode trace request: \{message}",
+        "grpc transport is not supported by HTTP exporters",
       )
   }
-  let response = post_protobuf(self.config, payload)
+  let response = post_payload(self.config, payload, content_type)
   match response {
     Ok(body) =>
-      match validate_trace_response(body) {
+      match validate_trace_response(self.config.protocol, body) {
         Ok(_) => @error.ok()
         Err(message) => @error.export_failure(self.name(), message)
       }
@@ -1548,6 +1709,10 @@ pub async fn SpanExporter::export_batch(
 }
 
 ///|
+/// Exports one batch of log records.
+///
+/// Empty batches succeed immediately. After shutdown, the call returns
+/// `AlreadyShutdown`.
 pub async fn LogExporter::export_batch(
   self : LogExporter,
   batch : ArrayView[@sdklogs.LogRecord],
@@ -1559,18 +1724,27 @@ pub async fn LogExporter::export_batch(
     return @error.ok()
   }
   let request = build_logs_request(batch)
-  let payload = match encode_protobuf(request) {
-    Ok(payload) => payload
-    Err(message) =>
+  let (payload, content_type) = match self.config.protocol {
+    Protocol::HttpBinary =>
+      match encode_protobuf(request) {
+        Ok(payload) => (payload, "application/x-protobuf")
+        Err(message) =>
+          return @error.export_failure(
+            self.name(),
+            "failed to encode logs request: \{message}",
+          )
+      }
+    Protocol::HttpJson => (encode_json_message(request), "application/json")
+    Protocol::Grpc =>
       return @error.export_failure(
         self.name(),
-        "failed to encode logs request: \{message}",
+        "grpc transport is not supported by HTTP exporters",
       )
   }
-  let response = post_protobuf(self.config, payload)
+  let response = post_payload(self.config, payload, content_type)
   match response {
     Ok(body) =>
-      match validate_logs_response(body) {
+      match validate_logs_response(self.config.protocol, body) {
         Ok(_) => @error.ok()
         Err(message) => @error.export_failure(self.name(), message)
       }
@@ -1579,6 +1753,10 @@ pub async fn LogExporter::export_batch(
 }
 
 ///|
+/// Exports one batch of metrics.
+///
+/// Empty batches succeed immediately. After shutdown, the call returns
+/// `AlreadyShutdown`.
 pub async fn MetricExporter::export_batch(
   self : MetricExporter,
   batch : ArrayView[@sdkmetrics.MetricData],
@@ -1590,18 +1768,27 @@ pub async fn MetricExporter::export_batch(
     return @error.ok()
   }
   let request = build_metrics_request(batch, self.temporality)
-  let payload = match encode_protobuf(request) {
-    Ok(payload) => payload
-    Err(message) =>
+  let (payload, content_type) = match self.config.protocol {
+    Protocol::HttpBinary =>
+      match encode_protobuf(request) {
+        Ok(payload) => (payload, "application/x-protobuf")
+        Err(message) =>
+          return @error.export_failure(
+            self.name(),
+            "failed to encode metrics request: \{message}",
+          )
+      }
+    Protocol::HttpJson => (encode_json_message(request), "application/json")
+    Protocol::Grpc =>
       return @error.export_failure(
         self.name(),
-        "failed to encode metrics request: \{message}",
+        "grpc transport is not supported by HTTP exporters",
       )
   }
-  let response = post_protobuf(self.config, payload)
+  let response = post_payload(self.config, payload, content_type)
   match response {
     Ok(body) =>
-      match validate_metrics_response(body) {
+      match validate_metrics_response(self.config.protocol, body) {
         Ok(_) => @error.ok()
         Err(message) => @error.export_failure(self.name(), message)
       }
@@ -1610,6 +1797,10 @@ pub async fn MetricExporter::export_batch(
 }
 
 ///|
+/// Flushes the span exporter.
+///
+/// The current implementation has no extra buffered work, so this is a no-op
+/// unless the exporter has already been shut down.
 #warnings("-unused_async")
 pub async fn SpanExporter::force_flush(
   self : SpanExporter,
@@ -1622,6 +1813,10 @@ pub async fn SpanExporter::force_flush(
 }
 
 ///|
+/// Flushes the log exporter.
+///
+/// The current implementation has no extra buffered work, so this is a no-op
+/// unless the exporter has already been shut down.
 #warnings("-unused_async")
 pub async fn LogExporter::force_flush(
   self : LogExporter,
@@ -1634,6 +1829,10 @@ pub async fn LogExporter::force_flush(
 }
 
 ///|
+/// Flushes the metric exporter.
+///
+/// The current implementation has no extra buffered work, so this is a no-op
+/// unless the exporter has already been shut down.
 #warnings("-unused_async")
 pub async fn MetricExporter::force_flush(
   self : MetricExporter,
@@ -1646,6 +1845,10 @@ pub async fn MetricExporter::force_flush(
 }
 
 ///|
+/// Shuts down the span exporter.
+///
+/// `timeout_millis` is accepted for API parity but is not used by the current
+/// implementation.
 #warnings("-unused_async")
 pub async fn SpanExporter::shutdown_with_timeout(
   self : SpanExporter,
@@ -1660,6 +1863,10 @@ pub async fn SpanExporter::shutdown_with_timeout(
 }
 
 ///|
+/// Shuts down the log exporter.
+///
+/// `timeout_millis` is accepted for API parity but is not used by the current
+/// implementation.
 #warnings("-unused_async")
 pub async fn LogExporter::shutdown_with_timeout(
   self : LogExporter,
@@ -1674,6 +1881,10 @@ pub async fn LogExporter::shutdown_with_timeout(
 }
 
 ///|
+/// Shuts down the metric exporter.
+///
+/// `timeout_millis` is accepted for API parity but is not used by the current
+/// implementation.
 #warnings("-unused_async")
 pub async fn MetricExporter::shutdown_with_timeout(
   self : MetricExporter,
@@ -1688,6 +1899,7 @@ pub async fn MetricExporter::shutdown_with_timeout(
 }
 
 ///|
+/// Shuts down the span exporter using the default timeout budget.
 pub async fn SpanExporter::shutdown(
   self : SpanExporter,
 ) -> @error.OTelSdkResult {
@@ -1695,11 +1907,13 @@ pub async fn SpanExporter::shutdown(
 }
 
 ///|
+/// Shuts down the log exporter using the default timeout budget.
 pub async fn LogExporter::shutdown(self : LogExporter) -> @error.OTelSdkResult {
   self.shutdown_with_timeout(5000)
 }
 
 ///|
+/// Shuts down the metric exporter using the default timeout budget.
 pub async fn MetricExporter::shutdown(
   self : MetricExporter,
 ) -> @error.OTelSdkResult {
@@ -1707,6 +1921,7 @@ pub async fn MetricExporter::shutdown(
 }
 
 ///|
+/// Erases the concrete span exporter type into `@sdktrace.SpanExporter`.
 pub fn SpanExporter::into_span_exporter(
   self : SpanExporter,
 ) -> @sdktrace.SpanExporter {
@@ -1719,6 +1934,7 @@ pub fn SpanExporter::into_span_exporter(
 }
 
 ///|
+/// Erases the concrete log exporter type into `@sdklogs.LogExporter`.
 pub fn LogExporter::into_log_exporter(
   self : LogExporter,
 ) -> @sdklogs.LogExporter {
@@ -1731,6 +1947,7 @@ pub fn LogExporter::into_log_exporter(
 }
 
 ///|
+/// Erases the concrete metric exporter type into `@sdkmetrics.MetricExporter`.
 pub fn MetricExporter::into_metric_exporter(
   self : MetricExporter,
 ) -> @sdkmetrics.MetricExporter {
@@ -1743,6 +1960,9 @@ pub fn MetricExporter::into_metric_exporter(
 }
 
 ///|
+/// Builds a periodic reader using this exporter's resolved temporality.
+///
+/// When `interval_millis` is negative, the SDK reader default is used.
 pub fn MetricExporter::into_periodic_reader(
   self : MetricExporter,
   interval_millis? : Int = -1,

@@ -1,39 +1,47 @@
 ///|
+/// Monotonic synchronous counter handle.
 pub struct Counter[T] {
   add_fn : (T, ArrayView[@common.KeyValue]) -> Unit
 }
 
 ///|
+/// Additive synchronous counter that accepts positive and negative deltas.
 pub struct UpDownCounter[T] {
   add_fn : (T, ArrayView[@common.KeyValue]) -> Unit
 }
 
 ///|
+/// Synchronous histogram handle.
 pub struct Histogram[T] {
   record_fn : (T, ArrayView[@common.KeyValue]) -> Unit
 }
 
 ///|
+/// Synchronous gauge handle recording the latest value for one attribute set.
 pub struct Gauge[T] {
   record_fn : (T, ArrayView[@common.KeyValue]) -> Unit
 }
 
 ///|
+/// Observable monotonic counter handle used inside callbacks.
 pub struct ObservableCounter[T] {
   observe_fn : (T, ArrayView[@common.KeyValue]) -> Unit
 }
 
 ///|
+/// Observable additive counter handle used inside callbacks.
 pub struct ObservableUpDownCounter[T] {
   observe_fn : (T, ArrayView[@common.KeyValue]) -> Unit
 }
 
 ///|
+/// Observable gauge handle used inside callbacks.
 pub struct ObservableGauge[T] {
   observe_fn : (T, ArrayView[@common.KeyValue]) -> Unit
 }
 
 ///|
+/// Builder for `Counter`.
 pub struct CounterBuilder[T] {
   mut description : String?
   mut unit : String?
@@ -41,6 +49,7 @@ pub struct CounterBuilder[T] {
 }
 
 ///|
+/// Builder for `UpDownCounter`.
 pub struct UpDownCounterBuilder[T] {
   mut description : String?
   mut unit : String?
@@ -48,6 +57,7 @@ pub struct UpDownCounterBuilder[T] {
 }
 
 ///|
+/// Builder for `Histogram`.
 pub struct HistogramBuilder[T] {
   mut description : String?
   mut unit : String?
@@ -55,6 +65,7 @@ pub struct HistogramBuilder[T] {
 }
 
 ///|
+/// Builder for `Gauge`.
 pub struct GaugeBuilder[T] {
   mut description : String?
   mut unit : String?
@@ -62,6 +73,7 @@ pub struct GaugeBuilder[T] {
 }
 
 ///|
+/// Builder for `ObservableCounter`.
 pub struct ObservableCounterBuilder[T] {
   mut description : String?
   mut unit : String?
@@ -72,6 +84,7 @@ pub struct ObservableCounterBuilder[T] {
 }
 
 ///|
+/// Builder for `ObservableUpDownCounter`.
 pub struct ObservableUpDownCounterBuilder[T] {
   mut description : String?
   mut unit : String?
@@ -82,6 +95,7 @@ pub struct ObservableUpDownCounterBuilder[T] {
 }
 
 ///|
+/// Builder for `ObservableGauge`.
 pub struct ObservableGaugeBuilder[T] {
   mut description : String?
   mut unit : String?
@@ -92,11 +106,13 @@ pub struct ObservableGaugeBuilder[T] {
 }
 
 ///|
+/// Public meter handle.
 pub struct Meter {
   sdk_meter : @sdkmetrics.SdkMeter?
 }
 
 ///|
+/// Public meter provider wrapper around the SDK provider.
 pub struct MeterProvider {
   sdk_provider : @sdkmetrics.SdkMeterProvider?
 }
@@ -344,6 +360,7 @@ fn with_observable_gauge_options(
 }
 
 ///|
+/// Wraps an SDK meter provider in the public API type.
 pub fn MeterProvider::from_sdk(
   provider : @sdkmetrics.SdkMeterProvider,
 ) -> MeterProvider {
@@ -351,11 +368,15 @@ pub fn MeterProvider::from_sdk(
 }
 
 ///|
+/// Returns a no-op meter provider.
 pub fn MeterProvider::noop() -> MeterProvider {
   { sdk_provider: None }
 }
 
 ///|
+/// Returns a meter for one instrumentation name.
+///
+/// If the provider is no-op, the returned meter creates no-op instruments.
 pub fn MeterProvider::meter(self : MeterProvider, name : StringView) -> Meter {
   match self.sdk_provider {
     Some(provider) => { sdk_meter: Some(provider.meter(name)) }
@@ -364,6 +385,7 @@ pub fn MeterProvider::meter(self : MeterProvider, name : StringView) -> Meter {
 }
 
 ///|
+/// Returns a meter for a fully constructed instrumentation scope.
 pub fn MeterProvider::meter_with_scope(
   self : MeterProvider,
   scope : @common.InstrumentationScope,
@@ -383,6 +405,9 @@ pub fn MeterProvider::meter_with_scope(
 }
 
 ///|
+/// Flushes the underlying SDK provider.
+///
+/// No-op providers report success.
 pub async fn MeterProvider::force_flush(
   self : MeterProvider,
 ) -> @error.OTelSdkResult {
@@ -393,6 +418,9 @@ pub async fn MeterProvider::force_flush(
 }
 
 ///|
+/// Shuts down the underlying SDK provider.
+///
+/// No-op providers report success.
 pub async fn MeterProvider::shutdown(
   self : MeterProvider,
 ) -> @error.OTelSdkResult {
@@ -403,6 +431,9 @@ pub async fn MeterProvider::shutdown(
 }
 
 ///|
+/// Spawns background loops for periodic metric readers owned by this provider.
+///
+/// No-op providers do nothing.
 pub fn MeterProvider::spawn_periodic_readers(
   self : MeterProvider,
   group : @async.TaskGroup[Unit],
@@ -415,6 +446,9 @@ pub fn MeterProvider::spawn_periodic_readers(
 }
 
 ///|
+/// Adds one measurement to a monotonic counter.
+///
+/// The underlying SDK ignores negative deltas.
 pub fn[T] Counter::add(
   self : Counter[T],
   value : T,
@@ -424,6 +458,7 @@ pub fn[T] Counter::add(
 }
 
 ///|
+/// Adds one measurement to an up-down counter.
 pub fn[T] UpDownCounter::add(
   self : UpDownCounter[T],
   value : T,
@@ -433,6 +468,7 @@ pub fn[T] UpDownCounter::add(
 }
 
 ///|
+/// Records one histogram sample.
 pub fn[T] Histogram::record(
   self : Histogram[T],
   value : T,
@@ -442,6 +478,7 @@ pub fn[T] Histogram::record(
 }
 
 ///|
+/// Records the latest gauge value for one attribute set.
 pub fn[T] Gauge::record(
   self : Gauge[T],
   value : T,
@@ -451,6 +488,7 @@ pub fn[T] Gauge::record(
 }
 
 ///|
+/// Reports one observable counter value from a callback.
 pub fn[T] ObservableCounter::observe(
   self : ObservableCounter[T],
   value : T,
@@ -460,6 +498,7 @@ pub fn[T] ObservableCounter::observe(
 }
 
 ///|
+/// Reports one observable up-down counter value from a callback.
 pub fn[T] ObservableUpDownCounter::observe(
   self : ObservableUpDownCounter[T],
   value : T,
@@ -469,6 +508,7 @@ pub fn[T] ObservableUpDownCounter::observe(
 }
 
 ///|
+/// Reports one observable gauge value from a callback.
 pub fn[T] ObservableGauge::observe(
   self : ObservableGauge[T],
   value : T,
@@ -478,6 +518,7 @@ pub fn[T] ObservableGauge::observe(
 }
 
 ///|
+/// Sets the instrument description on the counter builder.
 pub fn[T] CounterBuilder::with_description(
   self : CounterBuilder[T],
   description : StringView,
@@ -487,6 +528,7 @@ pub fn[T] CounterBuilder::with_description(
 }
 
 ///|
+/// Sets the instrument unit on the counter builder.
 pub fn[T] CounterBuilder::with_unit(
   self : CounterBuilder[T],
   unit : StringView,
@@ -496,11 +538,13 @@ pub fn[T] CounterBuilder::with_unit(
 }
 
 ///|
+/// Builds the counter with the current builder options.
 pub fn[T] CounterBuilder::build(self : CounterBuilder[T]) -> Counter[T] {
   (self.create_fn)(self.description, self.unit)
 }
 
 ///|
+/// Sets the instrument description on the up-down counter builder.
 pub fn[T] UpDownCounterBuilder::with_description(
   self : UpDownCounterBuilder[T],
   description : StringView,
@@ -510,6 +554,7 @@ pub fn[T] UpDownCounterBuilder::with_description(
 }
 
 ///|
+/// Sets the instrument unit on the up-down counter builder.
 pub fn[T] UpDownCounterBuilder::with_unit(
   self : UpDownCounterBuilder[T],
   unit : StringView,
@@ -519,6 +564,7 @@ pub fn[T] UpDownCounterBuilder::with_unit(
 }
 
 ///|
+/// Builds the up-down counter with the current builder options.
 pub fn[T] UpDownCounterBuilder::build(
   self : UpDownCounterBuilder[T],
 ) -> UpDownCounter[T] {
@@ -526,6 +572,7 @@ pub fn[T] UpDownCounterBuilder::build(
 }
 
 ///|
+/// Sets the instrument description on the histogram builder.
 pub fn[T] HistogramBuilder::with_description(
   self : HistogramBuilder[T],
   description : StringView,
@@ -535,6 +582,7 @@ pub fn[T] HistogramBuilder::with_description(
 }
 
 ///|
+/// Sets the instrument unit on the histogram builder.
 pub fn[T] HistogramBuilder::with_unit(
   self : HistogramBuilder[T],
   unit : StringView,
@@ -544,11 +592,13 @@ pub fn[T] HistogramBuilder::with_unit(
 }
 
 ///|
+/// Builds the histogram with the current builder options.
 pub fn[T] HistogramBuilder::build(self : HistogramBuilder[T]) -> Histogram[T] {
   (self.create_fn)(self.description, self.unit)
 }
 
 ///|
+/// Sets the instrument description on the gauge builder.
 pub fn[T] GaugeBuilder::with_description(
   self : GaugeBuilder[T],
   description : StringView,
@@ -558,6 +608,7 @@ pub fn[T] GaugeBuilder::with_description(
 }
 
 ///|
+/// Sets the instrument unit on the gauge builder.
 pub fn[T] GaugeBuilder::with_unit(
   self : GaugeBuilder[T],
   unit : StringView,
@@ -567,11 +618,13 @@ pub fn[T] GaugeBuilder::with_unit(
 }
 
 ///|
+/// Builds the gauge with the current builder options.
 pub fn[T] GaugeBuilder::build(self : GaugeBuilder[T]) -> Gauge[T] {
   (self.create_fn)(self.description, self.unit)
 }
 
 ///|
+/// Sets the instrument description on the observable counter builder.
 pub fn[T] ObservableCounterBuilder::with_description(
   self : ObservableCounterBuilder[T],
   description : StringView,
@@ -581,6 +634,7 @@ pub fn[T] ObservableCounterBuilder::with_description(
 }
 
 ///|
+/// Sets the instrument unit on the observable counter builder.
 pub fn[T] ObservableCounterBuilder::with_unit(
   self : ObservableCounterBuilder[T],
   unit : StringView,
@@ -590,6 +644,7 @@ pub fn[T] ObservableCounterBuilder::with_unit(
 }
 
 ///|
+/// Registers one callback to run during metric collection.
 pub fn[T] ObservableCounterBuilder::with_callback(
   self : ObservableCounterBuilder[T],
   callback : (ObservableCounter[T]) -> Unit,
@@ -599,6 +654,8 @@ pub fn[T] ObservableCounterBuilder::with_callback(
 }
 
 ///|
+/// Builds the observable counter and freezes the currently registered
+/// callbacks.
 pub fn[T] ObservableCounterBuilder::build(
   self : ObservableCounterBuilder[T],
 ) -> ObservableCounter[T] {
@@ -606,6 +663,7 @@ pub fn[T] ObservableCounterBuilder::build(
 }
 
 ///|
+/// Sets the instrument description on the observable up-down counter builder.
 pub fn[T] ObservableUpDownCounterBuilder::with_description(
   self : ObservableUpDownCounterBuilder[T],
   description : StringView,
@@ -615,6 +673,7 @@ pub fn[T] ObservableUpDownCounterBuilder::with_description(
 }
 
 ///|
+/// Sets the instrument unit on the observable up-down counter builder.
 pub fn[T] ObservableUpDownCounterBuilder::with_unit(
   self : ObservableUpDownCounterBuilder[T],
   unit : StringView,
@@ -624,6 +683,7 @@ pub fn[T] ObservableUpDownCounterBuilder::with_unit(
 }
 
 ///|
+/// Registers one callback to run during metric collection.
 pub fn[T] ObservableUpDownCounterBuilder::with_callback(
   self : ObservableUpDownCounterBuilder[T],
   callback : (ObservableUpDownCounter[T]) -> Unit,
@@ -633,6 +693,8 @@ pub fn[T] ObservableUpDownCounterBuilder::with_callback(
 }
 
 ///|
+/// Builds the observable up-down counter and freezes the currently registered
+/// callbacks.
 pub fn[T] ObservableUpDownCounterBuilder::build(
   self : ObservableUpDownCounterBuilder[T],
 ) -> ObservableUpDownCounter[T] {
@@ -640,6 +702,7 @@ pub fn[T] ObservableUpDownCounterBuilder::build(
 }
 
 ///|
+/// Sets the instrument description on the observable gauge builder.
 pub fn[T] ObservableGaugeBuilder::with_description(
   self : ObservableGaugeBuilder[T],
   description : StringView,
@@ -649,6 +712,7 @@ pub fn[T] ObservableGaugeBuilder::with_description(
 }
 
 ///|
+/// Sets the instrument unit on the observable gauge builder.
 pub fn[T] ObservableGaugeBuilder::with_unit(
   self : ObservableGaugeBuilder[T],
   unit : StringView,
@@ -658,6 +722,7 @@ pub fn[T] ObservableGaugeBuilder::with_unit(
 }
 
 ///|
+/// Registers one callback to run during metric collection.
 pub fn[T] ObservableGaugeBuilder::with_callback(
   self : ObservableGaugeBuilder[T],
   callback : (ObservableGauge[T]) -> Unit,
@@ -667,6 +732,7 @@ pub fn[T] ObservableGaugeBuilder::with_callback(
 }
 
 ///|
+/// Builds the observable gauge and freezes the currently registered callbacks.
 pub fn[T] ObservableGaugeBuilder::build(
   self : ObservableGaugeBuilder[T],
 ) -> ObservableGauge[T] {
@@ -674,6 +740,10 @@ pub fn[T] ObservableGaugeBuilder::build(
 }
 
 ///|
+/// Starts building a `UInt64` monotonic counter.
+///
+/// Values are bridged through the SDK's signed 64-bit counter. Measurements
+/// larger than `Int64::max` are dropped.
 pub fn Meter::u64_counter(
   self : Meter,
   name : StringView,
@@ -705,6 +775,9 @@ pub fn Meter::u64_counter(
 }
 
 ///|
+/// Starts building a `Double` monotonic counter.
+///
+/// The underlying SDK ignores negative deltas.
 pub fn Meter::f64_counter(
   self : Meter,
   name : StringView,
@@ -729,6 +802,7 @@ pub fn Meter::f64_counter(
 }
 
 ///|
+/// Starts building an `Int64` up-down counter.
 pub fn Meter::i64_up_down_counter(
   self : Meter,
   name : StringView,
@@ -753,6 +827,7 @@ pub fn Meter::i64_up_down_counter(
 }
 
 ///|
+/// Starts building a `Double` up-down counter.
 pub fn Meter::f64_up_down_counter(
   self : Meter,
   name : StringView,
@@ -777,6 +852,9 @@ pub fn Meter::f64_up_down_counter(
 }
 
 ///|
+/// Starts building a `UInt64` histogram.
+///
+/// Values are converted to `Double` before they are forwarded to the SDK.
 pub fn Meter::u64_histogram(
   self : Meter,
   name : StringView,
@@ -805,6 +883,7 @@ pub fn Meter::u64_histogram(
 }
 
 ///|
+/// Starts building a `Double` histogram.
 pub fn Meter::f64_histogram(
   self : Meter,
   name : StringView,
@@ -833,6 +912,9 @@ pub fn Meter::f64_histogram(
 }
 
 ///|
+/// Starts building a `UInt64` gauge.
+///
+/// Values are converted to `Double` before they are forwarded to the SDK.
 pub fn Meter::u64_gauge(
   self : Meter,
   name : StringView,
@@ -857,6 +939,9 @@ pub fn Meter::u64_gauge(
 }
 
 ///|
+/// Starts building an `Int64` gauge.
+///
+/// Values are converted to `Double` before they are forwarded to the SDK.
 pub fn Meter::i64_gauge(self : Meter, name : StringView) -> GaugeBuilder[Int64] {
   {
     description: None,
@@ -878,6 +963,7 @@ pub fn Meter::i64_gauge(self : Meter, name : StringView) -> GaugeBuilder[Int64] 
 }
 
 ///|
+/// Starts building a `Double` gauge.
 pub fn Meter::f64_gauge(
   self : Meter,
   name : StringView,
@@ -898,6 +984,10 @@ pub fn Meter::f64_gauge(
 }
 
 ///|
+/// Starts building a `UInt64` observable counter.
+///
+/// Callback observations are bridged through the SDK's signed 64-bit counter.
+/// Values larger than `Int64::max` are dropped.
 pub fn Meter::u64_observable_counter(
   self : Meter,
   name : StringView,
@@ -944,6 +1034,7 @@ pub fn Meter::u64_observable_counter(
 }
 
 ///|
+/// Starts building a `Double` observable counter.
 pub fn Meter::f64_observable_counter(
   self : Meter,
   name : StringView,
@@ -984,6 +1075,7 @@ pub fn Meter::f64_observable_counter(
 }
 
 ///|
+/// Starts building an `Int64` observable up-down counter.
 pub fn Meter::i64_observable_up_down_counter(
   self : Meter,
   name : StringView,
@@ -1024,6 +1116,7 @@ pub fn Meter::i64_observable_up_down_counter(
 }
 
 ///|
+/// Starts building a `Double` observable up-down counter.
 pub fn Meter::f64_observable_up_down_counter(
   self : Meter,
   name : StringView,
@@ -1064,6 +1157,10 @@ pub fn Meter::f64_observable_up_down_counter(
 }
 
 ///|
+/// Starts building a `UInt64` observable gauge.
+///
+/// Callback observations are converted to `Double` before they are forwarded to
+/// the SDK.
 pub fn Meter::u64_observable_gauge(
   self : Meter,
   name : StringView,
@@ -1104,6 +1201,10 @@ pub fn Meter::u64_observable_gauge(
 }
 
 ///|
+/// Starts building an `Int64` observable gauge.
+///
+/// Callback observations are converted to `Double` before they are forwarded to
+/// the SDK.
 pub fn Meter::i64_observable_gauge(
   self : Meter,
   name : StringView,
@@ -1144,6 +1245,7 @@ pub fn Meter::i64_observable_gauge(
 }
 
 ///|
+/// Starts building a `Double` observable gauge.
 pub fn Meter::f64_observable_gauge(
   self : Meter,
   name : StringView,

@@ -46,36 +46,43 @@ fn build_scope(
 }
 
 ///|
+/// Returns the currently registered global tracer provider.
 pub fn tracer_provider() -> @trace.TracerProvider {
   tracer_provider_ref.val
 }
 
 ///|
+/// Replaces the current global tracer provider.
 pub fn set_tracer_provider(provider : @trace.TracerProvider) -> Unit {
   tracer_provider_ref.val = provider
 }
 
 ///|
+/// Returns the currently registered global logger provider.
 pub fn logger_provider() -> @logs.LoggerProvider {
   logger_provider_ref.val
 }
 
 ///|
+/// Replaces the current global logger provider.
 pub fn set_logger_provider(provider : @logs.LoggerProvider) -> Unit {
   logger_provider_ref.val = provider
 }
 
 ///|
+/// Returns the currently registered global meter provider.
 pub fn meter_provider() -> @metrics.MeterProvider {
   meter_provider_ref.val
 }
 
 ///|
+/// Replaces the current global meter provider.
 pub fn set_meter_provider(provider : @metrics.MeterProvider) -> Unit {
   meter_provider_ref.val = provider
 }
 
 ///|
+/// Replaces the current global text-map propagator.
 pub fn set_text_map_propagator(
   propagator : @propagation.TextMapPropagator,
 ) -> Unit {
@@ -83,6 +90,7 @@ pub fn set_text_map_propagator(
 }
 
 ///|
+/// Calls `f` with the current global text-map propagator.
 pub fn[T] get_text_map_propagator(
   f : (@propagation.TextMapPropagator) -> T,
 ) -> T {
@@ -90,6 +98,9 @@ pub fn[T] get_text_map_propagator(
 }
 
 ///|
+/// Returns a tracer from the current global tracer provider.
+///
+/// The scope is built from `name`, `version`, `schema_url`, and `attributes`.
 pub fn tracer(
   name : StringView,
   version? : String? = None,
@@ -102,11 +113,15 @@ pub fn tracer(
 }
 
 ///|
+/// Returns a tracer for an already constructed instrumentation scope.
 pub fn tracer_with_scope(scope : @common.InstrumentationScope) -> @trace.Tracer {
   tracer_provider_ref.val.tracer_with_scope(scope)
 }
 
 ///|
+/// Returns a logger from the current global logger provider.
+///
+/// The scope is built from `name`, `version`, `schema_url`, and `attributes`.
 pub fn logger(
   name : StringView,
   version? : String? = None,
@@ -119,11 +134,15 @@ pub fn logger(
 }
 
 ///|
+/// Returns a logger for an already constructed instrumentation scope.
 pub fn logger_with_scope(scope : @common.InstrumentationScope) -> @logs.Logger {
   logger_provider_ref.val.logger_with_scope(scope)
 }
 
 ///|
+/// Returns a meter from the current global meter provider.
+///
+/// The scope is built from `name`, `version`, `schema_url`, and `attributes`.
 pub fn meter(
   name : StringView,
   version? : String? = None,
@@ -136,11 +155,16 @@ pub fn meter(
 }
 
 ///|
+/// Returns a meter for an already constructed instrumentation scope.
 pub fn meter_with_scope(scope : @common.InstrumentationScope) -> @metrics.Meter {
   meter_provider_ref.val.meter_with_scope(scope)
 }
 
 ///|
+/// Spawns background loops for the currently registered global providers.
+///
+/// This activates batch span/log processors and periodic metric readers. No-op
+/// providers simply do nothing.
 pub fn spawn_background_tasks(
   group : @async.TaskGroup[Unit],
   allow_failure? : Bool = false,
@@ -151,6 +175,10 @@ pub fn spawn_background_tasks(
 }
 
 ///|
+/// Flushes all currently registered providers.
+///
+/// Individual provider errors are intentionally ignored so the call always
+/// completes with `Unit`.
 pub async fn force_flush() -> Unit {
   ignore(tracer_provider_ref.val.force_flush())
   ignore(logger_provider_ref.val.force_flush())
@@ -158,6 +186,10 @@ pub async fn force_flush() -> Unit {
 }
 
 ///|
+/// Shuts down all currently registered providers.
+///
+/// Individual provider errors are intentionally ignored so the call always
+/// completes with `Unit`.
 pub async fn shutdown() -> Unit {
   ignore(tracer_provider_ref.val.shutdown())
   ignore(logger_provider_ref.val.shutdown())
@@ -165,6 +197,10 @@ pub async fn shutdown() -> Unit {
 }
 
 ///|
+/// Resets all global state back to the default no-op providers and default
+/// propagator.
+///
+/// This helper exists for tests.
 pub fn reset_for_test() -> Unit {
   tracer_provider_ref.val = @trace.TracerProvider::noop()
   logger_provider_ref.val = @logs.LoggerProvider::noop()
