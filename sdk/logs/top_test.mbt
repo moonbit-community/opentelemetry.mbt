@@ -29,23 +29,26 @@ async test "logger exports trace-aware log records" {
     .build()
   let logger = provider.logger("logs-test")
   logger.emit(
-    @common.Value::String("request failed"),
+    AnyValue::String("request failed"),
     context~,
-    severity_number=Some(SeverityNumber::Error),
-    severity_text=Some("ERROR"),
-    attributes=[
-      @common.KeyValue::new("http.status_code", @common.Value::Int64(500)),
-    ],
+    severity_number=Some(SeverityNumber::Error3),
+    severity_text=Some("ERROR3"),
+    event_name=Some("checkout.failed"),
+    target=Some("api"),
+    attributes=[KeyValue::new("http.status_code", AnyValue::Int64(500))],
   )
 
   let records = exporter.finished_logs()
   assert_eq(records.length(), 1)
+  assert_eq(records[0].event_name, Some("checkout.failed"))
+  assert_eq(records[0].target, Some("api"))
   guard records[0].trace_context is Some(trace_context) else {
     fail("expected trace context on log record")
   }
   assert_eq(trace_context.trace_id().to_hex(), span_context.trace_id().to_hex())
   assert_eq(trace_context.span_id().to_hex(), span_context.span_id().to_hex())
   assert_eq(records[0].attributes.length(), 1)
+  assert_true(records[0].severity_number is Some(SeverityNumber::Error3))
 }
 
 ///|
@@ -64,7 +67,7 @@ async test "batch log processor flushes on scheduled delay in background" {
   @async.with_task_group(group => {
     provider.spawn_batch_processor_tasks(group)
     let logger = provider.logger("logs-background")
-    logger.emit(@common.Value::String("background flush"))
+    logger.emit(AnyValue::String("background flush"))
     @async.sleep(40)
     assert_eq(exporter.finished_logs().length(), 1)
     ignore(provider.shutdown())

@@ -98,9 +98,9 @@ pub fn HistogramBuilder::with_unit(Self, StringView) -> Self
 
 pub struct HistogramSummary {
   count : Int64
-  sum : Double
-  min : Double?
-  max : Double?
+  sum : Number
+  min : Number?
+  max : Number?
 } derive(Eq, ToJson, @debug.Debug)
 
 pub struct InMemoryMetricExporter {
@@ -178,6 +178,7 @@ pub async fn MetricExporter::shutdown_with_timeout(Self, Int) -> Result[Unit, @e
 
 pub(all) enum Number {
   Int64(Int64)
+  UInt64(UInt64)
   Double(Double)
 } derive(Eq, ToJson, @debug.Debug)
 
@@ -249,6 +250,40 @@ pub fn ObservableGaugeBuilder::with_callback(Self, (ObservableGauge) -> Unit) ->
 pub fn ObservableGaugeBuilder::with_description(Self, StringView) -> Self
 pub fn ObservableGaugeBuilder::with_unit(Self, StringView) -> Self
 
+pub struct ObservableUInt64Counter {
+  state : @ref.Ref[SyncInstrumentState]
+}
+pub fn ObservableUInt64Counter::observe(Self, UInt64, attributes? : ArrayView[@common.KeyValue]) -> Unit
+
+pub struct ObservableUInt64CounterBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+  callbacks : Array[(ObservableUInt64Counter) -> Unit]
+}
+pub fn ObservableUInt64CounterBuilder::build(Self) -> ObservableUInt64Counter
+pub fn ObservableUInt64CounterBuilder::with_callback(Self, (ObservableUInt64Counter) -> Unit) -> Self
+pub fn ObservableUInt64CounterBuilder::with_description(Self, StringView) -> Self
+pub fn ObservableUInt64CounterBuilder::with_unit(Self, StringView) -> Self
+
+pub struct ObservableUInt64Gauge {
+  state : @ref.Ref[SyncInstrumentState]
+}
+pub fn ObservableUInt64Gauge::observe(Self, UInt64, attributes? : ArrayView[@common.KeyValue]) -> Unit
+
+pub struct ObservableUInt64GaugeBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+  callbacks : Array[(ObservableUInt64Gauge) -> Unit]
+}
+pub fn ObservableUInt64GaugeBuilder::build(Self) -> ObservableUInt64Gauge
+pub fn ObservableUInt64GaugeBuilder::with_callback(Self, (ObservableUInt64Gauge) -> Unit) -> Self
+pub fn ObservableUInt64GaugeBuilder::with_description(Self, StringView) -> Self
+pub fn ObservableUInt64GaugeBuilder::with_unit(Self, StringView) -> Self
+
 pub struct ObservableUpDownCounter {
   state : @ref.Ref[SyncInstrumentState]
 }
@@ -301,6 +336,11 @@ pub fn SdkMeter::histogram(Self, StringView) -> HistogramBuilder
 pub fn SdkMeter::observable_counter(Self, StringView) -> ObservableCounterBuilder
 pub fn SdkMeter::observable_gauge(Self, StringView) -> ObservableGaugeBuilder
 pub fn SdkMeter::observable_up_down_counter(Self, StringView) -> ObservableUpDownCounterBuilder
+pub fn SdkMeter::u64_counter(Self, StringView) -> UInt64CounterBuilder
+pub fn SdkMeter::u64_gauge(Self, StringView) -> UInt64GaugeBuilder
+pub fn SdkMeter::u64_histogram(Self, StringView) -> UInt64HistogramBuilder
+pub fn SdkMeter::u64_observable_counter(Self, StringView) -> ObservableUInt64CounterBuilder
+pub fn SdkMeter::u64_observable_gauge(Self, StringView) -> ObservableUInt64GaugeBuilder
 pub fn SdkMeter::up_down_counter(Self, StringView) -> UpDownCounterBuilder
 
 pub struct SdkMeterProvider {
@@ -372,6 +412,51 @@ pub(all) enum Temporality {
   Delta
   LowMemory
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+
+pub struct UInt64Counter {
+  state : @ref.Ref[SyncInstrumentState]
+}
+pub fn UInt64Counter::add(Self, UInt64, attributes? : ArrayView[@common.KeyValue]) -> Unit
+
+pub struct UInt64CounterBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+}
+pub fn UInt64CounterBuilder::build(Self) -> UInt64Counter
+pub fn UInt64CounterBuilder::with_description(Self, StringView) -> Self
+pub fn UInt64CounterBuilder::with_unit(Self, StringView) -> Self
+
+pub struct UInt64Gauge {
+  state : @ref.Ref[SyncInstrumentState]
+}
+pub fn UInt64Gauge::record(Self, UInt64, attributes? : ArrayView[@common.KeyValue]) -> Unit
+
+pub struct UInt64GaugeBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+}
+pub fn UInt64GaugeBuilder::build(Self) -> UInt64Gauge
+pub fn UInt64GaugeBuilder::with_description(Self, StringView) -> Self
+pub fn UInt64GaugeBuilder::with_unit(Self, StringView) -> Self
+
+pub struct UInt64Histogram {
+  state : @ref.Ref[SyncInstrumentState]
+}
+pub fn UInt64Histogram::record(Self, UInt64, attributes? : ArrayView[@common.KeyValue]) -> Unit
+
+pub struct UInt64HistogramBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+}
+pub fn UInt64HistogramBuilder::build(Self) -> UInt64Histogram
+pub fn UInt64HistogramBuilder::with_description(Self, StringView) -> Self
+pub fn UInt64HistogramBuilder::with_unit(Self, StringView) -> Self
 
 pub struct UpDownCounter {
   state : @ref.Ref[SyncInstrumentState]

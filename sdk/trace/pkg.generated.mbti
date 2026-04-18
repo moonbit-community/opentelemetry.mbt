@@ -147,8 +147,8 @@ pub fn SimpleSpanProcessor::new(SpanExporter) -> Self
 pub struct Span {
   state : @ref.Ref[SpanState]
 }
-pub fn Span::add_event(Self, StringView, attributes? : ArrayView[@common.KeyValue], timestamp_unix_nano? : Int64) -> Unit
-pub fn Span::add_link(Self, @common.SpanContext, attributes? : ArrayView[@common.KeyValue]) -> Unit
+pub fn Span::add_event(Self, StringView, attributes? : ArrayView[@common.KeyValue], timestamp_unix_nano? : Int64, dropped_attributes_count? : Int) -> Unit
+pub fn Span::add_link(Self, @common.SpanContext, attributes? : ArrayView[@common.KeyValue], dropped_attributes_count? : Int) -> Unit
 pub fn Span::context(Self) -> @context.Context
 pub async fn Span::end(Self, end_time_unix_nano? : Int64) -> Unit
 pub fn Span::has_ended(Self) -> Bool
@@ -181,8 +181,9 @@ pub struct SpanEvent {
   name : String
   timestamp_unix_nano : Int64
   attributes : Array[@common.KeyValue]
+  dropped_attributes_count : Int
 } derive(Eq, ToJson, @debug.Debug)
-pub fn SpanEvent::new(StringView, attributes? : ArrayView[@common.KeyValue], timestamp_unix_nano? : Int64) -> Self
+pub fn SpanEvent::new(StringView, attributes? : ArrayView[@common.KeyValue], timestamp_unix_nano? : Int64, dropped_attributes_count? : Int) -> Self
 
 pub struct SpanExporter {
   export_fn : async (ArrayView[SpanData]) -> Result[Unit, @error.OTelSdkError]
@@ -209,15 +210,18 @@ pub struct SpanLimits {
   max_attributes_per_span : Int
   max_events_per_span : Int
   max_links_per_span : Int
+  max_attributes_per_event : Int
+  max_attributes_per_link : Int
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
-pub fn SpanLimits::new(max_attributes_per_span? : Int, max_events_per_span? : Int, max_links_per_span? : Int) -> Self
+pub fn SpanLimits::new(max_attributes_per_span? : Int, max_events_per_span? : Int, max_links_per_span? : Int, max_attributes_per_event? : Int, max_attributes_per_link? : Int) -> Self
 pub impl Default for SpanLimits
 
 pub struct SpanLink {
   span_context : @common.SpanContext
   attributes : Array[@common.KeyValue]
+  dropped_attributes_count : Int
 } derive(Eq, ToJson, @debug.Debug)
-pub fn SpanLink::new(@common.SpanContext, attributes? : ArrayView[@common.KeyValue]) -> Self
+pub fn SpanLink::new(@common.SpanContext, attributes? : ArrayView[@common.KeyValue], dropped_attributes_count? : Int) -> Self
 
 pub struct SpanProcessor {
   on_start_fn : (@context.Context, SpanData) -> Unit

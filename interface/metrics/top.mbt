@@ -153,20 +153,11 @@ fn[T] noop_observable_gauge() -> ObservableGauge[T] {
 }
 
 ///|
-fn uint64_to_int64(value : UInt64) -> Int64? {
-  if value > 9223372036854775807UL {
-    None
-  } else {
-    Some(value.reinterpret_as_int64())
-  }
-}
-
-///|
-fn with_counter_options(
-  builder : @sdkmetrics.CounterBuilder,
+fn with_double_counter_options(
+  builder : @sdkmetrics.DoubleCounterBuilder,
   description : String?,
   unit : String?,
-) -> @sdkmetrics.CounterBuilder {
+) -> @sdkmetrics.DoubleCounterBuilder {
   let mut builder = builder
   match description {
     Some(description) => builder = builder.with_description(description)
@@ -180,11 +171,11 @@ fn with_counter_options(
 }
 
 ///|
-fn with_double_counter_options(
-  builder : @sdkmetrics.DoubleCounterBuilder,
+fn with_u64_counter_options(
+  builder : @sdkmetrics.UInt64CounterBuilder,
   description : String?,
   unit : String?,
-) -> @sdkmetrics.DoubleCounterBuilder {
+) -> @sdkmetrics.UInt64CounterBuilder {
   let mut builder = builder
   match description {
     Some(description) => builder = builder.with_description(description)
@@ -252,6 +243,24 @@ fn with_histogram_options(
 }
 
 ///|
+fn with_u64_histogram_options(
+  builder : @sdkmetrics.UInt64HistogramBuilder,
+  description : String?,
+  unit : String?,
+) -> @sdkmetrics.UInt64HistogramBuilder {
+  let mut builder = builder
+  match description {
+    Some(description) => builder = builder.with_description(description)
+    None => ()
+  }
+  match unit {
+    Some(unit) => builder = builder.with_unit(unit)
+    None => ()
+  }
+  builder
+}
+
+///|
 fn with_gauge_options(
   builder : @sdkmetrics.GaugeBuilder,
   description : String?,
@@ -270,11 +279,11 @@ fn with_gauge_options(
 }
 
 ///|
-fn with_observable_counter_options(
-  builder : @sdkmetrics.ObservableCounterBuilder,
+fn with_u64_gauge_options(
+  builder : @sdkmetrics.UInt64GaugeBuilder,
   description : String?,
   unit : String?,
-) -> @sdkmetrics.ObservableCounterBuilder {
+) -> @sdkmetrics.UInt64GaugeBuilder {
   let mut builder = builder
   match description {
     Some(description) => builder = builder.with_description(description)
@@ -293,6 +302,24 @@ fn with_observable_double_counter_options(
   description : String?,
   unit : String?,
 ) -> @sdkmetrics.ObservableDoubleCounterBuilder {
+  let mut builder = builder
+  match description {
+    Some(description) => builder = builder.with_description(description)
+    None => ()
+  }
+  match unit {
+    Some(unit) => builder = builder.with_unit(unit)
+    None => ()
+  }
+  builder
+}
+
+///|
+fn with_observable_u64_counter_options(
+  builder : @sdkmetrics.ObservableUInt64CounterBuilder,
+  description : String?,
+  unit : String?,
+) -> @sdkmetrics.ObservableUInt64CounterBuilder {
   let mut builder = builder
   match description {
     Some(description) => builder = builder.with_description(description)
@@ -329,6 +356,24 @@ fn with_observable_double_up_down_counter_options(
   description : String?,
   unit : String?,
 ) -> @sdkmetrics.ObservableDoubleUpDownCounterBuilder {
+  let mut builder = builder
+  match description {
+    Some(description) => builder = builder.with_description(description)
+    None => ()
+  }
+  match unit {
+    Some(unit) => builder = builder.with_unit(unit)
+    None => ()
+  }
+  builder
+}
+
+///|
+fn with_observable_u64_gauge_options(
+  builder : @sdkmetrics.ObservableUInt64GaugeBuilder,
+  description : String?,
+  unit : String?,
+) -> @sdkmetrics.ObservableUInt64GaugeBuilder {
   let mut builder = builder
   match description {
     Some(description) => builder = builder.with_description(description)
@@ -741,9 +786,6 @@ pub fn[T] ObservableGaugeBuilder::build(
 
 ///|
 /// Starts building a `UInt64` monotonic counter.
-///
-/// Values are bridged through the SDK's signed 64-bit counter. Measurements
-/// larger than `Int64::max` are dropped.
 pub fn Meter::u64_counter(
   self : Meter,
   name : StringView,
@@ -754,19 +796,12 @@ pub fn Meter::u64_counter(
     create_fn: (description, unit) => {
       match self.sdk_meter {
         Some(meter) => {
-          let counter = with_counter_options(
-            meter.counter(name),
+          let counter = with_u64_counter_options(
+            meter.u64_counter(name),
             description,
             unit,
           ).build()
-          {
-            add_fn: (value, attributes) => {
-              match uint64_to_int64(value) {
-                Some(value) => counter.add(value, attributes~)
-                None => ()
-              }
-            },
-          }
+          { add_fn: (value, attributes) => counter.add(value, attributes~) }
         }
         None => noop_counter()
       }
@@ -853,8 +888,6 @@ pub fn Meter::f64_up_down_counter(
 
 ///|
 /// Starts building a `UInt64` histogram.
-///
-/// Values are converted to `Double` before they are forwarded to the SDK.
 pub fn Meter::u64_histogram(
   self : Meter,
   name : StringView,
@@ -865,14 +898,14 @@ pub fn Meter::u64_histogram(
     create_fn: (description, unit) => {
       match self.sdk_meter {
         Some(meter) => {
-          let histogram = with_histogram_options(
-            meter.histogram(name),
+          let histogram = with_u64_histogram_options(
+            meter.u64_histogram(name),
             description,
             unit,
           ).build()
           {
             record_fn: (value, attributes) => {
-              histogram.record(value.to_double(), attributes~)
+              histogram.record(value, attributes~)
             },
           }
         }
@@ -913,8 +946,6 @@ pub fn Meter::f64_histogram(
 
 ///|
 /// Starts building a `UInt64` gauge.
-///
-/// Values are converted to `Double` before they are forwarded to the SDK.
 pub fn Meter::u64_gauge(
   self : Meter,
   name : StringView,
@@ -925,12 +956,12 @@ pub fn Meter::u64_gauge(
     create_fn: (description, unit) => {
       match self.sdk_meter {
         Some(meter) => {
-          let gauge = with_gauge_options(meter.gauge(name), description, unit).build()
-          {
-            record_fn: (value, attributes) => {
-              gauge.record(value.to_double(), attributes~)
-            },
-          }
+          let gauge = with_u64_gauge_options(
+            meter.u64_gauge(name),
+            description,
+            unit,
+          ).build()
+          { record_fn: (value, attributes) => gauge.record(value, attributes~) }
         }
         None => noop_gauge()
       }
@@ -985,9 +1016,6 @@ pub fn Meter::f64_gauge(
 
 ///|
 /// Starts building a `UInt64` observable counter.
-///
-/// Callback observations are bridged through the SDK's signed 64-bit counter.
-/// Values larger than `Int64::max` are dropped.
 pub fn Meter::u64_observable_counter(
   self : Meter,
   name : StringView,
@@ -999,8 +1027,8 @@ pub fn Meter::u64_observable_counter(
     create_fn: (description, unit, callbacks) => {
       match self.sdk_meter {
         Some(meter) => {
-          let mut builder = with_observable_counter_options(
-            meter.observable_counter(name),
+          let mut builder = with_observable_u64_counter_options(
+            meter.u64_observable_counter(name),
             description,
             unit,
           )
@@ -1008,10 +1036,7 @@ pub fn Meter::u64_observable_counter(
             builder = builder.with_callback(observer => {
               let wrapped : ObservableCounter[UInt64] = {
                 observe_fn: (value, attributes) => {
-                  match uint64_to_int64(value) {
-                    Some(value) => observer.observe(value, attributes~)
-                    None => ()
-                  }
+                  observer.observe(value, attributes~)
                 },
               }
               callback(wrapped)
@@ -1020,10 +1045,7 @@ pub fn Meter::u64_observable_counter(
           let observer = builder.build()
           {
             observe_fn: (value, attributes) => {
-              match uint64_to_int64(value) {
-                Some(value) => observer.observe(value, attributes~)
-                None => ()
-              }
+              observer.observe(value, attributes~)
             },
           }
         }
@@ -1158,9 +1180,6 @@ pub fn Meter::f64_observable_up_down_counter(
 
 ///|
 /// Starts building a `UInt64` observable gauge.
-///
-/// Callback observations are converted to `Double` before they are forwarded to
-/// the SDK.
 pub fn Meter::u64_observable_gauge(
   self : Meter,
   name : StringView,
@@ -1172,8 +1191,8 @@ pub fn Meter::u64_observable_gauge(
     create_fn: (description, unit, callbacks) => {
       match self.sdk_meter {
         Some(meter) => {
-          let mut builder = with_observable_gauge_options(
-            meter.observable_gauge(name),
+          let mut builder = with_observable_u64_gauge_options(
+            meter.u64_observable_gauge(name),
             description,
             unit,
           )
@@ -1181,7 +1200,7 @@ pub fn Meter::u64_observable_gauge(
             builder = builder.with_callback(observer => {
               let wrapped : ObservableGauge[UInt64] = {
                 observe_fn: (value, attributes) => {
-                  observer.observe(value.to_double(), attributes~)
+                  observer.observe(value, attributes~)
                 },
               }
               callback(wrapped)
@@ -1190,7 +1209,7 @@ pub fn Meter::u64_observable_gauge(
           let observer = builder.build()
           {
             observe_fn: (value, attributes) => {
-              observer.observe(value.to_double(), attributes~)
+              observer.observe(value, attributes~)
             },
           }
         }

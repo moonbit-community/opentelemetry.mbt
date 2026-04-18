@@ -7,6 +7,22 @@ fn restore_env_var(key : String, value : String?) -> Unit {
 }
 
 ///|
+fn sample_span_context(
+  trace_id_hex : String,
+  span_id_hex : String,
+) -> @common.SpanContext {
+  let trace_id = match @common.TraceId::from_hex(trace_id_hex) {
+    Some(trace_id) => trace_id
+    None => @common.TraceId::invalid()
+  }
+  let span_id = match @common.SpanId::from_hex(span_id_hex) {
+    Some(span_id) => span_id
+    None => @common.SpanId::invalid()
+  }
+  @common.SpanContext::new(trace_id, span_id)
+}
+
+///|
 async test "simple processor exports parent child spans" {
   let exporter = InMemorySpanExporter::new()
   let provider = SdkTracerProvider::builder()
@@ -135,4 +151,62 @@ async test "provider shutdown with timeout marks provider unavailable" {
   guard provider.shutdown() is Err(@error.OTelSdkError::AlreadyShutdown) else {
     fail("expected provider to stay shut down")
   }
+}
+
+///|
+test "span status follows ok error unset precedence" {
+  let span = SdkTracerProvider::builder()
+    .build()
+    .tracer("trace-status")
+    .start("status")
+  span.set_status(Status::error(description=Some("boom")))
+  span.set_status(Status::unset())
+  assert_true(span.snapshot().status.code == StatusCode::Error)
+  span.set_status(Status::ok())
+  span.set_status(Status::error(description=Some("later")))
+  let status = span.snapshot().status
+  assert_true(status.code == StatusCode::Ok)
+  assert_eq(status.description, None)
+}
+
+///|
+test "event and link attributes honor per-item limits" {
+  let tracer = SdkTracerProvider::builder()
+    .with_span_limits(
+      SpanLimits::new(max_attributes_per_event=1, max_attributes_per_link=1),
+    )
+    .build()
+    .tracer("trace-limits")
+  let span = tracer.start("limited", links=[
+    SpanLink::new(
+      sample_span_context(
+        "4bf92f3577b34da6a3ce929d0e0e4736", "00f067aa0ba902b7",
+      ),
+      attributes=[
+        @common.KeyValue::new("kept", @common.Value::String("one")),
+        @common.KeyValue::new("dropped", @common.Value::String("two")),
+      ],
+    ),
+  ])
+  span.add_event("db.query", attributes=[
+    @common.KeyValue::new("db.system", @common.Value::String("postgresql")),
+    @common.KeyValue::new("db.name", @common.Value::String("app")),
+  ])
+  span.add_link(
+    sample_span_context("4bf92f3577b34da6a3ce929d0e0e4737", "00f067aa0ba902b8"),
+    attributes=[
+      @common.KeyValue::new("kept", @common.Value::String("yes")),
+      @common.KeyValue::new("dropped", @common.Value::String("no")),
+    ],
+  )
+
+  let snapshot = span.snapshot()
+  assert_eq(snapshot.events.length(), 1)
+  assert_eq(snapshot.events[0].attributes.length(), 1)
+  assert_eq(snapshot.events[0].dropped_attributes_count, 1)
+  assert_eq(snapshot.links.length(), 2)
+  assert_eq(snapshot.links[0].attributes.length(), 1)
+  assert_eq(snapshot.links[0].dropped_attributes_count, 1)
+  assert_eq(snapshot.links[1].attributes.length(), 1)
+  assert_eq(snapshot.links[1].dropped_attributes_count, 1)
 }

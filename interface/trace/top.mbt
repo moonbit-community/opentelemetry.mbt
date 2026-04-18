@@ -192,7 +192,11 @@ fn build_sdk_span(
   for link in builder.links {
     if link.span_context.is_valid() {
       links.push(
-        @sdktrace.SpanLink::new(link.span_context, attributes=link.attributes),
+        @sdktrace.SpanLink::new(
+          link.span_context,
+          attributes=link.attributes,
+          dropped_attributes_count=link.dropped_attributes_count,
+        ),
       )
     }
   }
@@ -215,6 +219,7 @@ fn build_sdk_span(
       event.name,
       attributes=event.attributes,
       timestamp_unix_nano=event.timestamp_unix_nano,
+      dropped_attributes_count=event.dropped_attributes_count,
     )
   }
   let span_context = sdk_span.span_context()

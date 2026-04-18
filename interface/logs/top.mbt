@@ -1,8 +1,5 @@
 ///|
 /// Log body/attribute value accepted by the public logging API.
-///
-/// Maps are serialized to JSON strings when bridged into the SDK because the
-/// shared attribute model does not carry nested map values directly.
 pub(all) enum AnyValue {
   Int(Int64)
   Double(Double)
@@ -15,10 +12,6 @@ pub(all) enum AnyValue {
 
 ///|
 /// Public severity ladder matching the OpenTelemetry log data model.
-///
-/// `Trace2`..`Trace4`, `Debug2`..`Debug4`, and similar variants preserve the
-/// original 24-slot severity scale while still collapsing to the broader
-/// severity family in the SDK.
 pub(all) enum Severity {
   Trace
   Trace2
@@ -48,8 +41,6 @@ pub(all) enum Severity {
 
 ///|
 /// Mutable log record builder used by `Logger::emit()`.
-///
-/// Event name and target are stored as synthetic attributes during export.
 pub struct LogRecord {
   mut event_name : String?
   mut target : String?
@@ -58,7 +49,7 @@ pub struct LogRecord {
   mut severity_text : String?
   mut severity_number : Severity?
   mut body : AnyValue?
-  attributes : Array[@common.KeyValue]
+  attributes : Array[@sdklogs.KeyValue]
   mut trace_context : @common.SpanContext?
 } derive(Eq, ToJson, Debug)
 
@@ -112,50 +103,74 @@ pub fn Severity::name(self : Severity) -> String {
 ///|
 fn to_sdk_severity(severity : Severity?) -> @sdklogs.SeverityNumber? {
   match severity {
-    Some(Severity::Trace)
-    | Some(Severity::Trace2)
-    | Some(Severity::Trace3)
-    | Some(Severity::Trace4) => Some(@sdklogs.SeverityNumber::Trace)
-    Some(Severity::Debug)
-    | Some(Severity::Debug2)
-    | Some(Severity::Debug3)
-    | Some(Severity::Debug4) => Some(@sdklogs.SeverityNumber::Debug)
-    Some(Severity::Info)
-    | Some(Severity::Info2)
-    | Some(Severity::Info3)
-    | Some(Severity::Info4) => Some(@sdklogs.SeverityNumber::Info)
-    Some(Severity::Warn)
-    | Some(Severity::Warn2)
-    | Some(Severity::Warn3)
-    | Some(Severity::Warn4) => Some(@sdklogs.SeverityNumber::Warn)
-    Some(Severity::Error)
-    | Some(Severity::Error2)
-    | Some(Severity::Error3)
-    | Some(Severity::Error4) => Some(@sdklogs.SeverityNumber::Error)
-    Some(Severity::Fatal)
-    | Some(Severity::Fatal2)
-    | Some(Severity::Fatal3)
-    | Some(Severity::Fatal4) => Some(@sdklogs.SeverityNumber::Fatal)
+    Some(Severity::Trace) => Some(@sdklogs.SeverityNumber::Trace)
+    Some(Severity::Trace2) => Some(@sdklogs.SeverityNumber::Trace2)
+    Some(Severity::Trace3) => Some(@sdklogs.SeverityNumber::Trace3)
+    Some(Severity::Trace4) => Some(@sdklogs.SeverityNumber::Trace4)
+    Some(Severity::Debug) => Some(@sdklogs.SeverityNumber::Debug)
+    Some(Severity::Debug2) => Some(@sdklogs.SeverityNumber::Debug2)
+    Some(Severity::Debug3) => Some(@sdklogs.SeverityNumber::Debug3)
+    Some(Severity::Debug4) => Some(@sdklogs.SeverityNumber::Debug4)
+    Some(Severity::Info) => Some(@sdklogs.SeverityNumber::Info)
+    Some(Severity::Info2) => Some(@sdklogs.SeverityNumber::Info2)
+    Some(Severity::Info3) => Some(@sdklogs.SeverityNumber::Info3)
+    Some(Severity::Info4) => Some(@sdklogs.SeverityNumber::Info4)
+    Some(Severity::Warn) => Some(@sdklogs.SeverityNumber::Warn)
+    Some(Severity::Warn2) => Some(@sdklogs.SeverityNumber::Warn2)
+    Some(Severity::Warn3) => Some(@sdklogs.SeverityNumber::Warn3)
+    Some(Severity::Warn4) => Some(@sdklogs.SeverityNumber::Warn4)
+    Some(Severity::Error) => Some(@sdklogs.SeverityNumber::Error)
+    Some(Severity::Error2) => Some(@sdklogs.SeverityNumber::Error2)
+    Some(Severity::Error3) => Some(@sdklogs.SeverityNumber::Error3)
+    Some(Severity::Error4) => Some(@sdklogs.SeverityNumber::Error4)
+    Some(Severity::Fatal) => Some(@sdklogs.SeverityNumber::Fatal)
+    Some(Severity::Fatal2) => Some(@sdklogs.SeverityNumber::Fatal2)
+    Some(Severity::Fatal3) => Some(@sdklogs.SeverityNumber::Fatal3)
+    Some(Severity::Fatal4) => Some(@sdklogs.SeverityNumber::Fatal4)
     None => None
   }
 }
 
 ///|
-fn any_value_to_sdk_value(value : AnyValue) -> @common.Value {
+fn sorted_keys(values : Map[String, AnyValue]) -> Array[String] {
+  let keys = values.keys().to_array()
+  for i in 1..<keys.length() {
+    let current = keys[i]
+    let mut j = i
+    while j > 0 && current < keys[j - 1] {
+      keys[j] = keys[j - 1]
+      j = j - 1
+    }
+    keys[j] = current
+  }
+  keys
+}
+
+///|
+fn any_value_to_sdk_value(value : AnyValue) -> @sdklogs.AnyValue {
   match value {
-    AnyValue::Int(value) => @common.Value::Int64(value)
-    AnyValue::Double(value) => @common.Value::Double(value)
-    AnyValue::String(value) => @common.Value::String(value)
-    AnyValue::Boolean(value) => @common.Value::Bool(value)
-    AnyValue::Bytes(value) => @common.Value::Bytes(value)
+    AnyValue::Int(value) => @sdklogs.AnyValue::Int64(value)
+    AnyValue::Double(value) => @sdklogs.AnyValue::Double(value)
+    AnyValue::String(value) => @sdklogs.AnyValue::String(value)
+    AnyValue::Boolean(value) => @sdklogs.AnyValue::Bool(value)
+    AnyValue::Bytes(value) => @sdklogs.AnyValue::Bytes(value)
     AnyValue::ListAny(values) => {
       let converted = []
       for value in values {
         converted.push(any_value_to_sdk_value(value))
       }
-      @common.Value::Array(converted)
+      @sdklogs.AnyValue::Array(converted)
     }
-    AnyValue::Map(value) => @common.Value::String(value.to_json().stringify())
+    AnyValue::Map(values) => {
+      let converted = []
+      for key in sorted_keys(values) {
+        guard values.get(key) is Some(value)
+        converted.push(
+          @sdklogs.KeyValue::new(key, any_value_to_sdk_value(value)),
+        )
+      }
+      @sdklogs.AnyValue::Map(converted)
+    }
   }
 }
 
@@ -168,29 +183,6 @@ fn to_sdk_context(context : @common.SpanContext?) -> @sdkcontext.Context {
       @sdkcontext.Context::empty().with_span_context(span_context)
     None => @sdkcontext.Context::empty()
   }
-}
-
-///|
-fn sdk_attributes(record : LogRecord) -> Array[@common.KeyValue] {
-  let attributes = record.attributes.copy()
-  match record.event_name {
-    Some(event_name) =>
-      attributes.push(
-        @common.KeyValue::new(
-          "log.event_name",
-          @common.Value::String(event_name),
-        ),
-      )
-    None => ()
-  }
-  match record.target {
-    Some(target) =>
-      attributes.push(
-        @common.KeyValue::new("log.target", @common.Value::String(target)),
-      )
-    None => ()
-  }
-  attributes
 }
 
 ///|
@@ -210,15 +202,14 @@ pub fn LogRecord::new() -> LogRecord {
 }
 
 ///|
-/// Sets the event name that will later be exported as the `log.event_name`
-/// attribute.
+/// Sets the event name that will later be exported through the OTLP
+/// `event_name` field.
 pub fn LogRecord::set_event_name(self : LogRecord, name : StringView) -> Unit {
   self.event_name = Some(name.to_string())
 }
 
 ///|
-/// Sets the log target that will later be exported as the `log.target`
-/// attribute.
+/// Sets the log target used for export-time scope grouping.
 pub fn LogRecord::set_target(self : LogRecord, target : StringView) -> Unit {
   self.target = Some(target.to_string())
 }
@@ -282,7 +273,7 @@ pub fn LogRecord::add_attribute(
   value : AnyValue,
 ) -> Unit {
   self.attributes.push(
-    @common.KeyValue::new(key, any_value_to_sdk_value(value)),
+    @sdklogs.KeyValue::new(key, any_value_to_sdk_value(value)),
   )
 }
 
@@ -292,7 +283,9 @@ pub fn LogRecord::add_attributes(
   self : LogRecord,
   attributes : ArrayView[@common.KeyValue],
 ) -> Unit {
-  self.attributes.append(attributes)
+  for attribute in attributes {
+    self.attributes.push(@sdklogs.KeyValue::from_common(attribute))
+  }
 }
 
 ///|
@@ -440,12 +433,14 @@ pub async fn Logger::emit(self : Logger, record : LogRecord) -> Unit {
       logger.emit(
         match record.body {
           Some(body) => any_value_to_sdk_value(body)
-          None => @common.Value::String("")
+          None => @sdklogs.AnyValue::String("")
         },
         context=to_sdk_context(record.trace_context),
         severity_number=to_sdk_severity(record.severity_number),
         severity_text~,
-        attributes=sdk_attributes(record),
+        event_name=record.event_name,
+        target=record.target,
+        attributes=record.attributes,
         timestamp_unix_nano=match record.timestamp_unix_nano {
           Some(timestamp_unix_nano) => timestamp_unix_nano
           None => @common.now_unix_nano()

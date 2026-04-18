@@ -29,6 +29,7 @@ pub struct SpanEvent {
   name : String
   timestamp_unix_nano : Int64
   attributes : Array[@common.KeyValue]
+  dropped_attributes_count : Int
 } derive(Eq, ToJson, Debug)
 
 ///|
@@ -36,6 +37,7 @@ pub struct SpanEvent {
 pub struct SpanLink {
   span_context : @common.SpanContext
   attributes : Array[@common.KeyValue]
+  dropped_attributes_count : Int
 } derive(Eq, ToJson, Debug)
 
 ///|
@@ -44,6 +46,8 @@ pub struct SpanLimits {
   max_attributes_per_span : Int
   max_events_per_span : Int
   max_links_per_span : Int
+  max_attributes_per_event : Int
+  max_attributes_per_link : Int
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
@@ -268,11 +272,13 @@ pub fn SpanEvent::new(
   name : StringView,
   attributes? : ArrayView[@common.KeyValue] = [],
   timestamp_unix_nano? : Int64 = @common.now_unix_nano(),
+  dropped_attributes_count? : Int = 0,
 ) -> SpanEvent {
   {
     name: name.to_string(),
     timestamp_unix_nano,
     attributes: attributes.to_array(),
+    dropped_attributes_count,
   }
 }
 
@@ -281,8 +287,9 @@ pub fn SpanEvent::new(
 pub fn SpanLink::new(
   span_context : @common.SpanContext,
   attributes? : ArrayView[@common.KeyValue] = [],
+  dropped_attributes_count? : Int = 0,
 ) -> SpanLink {
-  { span_context, attributes: attributes.to_array() }
+  { span_context, attributes: attributes.to_array(), dropped_attributes_count }
 }
 
 ///|
@@ -291,8 +298,16 @@ pub fn SpanLimits::new(
   max_attributes_per_span? : Int = 128,
   max_events_per_span? : Int = 128,
   max_links_per_span? : Int = 128,
+  max_attributes_per_event? : Int = 128,
+  max_attributes_per_link? : Int = 128,
 ) -> SpanLimits {
-  { max_attributes_per_span, max_events_per_span, max_links_per_span }
+  {
+    max_attributes_per_span,
+    max_events_per_span,
+    max_links_per_span,
+    max_attributes_per_event,
+    max_attributes_per_link,
+  }
 }
 
 ///|
@@ -1003,6 +1018,34 @@ fn[T] push_bounded(
 }
 
 ///|
+fn truncate_attributes(
+  attributes : ArrayView[@common.KeyValue],
+  limit : Int,
+  dropped_attributes_count? : Int = 0,
+) -> (Array[@common.KeyValue], Int) {
+  let copied = attributes.to_array()
+  if limit <= 0 {
+    return ([], copied.length() + dropped_attributes_count)
+  }
+  if copied.length() <= limit {
+    return (copied, dropped_attributes_count)
+  }
+  (
+    copied[:limit].to_array(),
+    copied.length() - limit + dropped_attributes_count,
+  )
+}
+
+///|
+fn status_priority(code : StatusCode) -> Int {
+  match code {
+    StatusCode::Unset => 0
+    StatusCode::Error => 1
+    StatusCode::Ok => 2
+  }
+}
+
+///|
 fn recording_from_decision(decision : SamplingDecision) -> Bool {
   match decision {
     SamplingDecision::Drop => false
@@ -1063,13 +1106,24 @@ pub fn Span::add_event(
   name : StringView,
   attributes? : ArrayView[@common.KeyValue] = [],
   timestamp_unix_nano? : Int64 = @common.now_unix_nano(),
+  dropped_attributes_count? : Int = 0,
 ) -> Unit {
   if !self.is_recording() {
     return
   }
+  let (attributes, dropped_attributes_count) = truncate_attributes(
+    attributes,
+    self.state.val.limits.max_attributes_per_event,
+    dropped_attributes_count~,
+  )
   let (events, dropped) = push_bounded(
     self.state.val.events,
-    SpanEvent::new(name, attributes~, timestamp_unix_nano~),
+    SpanEvent::new(
+      name,
+      attributes~,
+      timestamp_unix_nano~,
+      dropped_attributes_count~,
+    ),
     self.state.val.limits.max_events_per_span,
   )
   self.state.val = {
@@ -1085,13 +1139,19 @@ pub fn Span::add_link(
   self : Span,
   span_context : @common.SpanContext,
   attributes? : ArrayView[@common.KeyValue] = [],
+  dropped_attributes_count? : Int = 0,
 ) -> Unit {
   if !self.is_recording() {
     return
   }
+  let (attributes, dropped_attributes_count) = truncate_attributes(
+    attributes,
+    self.state.val.limits.max_attributes_per_link,
+    dropped_attributes_count~,
+  )
   let (links, dropped) = push_bounded(
     self.state.val.links,
-    SpanLink::new(span_context, attributes~),
+    SpanLink::new(span_context, attributes~, dropped_attributes_count~),
     self.state.val.limits.max_links_per_span,
   )
   self.state.val = {
@@ -1107,7 +1167,11 @@ pub fn Span::set_status(self : Span, status : Status) -> Unit {
   if !self.is_recording() {
     return
   }
-  self.state.val = { ..self.state.val, status, }
+  let current = self.state.val.status
+  if status.code == current.code ||
+    status_priority(status.code) > status_priority(current.code) {
+    self.state.val = { ..self.state.val, status, }
+  }
 }
 
 ///|
@@ -1452,12 +1516,24 @@ pub fn SdkTracer::start(
       provider_state.config.span_limits.max_attributes_per_span
     span_attributes = span_attributes[:provider_state.config.span_limits.max_attributes_per_span].to_array()
   }
-  let mut span_links = links.to_array()
   let mut dropped_links_count = 0
-  if span_links.length() > provider_state.config.span_limits.max_links_per_span {
-    dropped_links_count = span_links.length() -
-      provider_state.config.span_limits.max_links_per_span
-    span_links = span_links[:provider_state.config.span_limits.max_links_per_span].to_array()
+  let span_links = []
+  for link in links {
+    if span_links.length() >=
+      provider_state.config.span_limits.max_links_per_span {
+      dropped_links_count += 1
+      continue
+    }
+    let (attributes, dropped_attributes_count) = truncate_attributes(
+      link.attributes,
+      provider_state.config.span_limits.max_attributes_per_link,
+      dropped_attributes_count=link.dropped_attributes_count,
+    )
+    span_links.push({
+      span_context: link.span_context,
+      attributes,
+      dropped_attributes_count,
+    })
   }
   let span : Span = {
     state: Ref::new({

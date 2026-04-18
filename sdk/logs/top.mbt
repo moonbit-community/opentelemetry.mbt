@@ -1,23 +1,62 @@
 ///|
-/// Coarse severity buckets used by `LogRecord`.
+/// Full OpenTelemetry severity ladder used by `LogRecord`.
 pub(all) enum SeverityNumber {
   Trace
+  Trace2
+  Trace3
+  Trace4
   Debug
+  Debug2
+  Debug3
+  Debug4
   Info
+  Info2
+  Info3
+  Info4
   Warn
+  Warn2
+  Warn3
+  Warn4
   Error
+  Error2
+  Error3
+  Error4
   Fatal
+  Fatal2
+  Fatal3
+  Fatal4
 } derive(Eq, Compare, Hash, ToJson, Debug)
+
+///|
+/// Structured log value preserved by the SDK and OTLP exporter.
+pub(all) enum AnyValue {
+  Bool(Bool)
+  Int64(Int64)
+  Double(Double)
+  String(String)
+  Bytes(Bytes)
+  Array(Array[AnyValue])
+  Map(Array[KeyValue])
+} derive(Eq, ToJson, Debug)
+
+///|
+/// Structured log attribute key/value pair.
+pub struct KeyValue {
+  key : @common.Key
+  value : AnyValue
+} derive(Eq, ToJson, Debug)
 
 ///|
 /// Immutable log payload exported by processors and exporters.
 pub struct LogRecord {
-  body : @common.Value
+  event_name : String?
+  target : String?
+  body : AnyValue
   timestamp_unix_nano : Int64
   observed_timestamp_unix_nano : Int64
   severity_number : SeverityNumber?
   severity_text : String?
-  attributes : Array[@common.KeyValue]
+  attributes : Array[KeyValue]
   trace_context : @common.SpanContext?
   resource : @resource.Resource
   instrumentation_scope : @common.InstrumentationScope
@@ -112,19 +151,54 @@ pub struct SdkLogger {
 }
 
 ///|
+/// Creates a structured log attribute.
+pub fn KeyValue::new(key : StringView, value : AnyValue) -> KeyValue {
+  { key: @common.Key::new(key), value }
+}
+
+///|
+/// Converts a shared SDK attribute value into a log-specific structured value.
+pub fn AnyValue::from_common(value : @common.Value) -> AnyValue {
+  match value {
+    @common.Value::Bool(value) => AnyValue::Bool(value)
+    @common.Value::Int64(value) => AnyValue::Int64(value)
+    @common.Value::Double(value) => AnyValue::Double(value)
+    @common.Value::String(value) => AnyValue::String(value)
+    @common.Value::Bytes(value) => AnyValue::Bytes(value)
+    @common.Value::Array(values) => {
+      let converted = []
+      for value in values {
+        converted.push(AnyValue::from_common(value))
+      }
+      AnyValue::Array(converted)
+    }
+  }
+}
+
+///|
+/// Converts a shared SDK attribute into a log-specific structured attribute.
+pub fn KeyValue::from_common(attribute : @common.KeyValue) -> KeyValue {
+  { key: attribute.key, value: AnyValue::from_common(attribute.value) }
+}
+
+///|
 /// Creates a log record snapshot.
 pub fn LogRecord::new(
-  body : @common.Value,
+  body : AnyValue,
   timestamp_unix_nano? : Int64 = @common.now_unix_nano(),
   observed_timestamp_unix_nano? : Int64 = @common.now_unix_nano(),
   severity_number? : SeverityNumber? = None,
   severity_text? : String? = None,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  event_name? : String? = None,
+  target? : String? = None,
+  attributes? : ArrayView[KeyValue] = [],
   trace_context? : @common.SpanContext? = None,
   resource? : @resource.Resource = @resource.Resource::empty(),
   instrumentation_scope? : @common.InstrumentationScope = Default::default(),
 ) -> LogRecord {
   {
+    event_name,
+    target,
     body,
     timestamp_unix_nano,
     observed_timestamp_unix_nano,
@@ -639,11 +713,13 @@ fn trace_context_from_context(
 /// Emits one log record through the provider pipeline.
 pub async fn SdkLogger::emit(
   self : SdkLogger,
-  body : @common.Value,
+  body : AnyValue,
   context? : @context.Context = Default::default(),
   severity_number? : SeverityNumber? = None,
   severity_text? : String? = None,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  event_name? : String? = None,
+  target? : String? = None,
+  attributes? : ArrayView[KeyValue] = [],
   timestamp_unix_nano? : Int64 = @common.now_unix_nano(),
   observed_timestamp_unix_nano? : Int64 = @common.now_unix_nano(),
 ) -> Unit {
@@ -656,6 +732,8 @@ pub async fn SdkLogger::emit(
     observed_timestamp_unix_nano~,
     severity_number~,
     severity_text~,
+    event_name~,
+    target~,
     attributes~,
     trace_context=trace_context_from_context(context),
     resource=self.provider.state.val.resource,

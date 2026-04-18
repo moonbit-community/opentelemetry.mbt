@@ -69,8 +69,7 @@ Callbacks are frozen when `build()` is called.
 ### Counters
 
 - `u64_counter(name)`:
-  builds a `UInt64` counter; values are bridged through the SDK's signed
-  64-bit counter and values larger than `Int64::max` are dropped
+  builds a native `UInt64` counter
 - `f64_counter(name)`:
   builds a floating-point counter
 
@@ -84,14 +83,14 @@ Callbacks are frozen when `build()` is called.
 ### Histograms
 
 - `u64_histogram(name)`:
-  builds a `UInt64` histogram; values are converted to `Double`
+  builds a native `UInt64` histogram
 - `f64_histogram(name)`:
   builds a `Double` histogram
 
 ### Gauges
 
 - `u64_gauge(name)`:
-  builds a `UInt64` gauge; values are converted to `Double`
+  builds a native `UInt64` gauge
 - `i64_gauge(name)`:
   builds an `Int64` gauge; values are converted to `Double`
 - `f64_gauge(name)`:
@@ -100,8 +99,7 @@ Callbacks are frozen when `build()` is called.
 ### Observable counters
 
 - `u64_observable_counter(name)`:
-  builds a `UInt64` observable counter; callback values larger than
-  `Int64::max` are dropped
+  builds a native `UInt64` observable counter
 - `f64_observable_counter(name)`:
   builds a `Double` observable counter
 
@@ -115,7 +113,7 @@ Callbacks are frozen when `build()` is called.
 ### Observable gauges
 
 - `u64_observable_gauge(name)`:
-  builds a `UInt64` observable gauge; callback values are converted to `Double`
+  builds a native `UInt64` observable gauge
 - `i64_observable_gauge(name)`:
   builds an `Int64` observable gauge; callback values are converted to `Double`
 - `f64_observable_gauge(name)`:

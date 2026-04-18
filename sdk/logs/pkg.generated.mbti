@@ -16,6 +16,17 @@ import {
 // Errors
 
 // Types and methods
+pub(all) enum AnyValue {
+  Bool(Bool)
+  Int64(Int64)
+  Double(Double)
+  String(String)
+  Bytes(Bytes)
+  Array(Array[AnyValue])
+  Map(Array[KeyValue])
+} derive(Eq, ToJson, @debug.Debug)
+pub fn AnyValue::from_common(@common.Value) -> Self
+
 pub struct BatchConfig {
   max_queue_size : Int
   max_export_batch_size : Int
@@ -45,6 +56,13 @@ pub fn InMemoryLogExporter::reset(Self) -> Unit
 
 type InMemoryLogExporterState
 
+pub struct KeyValue {
+  key : @common.Key
+  value : AnyValue
+} derive(Eq, ToJson, @debug.Debug)
+pub fn KeyValue::from_common(@common.KeyValue) -> Self
+pub fn KeyValue::new(StringView, AnyValue) -> Self
+
 pub struct LogExporter {
   export_fn : async (ArrayView[LogRecord]) -> Result[Unit, @error.OTelSdkError]
   force_flush_fn : async () -> Result[Unit, @error.OTelSdkError]
@@ -70,17 +88,19 @@ pub async fn LogProcessor::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
 pub async fn LogProcessor::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
 
 pub struct LogRecord {
-  body : @common.Value
+  event_name : String?
+  target : String?
+  body : AnyValue
   timestamp_unix_nano : Int64
   observed_timestamp_unix_nano : Int64
   severity_number : SeverityNumber?
   severity_text : String?
-  attributes : Array[@common.KeyValue]
+  attributes : Array[KeyValue]
   trace_context : @common.SpanContext?
   resource : @resource.Resource
   instrumentation_scope : @common.InstrumentationScope
 } derive(Eq, ToJson, @debug.Debug)
-pub fn LogRecord::new(@common.Value, timestamp_unix_nano? : Int64, observed_timestamp_unix_nano? : Int64, severity_number? : SeverityNumber?, severity_text? : String?, attributes? : ArrayView[@common.KeyValue], trace_context? : @common.SpanContext?, resource? : @resource.Resource, instrumentation_scope? : @common.InstrumentationScope) -> Self
+pub fn LogRecord::new(AnyValue, timestamp_unix_nano? : Int64, observed_timestamp_unix_nano? : Int64, severity_number? : SeverityNumber?, severity_text? : String?, event_name? : String?, target? : String?, attributes? : ArrayView[KeyValue], trace_context? : @common.SpanContext?, resource? : @resource.Resource, instrumentation_scope? : @common.InstrumentationScope) -> Self
 
 type LoggerProviderState
 
@@ -88,7 +108,7 @@ pub struct SdkLogger {
   provider : SdkLoggerProvider
   instrumentation_scope : @common.InstrumentationScope
 }
-pub async fn SdkLogger::emit(Self, @common.Value, context? : @context.Context, severity_number? : SeverityNumber?, severity_text? : String?, attributes? : ArrayView[@common.KeyValue], timestamp_unix_nano? : Int64, observed_timestamp_unix_nano? : Int64) -> Unit
+pub async fn SdkLogger::emit(Self, AnyValue, context? : @context.Context, severity_number? : SeverityNumber?, severity_text? : String?, event_name? : String?, target? : String?, attributes? : ArrayView[KeyValue], timestamp_unix_nano? : Int64, observed_timestamp_unix_nano? : Int64) -> Unit
 
 pub struct SdkLoggerProvider {
   state : @ref.Ref[LoggerProviderState]
@@ -114,11 +134,29 @@ pub fn SdkLoggerProviderBuilder::with_simple_exporter(Self, LogExporter) -> Self
 
 pub(all) enum SeverityNumber {
   Trace
+  Trace2
+  Trace3
+  Trace4
   Debug
+  Debug2
+  Debug3
+  Debug4
   Info
+  Info2
+  Info3
+  Info4
   Warn
+  Warn2
+  Warn3
+  Warn4
   Error
+  Error2
+  Error3
+  Error4
   Fatal
+  Fatal2
+  Fatal3
+  Fatal4
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
 
 pub struct SimpleLogProcessor {

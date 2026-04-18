@@ -74,11 +74,11 @@ async fn sample_span_data() -> @sdktrace.SpanData {
 ///|
 fn sample_log_record() -> @sdklogs.LogRecord {
   @sdklogs.LogRecord::new(
-    @common.Value::String("request failed"),
-    severity_number=Some(@sdklogs.SeverityNumber::Error),
-    severity_text=Some("ERROR"),
+    @sdklogs.AnyValue::String("request failed"),
+    severity_number=Some(@sdklogs.SeverityNumber::Error3),
+    severity_text=Some("ERROR3"),
     attributes=[
-      @common.KeyValue::new("http.status_code", @common.Value::Int64(500L)),
+      @sdklogs.KeyValue::new("http.status_code", @sdklogs.AnyValue::Int64(500L)),
     ],
     trace_context=Some(
       sample_span_context(

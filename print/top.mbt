@@ -68,6 +68,11 @@ fn format_value(value : @common.Value) -> String {
 }
 
 ///|
+fn format_log_value(value : @sdklogs.AnyValue) -> String {
+  value.to_json().stringify()
+}
+
+///|
 fn format_status(status : @sdktrace.Status) -> String {
   let code = match status.code {
     @sdktrace.StatusCode::Unset => "Unset"
@@ -95,11 +100,29 @@ fn format_span_kind(kind : @sdktrace.SpanKind) -> String {
 fn format_severity_number(severity : @sdklogs.SeverityNumber) -> String {
   match severity {
     @sdklogs.SeverityNumber::Trace => "Trace"
+    @sdklogs.SeverityNumber::Trace2 => "Trace2"
+    @sdklogs.SeverityNumber::Trace3 => "Trace3"
+    @sdklogs.SeverityNumber::Trace4 => "Trace4"
     @sdklogs.SeverityNumber::Debug => "Debug"
+    @sdklogs.SeverityNumber::Debug2 => "Debug2"
+    @sdklogs.SeverityNumber::Debug3 => "Debug3"
+    @sdklogs.SeverityNumber::Debug4 => "Debug4"
     @sdklogs.SeverityNumber::Info => "Info"
+    @sdklogs.SeverityNumber::Info2 => "Info2"
+    @sdklogs.SeverityNumber::Info3 => "Info3"
+    @sdklogs.SeverityNumber::Info4 => "Info4"
     @sdklogs.SeverityNumber::Warn => "Warn"
+    @sdklogs.SeverityNumber::Warn2 => "Warn2"
+    @sdklogs.SeverityNumber::Warn3 => "Warn3"
+    @sdklogs.SeverityNumber::Warn4 => "Warn4"
     @sdklogs.SeverityNumber::Error => "Error"
+    @sdklogs.SeverityNumber::Error2 => "Error2"
+    @sdklogs.SeverityNumber::Error3 => "Error3"
+    @sdklogs.SeverityNumber::Error4 => "Error4"
     @sdklogs.SeverityNumber::Fatal => "Fatal"
+    @sdklogs.SeverityNumber::Fatal2 => "Fatal2"
+    @sdklogs.SeverityNumber::Fatal3 => "Fatal3"
+    @sdklogs.SeverityNumber::Fatal4 => "Fatal4"
   }
 }
 
@@ -121,6 +144,7 @@ fn format_instrument_kind(kind : @sdkmetrics.InstrumentKind) -> String {
 fn format_number(number : @sdkmetrics.Number) -> String {
   match number {
     @sdkmetrics.Number::Int64(value) => value.to_string()
+    @sdkmetrics.Number::UInt64(value) => value.to_string()
     @sdkmetrics.Number::Double(value) => value.to_string()
   }
 }
@@ -143,6 +167,28 @@ fn write_array_attributes(
     builder.write_string(attribute.key.as_string())
     builder.write_string("=")
     builder.write_string(format_value(attribute.value))
+    builder.write_char('\n')
+  }
+}
+
+///|
+fn write_log_attributes(
+  builder : StringBuilder,
+  header_indent : Int,
+  item_indent : Int,
+  attributes : ArrayView[@sdklogs.KeyValue],
+) -> Unit {
+  if attributes.length() == 0 {
+    return
+  }
+  push_indent(builder, header_indent)
+  push_line(builder, "Attributes:")
+  for attribute in attributes {
+    push_indent(builder, item_indent)
+    builder.write_string("-> ")
+    builder.write_string(attribute.key.as_string())
+    builder.write_string("=")
+    builder.write_string(format_log_value(attribute.value))
     builder.write_char('\n')
   }
 }
@@ -343,8 +389,8 @@ fn render_log_batch(
         )
       None => ()
     }
-    push_field(builder, 2, "Body", format_value(record.body))
-    write_array_attributes(builder, 2, 4, record.attributes)
+    push_field(builder, 2, "Body", format_log_value(record.body))
+    write_log_attributes(builder, 2, 4, record.attributes)
   }
   builder.to_string()
 }
@@ -366,13 +412,13 @@ fn write_metric_aggregation(
     @sdkmetrics.Aggregation::Histogram(summary) => {
       push_field(builder, 2, "Aggregation", "Histogram")
       push_field(builder, 4, "Count", summary.count.to_string())
-      push_field(builder, 4, "Sum", summary.sum.to_string())
+      push_field(builder, 4, "Sum", format_number(summary.sum))
       match summary.min {
-        Some(min) => push_field(builder, 4, "Min", min.to_string())
+        Some(min) => push_field(builder, 4, "Min", format_number(min))
         None => ()
       }
       match summary.max {
-        Some(max) => push_field(builder, 4, "Max", max.to_string())
+        Some(max) => push_field(builder, 4, "Max", format_number(max))
         None => ()
       }
     }

@@ -14,6 +14,7 @@ pub(all) enum InstrumentKind {
 /// Numeric value stored inside metric aggregations.
 pub(all) enum Number {
   Int64(Int64)
+  UInt64(UInt64)
   Double(Double)
 } derive(Eq, ToJson, Debug)
 
@@ -21,9 +22,9 @@ pub(all) enum Number {
 /// Compact histogram summary emitted by the current implementation.
 pub struct HistogramSummary {
   count : Int64
-  sum : Double
-  min : Double?
-  max : Double?
+  sum : Number
+  min : Number?
+  max : Number?
 } derive(Eq, ToJson, Debug)
 
 ///|
@@ -254,6 +255,15 @@ pub struct DoubleCounterBuilder {
 }
 
 ///|
+/// Builder for an unsigned monotonic counter instrument.
+pub struct UInt64CounterBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+}
+
+///|
 /// Builder for a signed counter instrument.
 pub struct UpDownCounterBuilder {
   meter : SdkMeter
@@ -281,8 +291,26 @@ pub struct HistogramBuilder {
 }
 
 ///|
+/// Builder for an unsigned histogram instrument.
+pub struct UInt64HistogramBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+}
+
+///|
 /// Builder for a gauge instrument.
 pub struct GaugeBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+}
+
+///|
+/// Builder for an unsigned gauge instrument.
+pub struct UInt64GaugeBuilder {
   meter : SdkMeter
   name : String
   mut description : String?
@@ -307,6 +335,16 @@ pub struct ObservableDoubleCounterBuilder {
   mut description : String?
   mut unit : String?
   callbacks : Array[(ObservableDoubleCounter) -> Unit]
+}
+
+///|
+/// Builder for an unsigned observable monotonic counter instrument.
+pub struct ObservableUInt64CounterBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+  callbacks : Array[(ObservableUInt64Counter) -> Unit]
 }
 
 ///|
@@ -340,6 +378,16 @@ pub struct ObservableGaugeBuilder {
 }
 
 ///|
+/// Builder for an unsigned observable gauge instrument.
+pub struct ObservableUInt64GaugeBuilder {
+  meter : SdkMeter
+  name : String
+  mut description : String?
+  mut unit : String?
+  callbacks : Array[(ObservableUInt64Gauge) -> Unit]
+}
+
+///|
 /// Counter instrument handle.
 pub struct Counter {
   state : Ref[SyncInstrumentState]
@@ -348,6 +396,12 @@ pub struct Counter {
 ///|
 /// Floating-point counter instrument handle.
 pub struct DoubleCounter {
+  state : Ref[SyncInstrumentState]
+}
+
+///|
+/// Unsigned counter instrument handle.
+pub struct UInt64Counter {
   state : Ref[SyncInstrumentState]
 }
 
@@ -370,8 +424,20 @@ pub struct Histogram {
 }
 
 ///|
+/// Unsigned histogram instrument handle.
+pub struct UInt64Histogram {
+  state : Ref[SyncInstrumentState]
+}
+
+///|
 /// Gauge instrument handle.
 pub struct Gauge {
+  state : Ref[SyncInstrumentState]
+}
+
+///|
+/// Unsigned gauge instrument handle.
+pub struct UInt64Gauge {
   state : Ref[SyncInstrumentState]
 }
 
@@ -384,6 +450,12 @@ pub struct ObservableCounter {
 ///|
 /// Observable floating-point counter instrument handle passed to callbacks.
 pub struct ObservableDoubleCounter {
+  state : Ref[SyncInstrumentState]
+}
+
+///|
+/// Unsigned observable counter instrument handle passed to callbacks.
+pub struct ObservableUInt64Counter {
   state : Ref[SyncInstrumentState]
 }
 
@@ -402,6 +474,12 @@ pub struct ObservableDoubleUpDownCounter {
 ///|
 /// Observable gauge instrument handle passed to callbacks.
 pub struct ObservableGauge {
+  state : Ref[SyncInstrumentState]
+}
+
+///|
+/// Unsigned observable gauge instrument handle passed to callbacks.
+pub struct ObservableUInt64Gauge {
   state : Ref[SyncInstrumentState]
 }
 
@@ -776,6 +854,64 @@ fn metric_identity(metric : MetricData) -> String {
 }
 
 ///|
+fn zero_number(number : Number) -> Number {
+  match number {
+    Number::Int64(_) => Number::Int64(0)
+    Number::UInt64(_) => Number::UInt64(0UL)
+    Number::Double(_) => Number::Double(0.0)
+  }
+}
+
+///|
+fn add_numbers(lhs : Number, rhs : Number) -> Number {
+  match (lhs, rhs) {
+    (Number::Int64(lhs), Number::Int64(rhs)) => Number::Int64(lhs + rhs)
+    (Number::UInt64(lhs), Number::UInt64(rhs)) => Number::UInt64(lhs + rhs)
+    (Number::Double(lhs), Number::Double(rhs)) => Number::Double(lhs + rhs)
+    (_, _) => rhs
+  }
+}
+
+///|
+fn min_number(lhs : Number, rhs : Number) -> Number {
+  match (lhs, rhs) {
+    (Number::Int64(lhs), Number::Int64(rhs)) =>
+      Number::Int64(if lhs < rhs { lhs } else { rhs })
+    (Number::UInt64(lhs), Number::UInt64(rhs)) =>
+      Number::UInt64(if lhs < rhs { lhs } else { rhs })
+    (Number::Double(lhs), Number::Double(rhs)) =>
+      Number::Double(if lhs < rhs { lhs } else { rhs })
+    (_, _) => rhs
+  }
+}
+
+///|
+fn max_number(lhs : Number, rhs : Number) -> Number {
+  match (lhs, rhs) {
+    (Number::Int64(lhs), Number::Int64(rhs)) =>
+      Number::Int64(if lhs > rhs { lhs } else { rhs })
+    (Number::UInt64(lhs), Number::UInt64(rhs)) =>
+      Number::UInt64(if lhs > rhs { lhs } else { rhs })
+    (Number::Double(lhs), Number::Double(rhs)) =>
+      Number::Double(if lhs > rhs { lhs } else { rhs })
+    (_, _) => rhs
+  }
+}
+
+///|
+fn subtract_numbers(current : Number, previous : Number) -> Number {
+  match (current, previous) {
+    (Number::Int64(current), Number::Int64(previous)) =>
+      Number::Int64(current - previous)
+    (Number::UInt64(current), Number::UInt64(previous)) =>
+      Number::UInt64(if current > previous { current - previous } else { 0UL })
+    (Number::Double(current), Number::Double(previous)) =>
+      Number::Double(current - previous)
+    (_, _) => current
+  }
+}
+
+///|
 fn delta_histogram(
   current : HistogramSummary,
   previous : HistogramSummary?,
@@ -783,9 +919,9 @@ fn delta_histogram(
   match previous {
     Some(previous) => {
       let count = current.count - previous.count
-      let sum = current.sum - previous.sum
+      let sum = subtract_numbers(current.sum, previous.sum)
       if count <= 0 {
-        { count: 0, sum: 0.0, min: None, max: None }
+        { count: 0, sum: zero_number(current.sum), min: None, max: None }
       } else {
         { count, sum, min: current.min, max: current.max }
       }
@@ -807,6 +943,20 @@ fn delta_aggregation(
       match previous {
         Some(Aggregation::Sum(Number::Int64(previous_value))) =>
           Aggregation::Sum(Number::Int64(value - previous_value))
+        _ => metric.aggregation
+      }
+    Aggregation::Sum(Number::UInt64(value)) =>
+      match previous {
+        Some(Aggregation::Sum(Number::UInt64(previous_value))) =>
+          Aggregation::Sum(
+            Number::UInt64(
+              if value > previous_value {
+                value - previous_value
+              } else {
+                0UL
+              },
+            ),
+          )
         _ => metric.aggregation
       }
     Aggregation::Sum(Number::Double(value)) =>
@@ -1100,20 +1250,20 @@ fn create_builder(
 }
 
 ///|
-fn histogram_aggregation(current : Aggregation?, value : Double) -> Aggregation {
+fn histogram_aggregation(current : Aggregation?, value : Number) -> Aggregation {
   match current {
     Some(Aggregation::Histogram(summary)) => {
       let min = match summary.min {
-        Some(current) => Some(if value < current { value } else { current })
+        Some(current) => Some(min_number(current, value))
         None => Some(value)
       }
       let max = match summary.max {
-        Some(current) => Some(if value > current { value } else { current })
+        Some(current) => Some(max_number(current, value))
         None => Some(value)
       }
       Aggregation::Histogram({
         count: summary.count + 1,
-        sum: summary.sum + value,
+        sum: add_numbers(summary.sum, value),
         min,
         max,
       })
@@ -1153,7 +1303,7 @@ fn update_sum_stream(
       }
     StreamAggregation::LastValue => Aggregation::Gauge(Number::Int64(delta))
     StreamAggregation::Histogram =>
-      histogram_aggregation(current, delta.to_double())
+      histogram_aggregation(current, Number::Int64(delta))
     _ => Aggregation::Sum(Number::Int64(delta))
   }
   points[key] = { attributes, aggregation }
@@ -1184,8 +1334,41 @@ fn update_double_stream(
         _ => Aggregation::Sum(Number::Double(value))
       }
     StreamAggregation::LastValue => Aggregation::Gauge(Number::Double(value))
-    StreamAggregation::Histogram => histogram_aggregation(current, value)
+    StreamAggregation::Histogram =>
+      histogram_aggregation(current, Number::Double(value))
     _ => Aggregation::Gauge(Number::Double(value))
+  }
+  points[key] = { attributes, aggregation }
+  state.val = { ..state.val, points, }
+}
+
+///|
+fn update_u64_stream(
+  state : Ref[MetricStreamState],
+  attributes : ArrayView[@common.KeyValue],
+  value : UInt64,
+) -> Unit {
+  let attributes = filter_attributes(
+    state.val.allowed_attribute_keys,
+    attributes,
+  )
+  let key = encode_attributes(attributes)
+  let points = state.val.points.copy()
+  let current = points.get(key).map(fn(point) { point.aggregation })
+  if current is None && points.length() >= state.val.cardinality_limit {
+    return
+  }
+  let aggregation = match state.val.aggregation {
+    StreamAggregation::Sum =>
+      match current {
+        Some(Aggregation::Sum(Number::UInt64(current))) =>
+          Aggregation::Sum(Number::UInt64(current + value))
+        _ => Aggregation::Sum(Number::UInt64(value))
+      }
+    StreamAggregation::LastValue => Aggregation::Gauge(Number::UInt64(value))
+    StreamAggregation::Histogram =>
+      histogram_aggregation(current, Number::UInt64(value))
+    _ => Aggregation::Gauge(Number::UInt64(value))
   }
   points[key] = { attributes, aggregation }
   state.val = { ..state.val, points, }
@@ -1216,6 +1399,18 @@ fn update_double_sum(
 }
 
 ///|
+/// Updates an unsigned sum aggregation for the supplied attribute set.
+fn update_u64_sum(
+  state : Ref[SyncInstrumentState],
+  attributes : ArrayView[@common.KeyValue],
+  delta : UInt64,
+) -> Unit {
+  for stream in state.val.streams {
+    update_u64_stream(stream, attributes, delta)
+  }
+}
+
+///|
 /// Updates histogram summary statistics for the supplied attribute set.
 fn update_histogram(
   state : Ref[SyncInstrumentState],
@@ -1228,6 +1423,18 @@ fn update_histogram(
 }
 
 ///|
+/// Updates unsigned histogram summary statistics for the supplied attribute set.
+fn update_u64_histogram(
+  state : Ref[SyncInstrumentState],
+  attributes : ArrayView[@common.KeyValue],
+  value : UInt64,
+) -> Unit {
+  for stream in state.val.streams {
+    update_u64_stream(stream, attributes, value)
+  }
+}
+
+///|
 /// Replaces the last recorded gauge value for the supplied attribute set.
 fn update_gauge(
   state : Ref[SyncInstrumentState],
@@ -1236,6 +1443,18 @@ fn update_gauge(
 ) -> Unit {
   for stream in state.val.streams {
     update_double_stream(stream, attributes, value)
+  }
+}
+
+///|
+/// Replaces the last recorded unsigned gauge value for the supplied attribute set.
+fn update_u64_gauge(
+  state : Ref[SyncInstrumentState],
+  attributes : ArrayView[@common.KeyValue],
+  value : UInt64,
+) -> Unit {
+  for stream in state.val.streams {
+    update_u64_stream(stream, attributes, value)
   }
 }
 
@@ -1677,6 +1896,16 @@ pub fn SdkMeter::f64_counter(
 }
 
 ///|
+/// Starts building an unsigned counter instrument.
+pub fn SdkMeter::u64_counter(
+  self : SdkMeter,
+  name : StringView,
+) -> UInt64CounterBuilder {
+  let (meter, name, description, unit) = create_builder(self, name)
+  { meter, name, description, unit }
+}
+
+///|
 /// Starts building an up-down counter instrument.
 pub fn SdkMeter::up_down_counter(
   self : SdkMeter,
@@ -1707,8 +1936,28 @@ pub fn SdkMeter::histogram(
 }
 
 ///|
+/// Starts building an unsigned histogram instrument.
+pub fn SdkMeter::u64_histogram(
+  self : SdkMeter,
+  name : StringView,
+) -> UInt64HistogramBuilder {
+  let (meter, name, description, unit) = create_builder(self, name)
+  { meter, name, description, unit }
+}
+
+///|
 /// Starts building a gauge instrument.
 pub fn SdkMeter::gauge(self : SdkMeter, name : StringView) -> GaugeBuilder {
+  let (meter, name, description, unit) = create_builder(self, name)
+  { meter, name, description, unit }
+}
+
+///|
+/// Starts building an unsigned gauge instrument.
+pub fn SdkMeter::u64_gauge(
+  self : SdkMeter,
+  name : StringView,
+) -> UInt64GaugeBuilder {
   let (meter, name, description, unit) = create_builder(self, name)
   { meter, name, description, unit }
 }
@@ -1729,6 +1978,16 @@ pub fn SdkMeter::f64_observable_counter(
   self : SdkMeter,
   name : StringView,
 ) -> ObservableDoubleCounterBuilder {
+  let (meter, name, description, unit) = create_builder(self, name)
+  { meter, name, description, unit, callbacks: [] }
+}
+
+///|
+/// Starts building an unsigned observable counter instrument.
+pub fn SdkMeter::u64_observable_counter(
+  self : SdkMeter,
+  name : StringView,
+) -> ObservableUInt64CounterBuilder {
   let (meter, name, description, unit) = create_builder(self, name)
   { meter, name, description, unit, callbacks: [] }
 }
@@ -1764,6 +2023,16 @@ pub fn SdkMeter::observable_gauge(
 }
 
 ///|
+/// Starts building an unsigned observable gauge instrument.
+pub fn SdkMeter::u64_observable_gauge(
+  self : SdkMeter,
+  name : StringView,
+) -> ObservableUInt64GaugeBuilder {
+  let (meter, name, description, unit) = create_builder(self, name)
+  { meter, name, description, unit, callbacks: [] }
+}
+
+///|
 fn descriptor(
   name : String,
   description : String?,
@@ -1794,6 +2063,16 @@ pub fn DoubleCounterBuilder::with_description(
 }
 
 ///|
+/// Sets the instrument description.
+pub fn UInt64CounterBuilder::with_description(
+  self : UInt64CounterBuilder,
+  description : StringView,
+) -> UInt64CounterBuilder {
+  self.description = Some(description.to_string())
+  self
+}
+
+///|
 /// Sets the instrument unit.
 pub fn CounterBuilder::with_unit(
   self : CounterBuilder,
@@ -1809,6 +2088,16 @@ pub fn DoubleCounterBuilder::with_unit(
   self : DoubleCounterBuilder,
   unit : StringView,
 ) -> DoubleCounterBuilder {
+  self.unit = Some(unit.to_string())
+  self
+}
+
+///|
+/// Sets the instrument unit.
+pub fn UInt64CounterBuilder::with_unit(
+  self : UInt64CounterBuilder,
+  unit : StringView,
+) -> UInt64CounterBuilder {
   self.unit = Some(unit.to_string())
   self
 }
@@ -1834,6 +2123,24 @@ pub fn CounterBuilder::build(self : CounterBuilder) -> Counter {
 pub fn DoubleCounterBuilder::build(
   self : DoubleCounterBuilder,
 ) -> DoubleCounter {
+  {
+    state: register_instrument(
+      self.meter,
+      descriptor(
+        self.name,
+        self.description,
+        self.unit,
+        InstrumentKind::Counter,
+      ),
+    ),
+  }
+}
+
+///|
+/// Builds the unsigned counter instrument and registers it with the provider.
+pub fn UInt64CounterBuilder::build(
+  self : UInt64CounterBuilder,
+) -> UInt64Counter {
   {
     state: register_instrument(
       self.meter,
@@ -1934,6 +2241,16 @@ pub fn HistogramBuilder::with_description(
 }
 
 ///|
+/// Sets the instrument description.
+pub fn UInt64HistogramBuilder::with_description(
+  self : UInt64HistogramBuilder,
+  description : StringView,
+) -> UInt64HistogramBuilder {
+  self.description = Some(description.to_string())
+  self
+}
+
+///|
 /// Sets the instrument unit.
 pub fn HistogramBuilder::with_unit(
   self : HistogramBuilder,
@@ -1944,8 +2261,36 @@ pub fn HistogramBuilder::with_unit(
 }
 
 ///|
+/// Sets the instrument unit.
+pub fn UInt64HistogramBuilder::with_unit(
+  self : UInt64HistogramBuilder,
+  unit : StringView,
+) -> UInt64HistogramBuilder {
+  self.unit = Some(unit.to_string())
+  self
+}
+
+///|
 /// Builds the histogram instrument and registers it with the provider.
 pub fn HistogramBuilder::build(self : HistogramBuilder) -> Histogram {
+  {
+    state: register_instrument(
+      self.meter,
+      descriptor(
+        self.name,
+        self.description,
+        self.unit,
+        InstrumentKind::Histogram,
+      ),
+    ),
+  }
+}
+
+///|
+/// Builds the unsigned histogram instrument and registers it with the provider.
+pub fn UInt64HistogramBuilder::build(
+  self : UInt64HistogramBuilder,
+) -> UInt64Histogram {
   {
     state: register_instrument(
       self.meter,
@@ -1970,6 +2315,16 @@ pub fn GaugeBuilder::with_description(
 }
 
 ///|
+/// Sets the instrument description.
+pub fn UInt64GaugeBuilder::with_description(
+  self : UInt64GaugeBuilder,
+  description : StringView,
+) -> UInt64GaugeBuilder {
+  self.description = Some(description.to_string())
+  self
+}
+
+///|
 /// Sets the instrument unit.
 pub fn GaugeBuilder::with_unit(
   self : GaugeBuilder,
@@ -1980,8 +2335,29 @@ pub fn GaugeBuilder::with_unit(
 }
 
 ///|
+/// Sets the instrument unit.
+pub fn UInt64GaugeBuilder::with_unit(
+  self : UInt64GaugeBuilder,
+  unit : StringView,
+) -> UInt64GaugeBuilder {
+  self.unit = Some(unit.to_string())
+  self
+}
+
+///|
 /// Builds the gauge instrument and registers it with the provider.
 pub fn GaugeBuilder::build(self : GaugeBuilder) -> Gauge {
+  {
+    state: register_instrument(
+      self.meter,
+      descriptor(self.name, self.description, self.unit, InstrumentKind::Gauge),
+    ),
+  }
+}
+
+///|
+/// Builds the unsigned gauge instrument and registers it with the provider.
+pub fn UInt64GaugeBuilder::build(self : UInt64GaugeBuilder) -> UInt64Gauge {
   {
     state: register_instrument(
       self.meter,
@@ -2027,6 +2403,15 @@ pub fn ObservableDoubleCounterBuilder::with_description(
 }
 
 ///|
+pub fn ObservableUInt64CounterBuilder::with_description(
+  self : ObservableUInt64CounterBuilder,
+  description : StringView,
+) -> ObservableUInt64CounterBuilder {
+  self.description = Some(description.to_string())
+  self
+}
+
+///|
 pub fn ObservableDoubleCounterBuilder::with_unit(
   self : ObservableDoubleCounterBuilder,
   unit : StringView,
@@ -2036,10 +2421,28 @@ pub fn ObservableDoubleCounterBuilder::with_unit(
 }
 
 ///|
+pub fn ObservableUInt64CounterBuilder::with_unit(
+  self : ObservableUInt64CounterBuilder,
+  unit : StringView,
+) -> ObservableUInt64CounterBuilder {
+  self.unit = Some(unit.to_string())
+  self
+}
+
+///|
 pub fn ObservableDoubleCounterBuilder::with_callback(
   self : ObservableDoubleCounterBuilder,
   callback : (ObservableDoubleCounter) -> Unit,
 ) -> ObservableDoubleCounterBuilder {
+  self.callbacks.push(callback)
+  self
+}
+
+///|
+pub fn ObservableUInt64CounterBuilder::with_callback(
+  self : ObservableUInt64CounterBuilder,
+  callback : (ObservableUInt64Counter) -> Unit,
+) -> ObservableUInt64CounterBuilder {
   self.callbacks.push(callback)
   self
 }
@@ -2074,6 +2477,30 @@ pub fn ObservableDoubleCounterBuilder::build(
 ) -> ObservableDoubleCounter {
   let state : Ref[SyncInstrumentState] = Ref::new({ streams: [] })
   let instrument : ObservableDoubleCounter = { state, }
+  let callbacks = []
+  for callback in self.callbacks {
+    callbacks.push(() => callback(instrument))
+  }
+  register_observable_instrument(
+    self.meter,
+    descriptor(
+      self.name,
+      self.description,
+      self.unit,
+      InstrumentKind::ObservableCounter,
+    ),
+    state,
+    callbacks,
+  )
+  instrument
+}
+
+///|
+pub fn ObservableUInt64CounterBuilder::build(
+  self : ObservableUInt64CounterBuilder,
+) -> ObservableUInt64Counter {
+  let state : Ref[SyncInstrumentState] = Ref::new({ streams: [] })
+  let instrument : ObservableUInt64Counter = { state, }
   let callbacks = []
   for callback in self.callbacks {
     callbacks.push(() => callback(instrument))
@@ -2204,10 +2631,28 @@ pub fn ObservableGaugeBuilder::with_description(
 }
 
 ///|
+pub fn ObservableUInt64GaugeBuilder::with_description(
+  self : ObservableUInt64GaugeBuilder,
+  description : StringView,
+) -> ObservableUInt64GaugeBuilder {
+  self.description = Some(description.to_string())
+  self
+}
+
+///|
 pub fn ObservableGaugeBuilder::with_unit(
   self : ObservableGaugeBuilder,
   unit : StringView,
 ) -> ObservableGaugeBuilder {
+  self.unit = Some(unit.to_string())
+  self
+}
+
+///|
+pub fn ObservableUInt64GaugeBuilder::with_unit(
+  self : ObservableUInt64GaugeBuilder,
+  unit : StringView,
+) -> ObservableUInt64GaugeBuilder {
   self.unit = Some(unit.to_string())
   self
 }
@@ -2222,11 +2667,44 @@ pub fn ObservableGaugeBuilder::with_callback(
 }
 
 ///|
+pub fn ObservableUInt64GaugeBuilder::with_callback(
+  self : ObservableUInt64GaugeBuilder,
+  callback : (ObservableUInt64Gauge) -> Unit,
+) -> ObservableUInt64GaugeBuilder {
+  self.callbacks.push(callback)
+  self
+}
+
+///|
 pub fn ObservableGaugeBuilder::build(
   self : ObservableGaugeBuilder,
 ) -> ObservableGauge {
   let state : Ref[SyncInstrumentState] = Ref::new({ streams: [] })
   let instrument : ObservableGauge = { state, }
+  let callbacks = []
+  for callback in self.callbacks {
+    callbacks.push(() => callback(instrument))
+  }
+  register_observable_instrument(
+    self.meter,
+    descriptor(
+      self.name,
+      self.description,
+      self.unit,
+      InstrumentKind::ObservableGauge,
+    ),
+    state,
+    callbacks,
+  )
+  instrument
+}
+
+///|
+pub fn ObservableUInt64GaugeBuilder::build(
+  self : ObservableUInt64GaugeBuilder,
+) -> ObservableUInt64Gauge {
+  let state : Ref[SyncInstrumentState] = Ref::new({ streams: [] })
+  let instrument : ObservableUInt64Gauge = { state, }
   let callbacks = []
   for callback in self.callbacks {
     callbacks.push(() => callback(instrument))
@@ -2272,6 +2750,16 @@ pub fn DoubleCounter::add(
 }
 
 ///|
+/// Adds a delta to the unsigned counter for one attribute set.
+pub fn UInt64Counter::add(
+  self : UInt64Counter,
+  value : UInt64,
+  attributes? : ArrayView[@common.KeyValue] = [],
+) -> Unit {
+  update_u64_sum(self.state, attributes, value)
+}
+
+///|
 /// Adds a delta to the up-down counter for one attribute set.
 pub fn UpDownCounter::add(
   self : UpDownCounter,
@@ -2302,6 +2790,16 @@ pub fn Histogram::record(
 }
 
 ///|
+/// Records one unsigned histogram sample for an attribute set.
+pub fn UInt64Histogram::record(
+  self : UInt64Histogram,
+  value : UInt64,
+  attributes? : ArrayView[@common.KeyValue] = [],
+) -> Unit {
+  update_u64_histogram(self.state, attributes, value)
+}
+
+///|
 /// Records the latest gauge value for an attribute set.
 pub fn Gauge::record(
   self : Gauge,
@@ -2309,6 +2807,16 @@ pub fn Gauge::record(
   attributes? : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   update_gauge(self.state, attributes, value)
+}
+
+///|
+/// Records the latest unsigned gauge value for an attribute set.
+pub fn UInt64Gauge::record(
+  self : UInt64Gauge,
+  value : UInt64,
+  attributes? : ArrayView[@common.KeyValue] = [],
+) -> Unit {
+  update_u64_gauge(self.state, attributes, value)
 }
 
 ///|
@@ -2335,6 +2843,16 @@ pub fn ObservableDoubleCounter::observe(
     return
   }
   update_double_sum(self.state, attributes, value)
+}
+
+///|
+/// Observes one unsigned value for an observable counter during callback execution.
+pub fn ObservableUInt64Counter::observe(
+  self : ObservableUInt64Counter,
+  value : UInt64,
+  attributes? : ArrayView[@common.KeyValue] = [],
+) -> Unit {
+  update_u64_sum(self.state, attributes, value)
 }
 
 ///|
@@ -2367,4 +2885,14 @@ pub fn ObservableGauge::observe(
   attributes? : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   update_gauge(self.state, attributes, value)
+}
+
+///|
+/// Observes one unsigned value for an observable gauge during callback execution.
+pub fn ObservableUInt64Gauge::observe(
+  self : ObservableUInt64Gauge,
+  value : UInt64,
+  attributes? : ArrayView[@common.KeyValue] = [],
+) -> Unit {
+  update_u64_gauge(self.state, attributes, value)
 }

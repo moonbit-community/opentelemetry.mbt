@@ -712,6 +712,31 @@ fn any_value_from_sdk(value : @common.Value) -> @otlpcommon.AnyValue {
 }
 
 ///|
+fn log_any_value_from_sdk(value : @sdklogs.AnyValue) -> @otlpcommon.AnyValue {
+  let value = match value {
+    @sdklogs.AnyValue::Bool(value) =>
+      @otlpcommon.AnyValue_Value::BoolValue(value)
+    @sdklogs.AnyValue::Int64(value) =>
+      @otlpcommon.AnyValue_Value::IntValue(value)
+    @sdklogs.AnyValue::Double(value) =>
+      @otlpcommon.AnyValue_Value::DoubleValue(value)
+    @sdklogs.AnyValue::String(value) =>
+      @otlpcommon.AnyValue_Value::StringValue(value)
+    @sdklogs.AnyValue::Bytes(value) =>
+      @otlpcommon.AnyValue_Value::BytesValue(value)
+    @sdklogs.AnyValue::Array(values) =>
+      @otlpcommon.AnyValue_Value::ArrayValue(
+        @otlpcommon.ArrayValue::new(values.map(log_any_value_from_sdk)),
+      )
+    @sdklogs.AnyValue::Map(values) =>
+      @otlpcommon.AnyValue_Value::KvlistValue(
+        @otlpcommon.KeyValueList::new(values.map(log_key_value_from_sdk)),
+      )
+  }
+  @otlpcommon.AnyValue::new(value~)
+}
+
+///|
 fn common_key_value_from_sdk(
   attribute : @common.KeyValue,
 ) -> @otlpcommon.KeyValue {
@@ -723,10 +748,28 @@ fn common_key_value_from_sdk(
 }
 
 ///|
+fn log_key_value_from_sdk(
+  attribute : @sdklogs.KeyValue,
+) -> @otlpcommon.KeyValue {
+  @otlpcommon.KeyValue::new(
+    attribute.key.as_string(),
+    log_any_value_from_sdk(attribute.value),
+    0,
+  )
+}
+
+///|
 fn otlp_attributes(
   attributes : ArrayView[@common.KeyValue],
 ) -> Array[@otlpcommon.KeyValue] {
   attributes.map(common_key_value_from_sdk)
+}
+
+///|
+fn otlp_log_attributes(
+  attributes : ArrayView[@sdklogs.KeyValue],
+) -> Array[@otlpcommon.KeyValue] {
+  attributes.map(log_key_value_from_sdk)
 }
 
 ///|
@@ -798,7 +841,7 @@ fn otlp_span_event(event : @sdktrace.SpanEvent) -> @otlptrace.Span_Event {
     to_uint64_non_negative(event.timestamp_unix_nano),
     event.name,
     otlp_attributes(event.attributes),
-    0U,
+    to_uint_non_negative(event.dropped_attributes_count),
   )
 }
 
@@ -810,7 +853,7 @@ fn otlp_span_link(link : @sdktrace.SpanLink) -> @otlptrace.Span_Link {
     span_context.span_id().bytes(),
     trace_state_header(span_context.trace_state()),
     otlp_attributes(link.attributes),
-    0U,
+    to_uint_non_negative(link.dropped_attributes_count),
     span_context_flags(span_context),
   )
 }
@@ -853,16 +896,52 @@ fn otlp_severity_number(
   match severity_number {
     Some(@sdklogs.SeverityNumber::Trace) =>
       @otlplogs.SeverityNumber::SEVERITY_NUMBER_TRACE
+    Some(@sdklogs.SeverityNumber::Trace2) =>
+      @otlplogs.SeverityNumber::SEVERITY_NUMBER_TRACE2
+    Some(@sdklogs.SeverityNumber::Trace3) =>
+      @otlplogs.SeverityNumber::SEVERITY_NUMBER_TRACE3
+    Some(@sdklogs.SeverityNumber::Trace4) =>
+      @otlplogs.SeverityNumber::SEVERITY_NUMBER_TRACE4
     Some(@sdklogs.SeverityNumber::Debug) =>
       @otlplogs.SeverityNumber::SEVERITY_NUMBER_DEBUG
+    Some(@sdklogs.SeverityNumber::Debug2) =>
+      @otlplogs.SeverityNumber::SEVERITY_NUMBER_DEBUG2
+    Some(@sdklogs.SeverityNumber::Debug3) =>
+      @otlplogs.SeverityNumber::SEVERITY_NUMBER_DEBUG3
+    Some(@sdklogs.SeverityNumber::Debug4) =>
+      @otlplogs.SeverityNumber::SEVERITY_NUMBER_DEBUG4
     Some(@sdklogs.SeverityNumber::Info) =>
       @otlplogs.SeverityNumber::SEVERITY_NUMBER_INFO
+    Some(@sdklogs.SeverityNumber::Info2) =>
+      @otlplogs.SeverityNumber::SEVERITY_NUMBER_INFO2
+    Some(@sdklogs.SeverityNumber::Info3) =>
+      @otlplogs.SeverityNumber::SEVERITY_NUMBER_INFO3
+    Some(@sdklogs.SeverityNumber::Info4) =>
+      @otlplogs.SeverityNumber::SEVERITY_NUMBER_INFO4
     Some(@sdklogs.SeverityNumber::Warn) =>
       @otlplogs.SeverityNumber::SEVERITY_NUMBER_WARN
+    Some(@sdklogs.SeverityNumber::Warn2) =>
+      @otlplogs.SeverityNumber::SEVERITY_NUMBER_WARN2
+    Some(@sdklogs.SeverityNumber::Warn3) =>
+      @otlplogs.SeverityNumber::SEVERITY_NUMBER_WARN3
+    Some(@sdklogs.SeverityNumber::Warn4) =>
+      @otlplogs.SeverityNumber::SEVERITY_NUMBER_WARN4
     Some(@sdklogs.SeverityNumber::Error) =>
       @otlplogs.SeverityNumber::SEVERITY_NUMBER_ERROR
+    Some(@sdklogs.SeverityNumber::Error2) =>
+      @otlplogs.SeverityNumber::SEVERITY_NUMBER_ERROR2
+    Some(@sdklogs.SeverityNumber::Error3) =>
+      @otlplogs.SeverityNumber::SEVERITY_NUMBER_ERROR3
+    Some(@sdklogs.SeverityNumber::Error4) =>
+      @otlplogs.SeverityNumber::SEVERITY_NUMBER_ERROR4
     Some(@sdklogs.SeverityNumber::Fatal) =>
       @otlplogs.SeverityNumber::SEVERITY_NUMBER_FATAL
+    Some(@sdklogs.SeverityNumber::Fatal2) =>
+      @otlplogs.SeverityNumber::SEVERITY_NUMBER_FATAL2
+    Some(@sdklogs.SeverityNumber::Fatal3) =>
+      @otlplogs.SeverityNumber::SEVERITY_NUMBER_FATAL3
+    Some(@sdklogs.SeverityNumber::Fatal4) =>
+      @otlplogs.SeverityNumber::SEVERITY_NUMBER_FATAL4
     None => @otlplogs.SeverityNumber::SEVERITY_NUMBER_UNSPECIFIED
   }
 }
@@ -883,13 +962,13 @@ fn otlp_log_record(record : @sdklogs.LogRecord) -> @otlplogs.LogRecord {
     to_uint64_non_negative(record.observed_timestamp_unix_nano),
     otlp_severity_number(record.severity_number),
     string_or_empty(record.severity_text),
-    any_value_from_sdk(record.body),
-    otlp_attributes(record.attributes),
+    log_any_value_from_sdk(record.body),
+    otlp_log_attributes(record.attributes),
     0U,
     flags,
     trace_id,
     span_id,
-    "",
+    string_or_empty(record.event_name),
   )
 }
 
@@ -915,12 +994,27 @@ fn metric_is_monotonic(kind : @sdkmetrics.InstrumentKind) -> Bool {
 }
 
 ///|
+fn sdkmetrics_number_to_double(number : @sdkmetrics.Number) -> Double {
+  match number {
+    @sdkmetrics.Number::Int64(value) => value.to_double()
+    @sdkmetrics.Number::UInt64(value) => value.to_double()
+    @sdkmetrics.Number::Double(value) => value
+  }
+}
+
+///|
 fn otlp_number_value(
   number : @sdkmetrics.Number,
 ) -> @otlpmetrics.NumberDataPoint_Value {
   match number {
     @sdkmetrics.Number::Int64(value) =>
       @otlpmetrics.NumberDataPoint_Value::AsInt(value)
+    @sdkmetrics.Number::UInt64(value) =>
+      if value <= 9223372036854775807UL {
+        @otlpmetrics.NumberDataPoint_Value::AsInt(value.reinterpret_as_int64())
+      } else {
+        @otlpmetrics.NumberDataPoint_Value::AsDouble(value.to_double())
+      }
     @sdkmetrics.Number::Double(value) =>
       @otlpmetrics.NumberDataPoint_Value::AsDouble(value)
   }
@@ -952,13 +1046,13 @@ fn otlp_histogram_point(
     start_time_unix_nano: 0UL,
     time_unix_nano: to_uint64_non_negative(metric.time_unix_nano),
     count,
-    sum: Some(summary.sum),
+    sum: Some(sdkmetrics_number_to_double(summary.sum)),
     bucket_counts: [count],
     explicit_bounds: [],
     exemplars: [],
     flags: 0U,
-    min: summary.min,
-    max: summary.max,
+    min: summary.min.map(value => sdkmetrics_number_to_double(value)),
+    max: summary.max.map(value => sdkmetrics_number_to_double(value)),
   }
 }
 
@@ -1098,22 +1192,119 @@ fn build_trace_request(
 }
 
 ///|
+priv struct LogsRequestGroup {
+  resource_key : String
+  scope_key : String
+  resource : @otlpresource.Resource
+  resource_schema_url : String
+  scope : @otlpcommon.InstrumentationScope
+  scope_schema_url : String
+  log_records : Array[@otlplogs.LogRecord]
+}
+
+///|
+fn resource_identity(resource : @resource.Resource) -> String {
+  let builder = StringBuilder::new()
+  builder.write_string(string_or_empty(resource.schema_url()))
+  let attributes = resource.attributes()
+  let keys = sorted_strings(attributes.keys().to_array())
+  for key in keys {
+    guard attributes.get(key) is Some(value)
+    builder.write_char('|')
+    builder.write_string(key)
+    builder.write_char('=')
+    builder.write_string(value.to_json().stringify())
+  }
+  builder.to_string()
+}
+
+///|
+fn scope_identity(
+  instrumentation_scope : @common.InstrumentationScope,
+  target : String?,
+) -> String {
+  match target {
+    Some(target) => "target|\{target}"
+    None => {
+      let builder = StringBuilder::new()
+      builder.write_string(instrumentation_scope.name())
+      builder.write_char('|')
+      builder.write_string(string_or_empty(instrumentation_scope.version()))
+      builder.write_char('|')
+      builder.write_string(string_or_empty(instrumentation_scope.schema_url()))
+      for attribute in otlp_attributes(instrumentation_scope.attributes()) {
+        builder.write_char('|')
+        builder.write_string(attribute.key)
+        builder.write_char('=')
+        builder.write_string(attribute.value.to_json().stringify())
+      }
+      builder.to_string()
+    }
+  }
+}
+
+///|
+fn log_scope(record : @sdklogs.LogRecord) -> @otlpcommon.InstrumentationScope {
+  match record.target {
+    Some(target) => @otlpcommon.InstrumentationScope::new(target, "", [], 0U)
+    None => otlp_scope(record.instrumentation_scope)
+  }
+}
+
+///|
+fn log_scope_schema_url(record : @sdklogs.LogRecord) -> String {
+  match record.target {
+    Some(_) => ""
+    None => string_or_empty(record.instrumentation_scope.schema_url())
+  }
+}
+
+///|
 fn build_logs_request(
   batch : ArrayView[@sdklogs.LogRecord],
 ) -> @collectorlogs.ExportLogsServiceRequest {
-  let resource_logs = []
+  let groups : Array[Ref[LogsRequestGroup]] = []
   for record in batch {
+    let resource_key = resource_identity(record.resource)
+    let scope_key = scope_identity(record.instrumentation_scope, record.target)
+    let otlp_record = otlp_log_record(record)
+    let mut matched_group : Ref[LogsRequestGroup]? = None
+    for group in groups {
+      if group.val.resource_key == resource_key &&
+        group.val.scope_key == scope_key {
+        matched_group = Some(group)
+        break
+      }
+    }
+    match matched_group {
+      Some(group) => group.val.log_records.push(otlp_record)
+      None =>
+        groups.push(
+          Ref::new({
+            resource_key,
+            scope_key,
+            resource: otlp_resource(record.resource),
+            resource_schema_url: string_or_empty(record.resource.schema_url()),
+            scope: log_scope(record),
+            scope_schema_url: log_scope_schema_url(record),
+            log_records: [otlp_record],
+          }),
+        )
+    }
+  }
+  let resource_logs = []
+  for group in groups {
     resource_logs.push(
       @otlplogs.ResourceLogs::new(
-        otlp_resource(record.resource),
+        group.val.resource,
         [
           @otlplogs.ScopeLogs::new(
-            otlp_scope(record.instrumentation_scope),
-            [otlp_log_record(record)],
-            string_or_empty(record.instrumentation_scope.schema_url()),
+            group.val.scope,
+            group.val.log_records,
+            group.val.scope_schema_url,
           ),
         ],
-        string_or_empty(record.resource.schema_url()),
+        group.val.resource_schema_url,
       ),
     )
   }

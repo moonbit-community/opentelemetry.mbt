@@ -31,7 +31,7 @@ pub struct LogRecord {
   mut severity_text : String?
   mut severity_number : Severity?
   mut body : AnyValue?
-  attributes : Array[@common.KeyValue]
+  attributes : Array[@moonbit-community/opentelemetry/sdk/logs.KeyValue]
   mut trace_context : @common.SpanContext?
 } derive(Eq, ToJson, @debug.Debug)
 pub fn LogRecord::add_attribute(Self, StringView, AnyValue) -> Unit

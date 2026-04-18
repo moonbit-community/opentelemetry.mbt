@@ -13,8 +13,7 @@ the SDK but keeps a signal-specific surface for applications and bridges.
 
 ## Value mapping
 
-- `AnyValue::Map` is serialized to a JSON string before it is bridged into the
-  SDK attribute model.
+- `AnyValue::Map` stays structured when it is bridged into the SDK and OTLP.
 - `Severity::name()` returns the canonical uppercase severity text, such as
   `ERROR3` or `INFO`.
 
@@ -23,9 +22,9 @@ the SDK but keeps a signal-specific surface for applications and bridges.
 - `LogRecord::new()`:
   creates an empty mutable record
 - `set_event_name(name)`:
-  stores the event name; export turns it into `log.event_name`
+  stores the event name for the OTLP `event_name` field
 - `set_target(target)`:
-  stores the target; export turns it into `log.target`
+  stores the target used for export-time scope grouping
 - `set_timestamp(ts)`:
   sets the event timestamp in Unix nanoseconds
 - `set_observed_timestamp(ts)`:

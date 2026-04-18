@@ -35,9 +35,15 @@ variables:
 - attributes per span
 - events per span
 - links per span
+- attributes per event
+- attributes per link
 
 When a limit is exceeded, new items are dropped and the corresponding dropped
-count is incremented in `SpanData`.
+count is incremented in `SpanData`. Event and link attribute truncation also
+updates the per-item dropped attribute counts exported through OTLP.
+
+`Span::set_status()` follows the OpenTelemetry precedence order
+`Ok > Error > Unset`.
 
 ## Batch processing
 

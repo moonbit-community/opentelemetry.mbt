@@ -16,6 +16,60 @@ fn sum_double(
 }
 
 ///|
+fn sum_u64(
+  metrics : Array[@sdkmetrics.MetricData],
+  name : StringView,
+) -> UInt64? {
+  for metric in metrics {
+    if metric.name == name.to_string() {
+      match metric.aggregation {
+        @sdkmetrics.Aggregation::Sum(@sdkmetrics.Number::UInt64(value)) =>
+          return Some(value)
+        _ => return None
+      }
+    }
+  }
+  None
+}
+
+///|
+fn gauge_u64(
+  metrics : Array[@sdkmetrics.MetricData],
+  name : StringView,
+) -> UInt64? {
+  for metric in metrics {
+    if metric.name == name.to_string() {
+      match metric.aggregation {
+        @sdkmetrics.Aggregation::Gauge(@sdkmetrics.Number::UInt64(value)) =>
+          return Some(value)
+        _ => return None
+      }
+    }
+  }
+  None
+}
+
+///|
+fn histogram_sum_u64(
+  metrics : Array[@sdkmetrics.MetricData],
+  name : StringView,
+) -> UInt64? {
+  for metric in metrics {
+    if metric.name == name.to_string() {
+      match metric.aggregation {
+        @sdkmetrics.Aggregation::Histogram(summary) =>
+          match summary.sum {
+            @sdkmetrics.Number::UInt64(value) => return Some(value)
+            _ => return None
+          }
+        _ => return None
+      }
+    }
+  }
+  None
+}
+
+///|
 test "wrapper floating-point counters use sdk-backed double sums" {
   let reader = @sdkmetrics.ManualReader::builder().build()
   let provider = MeterProvider::from_sdk(
@@ -46,4 +100,40 @@ test "wrapper floating-point counters use sdk-backed double sums" {
   current_rate.val = 2.75
   let second = reader.collect()
   assert_eq(sum_double(second, "rate"), Some(2.75))
+}
+
+///|
+test "wrapper u64 instruments preserve full range" {
+  let reader = @sdkmetrics.ManualReader::builder().build()
+  let provider = MeterProvider::from_sdk(
+    @sdkmetrics.SdkMeterProvider::builder().with_reader(reader).build(),
+  )
+  let meter = provider.meter("wrapper-u64")
+  let counter = meter.u64_counter("bytes").build()
+  let histogram = meter.u64_histogram("payload").build()
+  let gauge = meter.u64_gauge("load").build()
+  let current = Ref::new(9223372036854775809UL)
+  ignore(
+    meter
+    .u64_observable_counter("rate")
+    .with_callback(observer => observer.observe(current.val))
+    .build(),
+  )
+  ignore(
+    meter
+    .u64_observable_gauge("current")
+    .with_callback(observer => observer.observe(current.val))
+    .build(),
+  )
+
+  counter.add(current.val)
+  histogram.record(current.val)
+  gauge.record(current.val)
+
+  let metrics = reader.collect()
+  assert_eq(sum_u64(metrics, "bytes"), Some(current.val))
+  assert_eq(histogram_sum_u64(metrics, "payload"), Some(current.val))
+  assert_eq(gauge_u64(metrics, "load"), Some(current.val))
+  assert_eq(sum_u64(metrics, "rate"), Some(current.val))
+  assert_eq(gauge_u64(metrics, "current"), Some(current.val))
 }

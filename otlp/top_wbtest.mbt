@@ -93,20 +93,42 @@ async fn sample_span_data() -> @sdktrace.SpanData {
 
 ///|
 fn sample_log_record() -> @sdklogs.LogRecord {
+  sample_log_record_with_timestamp(300L, 301L)
+}
+
+///|
+fn sample_log_record_with_timestamp(
+  timestamp_unix_nano : Int64,
+  observed_timestamp_unix_nano : Int64,
+) -> @sdklogs.LogRecord {
   @sdklogs.LogRecord::new(
-    @common.Value::String("request failed"),
-    severity_number=Some(@sdklogs.SeverityNumber::Error),
-    severity_text=Some("ERROR"),
+    @sdklogs.AnyValue::Map([
+      @sdklogs.KeyValue::new(
+        "message",
+        @sdklogs.AnyValue::String("request failed"),
+      ),
+      @sdklogs.KeyValue::new(
+        "codes",
+        @sdklogs.AnyValue::Array([
+          @sdklogs.AnyValue::Int64(7L),
+          @sdklogs.AnyValue::Int64(9L),
+        ]),
+      ),
+    ]),
+    severity_number=Some(@sdklogs.SeverityNumber::Error3),
+    severity_text=Some("ERROR3"),
+    event_name=Some("checkout.failed"),
+    target=Some("my-target"),
     attributes=[
-      @common.KeyValue::new("http.status_code", @common.Value::Int64(500L)),
+      @sdklogs.KeyValue::new("http.status_code", @sdklogs.AnyValue::Int64(500L)),
     ],
     trace_context=Some(
       sample_span_context(
         "4bf92f3577b34da6a3ce929d0e0e4736", "00f067aa0ba902b7",
       ),
     ),
-    timestamp_unix_nano=300L,
-    observed_timestamp_unix_nano=301L,
+    timestamp_unix_nano~,
+    observed_timestamp_unix_nano~,
     resource=sample_resource(),
     instrumentation_scope=sample_scope(),
   )
@@ -314,19 +336,21 @@ async test "trace request json roundtrips" {
 test "logs request encodes severity and trace context" {
   let request = build_logs_request([sample_log_record()])
   assert_eq(request.resource_logs.length(), 1)
+  assert_eq(request.resource_logs[0].scope_logs[0].scope.name, "my-target")
   let record = request.resource_logs[0].scope_logs[0].log_records[0]
   assert_true(
-    record.severity_number == @otlplogs.SeverityNumber::SEVERITY_NUMBER_ERROR,
+    record.severity_number == @otlplogs.SeverityNumber::SEVERITY_NUMBER_ERROR3,
   )
-  assert_eq(record.severity_text, "ERROR")
+  assert_eq(record.severity_text, "ERROR3")
+  assert_eq(record.event_name, "checkout.failed")
   assert_eq(record.attributes.length(), 1)
   assert_true(record.trace_id.length() == 16)
   assert_true(record.span_id.length() == 8)
   assert_true((record.flags & 0x1U) == 0x1U)
-  guard record.body.value is @otlpcommon.AnyValue_Value::StringValue(body) else {
-    fail("expected log body to be encoded as string")
+  guard record.body.value is @otlpcommon.AnyValue_Value::KvlistValue(body) else {
+    fail("expected log body to be encoded as a structured map")
   }
-  assert_eq(body, "request failed")
+  assert_eq(body.values.length(), 2)
 }
 
 ///|
@@ -338,8 +362,20 @@ test "logs request json roundtrips" {
     Err(message) => fail("expected valid logs json payload: \{message}")
   }
   let record = request.resource_logs[0].scope_logs[0].log_records[0]
-  assert_eq(record.severity_text, "ERROR")
+  assert_eq(record.severity_text, "ERROR3")
+  assert_eq(record.event_name, "checkout.failed")
   assert_eq(record.attributes.length(), 1)
+}
+
+///|
+test "logs request groups identical target and resource into one scope" {
+  let first = sample_log_record()
+  let second = sample_log_record_with_timestamp(302L, 303L)
+  let request = build_logs_request([first, second])
+  assert_eq(request.resource_logs.length(), 1)
+  assert_eq(request.resource_logs[0].scope_logs.length(), 1)
+  assert_eq(request.resource_logs[0].scope_logs[0].log_records.length(), 2)
+  assert_eq(request.resource_logs[0].scope_logs[0].scope.name, "my-target")
 }
 
 ///|
