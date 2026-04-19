@@ -1,6 +1,6 @@
 {
   "name": "moonbit-community/opentelemetry",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "deps": {
     "moonbitlang/async": "0.17.1",
     "moonbitlang/protobuf": "0.1.0"
@@ -10,5 +10,6 @@
   "license": "Apache-2.0",
   "keywords": [],
   "description": "The MoonBit implementation of OpenTelemetry.",
-  "preferred-target": "native"
+  "preferred-target": "native",
+  "exclude": ["integration"]
 }
