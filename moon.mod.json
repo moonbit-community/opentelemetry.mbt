@@ -6,9 +6,9 @@
     "moonbitlang/protobuf": "0.1.0"
   },
   "readme": "README.mbt.md",
-  "repository": "",
+  "repository": "https://github.com/moonbit-community/opentelemetry.mbt",
   "license": "Apache-2.0",
   "keywords": [],
-  "description": "",
+  "description": "The MoonBit implementation of OpenTelemetry.",
   "preferred-target": "native"
 }

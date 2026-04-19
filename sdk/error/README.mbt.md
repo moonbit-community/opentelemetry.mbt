@@ -6,8 +6,10 @@ and providers.
 ## Error model
 
 - `AlreadyShutdown`: an operation was attempted after shutdown completed
-- `Timeout`: a flush or shutdown path exceeded its timeout budget
-- `InvalidArgument`: invalid configuration or invalid user input
+- `Timeout`: reserved for timeout-aware implementations; the built-in exporters
+  and providers in this repository do not currently emit it
+- `InvalidArgument`: reserved for invalid user input; the built-in exporters and
+  providers in this repository do not currently emit it
 - `InternalFailure`: implementation or runtime failure
 - `ExportFailure`: exporter-specific failure with exporter name and message
 

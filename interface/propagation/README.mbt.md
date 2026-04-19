@@ -10,8 +10,9 @@ HTTP headers.
 - `Extractor`:
   read side of an inbound carrier
 
-`Map[String, String]` implements both traits. Keys are normalized to lowercase
-by that implementation, which makes it convenient for HTTP-style headers.
+`Map[String, String]` implements both traits. When used through `Injector`, keys
+are normalized to lowercase. When used through `Extractor`, lookups are
+case-insensitive, which makes the map convenient for HTTP-style headers.
 
 ## `TextMapPropagator`
 
@@ -31,7 +32,8 @@ by that implementation, which makes it convenient for HTTP-style headers.
 - `inject_context(context, injector)`:
   serializes baggage into the carrier
 - `extract_with_context(context, extractor)`:
-  parses baggage and merges it into the supplied context
+  parses baggage and merges it into the supplied context; extracted entries
+  overwrite existing baggage entries with the same key
 - `into_text_map()`:
   erases the concrete type into `TextMapPropagator`
 

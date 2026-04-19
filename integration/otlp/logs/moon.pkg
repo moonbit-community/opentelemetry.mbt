@@ -1,0 +1,21 @@
+import {
+  "moonbitlang/async" @async,
+  "moonbitlang/core/debug",
+  "moonbitlang/core/env" @env,
+  "moonbit-community/opentelemetry" @otel,
+  "moonbit-community/opentelemetry/interface/global" @global,
+  "moonbit-community/opentelemetry/interface/logs" @ilogs,
+  "moonbit-community/opentelemetry/otlp" @otlp,
+  "moonbit-community/opentelemetry/protocol/common/v1" @otlp_common,
+  "moonbit-community/opentelemetry/protocol/logs/v1" @otlp_logs,
+  "moonbit-community/opentelemetry/sdk" @sdk,
+  "moonbit-community/opentelemetry/sdk/error" @error,
+  "moonbit-community/opentelemetry/sdk/logs" @sdklogs,
+  "moonbit-community/opentelemetry/sdk/resource" @resource,
+  "moonbit-community/opentelemetry-integration-otlp/support" @support,
+} for "test"
+
+options(
+  backend: [ "native" ],
+  "max-concurrent-tests": 1,
+)

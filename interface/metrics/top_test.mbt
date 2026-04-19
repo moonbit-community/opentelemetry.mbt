@@ -70,6 +70,8 @@ fn histogram_sum_u64(
 }
 
 ///|
+// Test target: Verify wrapper floating-point instruments map onto the SDK's double-valued sums and observable callbacks.
+// Test method: Record synchronous and observable values, collect twice, and assert the exported sums match the current readings.
 test "wrapper floating-point counters use sdk-backed double sums" {
   let reader = @sdkmetrics.ManualReader::builder().build()
   let provider = MeterProvider::from_sdk(
@@ -103,6 +105,8 @@ test "wrapper floating-point counters use sdk-backed double sums" {
 }
 
 ///|
+// Test target: Verify wrapper u64 instruments preserve values across the full unsigned range.
+// Test method: Record and observe a large u64 value through multiple instrument kinds, then assert every exported aggregate matches it.
 test "wrapper u64 instruments preserve full range" {
   let reader = @sdkmetrics.ManualReader::builder().build()
   let provider = MeterProvider::from_sdk(

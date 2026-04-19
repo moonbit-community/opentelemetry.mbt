@@ -1,4 +1,5 @@
 import {
+  "moonbit-community/opentelemetry/sdk" @sdk,
   "moonbit-community/opentelemetry/semantics/attribute" @attribute,
   "moonbit-community/opentelemetry/semantics/metric" @metric,
   "moonbit-community/opentelemetry/semantics/resource" @resource,

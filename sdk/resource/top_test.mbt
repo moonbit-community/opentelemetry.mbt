@@ -7,6 +7,8 @@ fn restore_env_var(key : String, value : String?) -> Unit {
 }
 
 ///|
+// Test target: Verify the environment resource detector reads standard OpenTelemetry resource variables.
+// Test method: Set OTEL environment variables, detect a resource, and assert the expected attributes are present with the configured values.
 test "env resource detector reads process environment" {
   let original_service_name = @env.get_env_var("OTEL_SERVICE_NAME")
   let original_resource_attributes = @env.get_env_var(

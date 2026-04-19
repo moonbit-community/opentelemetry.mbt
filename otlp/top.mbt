@@ -1103,8 +1103,98 @@ fn[T : @protobuf.Write] encode_protobuf(message : T) -> Result[Bytes, String] {
 }
 
 ///|
+fn encode_trace_id_json(value : String) -> Json {
+  let bytes = @protobuf.base64_decode(value)
+  match @common.TraceId::from_bytes(bytes) {
+    Some(trace_id) => Json::string(trace_id.to_hex())
+    None => Json::string(value)
+  }
+}
+
+///|
+fn encode_span_id_json(value : String, allow_empty : Bool) -> Json {
+  if allow_empty && value == "" {
+    return Json::string("")
+  }
+  let bytes = @protobuf.base64_decode(value)
+  match @common.SpanId::from_bytes(bytes) {
+    Some(span_id) => Json::string(span_id.to_hex())
+    None => Json::string(value)
+  }
+}
+
+///|
+fn decode_trace_id_json(value : String) -> Json {
+  match @common.TraceId::from_hex(value) {
+    Some(trace_id) => Json::string(@protobuf.base64_encode(trace_id.bytes()))
+    None => Json::string(value)
+  }
+}
+
+///|
+fn decode_span_id_json(value : String, allow_empty : Bool) -> Json {
+  if allow_empty && value == "" {
+    return Json::string("")
+  }
+  match @common.SpanId::from_hex(value) {
+    Some(span_id) => Json::string(@protobuf.base64_encode(span_id.bytes()))
+    None => Json::string(value)
+  }
+}
+
+///|
+fn normalize_otlp_http_json_request(json : Json) -> Json {
+  match json {
+    Object(obj) => {
+      let normalized : Map[String, Json] = {}
+      for key, value in obj {
+        normalized[key] = match value {
+          String(value) =>
+            match key {
+              "traceId" => encode_trace_id_json(value)
+              "spanId" => encode_span_id_json(value, false)
+              "parentSpanId" => encode_span_id_json(value, true)
+              _ => Json::string(value)
+            }
+          _ => normalize_otlp_http_json_request(value)
+        }
+      }
+      Json::object(normalized)
+    }
+    Array(values) =>
+      Json::array(values.map(value => normalize_otlp_http_json_request(value)))
+    _ => json
+  }
+}
+
+///|
+fn normalize_otlp_http_json_response(json : Json) -> Json {
+  match json {
+    Object(obj) => {
+      let normalized : Map[String, Json] = {}
+      for key, value in obj {
+        normalized[key] = match value {
+          String(value) =>
+            match key {
+              "traceId" => decode_trace_id_json(value)
+              "spanId" => decode_span_id_json(value, false)
+              "parentSpanId" => decode_span_id_json(value, true)
+              _ => Json::string(value)
+            }
+          _ => normalize_otlp_http_json_response(value)
+        }
+      }
+      Json::object(normalized)
+    }
+    Array(values) =>
+      Json::array(values.map(value => normalize_otlp_http_json_response(value)))
+    _ => json
+  }
+}
+
+///|
 fn[T : ToJson] encode_json_message(message : T) -> Bytes {
-  message.to_json().stringify() |> @utf8.encode
+  @utf8.encode(normalize_otlp_http_json_request(message.to_json()).stringify())
 }
 
 ///|
@@ -1116,7 +1206,7 @@ fn[T : @json.FromJson] decode_json_message(bytes : Bytes) -> Result[T, String] {
     _ => return Err("response body is not valid json")
   }
   try {
-    let message : T = @json.from_json(json)
+    let message : T = @json.from_json(normalize_otlp_http_json_response(json))
     Ok(message)
   } catch {
     _ => Err("response body does not match OTLP json schema")

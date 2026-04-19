@@ -1,4 +1,6 @@
 ///|
+// Test target: Verify the noop tracer creates non-recording child spans while still propagating the parent trace identity.
+// Test method: Start a child span from a remote parent context and assert recording stays disabled while the trace ID is preserved.
 test "noop tracer propagates parent span context without recording" {
   guard @common.TraceId::from_hex("4bf92f3577b34da6a3ce929d0e0e4736")
     is Some(trace_id) else {
@@ -22,6 +24,8 @@ test "noop tracer propagates parent span context without recording" {
 }
 
 ///|
+// Test target: Verify builder-supplied events and links retain dropped-attribute accounting when SDK limits are applied.
+// Test method: Build a span with oversized event and link attributes, export it, and assert the remaining attributes and drop counts.
 async test "builder events and links preserve dropped attribute counts" {
   let exporter = @sdktrace.InMemorySpanExporter::new()
   let provider = TracerProvider::from_sdk(

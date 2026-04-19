@@ -1,4 +1,6 @@
 ///|
+// Test target: Verify interface-level log records preserve severity, event metadata, and structured payloads when forwarded to the SDK.
+// Test method: Emit a structured record through the wrapper logger and assert the in-memory exporter retains the expected fields and map values.
 async test "logger record preserves full severity and structured fields" {
   let exporter = @sdklogs.InMemoryLogExporter::new()
   let provider = LoggerProvider::from_sdk(
