@@ -1,7 +1,6 @@
 # OpenTelemetry for MoonBit
 
-This repository is the MoonBit implementation of OpenTelemetry. It follows the
-same broad split as `opentelemetry-rust`:
+The MoonBit implementation of OpenTelemetry.
 
 - public API packages for instrumentation
 - SDK packages for providers, processors, readers, and resources
@@ -40,27 +39,25 @@ Two important defaults:
 - The default global text-map propagator is a composite of W3C trace-context
   and baggage propagation.
 
+When you obtain instruments from the root package or `interface/*`, register
+providers through `interface/global`. `sdk/global` drives the SDK-only helper
+functions such as `sdk.tracer()`.
+
 ## Minimal tracing example
 
-```moonbit nocheck
-import {
-  "moonbit-community/opentelemetry" @otel,
-  "moonbit-community/opentelemetry/print" @print,
-  "moonbit-community/opentelemetry/sdk" @sdk,
-  "moonbit-community/opentelemetry/sdk/global" @sdkglobal,
-}
-
-async fn main {
+```mbt check
+///|
+async fn _minimal_tracing_example() -> Unit {
   let exporter = @print.SpanExporter::new()
   let provider = @sdk.tracer_provider_builder()
     .with_simple_exporter(exporter.into_span_exporter())
     .build()
 
-  @sdkglobal.set_tracer_provider(provider)
+  @global.set_tracer_provider(@trace.TracerProvider::from_sdk(provider))
 
-  let tracer = @otel.tracer("example-service", version=Some("1.0.0"))
-  let span = tracer.start("startup")
-  span.set_attribute(@sdk.KeyValue::new("component", @sdk.Value::String("cli")))
+  let otel_tracer = tracer("example-service", version=Some("1.0.0"))
+  let span = otel_tracer.start("startup")
+  span.set_attribute(KeyValue::new("component", Value::String("cli")))
   span.end()
 
   ignore(provider.shutdown())
@@ -80,12 +77,11 @@ Use `spawn_background_tasks()` when you configure:
 
 Example shape:
 
-```moonbit nocheck
-@async.with_task_group(group => {
-  @sdkglobal.spawn_background_tasks(group)
-  // application work
-  ignore(@sdkglobal.shutdown())
-})
+```mbt check
+///|
+async fn _background_work_shape() -> Unit {
+  @async.with_task_group(group => @sdk.spawn_background_tasks(group))
+}
 ```
 
 ## Signal-specific notes
@@ -102,8 +98,8 @@ Example shape:
 
 - `Logger::create_log_record()` returns a mutable record builder.
 - `Logger::emit()` fills in missing timestamps with `now`.
-- `event_name` and `target` are exported as synthetic attributes:
-  `log.event_name` and `log.target`.
+- `event_name` is exported to the OTLP `event_name` field.
+- `target` is used for export-time log scope grouping.
 
 ### Metrics
 
@@ -139,18 +135,11 @@ The semantic-convention packages are generated from upstream OpenTelemetry
 semantic-convention data. Use them to avoid hard-coding attribute keys and
 metric names:
 
-```moonbit nocheck
-import {
-  "moonbit-community/opentelemetry/sdk" @sdk,
-  "moonbit-community/opentelemetry/semantics/trace" @semtrace,
+```mbt check
+///|
+fn _semantic_convention_attrs() -> Array[KeyValue] {
+  [KeyValue::new(@semtrace.HTTP_REQUEST_METHOD, Value::String("GET"))]
 }
-
-let attrs = [
-  @sdk.KeyValue::new(
-    @semtrace.HTTP_REQUEST_METHOD,
-    @sdk.Value::String("GET"),
-  ),
-]
 ```
 
 ## Where to read next
@@ -162,3 +151,10 @@ let attrs = [
 - [`interface/propagation/README.mbt.md`](interface/propagation/README.mbt.md): propagation API
 - [`otlp/README.mbt.md`](otlp/README.mbt.md): OTLP exporter behavior
 - [`print/README.mbt.md`](print/README.mbt.md): stdout exporter behavior
+
+## Integration tests
+
+Collector-backed OTLP integration tests live in [`integration/otlp/README.md`](integration/otlp/README.md)
+and run through the helper scripts
+`integration/otlp/scripts/test_with_docker.mjs` or
+`integration/otlp/scripts/test_with_binary.mjs`.

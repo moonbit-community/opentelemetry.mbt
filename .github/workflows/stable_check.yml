@@ -1,0 +1,58 @@
+name: check
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  check:
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-latest
+    continue-on-error: false
+    env:
+      OTEL_COLLECTOR_IMAGE: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.150.1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: install
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+
+      - name: node / docker version
+        run: |
+          node --version
+          docker version
+          docker pull "$OTEL_COLLECTOR_IMAGE"
+
+      - name: moon version
+        run: |
+          moon version --all
+
+      - name: moon update
+        run: |
+          moon update
+          moon -C integration/otlp update
+
+      - name: moon check
+        run: moon check
+
+      - name: format diff
+        run: |
+          moon fmt
+          git diff --exit-code
+      
+      - name: moon test
+        run: |
+          moon test
+
+      - name: opentelemetry integration test
+        run: |
+          node integration/otlp/scripts/test_with_docker.mjs

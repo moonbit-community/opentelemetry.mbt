@@ -7,6 +7,8 @@ fn restore_env_var(key : String, value : String?) -> Unit {
 }
 
 ///|
+// Test target: Verify emitted SDK log records preserve trace context, severity, and attributes in exported output.
+// Test method: Emit one log record with an explicit span context into an in-memory exporter and assert the exported fields match.
 async test "logger exports trace-aware log records" {
   guard @common.TraceId::from_hex("4bf92f3577b34da6a3ce929d0e0e4736")
     is Some(trace_id) else {
@@ -52,6 +54,8 @@ async test "logger exports trace-aware log records" {
 }
 
 ///|
+// Test target: Verify the batch log processor flushes queued records once the scheduled delay elapses.
+// Test method: Spawn the processor background tasks, emit one record, wait past the delay, and assert the exporter received it.
 async test "batch log processor flushes on scheduled delay in background" {
   let exporter = InMemoryLogExporter::new()
   let provider = SdkLoggerProvider::builder()
@@ -75,6 +79,8 @@ async test "batch log processor flushes on scheduled delay in background" {
 }
 
 ///|
+// Test target: Verify the default batch log processor configuration is sourced from the documented environment variables.
+// Test method: Override the environment variables before constructing the default config and assert the parsed values are applied.
 test "default batch log config reads environment variables" {
   let original_schedule_delay = @env.get_env_var("OTEL_BLRP_SCHEDULE_DELAY")
   let original_export_timeout = @env.get_env_var("OTEL_BLRP_EXPORT_TIMEOUT")
@@ -98,6 +104,8 @@ test "default batch log config reads environment variables" {
 }
 
 ///|
+// Test target: Verify shutdown_with_timeout closes the logger provider and keeps it unavailable for later shutdown calls.
+// Test method: Shut the provider down with a timeout, then call shutdown again and assert the already-shutdown error is returned.
 async test "logger provider shutdown with timeout marks provider unavailable" {
   let exporter = InMemoryLogExporter::new()
   let provider = SdkLoggerProvider::builder()

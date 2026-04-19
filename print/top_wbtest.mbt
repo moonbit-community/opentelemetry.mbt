@@ -134,6 +134,8 @@ fn counter_sum(
 }
 
 ///|
+// Test target: Verify span batch rendering includes the expected resource, scope, event, link, and status details.
+// Test method: Render a representative exported span batch to text and assert the output contains the key serialized fields.
 async test "render span batch includes resource scope event and link" {
   let rendered = render_span_batch([sample_span_data()], true)
   assert_true(rendered.contains("Spans"))
@@ -148,6 +150,8 @@ async test "render span batch includes resource scope event and link" {
 }
 
 ///|
+// Test target: Verify log batch rendering includes trace correlation fields, severity data, and structured attributes.
+// Test method: Render a representative log batch and assert the textual output contains the expected identifiers and payload fields.
 test "render log batch includes trace context and severity" {
   let rendered = render_log_batch([sample_log_record()], true)
   assert_true(rendered.contains("Logs"))
@@ -160,6 +164,8 @@ test "render log batch includes trace context and severity" {
 }
 
 ///|
+// Test target: Verify metric batch rendering includes metric identity and aggregation details.
+// Test method: Render a collected metric batch and assert the output mentions the metric name, aggregation kind, and attributes.
 test "render metric batch includes aggregation details" {
   let rendered = render_metric_batch([sample_metric_data()])
   assert_true(rendered.contains("Metrics"))
@@ -171,6 +177,8 @@ test "render metric batch includes aggregation details" {
 }
 
 ///|
+// Test target: Verify the print package exporters reject additional exports after shutdown.
+// Test method: Shut down each exporter type first, then call export_batch and assert the already-shutdown error is returned.
 async test "sdk exporters reject exports after shutdown" {
   let span_exporter = SpanExporter::new().into_span_exporter()
   guard span_exporter.shutdown() is Ok(_) else {
@@ -201,6 +209,8 @@ async test "sdk exporters reject exports after shutdown" {
 }
 
 ///|
+// Test target: Verify a metric exporter's configured temporality is preserved when it is converted into a periodic reader.
+// Test method: Build a delta exporter, collect twice through the derived reader, and assert the observed counter values are delta snapshots.
 test "metric exporter builder temporality feeds periodic reader" {
   let exporter = MetricExporter::builder()
     .with_temporality(@sdkmetrics.Temporality::Delta)

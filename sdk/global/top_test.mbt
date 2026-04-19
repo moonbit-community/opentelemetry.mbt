@@ -1,4 +1,6 @@
 ///|
+// Test target: Verify the SDK-level global tracer provider can be replaced for subsequent root API calls.
+// Test method: Install an in-memory provider globally, create a span through the global tracer helper, and assert one span is exported.
 async test "global tracer provider can be replaced" {
   reset_for_test()
 
@@ -17,6 +19,8 @@ async test "global tracer provider can be replaced" {
 }
 
 ///|
+// Test target: Verify the global background-task runner drives both batch span export and periodic metric export.
+// Test method: Register batch and periodic providers, spawn the shared background tasks, then assert spans and metrics are exported asynchronously.
 async test "global background tasks drive batch and periodic exporters" {
   reset_for_test()
 

@@ -21,12 +21,11 @@ from upstream OpenTelemetry semantic-convention data.
 Use these constants anywhere you would otherwise hard-code an attribute key or
 metric name:
 
-```moonbit nocheck
+```mbt check
 ///|
-let attr = @sdk.KeyValue::new(
-  @semtrace.HTTP_REQUEST_METHOD,
-  @sdk.Value::String("GET"),
-)
+fn _trace_attr_example() -> @sdk.KeyValue {
+  @sdk.KeyValue::new(@trace.HTTP_REQUEST_METHOD, @sdk.Value::String("GET"))
+}
 ```
 
 ## Generation model

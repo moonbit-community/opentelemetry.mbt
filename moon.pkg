@@ -9,6 +9,13 @@ import {
   "moonbit-community/opentelemetry/sdk/common" @common,
 }
 
+import {
+  "moonbitlang/async" @async,
+  "moonbit-community/opentelemetry/print" @print,
+  "moonbit-community/opentelemetry/sdk" @sdk,
+  "moonbit-community/opentelemetry/semantics/trace" @semtrace,
+} for "test"
+
 options(
   backend: [ "native" ],
 )

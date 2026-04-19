@@ -26,13 +26,48 @@ fn normalize_ascii_lower(value : StringView) -> String {
 }
 
 ///|
+fn get_case_insensitive(
+  values : Map[String, String],
+  key : StringView,
+) -> String? {
+  let normalized_key = normalize_ascii_lower(key)
+  match values.get_from_string(normalized_key) {
+    Some(value) => Some(value)
+    None => {
+      for candidate_key, candidate_value in values {
+        if normalize_ascii_lower(candidate_key) == normalized_key {
+          return Some(candidate_value)
+        }
+      }
+      None
+    }
+  }
+}
+
+///|
 pub impl Injector for Map[String, String] with set(self, key, value) {
   self[normalize_ascii_lower(key)] = value
 }
 
 ///|
 pub impl Extractor for Map[String, String] with get(self, key) {
-  self.get_from_string(normalize_ascii_lower(key))
+  get_case_insensitive(self, key)
+}
+
+///|
+fn merge_baggage(
+  current : @baggage.Baggage,
+  incoming : @baggage.Baggage,
+) -> @baggage.Baggage {
+  let mut merged = current
+  for entry in incoming.entries() {
+    merged = merged.insert_with_metadata(
+      entry.key.as_string(),
+      entry.value,
+      entry.metadata,
+    )
+  }
+  merged
 }
 
 ///|
@@ -327,7 +362,9 @@ pub fn BaggagePropagator::new() -> BaggagePropagator {
       },
       (context, extractor) => {
         if extractor.get("baggage") is Some(header) {
-          context.with_baggage(decode_baggage(header))
+          context.with_baggage(
+            merge_baggage(context.baggage(), decode_baggage(header)),
+          )
         } else {
           context
         }

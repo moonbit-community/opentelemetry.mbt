@@ -23,6 +23,8 @@ fn sample_span_context(
 }
 
 ///|
+// Test target: Verify the simple span processor exports parent and child spans with the expected relationships and payload data.
+// Test method: Create nested spans with attributes and events, end them, and assert the in-memory exporter receives both snapshots in order.
 async test "simple processor exports parent child spans" {
   let exporter = InMemorySpanExporter::new()
   let provider = SdkTracerProvider::builder()
@@ -52,6 +54,8 @@ async test "simple processor exports parent child spans" {
 }
 
 ///|
+// Test target: Verify the batch span processor keeps spans queued until an explicit flush is requested.
+// Test method: End one span, assert nothing is exported immediately, then call force_flush and assert the span is delivered.
 async test "batch processor flushes queued spans" {
   let exporter = InMemorySpanExporter::new()
   let provider = SdkTracerProvider::builder()
@@ -72,6 +76,8 @@ async test "batch processor flushes queued spans" {
 }
 
 ///|
+// Test target: Verify default trace and batch configuration reads all supported environment overrides.
+// Test method: Set the sampler, limit, and batch-related environment variables, then assert the default configs reflect the parsed values.
 test "default trace config reads environment variables" {
   let original_sampler = @env.get_env_var("OTEL_TRACES_SAMPLER")
   let original_sampler_arg = @env.get_env_var("OTEL_TRACES_SAMPLER_ARG")
@@ -116,6 +122,8 @@ test "default trace config reads environment variables" {
 }
 
 ///|
+// Test target: Verify the batch span processor flushes automatically once its scheduled delay expires.
+// Test method: Spawn the processor background tasks, finish one span, wait past the delay, and assert the exporter receives it.
 async test "batch processor flushes on scheduled delay in background" {
   let exporter = InMemorySpanExporter::new()
   let provider = SdkTracerProvider::builder()
@@ -140,6 +148,8 @@ async test "batch processor flushes on scheduled delay in background" {
 }
 
 ///|
+// Test target: Verify shutdown_with_timeout leaves the tracer provider permanently shut down.
+// Test method: Shut the provider down with a timeout, then call shutdown again and assert the already-shutdown error is returned.
 async test "provider shutdown with timeout marks provider unavailable" {
   let exporter = InMemorySpanExporter::new()
   let provider = SdkTracerProvider::builder()
@@ -154,6 +164,8 @@ async test "provider shutdown with timeout marks provider unavailable" {
 }
 
 ///|
+// Test target: Verify span status obeys the OpenTelemetry precedence rules between unset, error, and ok.
+// Test method: Apply status updates in different orders to one span snapshot and assert the later disallowed transitions are ignored.
 test "span status follows ok error unset precedence" {
   let span = SdkTracerProvider::builder()
     .build()
@@ -170,6 +182,8 @@ test "span status follows ok error unset precedence" {
 }
 
 ///|
+// Test target: Verify per-event and per-link attribute limits trim stored attributes while tracking drop counts.
+// Test method: Add oversized event and link attribute sets to a span and assert the snapshot keeps one attribute plus the correct drop counters.
 test "event and link attributes honor per-item limits" {
   let tracer = SdkTracerProvider::builder()
     .with_span_limits(
