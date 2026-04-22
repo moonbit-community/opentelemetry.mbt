@@ -3,7 +3,7 @@
   "version": "0.1.1",
   "deps": {
     "moonbitlang/async": "0.17.1",
-    "moonbitlang/protobuf": "0.1.0"
+    "moonbitlang/protobuf": "0.1.1"
   },
   "readme": "README.mbt.md",
   "repository": "https://github.com/moonbit-community/opentelemetry.mbt",
