@@ -1,0 +1,18 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/opentelemetry/internal/utils"
+
+// Values
+pub fn basename(StringView) -> String
+
+pub fn getenv(StringView) -> String?
+
+pub fn now_unix_nano() -> Int64
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+

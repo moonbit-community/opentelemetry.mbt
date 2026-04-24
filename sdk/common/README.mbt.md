@@ -9,7 +9,8 @@ detection, and propagation.
 - Trace identity: `TraceId`, `SpanId`, `TraceFlags`, `TraceState`,
   `SpanContext`
 - Instrumentation metadata: `InstrumentationScope`
-- Small runtime helpers: `now_unix_nano()`, `basename()`, `getenv()`
+Host runtime helpers live in `internal/utils`; they are intentionally not part
+of this public common package.
 
 ## Design notes
 

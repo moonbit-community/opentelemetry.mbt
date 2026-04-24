@@ -1,56 +1,77 @@
 ///|
-/// Convenient alias for the shared attribute key type.
+/// Attribute key type used by all OpenTelemetry signals.
+///
+/// Keys should be stable, low-cardinality names. Prefer semantic-convention
+/// constants from `semantics/*` when a standard key exists.
 pub type Key = @common.Key
 
 ///|
-/// Convenient alias for the shared attribute value type.
+/// Attribute value type accepted by traces, metrics, resources, and baggage
+/// conversion helpers.
 pub type Value = @common.Value
 
 ///|
-/// Convenient alias for one attribute key/value pair.
+/// One OpenTelemetry attribute key/value pair.
+///
+/// Attributes add searchable dimensions to spans, metrics, logs, and resources.
+/// Avoid unbounded values such as user IDs or raw URLs on metrics because they
+/// can create high-cardinality time series.
 pub type KeyValue = @common.KeyValue
 
 ///|
-/// Convenient alias for the 16-byte trace identifier type.
+/// 16-byte trace identifier propagated across process boundaries.
 pub type TraceId = @common.TraceId
 
 ///|
-/// Convenient alias for the 8-byte span identifier type.
+/// 8-byte span identifier for one operation inside a trace.
 pub type SpanId = @common.SpanId
 
 ///|
-/// Convenient alias for the W3C trace flags type.
+/// W3C trace flags, including the sampled bit.
 pub type TraceFlags = @common.TraceFlags
 
 ///|
-/// Convenient alias for the W3C trace state container.
+/// W3C trace state container used by distributed tracing propagators.
 pub type TraceState = @common.TraceState
 
 ///|
-/// Convenient alias for instrumentation library metadata.
+/// Metadata describing the library or component that produced telemetry.
+///
+/// Instrumentation scope is attached to exported telemetry. Use a stable name
+/// such as a package or module name, and set version/schema URL when known.
 pub type InstrumentationScope = @common.InstrumentationScope
 
 ///|
-/// Convenient alias for the immutable context container.
+/// Immutable context container carrying active span context, baggage, and
+/// telemetry suppression.
 pub type Context = @context.Context
 
 ///|
-/// Convenient alias for the baggage container.
+/// Baggage container for small cross-process key/value metadata.
+///
+/// Baggage is propagated to downstream services, so do not store secrets or
+/// high-cardinality values in it.
 pub type Baggage = @baggage.Baggage
 
 ///|
-/// Convenient alias for one baggage metadata payload.
+/// Metadata associated with one baggage entry.
 pub type BaggageMetadata = @baggage.BaggageMetadata
 
 ///|
-/// Convenient alias for one baggage entry plus metadata.
+/// One baggage entry plus its metadata.
 pub type KeyValueMetadata = @baggage.KeyValueMetadata
 
 ///|
 /// Returns a tracer from the current global tracer provider.
 ///
-/// The optional version, schema URL, and attributes are folded into the
-/// instrumentation scope attached to all spans created by the returned tracer.
+/// This is the preferred trace entry point for library instrumentation. The
+/// final application can register a real SDK provider through
+/// `interface/global`; if it does not, the returned tracer is no-op and spans do
+/// not record telemetry.
+///
+/// `name` should identify the instrumentation library or component. Optional
+/// version, schema URL, and attributes are folded into the instrumentation scope
+/// attached to spans created by the returned tracer.
 pub fn tracer(
   name : StringView,
   version? : String? = None,
@@ -63,8 +84,12 @@ pub fn tracer(
 ///|
 /// Returns a meter from the current global meter provider.
 ///
-/// The optional version, schema URL, and attributes are folded into the
-/// instrumentation scope attached to all instruments created by the meter.
+/// Use meters to create reusable metric instruments. If the final application
+/// has not registered a meter provider, created instruments are no-op and
+/// measurements are discarded.
+///
+/// Optional version, schema URL, and attributes are folded into the
+/// instrumentation scope attached to instruments created by the returned meter.
 pub fn meter(
   name : StringView,
   version? : String? = None,
@@ -77,8 +102,12 @@ pub fn meter(
 ///|
 /// Returns a logger from the current global logger provider.
 ///
-/// The optional version, schema URL, and attributes are folded into the
-/// instrumentation scope attached to all log records emitted by the logger.
+/// This is the public logs bridge entry point. Use `Logger::event_enabled()` to
+/// avoid constructing expensive log records when no real SDK logger is
+/// installed.
+///
+/// Optional version, schema URL, and attributes are folded into the
+/// instrumentation scope attached to emitted log records.
 pub fn logger(
   name : StringView,
   version? : String? = None,
@@ -91,8 +120,12 @@ pub fn logger(
 ///|
 /// Calls `f` with the currently registered global text-map propagator.
 ///
-/// This avoids exposing the mutable global reference directly while still
-/// letting callers inject or extract propagation headers.
+/// Use this to inject or extract trace context and baggage for text carriers
+/// such as HTTP headers. The default propagator combines W3C trace context and
+/// baggage propagation.
+///
+/// The callback shape avoids exposing the mutable global reference directly
+/// while still letting callers use the current propagator.
 pub fn[T] get_text_map_propagator(
   f : (@propagation.TextMapPropagator) -> T,
 ) -> T {

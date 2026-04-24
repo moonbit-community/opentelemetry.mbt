@@ -1,53 +1,67 @@
 # OpenTelemetry for MoonBit
 
-The MoonBit implementation of OpenTelemetry.
+MoonBit implementation of [OpenTelemetry](https://opentelemetry.io/): APIs for
+instrumenting libraries and applications, SDK providers for processing telemetry,
+and exporters for getting telemetry out of the process.
 
-- public API packages for instrumentation
-- SDK packages for providers, processors, readers, and resources
-- exporters for stdout and OTLP
-- semantic-convention constants
-- generated OTLP protocol models
+OpenTelemetry is not a tracing UI, metrics database, or log backend. It is the
+standard instrumentation and transport layer that lets your code produce
+portable telemetry data, then send it to tools such as the OpenTelemetry
+Collector, Jaeger, Prometheus, or a vendor backend.
 
-## Which package should I import?
+This repository contains:
+
+- public API packages for traces, metrics, logs, context, baggage, and
+  propagation
+- SDK packages for providers, processors, readers, samplers, resources, and
+  in-memory test exporters
+- `print` exporters for local learning and debugging
+- OTLP HTTP exporters for production-oriented export through the OpenTelemetry
+  Protocol
+- semantic-convention constants and generated OTLP protocol model types
+
+## Mental Model
+
+OpenTelemetry has two layers:
+
+- **API layer**: what libraries should depend on. It provides stable
+  instrumentation types such as `Tracer`, `Meter`, `Logger`, `Context`, and
+  `KeyValue`. If an application does not install an SDK provider, the API layer
+  is no-op by default.
+- **SDK layer**: what applications configure. It owns resources, samplers,
+  processors, readers, exporters, batching, flushing, and shutdown.
+
+Library authors should usually import `moonbit-community/opentelemetry` or
+`moonbit-community/opentelemetry/interface/*`. Application authors add
+`moonbit-community/opentelemetry/sdk`, `print`, or `otlp` to make the
+instrumentation do real work.
+
+## Package Guide
 
 | Package | Use it for |
 | --- | --- |
-| `moonbit-community/opentelemetry` | The smallest public entry point. Good for libraries that only need `tracer()`, `meter()`, `logger()`, baggage, and context types. |
-| `moonbit-community/opentelemetry/interface/*` | Signal-specific public APIs when you want direct access to traces, logs, metrics, propagation, or baggage behavior. |
-| `moonbit-community/opentelemetry/sdk` | Application-side setup. Build providers, readers, processors, resources, and exporters here. |
-| `moonbit-community/opentelemetry/sdk/global` | Process-wide registration of tracer/logger/meter providers and the text-map propagator. |
-| `moonbit-community/opentelemetry/print` | Human-readable stdout exporters for local development and debugging. |
+| `moonbit-community/opentelemetry` | Small public entry point for library instrumentation: `tracer()`, `meter()`, `logger()`, attributes, baggage, and context aliases. |
+| `moonbit-community/opentelemetry/interface/trace` | Trace API: spans, span builders, events, links, status, and no-op trace behavior. |
+| `moonbit-community/opentelemetry/interface/metrics` | Metrics API: meters, counters, up-down counters, histograms, gauges, and observable instruments. |
+| `moonbit-community/opentelemetry/interface/logs` | Log bridge API: structured log records that can be correlated with traces. |
+| `moonbit-community/opentelemetry/interface/context` | Immutable context container used to carry span context, baggage, and telemetry suppression. |
+| `moonbit-community/opentelemetry/interface/propagation` | W3C trace-context and baggage propagation through text carriers such as HTTP headers. |
+| `moonbit-community/opentelemetry/interface/global` | Process-wide API providers. Libraries normally read from here indirectly through the root package. |
+| `moonbit-community/opentelemetry/sdk` | Application-side SDK facade for providers, processors, readers, resources, samplers, and global SDK helpers. |
+| `moonbit-community/opentelemetry/sdk/global` | Process-wide SDK providers used by the SDK facade. Prefer `interface/global` when wiring the public root package. |
+| `moonbit-community/opentelemetry/print` | Human-readable stdout exporters for examples, local debugging, and tests. |
 | `moonbit-community/opentelemetry/otlp` | OTLP HTTP exporters for traces, logs, and metrics. |
-| `moonbit-community/opentelemetry/semantics/*` | Semantic-convention constants for attributes and metric names. |
-| `moonbit-community/opentelemetry/protocol/*` | Low-level generated OTLP protobuf/JSON model types. Import these only when you need raw protocol payloads. |
+| `moonbit-community/opentelemetry/semantics/*` | Generated semantic-convention constants for standard attribute and metric names. |
+| `moonbit-community/opentelemetry/protocol/*` | Low-level generated OTLP protobuf/JSON models. Most users do not need these directly. |
 
-## Typical startup flow
+## Quick Start: Trace To Stdout
 
-Applications normally follow this order:
-
-1. Build one provider per signal in `sdk/trace`, `sdk/logs`, or `sdk/metrics`.
-2. Optionally register those providers into `sdk/global`.
-3. Spawn background tasks when you use batch span/log processors or periodic
-   metric readers.
-4. Obtain tracers, loggers, and meters from the root package or the
-   `interface/*` packages.
-5. Flush and shut down providers during application teardown.
-
-Two important defaults:
-
-- Global providers start as no-op providers.
-- The default global text-map propagator is a composite of W3C trace-context
-  and baggage propagation.
-
-When you obtain instruments from the root package or `interface/*`, register
-providers through `interface/global`. `sdk/global` drives the SDK-only helper
-functions such as `sdk.tracer()`.
-
-## Minimal tracing example
+The shortest useful setup is: build an SDK provider, register it as the global
+API provider, get a tracer, create spans, and shut the provider down.
 
 ```mbt check
 ///|
-async fn _minimal_tracing_example() -> Unit {
+async fn _readme_trace_to_stdout() -> Unit {
   let exporter = @print.SpanExporter::new()
   let provider = @sdk.tracer_provider_builder()
     .with_simple_exporter(exporter.into_span_exporter())
@@ -55,104 +69,215 @@ async fn _minimal_tracing_example() -> Unit {
 
   @global.set_tracer_provider(@trace.TracerProvider::from_sdk(provider))
 
-  let otel_tracer = tracer("example-service", version=Some("1.0.0"))
-  let span = otel_tracer.start("startup")
-  span.set_attribute(KeyValue::new("component", Value::String("cli")))
+  let tracer = tracer("checkout-service", version=Some("1.0.0"))
+  let span = tracer.start("charge-card")
+  span.set_attribute(KeyValue::new("payment.system", Value::String("test")))
+  span.set_status(@trace.Status::ok())
   span.end()
 
   ignore(provider.shutdown())
 }
 ```
 
-## Background work matters
+`Span::end()` is async because processors and exporters may do I/O. In examples
+using a simple stdout exporter it returns quickly, but production exporters
+should still be flushed or shut down before process exit.
 
-Simple processors export immediately. Batch processors and periodic readers do
-not start themselves.
+## Instrumenting Libraries
 
-Use `spawn_background_tasks()` when you configure:
-
-- `sdk/trace.BatchSpanProcessor`
-- `sdk/logs.BatchLogProcessor`
-- `sdk/metrics.PeriodicMetricReader`
-
-Example shape:
+Libraries should depend on the API layer and avoid choosing exporters or SDK
+configuration for their users. The final application decides whether telemetry
+is enabled.
 
 ```mbt check
 ///|
-async fn _background_work_shape() -> Unit {
+pub async fn _library_operation() -> Unit {
+  let tracer = tracer(
+    "moonbit-community/example-library",
+    version=Some("0.1.0"),
+  )
+  let span = tracer.start("example.operation")
+  span.set_attribute(KeyValue::new("example.kind", Value::String("demo")))
+  // Library work goes here.
+  span.end()
+}
+```
+
+If no application registers a provider, the global API providers are no-op.
+Spans, instruments, and loggers still exist so code can remain unconditional,
+but they do not record or export telemetry. This is intentionally a low-overhead
+runtime no-op, not a compile-time removal of all instrumentation code.
+
+## Application Setup
+
+Applications configure one provider per signal:
+
+1. Build a trace, log, or metric provider in `sdk/*`.
+2. Register it into `interface/global` if code uses the root
+   `moonbit-community/opentelemetry` package.
+3. Spawn background tasks when using batch span/log processors or periodic
+   metric readers.
+4. Flush and shut down providers during application teardown.
+
+Simple processors export immediately when spans/logs end. Batch processors and
+periodic metric readers require background tasks:
+
+```mbt check
+///|
+async fn _spawn_background_tasks_shape() -> Unit {
   @async.with_task_group(group => @sdk.spawn_background_tasks(group))
 }
 ```
 
-## Signal-specific notes
+## Metrics
 
-### Traces
+Metrics record measurements and aggregate them in memory until a reader collects
+them. Reuse instruments instead of creating them on every request.
 
-- `Tracer::start()` creates a span immediately.
-- `Tracer::build()` lets you preconfigure span kind, start time, events, links,
-  and attributes.
-- `Span::record_error()` only adds an exception event. It does not set span
-  status automatically.
+Choose instruments by meaning:
 
-### Logs
-
-- `Logger::create_log_record()` returns a mutable record builder.
-- `Logger::emit()` fills in missing timestamps with `now`.
-- `event_name` is exported to the OTLP `event_name` field.
-- `target` is used for export-time log scope grouping.
-
-### Metrics
-
-- Counters are monotonic. Negative counter deltas are ignored by the SDK.
-- Observable callbacks run during collection, not at instrument creation time.
-- Integer gauges and some integer observable instruments are bridged through the
-  SDK's floating-point representation where noted in the package docs.
-
-## Exporter choices
-
-### `print`
-
-Use `print` when you want readable local output. It is best for tests,
-examples, and debugging.
-
-### `otlp`
-
-Use `otlp` when you want to send telemetry to an OpenTelemetry Collector or
-another OTLP HTTP endpoint. The current implementation supports:
-
-- `http/protobuf`
-- `http/json`
-
-`grpc` is exposed in the API for parity with upstream shapes, but exporter
-construction rejects it today.
-
-Compression flags are also exposed for parity, but they are not implemented
-yet. Setting compression currently produces a build error.
-
-## Semantic conventions
-
-The semantic-convention packages are generated from upstream OpenTelemetry
-semantic-convention data. Use them to avoid hard-coding attribute keys and
-metric names:
+- `Counter`: monotonic value that only increases, such as requests served or
+  bytes sent
+- `UpDownCounter`: value that can increase or decrease, such as active sessions
+  or queue depth
+- `Histogram`: distribution of measurements, such as latency or payload size
+- `Gauge`: latest value for state that can move up or down, such as temperature
+  or memory usage
+- observable instruments: callbacks for values already owned by another system
 
 ```mbt check
 ///|
-fn _semantic_convention_attrs() -> Array[KeyValue] {
+fn _record_request_metrics() -> Unit {
+  let meter = meter("checkout-service")
+  let request_count = meter.u64_counter("http.server.request.count").build()
+  let request_latency = meter
+    .f64_histogram("http.server.duration")
+    .with_unit("ms")
+    .build()
+
+  request_count.add(1UL, attributes=[
+    KeyValue::new("http.request.method", Value::String("POST")),
+  ])
+  request_latency.record(32.5, attributes=[
+    KeyValue::new("http.route", Value::String("/checkout")),
+  ])
+}
+```
+
+## Logs
+
+The logging API is a bridge into the OpenTelemetry log data model. Existing
+application logging can keep its own frontend; bridge code can translate log
+events into `LogRecord` values.
+
+```mbt check
+///|
+async fn _emit_structured_log() -> Unit {
+  let logger = logger("checkout-service")
+  if logger.event_enabled(@logs.Severity::Info, "checkout") {
+    let record = logger.create_log_record()
+    record.set_event_name("checkout.completed")
+    record.set_target("checkout")
+    record.set_severity_number(@logs.Severity::Info)
+    record.set_body(@logs.AnyValue::String("checkout completed"))
+    record.add_attribute("cart.items", @logs.AnyValue::Int(3L))
+    logger.emit(record)
+  }
+}
+```
+
+`event_enabled()` is the cheap guard to check before building expensive log
+records. It currently reports whether a real SDK logger exists; future versions
+may add severity or target filtering.
+
+## Propagation
+
+Propagation carries trace context and baggage across process boundaries. For
+HTTP-like transports, inject the current context into outgoing headers and
+extract it from incoming headers.
+
+```mbt check
+///|
+fn _inject_headers(context : Context) -> Map[String, String] {
+  let headers = {}
+  get_text_map_propagator(propagator => {
+    propagator.inject_context(context, headers)
+  })
+  headers
+}
+```
+
+The default global propagator is a composite of W3C trace context and W3C
+baggage.
+
+## OTLP Export
+
+Use `print` while learning. Use `otlp` when sending telemetry to the
+OpenTelemetry Collector or an OTLP-compatible backend.
+
+Typical local Collector command:
+
+```bash
+docker run --rm -p 4318:4318 otel/opentelemetry-collector:latest
+```
+
+The MoonBit OTLP exporter currently supports HTTP/protobuf and HTTP/JSON. gRPC
+and compression options are exposed for shape compatibility but rejected during
+exporter construction when unsupported. See [`otlp/README.mbt.md`](otlp/README.mbt.md)
+for endpoint, protocol, header, timeout, and signal-specific environment
+variables.
+
+## Environment Variables
+
+Programmatic builder configuration takes precedence over environment defaults
+where both are available.
+
+| Area | Variables |
+| --- | --- |
+| Resource | `OTEL_SERVICE_NAME`, `OTEL_RESOURCE_ATTRIBUTES` |
+| Trace sampling | `OTEL_TRACES_SAMPLER`, `OTEL_TRACES_SAMPLER_ARG` |
+| Trace limits | `OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT`, `OTEL_SPAN_EVENT_COUNT_LIMIT`, `OTEL_SPAN_LINK_COUNT_LIMIT` |
+| Batch spans | `OTEL_BSP_SCHEDULE_DELAY`, `OTEL_BSP_MAX_QUEUE_SIZE`, `OTEL_BSP_MAX_EXPORT_BATCH_SIZE`, `OTEL_BSP_EXPORT_TIMEOUT` |
+| Batch logs | `OTEL_BLRP_SCHEDULE_DELAY`, `OTEL_BLRP_MAX_QUEUE_SIZE`, `OTEL_BLRP_MAX_EXPORT_BATCH_SIZE`, `OTEL_BLRP_EXPORT_TIMEOUT` |
+| Periodic metrics | `OTEL_METRIC_EXPORT_INTERVAL` |
+| OTLP exporter | `OTEL_EXPORTER_OTLP_*` plus signal-specific `TRACES`, `METRICS`, and `LOGS` variants |
+
+## Practical Guidance
+
+- Use instrumentation names that identify the library or component, for example
+  `moonbit-community/http-client`.
+- Prefer semantic-convention constants from `semantics/*` instead of hard-coded
+  keys when a standard key exists.
+- Add low-cardinality attributes by default. Avoid user IDs, raw URLs, or
+  unbounded strings as metric attributes.
+- Create metric instruments once and reuse them.
+- Always call `shutdown()` on providers you own so buffered telemetry is flushed.
+- Library code should not import `sdk` or exporters unless it is explicitly an
+  integration package.
+
+```mbt check
+///|
+fn _semantic_convention_attribute() -> Array[KeyValue] {
   [KeyValue::new(@semtrace.HTTP_REQUEST_METHOD, Value::String("GET"))]
 }
 ```
 
-## Where to read next
+## Read Next
 
-- [`sdk/README.mbt.md`](sdk/README.mbt.md): application-side SDK entry point
-- [`interface/trace/README.mbt.md`](interface/trace/README.mbt.md): trace API
-- [`interface/logs/README.mbt.md`](interface/logs/README.mbt.md): log API
-- [`interface/metrics/README.mbt.md`](interface/metrics/README.mbt.md): metric API
-- [`interface/propagation/README.mbt.md`](interface/propagation/README.mbt.md): propagation API
+- [`interface/trace/README.mbt.md`](interface/trace/README.mbt.md): spans,
+  parent context, events, links, status, and no-op trace behavior
+- [`interface/metrics/README.mbt.md`](interface/metrics/README.mbt.md): choosing
+  instruments and recording measurements
+- [`interface/logs/README.mbt.md`](interface/logs/README.mbt.md): structured log
+  records and log bridge behavior
+- [`interface/propagation/README.mbt.md`](interface/propagation/README.mbt.md):
+  W3C trace context and baggage propagation
+- [`sdk/README.mbt.md`](sdk/README.mbt.md): provider configuration, processors,
+  readers, environment variables, and lifecycle
 - [`otlp/README.mbt.md`](otlp/README.mbt.md): OTLP exporter behavior
 - [`print/README.mbt.md`](print/README.mbt.md): stdout exporter behavior
 
-## Integration tests
+## Integration Tests
 
 Collector-backed OTLP integration tests live in [`integration/otlp/README.md`](integration/otlp/README.md)
 and run through the helper scripts

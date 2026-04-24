@@ -1,6 +1,7 @@
 import {
   "moonbitlang/async",
   "moonbit-community/opentelemetry/interface/context" @context,
+  "moonbit-community/opentelemetry/internal/utils" @utils,
   "moonbit-community/opentelemetry/sdk/common" @common,
   "moonbit-community/opentelemetry/sdk/context" @context_sdk,
   "moonbit-community/opentelemetry/sdk/error" @error,

@@ -138,7 +138,7 @@ pub fn ResourceDetector::detect(self : ResourceDetector) -> Resource {
 fn default_service_name() -> String {
   let args = @env.args()
   let process_name = if args.length() > 0 {
-    @common.basename(args[0])
+    @utils.basename(args[0])
   } else {
     "moonbit"
   }
@@ -209,11 +209,11 @@ fn parse_resource_attributes(
 pub fn env_resource_detector() -> ResourceDetector {
   ResourceDetector::new(() => {
     let mut resource = Resource::empty()
-    if @common.getenv("OTEL_RESOURCE_ATTRIBUTES") is Some(attributes) {
+    if @utils.getenv("OTEL_RESOURCE_ATTRIBUTES") is Some(attributes) {
       let detected = Resource::new(parse_resource_attributes(attributes))
       resource = resource.merge(detected)
     }
-    if @common.getenv("OTEL_SERVICE_NAME") is Some(service_name) {
+    if @utils.getenv("OTEL_SERVICE_NAME") is Some(service_name) {
       let service_resource = Resource::new([
         @common.KeyValue::new(
           "service.name",

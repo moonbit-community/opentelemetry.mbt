@@ -1,29 +1,44 @@
 ///|
 /// Monotonic synchronous counter handle.
+///
+/// Use counters for values that only increase, such as requests served, errors
+/// observed, or bytes sent. Negative deltas are ignored by the SDK.
 pub struct Counter[T] {
   add_fn : (T, ArrayView[@common.KeyValue]) -> Unit
 }
 
 ///|
 /// Additive synchronous counter that accepts positive and negative deltas.
+///
+/// Use up-down counters for state that can increase and decrease, such as
+/// active requests, queue depth, or open connections.
 pub struct UpDownCounter[T] {
   add_fn : (T, ArrayView[@common.KeyValue]) -> Unit
 }
 
 ///|
 /// Synchronous histogram handle.
+///
+/// Use histograms for distributions such as request latency, payload size, or
+/// retry count.
 pub struct Histogram[T] {
   record_fn : (T, ArrayView[@common.KeyValue]) -> Unit
 }
 
 ///|
 /// Synchronous gauge handle recording the latest value for one attribute set.
+///
+/// Use gauges for current-state measurements such as memory usage or
+/// temperature.
 pub struct Gauge[T] {
   record_fn : (T, ArrayView[@common.KeyValue]) -> Unit
 }
 
 ///|
 /// Observable monotonic counter handle used inside callbacks.
+///
+/// Observable instruments report values during SDK collection instead of at the
+/// point where application work happens.
 pub struct ObservableCounter[T] {
   observe_fn : (T, ArrayView[@common.KeyValue]) -> Unit
 }
@@ -107,12 +122,18 @@ pub struct ObservableGaugeBuilder[T] {
 
 ///|
 /// Public meter handle.
+///
+/// A meter creates reusable instruments for one instrumentation scope. Create
+/// instruments once and reuse them on hot paths.
 pub struct Meter {
   sdk_meter : @sdkmetrics.SdkMeter?
 }
 
 ///|
 /// Public meter provider wrapper around the SDK provider.
+///
+/// `sdk_provider = None` is the no-op implementation used until an application
+/// installs a real SDK meter provider.
 pub struct MeterProvider {
   sdk_provider : @sdkmetrics.SdkMeterProvider?
 }
@@ -414,6 +435,9 @@ pub fn MeterProvider::from_sdk(
 
 ///|
 /// Returns a no-op meter provider.
+///
+/// Meters from this provider create instruments that silently discard all
+/// measurements and never run observable callbacks.
 pub fn MeterProvider::noop() -> MeterProvider {
   { sdk_provider: None }
 }
@@ -493,7 +517,8 @@ pub fn MeterProvider::spawn_periodic_readers(
 ///|
 /// Adds one measurement to a monotonic counter.
 ///
-/// The underlying SDK ignores negative deltas.
+/// The underlying SDK ignores negative deltas. Attributes should be
+/// low-cardinality because they form metric series identity.
 pub fn[T] Counter::add(
   self : Counter[T],
   value : T,
@@ -504,6 +529,9 @@ pub fn[T] Counter::add(
 
 ///|
 /// Adds one measurement to an up-down counter.
+///
+/// Use this for state that can go up and down. For monotonically increasing
+/// totals, prefer `Counter`.
 pub fn[T] UpDownCounter::add(
   self : UpDownCounter[T],
   value : T,
@@ -514,6 +542,9 @@ pub fn[T] UpDownCounter::add(
 
 ///|
 /// Records one histogram sample.
+///
+/// Histograms aggregate distributions and are usually the right choice for
+/// latency and size measurements.
 pub fn[T] Histogram::record(
   self : Histogram[T],
   value : T,
@@ -524,6 +555,8 @@ pub fn[T] Histogram::record(
 
 ///|
 /// Records the latest gauge value for one attribute set.
+///
+/// The latest value replaces the previous value for the same attribute set.
 pub fn[T] Gauge::record(
   self : Gauge[T],
   value : T,
@@ -690,6 +723,9 @@ pub fn[T] ObservableCounterBuilder::with_unit(
 
 ///|
 /// Registers one callback to run during metric collection.
+///
+/// Keep callbacks fast and side-effect-light. They run on collection/export
+/// paths, not when the observable instrument is created.
 pub fn[T] ObservableCounterBuilder::with_callback(
   self : ObservableCounterBuilder[T],
   callback : (ObservableCounter[T]) -> Unit,
@@ -729,6 +765,9 @@ pub fn[T] ObservableUpDownCounterBuilder::with_unit(
 
 ///|
 /// Registers one callback to run during metric collection.
+///
+/// Keep callbacks fast and side-effect-light. They run on collection/export
+/// paths, not when the observable instrument is created.
 pub fn[T] ObservableUpDownCounterBuilder::with_callback(
   self : ObservableUpDownCounterBuilder[T],
   callback : (ObservableUpDownCounter[T]) -> Unit,
@@ -768,6 +807,9 @@ pub fn[T] ObservableGaugeBuilder::with_unit(
 
 ///|
 /// Registers one callback to run during metric collection.
+///
+/// Keep callbacks fast and side-effect-light. They run on collection/export
+/// paths, not when the observable instrument is created.
 pub fn[T] ObservableGaugeBuilder::with_callback(
   self : ObservableGaugeBuilder[T],
   callback : (ObservableGauge[T]) -> Unit,
@@ -786,6 +828,9 @@ pub fn[T] ObservableGaugeBuilder::build(
 
 ///|
 /// Starts building a `UInt64` monotonic counter.
+///
+/// Instrument names should be stable and low-cardinality. The same named
+/// instrument should be built once and reused.
 pub fn Meter::u64_counter(
   self : Meter,
   name : StringView,

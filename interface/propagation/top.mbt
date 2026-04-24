@@ -1,11 +1,18 @@
 ///|
 /// Write side of a text-map carrier used for outbound propagation.
+///
+/// Implement this for HTTP header maps or other text carriers that need
+/// outgoing trace context and baggage injection.
 pub(open) trait Injector {
   set(Self, String, String) -> Unit
 }
 
 ///|
 /// Read side of a text-map carrier used for inbound propagation.
+///
+/// Implement this for HTTP header maps or other text carriers that need
+/// incoming trace context and baggage extraction. `keys()` is optional but lets
+/// propagators handle case-insensitive carriers more efficiently.
 pub(open) trait Extractor {
   get(Self, StringView) -> String?
   keys(Self) -> Array[String] = _
@@ -77,6 +84,9 @@ pub impl Extractor for Map[String, String] with keys(self) {
 
 ///|
 /// Erased text-map propagator built from inject/extract callbacks.
+///
+/// Use this as the common type for concrete propagators and custom propagation
+/// formats.
 pub struct TextMapPropagator {
   inject_fn : (@context.Context, &Injector) -> Unit
   extract_fn : (@context.Context, &Extractor) -> @context.Context
@@ -85,18 +95,25 @@ pub struct TextMapPropagator {
 
 ///|
 /// W3C baggage propagator wrapper.
+///
+/// Reads and writes the `baggage` header.
 pub struct BaggagePropagator {
   inner : TextMapPropagator
 }
 
 ///|
 /// W3C trace-context propagator wrapper.
+///
+/// Reads and writes `traceparent` and `tracestate`.
 pub struct TraceContextPropagator {
   inner : TextMapPropagator
 }
 
 ///|
 /// Composite propagator that applies multiple propagators in sequence.
+///
+/// The default global propagator uses this to combine trace context and
+/// baggage.
 pub struct TextMapCompositePropagator {
   inner : TextMapPropagator
 }
@@ -113,6 +130,9 @@ pub fn TextMapPropagator::from_functions(
 
 ///|
 /// Injects values from `context` into the supplied carrier.
+///
+/// Call this before making an outbound request so downstream services can join
+/// the same trace and receive baggage.
 pub fn TextMapPropagator::inject_context(
   self : TextMapPropagator,
   context : @context.Context,
@@ -123,6 +143,9 @@ pub fn TextMapPropagator::inject_context(
 
 ///|
 /// Extracts values from the carrier and returns an updated context.
+///
+/// Call this when handling an inbound request, then use the returned context as
+/// the parent context for server spans and downstream work.
 pub fn TextMapPropagator::extract_with_context(
   self : TextMapPropagator,
   context : @context.Context,

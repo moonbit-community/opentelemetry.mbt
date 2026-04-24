@@ -1,5 +1,8 @@
 ///|
 /// Supported metric instrument kinds.
+///
+/// Instrument kind is part of stream identity and controls the default
+/// aggregation selected by the SDK.
 pub(all) enum InstrumentKind {
   Counter
   UpDownCounter
@@ -37,6 +40,8 @@ pub(all) enum Aggregation {
 
 ///|
 /// Aggregation selection used by metric views.
+///
+/// Views can keep the default, drop a stream, or force a supported aggregation.
 pub(all) enum StreamAggregation {
   Default
   Drop
@@ -122,6 +127,9 @@ pub struct InMemoryMetricExporter {
 
 ///|
 /// Pull-based metric reader that snapshots the provider on demand.
+///
+/// Use this in tests or integrations that want explicit collection instead of a
+/// background export loop.
 pub struct ManualReader {
   state : Ref[ManualReaderState]
 }
@@ -146,6 +154,9 @@ pub type View = (Instrument) -> Stream?
 
 ///|
 /// Push-style metric reader that exports snapshots on an interval.
+///
+/// The interval loop is not started automatically. Register the provider and
+/// call `spawn_periodic_readers()` or the facade/global equivalent.
 pub struct PeriodicMetricReader {
   state : Ref[PeriodicMetricReaderState]
 }
@@ -215,6 +226,9 @@ struct MeterProviderState {
 
 ///|
 /// Owns resource metadata, registered instruments, exporters, and readers.
+///
+/// Applications create one provider, configure readers/exporters/views, and
+/// shut it down during application teardown.
 pub struct SdkMeterProvider {
   state : Ref[MeterProviderState]
 }
@@ -231,6 +245,9 @@ pub struct SdkMeterProviderBuilder {
 
 ///|
 /// Meter scoped to one instrumentation library.
+///
+/// Meters create instruments. Instruments should usually be built once and
+/// reused on hot paths.
 pub struct SdkMeter {
   provider : SdkMeterProvider
   instrumentation_scope : @common.InstrumentationScope
@@ -557,7 +574,7 @@ pub fn InMemoryMetricExporter::reset(self : InMemoryMetricExporter) -> Unit {
 
 ///|
 fn parse_env_int(key : StringView) -> Int? {
-  match @common.getenv(key) {
+  match @utils.getenv(key) {
     Some(value) => {
       let value = value.trim()
       if value == "" {
@@ -1065,7 +1082,7 @@ fn collect_stream_metrics(state : Ref[MetricStreamState]) -> Array[MetricData] {
       kind: state.val.descriptor.kind,
       attributes: point.attributes.copy(),
       aggregation: point.aggregation,
-      time_unix_nano: @common.now_unix_nano(),
+      time_unix_nano: @utils.now_unix_nano(),
       resource: state.val.resource,
       instrumentation_scope: state.val.instrumentation_scope,
     })
@@ -1460,6 +1477,9 @@ fn update_u64_gauge(
 
 ///|
 /// Starts building a meter provider with the default resource.
+///
+/// Add readers, exporters, or views before `build()`. A provider without
+/// readers/exporters still aggregates local measurements but exports nothing.
 pub fn SdkMeterProvider::builder() -> SdkMeterProviderBuilder {
   {
     resource: @resource.Resource::builder().build(),
@@ -1482,6 +1502,9 @@ pub fn SdkMeterProviderBuilder::with_resource(
 
 ///|
 /// Registers an exporter used during `force_flush()` and `shutdown()`.
+///
+/// For periodic background export, use `with_periodic_exporter()` or register a
+/// `PeriodicMetricReader`.
 pub fn SdkMeterProviderBuilder::with_exporter(
   self : SdkMeterProviderBuilder,
   exporter : MetricExporter,
@@ -1492,6 +1515,8 @@ pub fn SdkMeterProviderBuilder::with_exporter(
 
 ///|
 /// Registers a manual reader with the provider.
+///
+/// Manual readers are useful for tests and pull-style integrations.
 pub fn SdkMeterProviderBuilder::with_reader(
   self : SdkMeterProviderBuilder,
   reader : ManualReader,
@@ -1502,6 +1527,9 @@ pub fn SdkMeterProviderBuilder::with_reader(
 
 ///|
 /// Registers a periodic reader with the provider.
+///
+/// The reader's background loop starts only after `spawn_periodic_readers()` or
+/// the facade/global equivalent is called.
 pub fn SdkMeterProviderBuilder::with_periodic_reader(
   self : SdkMeterProviderBuilder,
   reader : PeriodicMetricReader,
@@ -1512,6 +1540,9 @@ pub fn SdkMeterProviderBuilder::with_periodic_reader(
 
 ///|
 /// Adds a view that can rename or reshape future metric streams.
+///
+/// Views apply when instruments are registered. Use them to select aggregation,
+/// filter attributes, rename streams, or set cardinality limits.
 pub fn SdkMeterProviderBuilder::with_view(
   self : SdkMeterProviderBuilder,
   view : View,
@@ -1522,6 +1553,9 @@ pub fn SdkMeterProviderBuilder::with_view(
 
 ///|
 /// Registers an exporter and a periodic reader for background exports.
+///
+/// A negative interval uses the SDK default. Zero is normalized to one
+/// millisecond.
 pub fn SdkMeterProviderBuilder::with_periodic_exporter(
   self : SdkMeterProviderBuilder,
   exporter : MetricExporter,
@@ -1578,6 +1612,9 @@ pub fn SdkMeterProvider::resource(
 
 ///|
 /// Creates a meter scoped to the supplied instrumentation library metadata.
+///
+/// The instrumentation scope is attached to metric data produced by instruments
+/// created from the meter.
 pub fn SdkMeterProvider::meter(
   self : SdkMeterProvider,
   name : StringView,
@@ -2725,6 +2762,8 @@ pub fn ObservableUInt64GaugeBuilder::build(
 
 ///|
 /// Adds a delta to the counter for one attribute set.
+///
+/// Negative values are ignored because counters are monotonic.
 pub fn Counter::add(
   self : Counter,
   value : Int64,

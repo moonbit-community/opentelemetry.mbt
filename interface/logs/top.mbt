@@ -1,5 +1,9 @@
 ///|
-/// Log body/attribute value accepted by the public logging API.
+/// Log body or attribute value accepted by the public logging API.
+///
+/// Values remain structured when bridged into the SDK and OTLP exporters. Use
+/// scalar attributes for common query dimensions and structured bodies for
+/// payloads that should stay grouped.
 pub(all) enum AnyValue {
   Int(Int64)
   Double(Double)
@@ -12,6 +16,9 @@ pub(all) enum AnyValue {
 
 ///|
 /// Public severity ladder matching the OpenTelemetry log data model.
+///
+/// The variants map to OpenTelemetry's 24 severity slots. `Severity::name()`
+/// returns the canonical uppercase text such as `INFO`, `WARN3`, or `ERROR`.
 pub(all) enum Severity {
   Trace
   Trace2
@@ -41,6 +48,10 @@ pub(all) enum Severity {
 
 ///|
 /// Mutable log record builder used by `Logger::emit()`.
+///
+/// Construct records only after checking `Logger::event_enabled()` when
+/// formatting or attribute construction is expensive. `emit()` fills missing
+/// timestamps and default body values.
 pub struct LogRecord {
   mut event_name : String?
   mut target : String?
@@ -56,7 +67,8 @@ pub struct LogRecord {
 ///|
 /// Public logger handle.
 ///
-/// When backed by a no-op provider, all emissions are silently dropped.
+/// A logger emits records for one instrumentation scope. When backed by a no-op
+/// provider, all emissions are silently dropped.
 pub struct Logger {
   sdk_logger : @sdklogs.SdkLogger?
 }
@@ -65,12 +77,17 @@ pub struct Logger {
 /// Public logger provider wrapper around the SDK provider.
 ///
 /// A provider with `sdk_provider = None` behaves as a no-op provider.
+/// Applications install a real provider by wrapping an SDK logger provider with
+/// `LoggerProvider::from_sdk`.
 pub struct LoggerProvider {
   sdk_provider : @sdklogs.SdkLoggerProvider?
 }
 
 ///|
 /// Returns the canonical uppercase text form for one severity variant.
+///
+/// If `LogRecord::severity_text` is not set, `Logger::emit()` derives it from
+/// this method when a severity number exists.
 pub fn Severity::name(self : Severity) -> String {
   match self {
     Severity::Trace => "TRACE"
@@ -187,6 +204,8 @@ fn to_sdk_context(context : @common.SpanContext?) -> @sdkcontext.Context {
 
 ///|
 /// Creates an empty mutable log record.
+///
+/// The record is not tied to a logger until passed to `Logger::emit()`.
 pub fn LogRecord::new() -> LogRecord {
   {
     event_name: None,
@@ -267,6 +286,9 @@ pub fn LogRecord::set_body(self : LogRecord, body : AnyValue) -> Unit {
 
 ///|
 /// Adds one attribute to the log record.
+///
+/// Attribute keys should be stable names. Prefer scalar values for fields that
+/// users will search or group by.
 pub fn LogRecord::add_attribute(
   self : LogRecord,
   key : StringView,
@@ -291,7 +313,8 @@ pub fn LogRecord::add_attributes(
 ///|
 /// Stores explicit trace correlation fields on the record.
 ///
-/// When `trace_flags` is omitted, the trace flags default to zero.
+/// Use this when bridging logs from code that already knows the trace and span
+/// identifiers. When `trace_flags` is omitted, the trace flags default to zero.
 pub fn LogRecord::set_trace_context(
   self : LogRecord,
   trace_id : @common.TraceId,
@@ -325,6 +348,9 @@ pub fn LoggerProvider::from_sdk(
 
 ///|
 /// Returns a no-op logger provider.
+///
+/// Loggers from this provider report `event_enabled() == false` and drop
+/// emitted records.
 pub fn LoggerProvider::noop() -> LoggerProvider {
   { sdk_provider: None }
 }
@@ -443,11 +469,11 @@ pub async fn Logger::emit(self : Logger, record : LogRecord) -> Unit {
         attributes=record.attributes,
         timestamp_unix_nano=match record.timestamp_unix_nano {
           Some(timestamp_unix_nano) => timestamp_unix_nano
-          None => @common.now_unix_nano()
+          None => @utils.now_unix_nano()
         },
         observed_timestamp_unix_nano=match record.observed_timestamp_unix_nano {
           Some(observed_timestamp_unix_nano) => observed_timestamp_unix_nano
-          None => @common.now_unix_nano()
+          None => @utils.now_unix_nano()
         },
       )
     }
@@ -460,6 +486,8 @@ pub async fn Logger::emit(self : Logger, record : LogRecord) -> Unit {
 ///
 /// The current implementation only checks whether a real SDK logger exists; it
 /// does not apply severity-, target-, or name-based filtering yet.
+/// Use this as a guard before expensive message formatting or structured body
+/// construction.
 pub fn Logger::event_enabled(
   self : Logger,
   severity : Severity,

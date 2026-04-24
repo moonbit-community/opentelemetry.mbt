@@ -1,17 +1,27 @@
 ///|
-/// Alias for the span-kind enum used by the SDK.
+/// OpenTelemetry span kind.
+///
+/// Use `Server` for inbound request handlers, `Client` for outbound requests,
+/// `Producer`/`Consumer` for messaging, and `Internal` for local work.
 pub type SpanKind = @sdktrace.SpanKind
 
 ///|
-/// Alias for the span status struct used by the SDK.
+/// Span status with a code and optional description.
+///
+/// Status represents the final outcome of the operation. Recording an exception
+/// event does not automatically set status; call `Span::set_status()` when the
+/// operation should be marked as an error.
 pub type Status = @sdktrace.Status
 
 ///|
-/// Alias for the span status-code enum used by the SDK.
+/// Span status code: unset, ok, or error.
 pub type StatusCode = @sdktrace.StatusCode
 
 ///|
 /// Event attached to a span builder.
+///
+/// Events represent timestamped facts that happened during a span, such as a
+/// retry, cache miss, or exception. Use attributes for event-specific detail.
 pub struct Event {
   name : String
   timestamp_unix_nano : Int64
@@ -21,6 +31,9 @@ pub struct Event {
 
 ///|
 /// Link attached to a span builder.
+///
+/// Links connect this span to another span context without making that span the
+/// parent. They are useful for queues, batch jobs, and fan-in/fan-out workflows.
 pub struct Link {
   span_context : @common.SpanContext
   attributes : Array[@common.KeyValue]
@@ -29,6 +42,10 @@ pub struct Link {
 
 ///|
 /// Immutable span-construction descriptor used by `Tracer::build*()`.
+///
+/// Use a builder when a span needs non-default kind, explicit start time,
+/// initial attributes, events, or links. For simple spans, `Tracer::start()` is
+/// shorter.
 pub struct SpanBuilder {
   span_kind : SpanKind?
   name : String
@@ -41,8 +58,9 @@ pub struct SpanBuilder {
 ///|
 /// Public span handle.
 ///
-/// When created from a no-op tracer, the span still propagates context but does
-/// not record data.
+/// A span represents one in-flight operation. When created from a no-op tracer,
+/// the span still propagates a valid parent context but does not record data.
+/// End spans once the represented operation is complete.
 pub struct Span {
   sdk_span : @sdktrace.Span?
   propagated_span_context : @common.SpanContext
@@ -52,12 +70,19 @@ pub struct Span {
 
 ///|
 /// Public tracer handle.
+///
+/// A tracer creates spans for one instrumentation scope. Tracers are cheap
+/// handles; libraries normally keep or reacquire one by instrumentation name.
 pub struct Tracer {
   sdk_tracer : @sdktrace.SdkTracer?
 }
 
 ///|
 /// Public tracer provider wrapper around the SDK provider.
+///
+/// `sdk_provider = None` is the public API no-op implementation. This lets
+/// libraries instrument unconditionally while applications decide whether to
+/// install a real SDK provider.
 pub struct TracerProvider {
   sdk_provider : @sdktrace.SdkTracerProvider?
 }
@@ -65,10 +90,11 @@ pub struct TracerProvider {
 ///|
 /// Creates one span event.
 ///
-/// The timestamp defaults to the current Unix time in nanoseconds.
+/// The timestamp defaults to the current Unix time in nanoseconds. Events added
+/// to a no-op span are ignored.
 pub fn Event::new(
   name : StringView,
-  timestamp_unix_nano? : Int64 = @common.now_unix_nano(),
+  timestamp_unix_nano? : Int64 = @utils.now_unix_nano(),
   attributes? : ArrayView[@common.KeyValue] = [],
   dropped_attributes_count? : Int = 0,
 ) -> Event {
@@ -83,7 +109,8 @@ pub fn Event::new(
 ///|
 /// Creates one span link.
 ///
-/// Invalid linked span contexts are ignored later when the span is built.
+/// Invalid linked span contexts are ignored later when the span is built. Links
+/// do not affect parent/child relationships.
 pub fn Link::new(
   span_context : @common.SpanContext,
   attributes? : ArrayView[@common.KeyValue] = [],
@@ -93,7 +120,10 @@ pub fn Link::new(
 }
 
 ///|
-/// Starts building a span with the given name.
+/// Starts building a span with the given operation name.
+///
+/// Names should be low-cardinality and describe the operation shape, such as
+/// `http.request`, `db.query`, or `queue.publish`, not a user-specific value.
 pub fn SpanBuilder::from_name(name : StringView) -> SpanBuilder {
   {
     span_kind: None,
@@ -211,7 +241,7 @@ fn build_sdk_span(
     links~,
     start_time_unix_nano=match builder.start_time_unix_nano {
       Some(start_time) => start_time
-      None => @common.now_unix_nano()
+      None => @utils.now_unix_nano()
     },
   )
   for event in builder.events {
@@ -259,6 +289,9 @@ pub fn TracerProvider::from_sdk(
 
 ///|
 /// Returns a no-op tracer provider.
+///
+/// Tracers from this provider create non-recording spans. Valid parent context
+/// is still propagated so downstream services can continue an existing trace.
 pub fn TracerProvider::noop() -> TracerProvider {
   { sdk_provider: None }
 }
@@ -341,12 +374,18 @@ pub fn TracerProvider::spawn_batch_processor_tasks(
 
 ///|
 /// Starts a root span with the given name.
+///
+/// Use `start_with_context()` when handling an inbound request with an extracted
+/// parent context.
 pub fn Tracer::start(self : Tracer, name : StringView) -> Span {
   self.start_with_context(name, Default::default())
 }
 
 ///|
 /// Starts a span with an explicit parent context.
+///
+/// This is the usual entry point after extracting inbound propagation headers or
+/// when passing a parent context through asynchronous work.
 pub fn Tracer::start_with_context(
   self : Tracer,
   name : StringView,
@@ -357,6 +396,9 @@ pub fn Tracer::start_with_context(
 
 ///|
 /// Returns a fresh span builder for `name`.
+///
+/// The returned builder is independent of the tracer until passed to
+/// `build()` or `build_with_context()`.
 pub fn Tracer::span_builder(self : Tracer, name : StringView) -> SpanBuilder {
   ignore(self)
   SpanBuilder::from_name(name)
@@ -387,7 +429,8 @@ pub fn Tracer::build_with_context(
 ///|
 /// Runs `f` inside a root span and returns its result.
 ///
-/// The span is ended after `f` returns successfully.
+/// The span is ended after `f` returns successfully. If `f` can fail, record
+/// error status or events before returning from the callback.
 pub async fn[T] Tracer::in_span(
   self : Tracer,
   name : StringView,
@@ -429,6 +472,9 @@ pub async fn[T] Tracer::in_span_with_builder(
 
 ///|
 /// Returns the span context that should be propagated downstream.
+///
+/// For no-op spans this may be the valid incoming parent context rather than a
+/// newly recorded span context.
 pub fn Span::span_context(self : Span) -> @common.SpanContext {
   match self.sdk_span {
     Some(span) => span.span_context()
@@ -445,7 +491,8 @@ pub fn Span::context(self : Span) -> @context.Context {
 ///|
 /// Returns whether the span is currently recording telemetry.
 ///
-/// No-op spans always report `false`.
+/// No-op spans and sampled-out SDK spans report `false`. Use this to avoid
+/// constructing expensive attributes or events.
 pub fn Span::is_recording(self : Span) -> Bool {
   match self.sdk_span {
     Some(span) => span.is_recording()
@@ -469,7 +516,7 @@ pub fn Span::add_event(
   name : StringView,
   attributes? : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
-  self.add_event_with_timestamp(name, @common.now_unix_nano(), attributes~)
+  self.add_event_with_timestamp(name, @utils.now_unix_nano(), attributes~)
 }
 
 ///|
@@ -489,7 +536,8 @@ pub fn Span::add_event_with_timestamp(
 ///|
 /// Records an `"exception"` event carrying `exception.message`.
 ///
-/// This helper does not set the span status automatically.
+/// This helper does not set the span status automatically. Call
+/// `set_status(Status::error(...))` if the operation should be marked failed.
 pub fn Span::record_error(self : Span, message : StringView) -> Unit {
   self.add_event("exception", attributes=[
     @common.KeyValue::new(
@@ -552,8 +600,11 @@ pub fn Span::add_link(
 
 ///|
 /// Ends the span with the current timestamp.
+///
+/// Ending an SDK span may notify processors and exporters. Ending a no-op span
+/// only updates local state.
 pub async fn Span::end(self : Span) -> Unit {
-  self.end_with_timestamp(@common.now_unix_nano())
+  self.end_with_timestamp(@utils.now_unix_nano())
 }
 
 ///|
