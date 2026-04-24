@@ -1,5 +1,5 @@
 import {
-  "moonbitlang/core/string",
+  "moonbitlang/core/env",
 }
 
 options(

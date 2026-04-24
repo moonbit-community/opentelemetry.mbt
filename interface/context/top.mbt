@@ -4,6 +4,10 @@
 ///
 /// Each `with_*` helper returns a new value instead of mutating the original
 /// context.
+///
+/// Use `with_remote_span_context()` for contexts extracted from inbound
+/// carriers and `with_span_context()` for locally created spans. Propagators and
+/// log correlation rely on that distinction.
 pub struct Context {
   span_context : @common.SpanContext?
   baggage : @baggage.Baggage
@@ -33,6 +37,9 @@ pub fn Context::span_context(self : Context) -> @common.SpanContext? {
 
 ///|
 /// Returns whether the context contains a valid active span context.
+///
+/// Invalid span contexts are treated as absent for parent/child relationships
+/// and propagation.
 pub fn Context::has_active_span(self : Context) -> Bool {
   match self.span_context {
     Some(span_context) => span_context.is_valid()
@@ -64,6 +71,9 @@ pub fn Context::with_remote_span_context(
 
 ///|
 /// Returns the baggage stored in the context.
+///
+/// Baggage is propagated to downstream services. Do not place secrets or
+/// unbounded values in it.
 pub fn Context::baggage(self : Context) -> @baggage.Baggage {
   self.baggage
 }
@@ -93,6 +103,9 @@ pub fn Context::with_baggage_item(
 
 ///|
 /// Returns whether telemetry is suppressed for work performed in this context.
+///
+/// Suppression is useful inside exporters and instrumentation internals to
+/// avoid recursively producing telemetry while exporting telemetry.
 pub fn Context::is_telemetry_suppressed(self : Context) -> Bool {
   self.suppress_telemetry
 }

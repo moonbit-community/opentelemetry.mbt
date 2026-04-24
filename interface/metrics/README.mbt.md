@@ -1,123 +1,159 @@
 # OpenTelemetry Metrics API
 
-This package is the public metrics API surface. It wraps the SDK meter and
-instruments while keeping a stable signal-specific API.
+This package is the public metrics API. It lets instrumentation code describe
+measurements without depending on a concrete SDK, reader, or exporter.
 
-## Main types
+Metrics are not exported one measurement at a time. Instruments record raw
+measurements into in-memory aggregation state. SDK readers later collect the
+aggregated metric points and exporters send those points to a backend.
 
-- `MeterProvider`, `Meter`
-- synchronous instruments:
-  `Counter`, `UpDownCounter`, `Histogram`, `Gauge`
-- observable instruments:
-  `ObservableCounter`, `ObservableUpDownCounter`, `ObservableGauge`
-- builders for every instrument kind
+## Main Types
 
-## Provider behavior
+- `MeterProvider`: entry point that creates meters
+- `Meter`: creates instruments for one instrumentation scope
+- `Counter`, `UpDownCounter`, `Histogram`, `Gauge`: synchronous instruments
+- `ObservableCounter`, `ObservableUpDownCounter`, `ObservableGauge`: callback
+  instruments observed during collection
+- builder types for every instrument kind
 
-- `MeterProvider::from_sdk(provider)`:
-  wraps an SDK provider
-- `MeterProvider::noop()`:
-  returns a provider that creates no-op instruments
-- `meter(name)`:
-  returns a meter for one instrumentation name
-- `meter_with_scope(scope)`:
-  returns a meter for a full instrumentation scope
-- `force_flush()`:
-  forwards to the SDK provider; no-op providers return success
-- `shutdown()`:
-  forwards to the SDK provider; no-op providers return success
-- `spawn_periodic_readers(group, allow_failure?)`:
-  starts any periodic readers owned by the provider
+## Choosing Instruments
 
-## Instrument method behavior
+Choose the instrument based on the meaning of the value, not only its type:
 
-- `Counter::add(value, attributes?)`:
-  records a monotonic delta; the underlying SDK ignores negative deltas
-- `UpDownCounter::add(value, attributes?)`:
-  records a signed delta
-- `Histogram::record(value, attributes?)`:
-  records one sample
-- `Gauge::record(value, attributes?)`:
-  records the latest value
-- `ObservableCounter::observe(value, attributes?)`:
-  reports one callback value for a monotonic observable counter
-- `ObservableUpDownCounter::observe(value, attributes?)`:
-  reports one callback value for an additive observable counter
-- `ObservableGauge::observe(value, attributes?)`:
-  reports one callback value for a gauge
+| Use case | Instrument |
+| --- | --- |
+| Count requests, errors, bytes sent, or other monotonic totals | `Counter` |
+| Track active requests, queue depth, or connections that go up and down | `UpDownCounter` |
+| Record latency, payload size, or other distributions | `Histogram` |
+| Record latest temperature, memory use, or other current state | `Gauge` |
+| Read a value owned elsewhere only when metrics are collected | Observable instrument |
 
-## Builder method behavior
+Prefer low-cardinality attributes. Values such as user IDs, raw URLs, UUIDs, or
+unbounded error strings can create too many time series.
 
-All builders follow the same pattern:
+## Recording Measurements
 
-- `with_description(description)`:
-  sets the instrument description
-- `with_unit(unit)`:
-  sets the instrument unit
-- `build()`:
-  creates the instrument with the current options
+Create instruments once and reuse them. Instrument creation may register SDK
+state; recording is the hot path.
 
-Observable builders additionally expose:
+```mbt check
+///|
+fn _metrics_readme_record() -> Unit {
+  let meter = MeterProvider::noop().meter("example")
+  let counter = meter
+    .u64_counter("request.count")
+    .with_description("Total handled requests")
+    .build()
+  let latency = meter.f64_histogram("request.duration").with_unit("ms").build()
 
-- `with_callback(callback)`:
-  registers one callback to run during collection
+  counter.add(1UL, attributes=[
+    @common.KeyValue::new("http.request.method", @common.Value::String("GET")),
+  ])
+  latency.record(12.5, attributes=[
+    @common.KeyValue::new("http.route", @common.Value::String("/health")),
+  ])
+}
+```
 
-Callbacks are frozen when `build()` is called.
+The SDK ignores negative deltas for monotonic counters. Use an up-down counter
+when the value can decrease.
 
-## Meter factory methods
+## Observable Instruments
 
-### Counters
+Observable instruments are callbacks. Use them when the measurement already
+lives somewhere else and should be read during collection, for example process
+memory, queue length, connection pool size, or OS counters.
 
-- `u64_counter(name)`:
-  builds a native `UInt64` counter
-- `f64_counter(name)`:
-  builds a floating-point counter
+```mbt check
+///|
+fn _metrics_readme_observable() -> Unit {
+  let meter = MeterProvider::noop().meter("example")
+  let observable = meter
+    .i64_observable_up_down_counter("queue.depth")
+    .with_callback(observer => observer.observe(42L))
+    .build()
+  ignore(observable)
+}
+```
 
-### Up-down counters
+Callbacks are frozen when `build()` is called. If a no-op meter is used,
+callbacks are accepted but never collected by an SDK reader.
 
-- `i64_up_down_counter(name)`:
-  builds an `Int64` up-down counter
-- `f64_up_down_counter(name)`:
-  builds a floating-point up-down counter
+## Provider Reference
 
-### Histograms
+- `MeterProvider::from_sdk(provider)` wraps an SDK meter provider.
+- `MeterProvider::noop()` creates no-op instruments.
+- `meter(name)` creates a meter for one instrumentation name.
+- `meter_with_scope(scope)` creates a meter from a full instrumentation scope.
+- `force_flush()` and `shutdown()` forward to the SDK provider; no-op providers
+  report success.
+- `spawn_periodic_readers(group, allow_failure?)` starts periodic metric reader
+  loops owned by the provider.
 
-- `u64_histogram(name)`:
-  builds a native `UInt64` histogram
-- `f64_histogram(name)`:
-  builds a `Double` histogram
+## Instrument Reference
 
-### Gauges
+- `Counter::add(value, attributes?)` records a monotonic delta.
+- `UpDownCounter::add(value, attributes?)` records a signed delta.
+- `Histogram::record(value, attributes?)` records one sample.
+- `Gauge::record(value, attributes?)` records the latest value.
+- `ObservableCounter::observe(value, attributes?)` reports a callback value for
+  a monotonic observable counter.
+- `ObservableUpDownCounter::observe(value, attributes?)` reports a callback
+  value for an additive observable counter.
+- `ObservableGauge::observe(value, attributes?)` reports a callback value for a
+  gauge.
 
-- `u64_gauge(name)`:
-  builds a native `UInt64` gauge
-- `i64_gauge(name)`:
-  builds an `Int64` gauge; values are converted to `Double`
-- `f64_gauge(name)`:
-  builds a `Double` gauge
+## Builder Reference
 
-### Observable counters
+All builders expose:
 
-- `u64_observable_counter(name)`:
-  builds a native `UInt64` observable counter
-- `f64_observable_counter(name)`:
-  builds a `Double` observable counter
+- `with_description(description)`: human-readable explanation of the instrument
+- `with_unit(unit)`: UCUM-style unit such as `ms`, `By`, or `1`
+- `build()`: creates the instrument
 
-### Observable up-down counters
+Observable builders also expose `with_callback(callback)`.
 
-- `i64_observable_up_down_counter(name)`:
-  builds an `Int64` observable up-down counter
-- `f64_observable_up_down_counter(name)`:
-  builds a `Double` observable up-down counter
+## Meter Factory Reference
 
-### Observable gauges
+Counters:
 
-- `u64_observable_gauge(name)`:
-  builds a native `UInt64` observable gauge
-- `i64_observable_gauge(name)`:
-  builds an `Int64` observable gauge; callback values are converted to `Double`
-- `f64_observable_gauge(name)`:
-  builds a `Double` observable gauge
+- `u64_counter(name)`
+- `f64_counter(name)`
 
-No-op meters return builders whose built instruments silently discard all
-measurements.
+Up-down counters:
+
+- `i64_up_down_counter(name)`
+- `f64_up_down_counter(name)`
+
+Histograms:
+
+- `u64_histogram(name)`
+- `f64_histogram(name)`
+
+Gauges:
+
+- `u64_gauge(name)`
+- `i64_gauge(name)`, converted to the SDK's floating-point representation
+- `f64_gauge(name)`
+
+Observable counters:
+
+- `u64_observable_counter(name)`
+- `f64_observable_counter(name)`
+
+Observable up-down counters:
+
+- `i64_observable_up_down_counter(name)`
+- `f64_observable_up_down_counter(name)`
+
+Observable gauges:
+
+- `u64_observable_gauge(name)`
+- `i64_observable_gauge(name)`, callback values converted to floating point
+- `f64_observable_gauge(name)`
+
+## No-Op Behavior
+
+No-op meters return builders whose built instruments silently discard
+measurements. This lets libraries record metrics unconditionally while the final
+application decides whether a real SDK provider and reader are installed.

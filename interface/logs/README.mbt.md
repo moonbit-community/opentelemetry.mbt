@@ -1,80 +1,127 @@
 # OpenTelemetry Logs API
 
-This package is the public logging bridge API. It wraps the logging parts of
-the SDK but keeps a signal-specific surface for applications and bridges.
+This package is the public logs bridge API. It represents log events in the
+OpenTelemetry log data model and forwards them to an SDK logger when one is
+installed.
 
-## Main types
+You can use it directly, but its main role is to let logging libraries or
+application logging adapters translate existing log events into OpenTelemetry
+records. Traces, metrics, and logs can then share resource attributes,
+instrumentation scope, and trace correlation fields.
 
-- `AnyValue`: values accepted by log bodies and ad-hoc attributes
-- `Severity`: the 24-slot OpenTelemetry severity ladder
-- `LogRecord`: mutable record builder
-- `LoggerProvider`: provider wrapper
-- `Logger`: logger handle
+## Main Types
 
-## Value mapping
+- `AnyValue`: structured log body and attribute value
+- `Severity`: OpenTelemetry severity ladder
+- `LogRecord`: mutable builder for one log event
+- `LoggerProvider`: entry point that creates loggers
+- `Logger`: emits records for one instrumentation scope
 
-- `AnyValue::Map` stays structured when it is bridged into the SDK and OTLP.
-- `Severity::name()` returns the canonical uppercase severity text, such as
-  `ERROR3` or `INFO`.
+## Creating A Record
 
-## `LogRecord` behavior
+```mbt check
+///|
+async fn _logs_readme_emit() -> Unit {
+  let logger = LoggerProvider::noop().logger("example")
+  if logger.event_enabled(Severity::Info, "example") {
+    let record = logger.create_log_record()
+    record.set_event_name("user.created")
+    record.set_target("example")
+    record.set_severity_number(Severity::Info)
+    record.set_body(AnyValue::String("created user"))
+    record.add_attribute("user.plan", AnyValue::String("free"))
+    logger.emit(record)
+  }
+}
+```
 
-- `LogRecord::new()`:
-  creates an empty mutable record
-- `set_event_name(name)`:
-  stores the event name for the OTLP `event_name` field
-- `set_target(target)`:
-  stores the target used for export-time scope grouping
-- `set_timestamp(ts)`:
-  sets the event timestamp in Unix nanoseconds
-- `set_observed_timestamp(ts)`:
-  sets the observed timestamp in Unix nanoseconds
-- `set_severity_text(text)`:
-  sets the exact text that should be exported
-- `set_severity_number(severity)`:
-  sets the structured severity
-- `set_body(body)`:
-  sets the log body
-- `add_attribute(key, value)`:
-  appends one ad-hoc attribute
-- `add_attributes(attributes)`:
-  appends multiple pre-built attributes
-- `set_trace_context(trace_id, span_id, trace_flags?)`:
-  attaches explicit trace-correlation fields; omitted flags default to zero
+Use `event_enabled()` as a guard before building expensive records. The current
+implementation only checks whether the logger has a real SDK backend; it does
+not yet apply severity, target, or event-name filtering.
 
-When a field is not set:
+## Value Mapping
 
-- body defaults to an empty string during `emit()`
-- event timestamp defaults to `now`
-- observed timestamp defaults to `now`
-- severity text is derived from the severity number when possible
+`AnyValue` supports scalar and structured values:
 
-## `LoggerProvider` behavior
+- `Int`, `Double`, `String`, `Boolean`, and `Bytes`
+- `ListAny` for arrays
+- `Map` for structured objects
 
-- `LoggerProvider::from_sdk(provider)`:
-  wraps an SDK provider
-- `LoggerProvider::noop()`:
-  returns a provider that drops all log work
-- `logger(name)`:
-  returns a logger for one instrumentation name
-- `logger_with_scope(scope)`:
-  returns a logger for a full instrumentation scope
-- `force_flush()`:
-  forwards to the SDK provider; no-op providers return success
-- `shutdown()`:
-  forwards to the SDK provider; no-op providers return success
-- `spawn_batch_processor_tasks(group, allow_failure?)`:
-  starts batch processor loops when the provider owns them
+Structured values remain structured when converted into the SDK and OTLP data
+model. Use simple scalar attributes for common search fields and structured
+bodies for payloads that should remain grouped.
 
-## `Logger` behavior
+## Severity
 
-- `create_log_record()`:
-  returns a fresh mutable record
-- `emit(record)`:
-  converts the record into the SDK log pipeline and exports it through the
-  provider's processors
-- `event_enabled(severity, target, name?)`:
-  currently only reports whether a real SDK logger exists; it does not apply
-  severity-specific filtering yet
+`Severity` follows the OpenTelemetry 24-slot severity ladder:
 
-No-op loggers silently drop emitted records.
+- `Trace` through `Trace4`
+- `Debug` through `Debug4`
+- `Info` through `Info4`
+- `Warn` through `Warn4`
+- `Error` through `Error4`
+- `Fatal` through `Fatal4`
+
+`Severity::name()` returns the canonical uppercase text, such as `INFO`,
+`WARN3`, or `ERROR`.
+
+## Trace Correlation
+
+Logs can be correlated with traces by adding trace context to the record:
+
+```mbt check
+///|
+fn _logs_readme_trace_context(
+  record : LogRecord,
+  trace_id : @common.TraceId,
+  span_id : @common.SpanId,
+) -> Unit {
+  record.set_trace_context(trace_id, span_id)
+}
+```
+
+When using trace APIs directly, prefer passing the current span context from the
+active `Context` or `Span` so logs and spans share the same trace identifiers.
+
+## Record Reference
+
+- `LogRecord::new()` creates an empty mutable record.
+- `set_event_name(name)` stores the OTLP `event_name` field.
+- `set_target(target)` stores the target used for export-time scope grouping.
+- `set_timestamp(ts)` sets event time in Unix nanoseconds.
+- `set_observed_timestamp(ts)` sets observed time in Unix nanoseconds.
+- `set_severity_text(text)` sets exact exported severity text.
+- `set_severity_number(severity)` sets structured severity.
+- `set_body(body)` sets the log body.
+- `add_attribute(key, value)` appends one ad-hoc structured attribute.
+- `add_attributes(attributes)` appends shared `KeyValue` attributes.
+- `set_trace_context(trace_id, span_id, trace_flags?)` attaches explicit trace
+  correlation fields; omitted flags default to zero.
+
+When a field is omitted, `emit()` fills defaults:
+
+- body becomes an empty string
+- event timestamp becomes current time
+- observed timestamp becomes current time
+- severity text is derived from severity number when possible
+
+## Provider And Logger Reference
+
+- `LoggerProvider::from_sdk(provider)` wraps an SDK logger provider.
+- `LoggerProvider::noop()` drops all emitted records.
+- `logger(name)` creates a logger for one instrumentation name.
+- `logger_with_scope(scope)` creates a logger from a full instrumentation scope.
+- `force_flush()` and `shutdown()` forward to the SDK provider; no-op providers
+  report success.
+- `spawn_batch_processor_tasks(group, allow_failure?)` starts batch log
+  processor loops owned by the provider.
+- `Logger::create_log_record()` creates a fresh mutable record.
+- `Logger::emit(record)` converts the record into the SDK log pipeline.
+- `Logger::event_enabled(severity, target, name?)` is the pre-construction guard
+  for potentially expensive log records.
+
+## No-Op Behavior
+
+No-op loggers silently drop emitted records. Creating and populating a
+`LogRecord` still has normal application cost, so use `event_enabled()` around
+expensive message formatting or payload construction.

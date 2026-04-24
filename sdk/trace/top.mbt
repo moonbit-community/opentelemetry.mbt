@@ -1,5 +1,9 @@
 ///|
 /// OpenTelemetry span kinds.
+///
+/// Span kind describes the relationship between this operation and remote
+/// systems. It affects how backends render service maps and client/server
+/// relationships.
 pub(all) enum SpanKind {
   Internal
   Client
@@ -52,6 +56,10 @@ pub struct SpanLimits {
 
 ///|
 /// Result of a sampler decision.
+///
+/// `Drop` creates a non-recording span context, `RecordOnly` records locally
+/// without setting the sampled flag, and `RecordAndSample` records and marks the
+/// context as sampled for downstream services.
 pub(all) enum SamplingDecision {
   Drop
   RecordOnly
@@ -109,6 +117,9 @@ pub struct BatchConfig {
 
 ///|
 /// Provider-wide trace configuration.
+///
+/// Configuration is read when a span starts. Builder methods override defaults
+/// derived from environment variables.
 pub struct Config {
   sampler : Sampler
   id_generator : IdGenerator
@@ -147,6 +158,9 @@ pub struct SpanExporter {
 
 ///|
 /// Processing hook interface around span start and end.
+///
+/// Processors should avoid expensive work on `on_start`. Exporters usually run
+/// from `on_end` through simple or batch processor implementations.
 pub struct SpanProcessor {
   on_start_fn : (@context.Context, SpanData) -> Unit
   on_end_fn : async (SpanData) -> Unit
@@ -156,12 +170,18 @@ pub struct SpanProcessor {
 
 ///|
 /// Processor that exports spans immediately when `Span::end()` is awaited.
+///
+/// This is useful for tests and local debugging. For network exporters, prefer
+/// `BatchSpanProcessor` to reduce request-path latency.
 pub struct SimpleSpanProcessor {
   inner : SpanProcessor
 }
 
 ///|
 /// Processor that buffers ended spans and exports them in batches.
+///
+/// The background loop is not started automatically. Register the provider
+/// globally and call `spawn_background_tasks()` from the application runtime.
 pub struct BatchSpanProcessor {
   inner : SpanProcessor
   state : Ref[BatchProcessorState]
@@ -218,6 +238,9 @@ struct ProviderState {
 
 ///|
 /// Owns trace configuration, processors, and resource metadata.
+///
+/// Applications create one provider, configure processors/exporters, and shut it
+/// down during application teardown.
 pub struct SdkTracerProvider {
   state : Ref[ProviderState]
 }
@@ -232,6 +255,9 @@ pub struct SdkTracerProviderBuilder {
 
 ///|
 /// Tracer scoped to one instrumentation library.
+///
+/// Tracers are lightweight handles. The instrumentation scope is attached to
+/// every span they create.
 pub struct SdkTracer {
   provider : SdkTracerProvider
   instrumentation_scope : @common.InstrumentationScope
@@ -271,7 +297,7 @@ pub impl Default for Status with default() -> Status {
 pub fn SpanEvent::new(
   name : StringView,
   attributes? : ArrayView[@common.KeyValue] = [],
-  timestamp_unix_nano? : Int64 = @common.now_unix_nano(),
+  timestamp_unix_nano? : Int64 = @utils.now_unix_nano(),
   dropped_attributes_count? : Int = 0,
 ) -> SpanEvent {
   {
@@ -363,6 +389,9 @@ pub fn Sampler::description(self : Sampler) -> String {
 
 ///|
 /// Sampler that records and samples every span.
+///
+/// This is useful for development but can be expensive in high-throughput
+/// production services.
 pub fn Sampler::always_on() -> Sampler {
   Sampler::new(
     _ => SamplingResult::new(SamplingDecision::RecordAndSample),
@@ -372,6 +401,9 @@ pub fn Sampler::always_on() -> Sampler {
 
 ///|
 /// Sampler that drops every span.
+///
+/// Dropped spans still carry a valid context for propagation, but they do not
+/// record events, attributes, or processor callbacks.
 pub fn Sampler::always_off() -> Sampler {
   Sampler::new(
     _ => SamplingResult::new(SamplingDecision::Drop),
@@ -399,7 +431,7 @@ fn trace_id_prefix(trace_id : @common.TraceId) -> Int {
 
 ///|
 fn parse_env_int(key : StringView) -> Int? {
-  match @common.getenv(key) {
+  match @utils.getenv(key) {
     Some(value) => {
       let value = value.trim()
       if value == "" {
@@ -452,7 +484,7 @@ fn parse_decimal(value : StringView) -> Double? {
 
 ///|
 fn parse_env_ratio(key : StringView) -> Double? {
-  match @common.getenv(key) {
+  match @utils.getenv(key) {
     Some(value) => parse_decimal(value)
     None => None
   }
@@ -477,7 +509,7 @@ fn ratio_arg_or_default() -> Double {
 ///|
 fn sampler_from_env() -> Sampler {
   let default_sampler = Sampler::parent_based(Sampler::always_on())
-  match @common.getenv("OTEL_TRACES_SAMPLER") {
+  match @utils.getenv("OTEL_TRACES_SAMPLER") {
     Some(value) => {
       let value = value.trim()
       if value == "always_on" {
@@ -670,6 +702,9 @@ pub impl Default for BatchConfig with default() -> BatchConfig {
 
 ///|
 /// Creates trace provider configuration.
+///
+/// Omitted arguments use default sampler, ID generator, span limits, and
+/// resource. Environment variables are applied through `Default`.
 pub fn Config::new(
   sampler? : Sampler = Default::default(),
   id_generator? : IdGenerator = RandomIdGenerator::new().into_id_generator(),
@@ -1105,7 +1140,7 @@ pub fn Span::add_event(
   self : Span,
   name : StringView,
   attributes? : ArrayView[@common.KeyValue] = [],
-  timestamp_unix_nano? : Int64 = @common.now_unix_nano(),
+  timestamp_unix_nano? : Int64 = @utils.now_unix_nano(),
   dropped_attributes_count? : Int = 0,
 ) -> Unit {
   if !self.is_recording() {
@@ -1191,7 +1226,7 @@ pub fn Span::snapshot(self : Span) -> SpanData {
 /// span is recording.
 pub async fn Span::end(
   self : Span,
-  end_time_unix_nano? : Int64 = @common.now_unix_nano(),
+  end_time_unix_nano? : Int64 = @utils.now_unix_nano(),
 ) -> Unit {
   if self.state.val.has_ended {
     return
@@ -1212,6 +1247,10 @@ pub async fn Span::end(
 
 ///|
 /// Starts building a tracer provider.
+///
+/// Add processors or exporters before calling `build()`. A provider with no
+/// processors records spans in memory only long enough to return span handles;
+/// no telemetry is exported.
 pub fn SdkTracerProvider::builder() -> SdkTracerProviderBuilder {
   { config: Default::default(), processors: [], batch_processors: [] }
 }
@@ -1278,6 +1317,8 @@ pub fn SdkTracerProviderBuilder::with_span_processor(
 
 ///|
 /// Appends a simple processor around the exporter.
+///
+/// Finished spans are exported from `Span::end()`.
 pub fn SdkTracerProviderBuilder::with_simple_exporter(
   self : SdkTracerProviderBuilder,
   exporter : SpanExporter,
@@ -1290,6 +1331,10 @@ pub fn SdkTracerProviderBuilder::with_simple_exporter(
 ///|
 /// Appends a batch processor around the exporter and registers it for
 /// background execution.
+///
+/// The processor is registered with the provider, but its export loop only runs
+/// after `spawn_batch_processor_tasks()` or the facade/global equivalent is
+/// called.
 pub fn SdkTracerProviderBuilder::with_batch_exporter(
   self : SdkTracerProviderBuilder,
   exporter : SpanExporter,
@@ -1451,6 +1496,9 @@ fn span_state(
 
 ///|
 /// Starts a span using the provider configuration, sampler, and resource.
+///
+/// This evaluates the sampler, generates IDs, applies limits, and notifies
+/// processors when the span is recording.
 pub fn SdkTracer::start(
   self : SdkTracer,
   name : StringView,
@@ -1458,7 +1506,7 @@ pub fn SdkTracer::start(
   kind? : SpanKind = SpanKind::Internal,
   attributes? : ArrayView[@common.KeyValue] = [],
   links? : ArrayView[SpanLink] = [],
-  start_time_unix_nano? : Int64 = @common.now_unix_nano(),
+  start_time_unix_nano? : Int64 = @utils.now_unix_nano(),
 ) -> Span {
   let provider_state = self.provider.state.val
   if provider_state.is_shutdown {

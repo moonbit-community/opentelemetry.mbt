@@ -1,5 +1,8 @@
 ///|
 /// Full OpenTelemetry severity ladder used by `LogRecord`.
+///
+/// The 24 slots let bridges preserve finer-grained severity from existing
+/// logging frameworks.
 pub(all) enum SeverityNumber {
   Trace
   Trace2
@@ -29,6 +32,9 @@ pub(all) enum SeverityNumber {
 
 ///|
 /// Structured log value preserved by the SDK and OTLP exporter.
+///
+/// Use `Map` and `Array` when the backend should receive structured payloads
+/// rather than preformatted strings.
 pub(all) enum AnyValue {
   Bool(Bool)
   Int64(Int64)
@@ -73,6 +79,9 @@ pub struct LogExporter {
 
 ///|
 /// Processing hook interface for logs.
+///
+/// Processors receive immutable log snapshots after the logger attaches
+/// resource and instrumentation scope metadata.
 pub struct LogProcessor {
   emit_fn : async (LogRecord) -> Unit
   force_flush_fn : async () -> @error.OTelSdkResult
@@ -81,12 +90,18 @@ pub struct LogProcessor {
 
 ///|
 /// Processor that exports each log record immediately.
+///
+/// Useful for tests and local debugging. Network exporters should usually be
+/// wrapped by `BatchLogProcessor`.
 pub struct SimpleLogProcessor {
   inner : LogProcessor
 }
 
 ///|
 /// Processor that buffers log records and exports them in batches.
+///
+/// The background loop is not started automatically. Use global/facade
+/// `spawn_background_tasks()` after provider registration.
 pub struct BatchLogProcessor {
   inner : LogProcessor
   state : Ref[BatchProcessorState]
@@ -131,6 +146,9 @@ struct LoggerProviderState {
 
 ///|
 /// Owns resource metadata and the processor pipeline for loggers.
+///
+/// Applications create one provider, configure processors/exporters, register it
+/// if needed, then shut it down during application teardown.
 pub struct SdkLoggerProvider {
   state : Ref[LoggerProviderState]
 }
@@ -145,6 +163,8 @@ pub struct SdkLoggerProviderBuilder {
 
 ///|
 /// Logger scoped to one instrumentation library.
+///
+/// The instrumentation scope is copied onto every emitted log record.
 pub struct SdkLogger {
   provider : SdkLoggerProvider
   instrumentation_scope : @common.InstrumentationScope
@@ -183,10 +203,14 @@ pub fn KeyValue::from_common(attribute : @common.KeyValue) -> KeyValue {
 
 ///|
 /// Creates a log record snapshot.
+///
+/// This is the immutable SDK-side representation. Public API users usually
+/// build `interface/logs.LogRecord` values and let `Logger::emit()` convert
+/// them into this type.
 pub fn LogRecord::new(
   body : AnyValue,
-  timestamp_unix_nano? : Int64 = @common.now_unix_nano(),
-  observed_timestamp_unix_nano? : Int64 = @common.now_unix_nano(),
+  timestamp_unix_nano? : Int64 = @utils.now_unix_nano(),
+  observed_timestamp_unix_nano? : Int64 = @utils.now_unix_nano(),
   severity_number? : SeverityNumber? = None,
   severity_text? : String? = None,
   event_name? : String? = None,
@@ -213,7 +237,7 @@ pub fn LogRecord::new(
 
 ///|
 fn parse_env_int(key : StringView) -> Int? {
-  match @common.getenv(key) {
+  match @utils.getenv(key) {
     Some(value) => {
       let value = value.trim()
       if value == "" {
@@ -544,6 +568,9 @@ pub async fn BatchLogProcessor::run(self : BatchLogProcessor) -> Unit {
 
 ///|
 /// Starts building a logger provider with the default resource.
+///
+/// Add processors or exporters before calling `build()`. A provider with no
+/// processors accepts logs but exports nothing.
 pub fn SdkLoggerProvider::builder() -> SdkLoggerProviderBuilder {
   {
     resource: @resource.Resource::builder().build(),
@@ -574,6 +601,8 @@ pub fn SdkLoggerProviderBuilder::with_log_processor(
 
 ///|
 /// Appends a simple processor around the exporter.
+///
+/// Each emitted log is exported from `SdkLogger::emit()`.
 pub fn SdkLoggerProviderBuilder::with_simple_exporter(
   self : SdkLoggerProviderBuilder,
   exporter : LogExporter,
@@ -586,6 +615,10 @@ pub fn SdkLoggerProviderBuilder::with_simple_exporter(
 ///|
 /// Appends a batch processor around the exporter and registers it for
 /// background execution.
+///
+/// The processor is registered with the provider, but its export loop only runs
+/// after `spawn_batch_processor_tasks()` or the facade/global equivalent is
+/// called.
 pub fn SdkLoggerProviderBuilder::with_batch_exporter(
   self : SdkLoggerProviderBuilder,
   exporter : LogExporter,
@@ -711,6 +744,9 @@ fn trace_context_from_context(
 
 ///|
 /// Emits one log record through the provider pipeline.
+///
+/// The logger attaches resource and instrumentation scope metadata before
+/// forwarding the record to processors.
 pub async fn SdkLogger::emit(
   self : SdkLogger,
   body : AnyValue,
@@ -720,8 +756,8 @@ pub async fn SdkLogger::emit(
   event_name? : String? = None,
   target? : String? = None,
   attributes? : ArrayView[KeyValue] = [],
-  timestamp_unix_nano? : Int64 = @common.now_unix_nano(),
-  observed_timestamp_unix_nano? : Int64 = @common.now_unix_nano(),
+  timestamp_unix_nano? : Int64 = @utils.now_unix_nano(),
+  observed_timestamp_unix_nano? : Int64 = @utils.now_unix_nano(),
 ) -> Unit {
   if self.provider.state.val.is_shutdown {
     return

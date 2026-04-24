@@ -47,42 +47,62 @@ fn build_scope(
 
 ///|
 /// Returns the currently registered global tracer provider.
+///
+/// The default provider is no-op. Applications replace it during startup so
+/// library instrumentation obtained through the root package records spans.
 pub fn tracer_provider() -> @trace.TracerProvider {
   tracer_provider_ref.val
 }
 
 ///|
 /// Replaces the current global tracer provider.
+///
+/// Call this during application startup after building an SDK tracer provider
+/// and wrapping it with `interface/trace.TracerProvider::from_sdk`.
 pub fn set_tracer_provider(provider : @trace.TracerProvider) -> Unit {
   tracer_provider_ref.val = provider
 }
 
 ///|
 /// Returns the currently registered global logger provider.
+///
+/// The default provider is no-op.
 pub fn logger_provider() -> @logs.LoggerProvider {
   logger_provider_ref.val
 }
 
 ///|
 /// Replaces the current global logger provider.
+///
+/// Call this during application startup to enable log export through the public
+/// logging bridge.
 pub fn set_logger_provider(provider : @logs.LoggerProvider) -> Unit {
   logger_provider_ref.val = provider
 }
 
 ///|
 /// Returns the currently registered global meter provider.
+///
+/// The default provider is no-op.
 pub fn meter_provider() -> @metrics.MeterProvider {
   meter_provider_ref.val
 }
 
 ///|
 /// Replaces the current global meter provider.
+///
+/// Call this during application startup so root-package `meter()` calls create
+/// instruments backed by an SDK provider.
 pub fn set_meter_provider(provider : @metrics.MeterProvider) -> Unit {
   meter_provider_ref.val = provider
 }
 
 ///|
 /// Replaces the current global text-map propagator.
+///
+/// The default propagator combines W3C trace context and baggage. Replace it
+/// only when your transport or interoperability requirements need a different
+/// propagation format.
 pub fn set_text_map_propagator(
   propagator : @propagation.TextMapPropagator,
 ) -> Unit {
@@ -101,6 +121,7 @@ pub fn[T] get_text_map_propagator(
 /// Returns a tracer from the current global tracer provider.
 ///
 /// The scope is built from `name`, `version`, `schema_url`, and `attributes`.
+/// This is what the root package delegates to.
 pub fn tracer(
   name : StringView,
   version? : String? = None,
@@ -122,6 +143,7 @@ pub fn tracer_with_scope(scope : @common.InstrumentationScope) -> @trace.Tracer 
 /// Returns a logger from the current global logger provider.
 ///
 /// The scope is built from `name`, `version`, `schema_url`, and `attributes`.
+/// This is what the root package delegates to.
 pub fn logger(
   name : StringView,
   version? : String? = None,
@@ -143,6 +165,7 @@ pub fn logger_with_scope(scope : @common.InstrumentationScope) -> @logs.Logger {
 /// Returns a meter from the current global meter provider.
 ///
 /// The scope is built from `name`, `version`, `schema_url`, and `attributes`.
+/// This is what the root package delegates to.
 pub fn meter(
   name : StringView,
   version? : String? = None,
@@ -165,6 +188,9 @@ pub fn meter_with_scope(scope : @common.InstrumentationScope) -> @metrics.Meter 
 ///
 /// This activates batch span/log processors and periodic metric readers. No-op
 /// providers simply do nothing.
+///
+/// Call this only after provider registration; it uses the providers that are
+/// current at call time.
 pub fn spawn_background_tasks(
   group : @async.TaskGroup[Unit],
   allow_failure? : Bool = false,
