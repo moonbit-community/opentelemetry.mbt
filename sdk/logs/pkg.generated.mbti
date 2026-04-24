@@ -2,8 +2,8 @@
 package "moonbit-community/opentelemetry/sdk/logs"
 
 import {
-  "moonbit-community/opentelemetry/sdk/common",
-  "moonbit-community/opentelemetry/sdk/context",
+  "moonbit-community/opentelemetry/interface/common",
+  "moonbit-community/opentelemetry/interface/context",
   "moonbit-community/opentelemetry/sdk/error",
   "moonbit-community/opentelemetry/sdk/resource",
   "moonbitlang/async",
@@ -115,6 +115,7 @@ pub struct SdkLoggerProvider {
 }
 pub fn SdkLoggerProvider::builder() -> SdkLoggerProviderBuilder
 pub async fn SdkLoggerProvider::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn SdkLoggerProvider::into_logger_provider(Self) -> @moonbit-community/opentelemetry/interface/logs.LoggerProvider
 pub fn SdkLoggerProvider::logger(Self, StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> SdkLogger
 pub fn SdkLoggerProvider::resource(Self) -> @resource.Resource
 pub async fn SdkLoggerProvider::shutdown(Self) -> Result[Unit, @error.OTelSdkError]

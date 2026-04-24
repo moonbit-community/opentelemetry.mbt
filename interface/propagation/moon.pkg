@@ -2,7 +2,7 @@ import {
   "moonbitlang/core/string",
   "moonbit-community/opentelemetry/interface/baggage" @baggage,
   "moonbit-community/opentelemetry/interface/context" @context,
-  "moonbit-community/opentelemetry/sdk/common" @common,
+  "moonbit-community/opentelemetry/interface/common" @common,
 }
 
 options(

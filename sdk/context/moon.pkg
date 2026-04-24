@@ -1,7 +1,0 @@
-import {
-  "moonbit-community/opentelemetry/sdk/common" @common,
-}
-
-options(
-  backend: [ "native" ],
-)

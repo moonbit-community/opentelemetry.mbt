@@ -39,19 +39,10 @@ provider, and text-map propagator used by the public API layer.
 - `meter_with_scope(scope)`:
   same as above, but uses an already constructed scope
 
-## Lifecycle helpers
+## Test helper
 
-- `spawn_background_tasks(group, allow_failure?)`:
-  fans out to the currently registered providers and starts batch span/log
-  processors plus periodic metric readers
-- `force_flush()`:
-  flushes all current providers and intentionally ignores individual provider
-  errors
-- `shutdown()`:
-  shuts down all current providers and intentionally ignores individual provider
-  errors
 - `reset_for_test()`:
   resets every global slot back to the default no-op provider/propagator set
 
-Use `sdk/global` when you need the same global pattern but with SDK-specific
-types.
+Use `sdk.set_*_provider()`, `sdk.spawn_background_tasks()`,
+`sdk.force_flush()`, and `sdk.shutdown()` for SDK lifecycle management.

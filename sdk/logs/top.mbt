@@ -731,6 +731,150 @@ pub async fn SdkLoggerProvider::shutdown(
 }
 
 ///|
+fn api_sorted_keys(values : Map[String, @api.AnyValue]) -> Array[String] {
+  let keys = values.keys().to_array()
+  for i in 1..<keys.length() {
+    let current = keys[i]
+    let mut j = i
+    while j > 0 && current < keys[j - 1] {
+      keys[j] = keys[j - 1]
+      j = j - 1
+    }
+    keys[j] = current
+  }
+  keys
+}
+
+///|
+fn any_value_from_api(value : @api.AnyValue) -> AnyValue {
+  match value {
+    @api.AnyValue::Int(value) => AnyValue::Int64(value)
+    @api.AnyValue::Double(value) => AnyValue::Double(value)
+    @api.AnyValue::String(value) => AnyValue::String(value)
+    @api.AnyValue::Boolean(value) => AnyValue::Bool(value)
+    @api.AnyValue::Bytes(value) => AnyValue::Bytes(value)
+    @api.AnyValue::ListAny(values) => {
+      let converted = []
+      for value in values {
+        converted.push(any_value_from_api(value))
+      }
+      AnyValue::Array(converted)
+    }
+    @api.AnyValue::Map(values) => {
+      let converted = []
+      for key in api_sorted_keys(values) {
+        guard values.get(key) is Some(value)
+        converted.push(KeyValue::new(key, any_value_from_api(value)))
+      }
+      AnyValue::Map(converted)
+    }
+  }
+}
+
+///|
+fn key_value_from_api(attribute : @api.KeyValue) -> KeyValue {
+  { key: attribute.key, value: any_value_from_api(attribute.value) }
+}
+
+///|
+fn severity_from_api(severity : @api.Severity?) -> SeverityNumber? {
+  match severity {
+    Some(@api.Severity::Trace) => Some(SeverityNumber::Trace)
+    Some(@api.Severity::Trace2) => Some(SeverityNumber::Trace2)
+    Some(@api.Severity::Trace3) => Some(SeverityNumber::Trace3)
+    Some(@api.Severity::Trace4) => Some(SeverityNumber::Trace4)
+    Some(@api.Severity::Debug) => Some(SeverityNumber::Debug)
+    Some(@api.Severity::Debug2) => Some(SeverityNumber::Debug2)
+    Some(@api.Severity::Debug3) => Some(SeverityNumber::Debug3)
+    Some(@api.Severity::Debug4) => Some(SeverityNumber::Debug4)
+    Some(@api.Severity::Info) => Some(SeverityNumber::Info)
+    Some(@api.Severity::Info2) => Some(SeverityNumber::Info2)
+    Some(@api.Severity::Info3) => Some(SeverityNumber::Info3)
+    Some(@api.Severity::Info4) => Some(SeverityNumber::Info4)
+    Some(@api.Severity::Warn) => Some(SeverityNumber::Warn)
+    Some(@api.Severity::Warn2) => Some(SeverityNumber::Warn2)
+    Some(@api.Severity::Warn3) => Some(SeverityNumber::Warn3)
+    Some(@api.Severity::Warn4) => Some(SeverityNumber::Warn4)
+    Some(@api.Severity::Error) => Some(SeverityNumber::Error)
+    Some(@api.Severity::Error2) => Some(SeverityNumber::Error2)
+    Some(@api.Severity::Error3) => Some(SeverityNumber::Error3)
+    Some(@api.Severity::Error4) => Some(SeverityNumber::Error4)
+    Some(@api.Severity::Fatal) => Some(SeverityNumber::Fatal)
+    Some(@api.Severity::Fatal2) => Some(SeverityNumber::Fatal2)
+    Some(@api.Severity::Fatal3) => Some(SeverityNumber::Fatal3)
+    Some(@api.Severity::Fatal4) => Some(SeverityNumber::Fatal4)
+    None => None
+  }
+}
+
+///|
+fn context_from_api_trace_context(
+  span_context : @common.SpanContext?,
+) -> @context.Context {
+  match span_context {
+    Some(span_context) if span_context.is_remote() =>
+      @context.Context::empty().with_remote_span_context(span_context)
+    Some(span_context) =>
+      @context.Context::empty().with_span_context(span_context)
+    None => @context.Context::empty()
+  }
+}
+
+///|
+fn SdkLogger::into_api_logger(self : SdkLogger) -> @api.Logger {
+  @api.Logger::from_functions(
+    record => {
+      let severity_text = match record.severity_text {
+        Some(severity_text) => Some(severity_text)
+        None => record.severity_number.map(severity => severity.name())
+      }
+      let attributes = []
+      for attribute in record.attributes {
+        attributes.push(key_value_from_api(attribute))
+      }
+      self.emit(
+        match record.body {
+          Some(body) => any_value_from_api(body)
+          None => AnyValue::String("")
+        },
+        context=context_from_api_trace_context(record.trace_context),
+        severity_number=severity_from_api(record.severity_number),
+        severity_text~,
+        event_name=record.event_name,
+        target=record.target,
+        attributes~,
+        timestamp_unix_nano=match record.timestamp_unix_nano {
+          Some(timestamp_unix_nano) => timestamp_unix_nano
+          None => @utils.now_unix_nano()
+        },
+        observed_timestamp_unix_nano=match record.observed_timestamp_unix_nano {
+          Some(observed_timestamp_unix_nano) => observed_timestamp_unix_nano
+          None => @utils.now_unix_nano()
+        },
+      )
+    },
+    event_enabled_fn=(_, _, _) => !self.provider.state.val.is_shutdown,
+  )
+}
+
+///|
+/// Erases this SDK provider into the public logs API provider.
+pub fn SdkLoggerProvider::into_logger_provider(
+  self : SdkLoggerProvider,
+) -> @api.LoggerProvider {
+  @api.LoggerProvider::from_functions(scope => {
+    self
+    .logger(
+      scope.name(),
+      version=scope.version(),
+      schema_url=scope.schema_url(),
+      attributes=scope.attributes(),
+    )
+    .into_api_logger()
+  })
+}
+
+///|
 /// Extracts a local span context from the supplied context for log correlation.
 fn trace_context_from_context(
   context : @context.Context,

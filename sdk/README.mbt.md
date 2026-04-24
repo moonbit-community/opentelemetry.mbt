@@ -1,9 +1,9 @@
 # OpenTelemetry SDK
 
 This package is the MoonBit SDK facade. It re-exports the implementation layer
-from `sdk/common`, `sdk/context`, `sdk/resource`, `sdk/propagation`,
-`sdk/trace`, `sdk/logs`, and `sdk/metrics` so application code can configure
-telemetry through one import path.
+from `interface/common`, `interface/context`, `interface/propagation`,
+`sdk/resource`, `sdk/trace`, `sdk/logs`, and `sdk/metrics` so application code
+can configure telemetry through one import path.
 
 The API layer answers "where should instrumentation write data?". The SDK layer
 answers "what should happen to that data?". Applications own the SDK layer:
@@ -23,8 +23,8 @@ The lifecycle is the same for all signals:
 
 1. Build a provider with the signal-specific builder.
 2. Attach exporters, processors, readers, resources, samplers, or views.
-3. Register the provider into a global provider if application code uses global
-   lookup.
+3. Register the provider with `sdk.set_*_provider()` if application code uses
+   global lookup.
 4. Spawn background tasks for batch processors and periodic metric readers.
 5. Force flush and shut down providers during teardown.
 
@@ -53,9 +53,9 @@ async fn _sdk_readme_trace_setup() -> Unit {
 }
 ```
 
-To make root-package calls such as `@otel.tracer()` use this provider, wrap it
-with `interface/trace.TracerProvider::from_sdk(provider)` and register it in
-`interface/global`.
+To make root-package calls such as `@otel.tracer()` use this provider, register
+it with `set_tracer_provider(provider)`. The SDK facade updates both SDK global
+state and the public API global state.
 
 ## Traces
 

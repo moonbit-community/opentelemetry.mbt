@@ -2,7 +2,7 @@
 package "moonbit-community/opentelemetry/interface/baggage"
 
 import {
-  "moonbit-community/opentelemetry/sdk/common",
+  "moonbit-community/opentelemetry/interface/common",
   "moonbitlang/core/debug",
 }
 

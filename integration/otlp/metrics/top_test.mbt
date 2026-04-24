@@ -146,10 +146,10 @@ async test "periodic metrics export over http protobuf via root API" {
       ),
     )
     .build()
-  @global.set_meter_provider(@imetrics.MeterProvider::from_sdk(provider))
+  @sdk.set_meter_provider(provider)
 
   @async.with_task_group(group => {
-    @global.spawn_background_tasks(group)
+    @sdk.spawn_background_tasks(group)
     emit_metrics(scope_name)
 
     let actual = match
@@ -198,7 +198,7 @@ async test "force flushed metrics export over http json via root API" {
       ),
     )
     .build()
-  @global.set_meter_provider(@imetrics.MeterProvider::from_sdk(provider))
+  @sdk.set_meter_provider(provider)
 
   emit_metrics(scope_name)
   match provider.force_flush() {
@@ -287,7 +287,7 @@ async test "rich metrics export covers sync and observable instruments" {
       .build(),
     )
     .build()
-  @global.set_meter_provider(@imetrics.MeterProvider::from_sdk(provider))
+  @sdk.set_meter_provider(provider)
 
   let meter = @otel.meter(
     scope_name,
@@ -524,7 +524,7 @@ async test "metric force_flush times out against a delayed endpoint" {
       .with_resource(integration_resource("integration-metrics-timeout"))
       .with_periodic_reader(reader)
       .build()
-    @global.set_meter_provider(@imetrics.MeterProvider::from_sdk(provider))
+    @sdk.set_meter_provider(provider)
 
     emit_metrics(scope_name)
 
@@ -598,7 +598,7 @@ async test "signal-specific metric endpoint overrides invalid global endpoint" {
       ),
     )
     .build()
-  @global.set_meter_provider(@imetrics.MeterProvider::from_sdk(provider))
+  @sdk.set_meter_provider(provider)
 
   emit_metrics(scope_name)
   match provider.force_flush() {

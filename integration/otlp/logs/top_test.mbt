@@ -191,10 +191,10 @@ async test "batch logs export over http protobuf via root API" {
       ),
     )
     .build()
-  @global.set_logger_provider(@ilogs.LoggerProvider::from_sdk(provider))
+  @sdk.set_logger_provider(provider)
 
   @async.with_task_group(group => {
-    @global.spawn_background_tasks(group)
+    @sdk.spawn_background_tasks(group)
 
     let logger = @global.logger_provider().logger_with_scope(
       @sdk.InstrumentationScope::builder("integration.logs.logger")
@@ -253,7 +253,7 @@ async test "force flushed logs export over http json via root API" {
       ),
     )
     .build()
-  @global.set_logger_provider(@ilogs.LoggerProvider::from_sdk(provider))
+  @sdk.set_logger_provider(provider)
 
   let logger = @global.logger_provider().logger_with_scope(
     @sdk.InstrumentationScope::builder("integration.logs.logger")
@@ -356,7 +356,7 @@ async test "root logger API exports explicit and default log record fields" {
       ),
     )
     .build()
-  @global.set_logger_provider(@ilogs.LoggerProvider::from_sdk(provider))
+  @sdk.set_logger_provider(provider)
 
   let logger = @otel.logger(
     "integration.logs.root",
@@ -495,7 +495,7 @@ async test "log force_flush times out against a delayed endpoint" {
       .with_resource(integration_resource("integration-logs-timeout"))
       .with_log_processor(log_processor)
       .build()
-    @global.set_logger_provider(@ilogs.LoggerProvider::from_sdk(provider))
+    @sdk.set_logger_provider(provider)
 
     let logger = @global.logger_provider().logger("integration.logs.timeout")
     logger.emit(build_record(target_name))
@@ -573,7 +573,7 @@ async test "signal-specific log endpoint overrides invalid global endpoint" {
       ),
     )
     .build()
-  @global.set_logger_provider(@ilogs.LoggerProvider::from_sdk(provider))
+  @sdk.set_logger_provider(provider)
 
   let logger = @global.logger_provider().logger_with_scope(
     @sdk.InstrumentationScope::builder("integration.logs.env")

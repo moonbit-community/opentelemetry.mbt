@@ -1,6 +1,6 @@
 import {
   "moonbitlang/core/string",
-  "moonbit-community/opentelemetry/sdk/common" @common,
+  "moonbit-community/opentelemetry/interface/common" @common,
   "moonbit-community/opentelemetry/sdk/error" @error,
   "moonbit-community/opentelemetry/sdk/logs" @sdklogs,
   "moonbit-community/opentelemetry/sdk/metrics" @sdkmetrics,

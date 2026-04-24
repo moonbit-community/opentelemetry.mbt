@@ -28,8 +28,7 @@ test "noop tracer propagates parent span context without recording" {
 // Test method: Build a span with oversized event and link attributes, export it, and assert the remaining attributes and drop counts.
 async test "builder events and links preserve dropped attribute counts" {
   let exporter = @sdktrace.InMemorySpanExporter::new()
-  let provider = TracerProvider::from_sdk(
-    @sdktrace.SdkTracerProvider::builder()
+  let provider = @sdktrace.SdkTracerProvider::builder()
     .with_span_limits(
       @sdktrace.SpanLimits::new(
         max_attributes_per_event=1,
@@ -37,8 +36,8 @@ async test "builder events and links preserve dropped attribute counts" {
       ),
     )
     .with_simple_exporter(exporter.into_span_exporter())
-    .build(),
-  )
+    .build()
+    .into_tracer_provider()
   guard @common.TraceId::from_hex("4bf92f3577b34da6a3ce929d0e0e4736")
     is Some(trace_id) else {
     fail("expected trace id")

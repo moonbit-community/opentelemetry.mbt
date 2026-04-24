@@ -2,9 +2,7 @@
 package "moonbit-community/opentelemetry/interface/logs"
 
 import {
-  "moonbit-community/opentelemetry/sdk/common",
-  "moonbit-community/opentelemetry/sdk/error",
-  "moonbitlang/async",
+  "moonbit-community/opentelemetry/interface/common",
   "moonbitlang/core/debug",
 }
 
@@ -22,6 +20,15 @@ pub(all) enum AnyValue {
   ListAny(Array[AnyValue])
   Map(Map[String, AnyValue])
 } derive(Eq, ToJson, @debug.Debug)
+pub fn AnyValue::from_common(@common.Value) -> Self
+pub fn AnyValue::map(Map[String, Self]) -> Self
+
+pub struct KeyValue {
+  key : @common.Key
+  value : AnyValue
+} derive(Eq, ToJson, @debug.Debug)
+pub fn KeyValue::from_common(@common.KeyValue) -> Self
+pub fn KeyValue::new(StringView, AnyValue) -> Self
 
 pub struct LogRecord {
   mut event_name : String?
@@ -31,7 +38,7 @@ pub struct LogRecord {
   mut severity_text : String?
   mut severity_number : Severity?
   mut body : AnyValue?
-  attributes : Array[@moonbit-community/opentelemetry/sdk/logs.KeyValue]
+  attributes : Array[KeyValue]
   mut trace_context : @common.SpanContext?
 } derive(Eq, ToJson, @debug.Debug)
 pub fn LogRecord::add_attribute(Self, StringView, AnyValue) -> Unit
@@ -48,22 +55,21 @@ pub fn LogRecord::set_trace_context(Self, @common.TraceId, @common.SpanId, trace
 pub impl Default for LogRecord
 
 pub struct Logger {
-  sdk_logger : @moonbit-community/opentelemetry/sdk/logs.SdkLogger?
+  emit_fn : async (LogRecord) -> Unit
+  event_enabled_fn : (Severity, StringView, String?) -> Bool
 }
 pub fn Logger::create_log_record(Self) -> LogRecord
 pub async fn Logger::emit(Self, LogRecord) -> Unit
 pub fn Logger::event_enabled(Self, Severity, StringView, name? : String?) -> Bool
+pub fn Logger::from_functions(async (LogRecord) -> Unit, event_enabled_fn? : (Severity, StringView, String?) -> Bool) -> Self
 
 pub struct LoggerProvider {
-  sdk_provider : @moonbit-community/opentelemetry/sdk/logs.SdkLoggerProvider?
+  logger_with_scope_fn : (@common.InstrumentationScope) -> Logger
 }
-pub async fn LoggerProvider::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
-pub fn LoggerProvider::from_sdk(@moonbit-community/opentelemetry/sdk/logs.SdkLoggerProvider) -> Self
+pub fn LoggerProvider::from_functions((@common.InstrumentationScope) -> Logger) -> Self
 pub fn LoggerProvider::logger(Self, StringView) -> Logger
 pub fn LoggerProvider::logger_with_scope(Self, @common.InstrumentationScope) -> Logger
 pub fn LoggerProvider::noop() -> Self
-pub async fn LoggerProvider::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
-pub fn LoggerProvider::spawn_batch_processor_tasks(Self, @async.TaskGroup[Unit], allow_failure? : Bool) -> Unit
 
 pub(all) enum Severity {
   Trace

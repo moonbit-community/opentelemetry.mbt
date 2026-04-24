@@ -3,12 +3,12 @@ package "moonbit-community/opentelemetry"
 
 import {
   "moonbit-community/opentelemetry/interface/baggage",
+  "moonbit-community/opentelemetry/interface/common",
   "moonbit-community/opentelemetry/interface/context",
   "moonbit-community/opentelemetry/interface/logs",
   "moonbit-community/opentelemetry/interface/metrics",
   "moonbit-community/opentelemetry/interface/propagation",
   "moonbit-community/opentelemetry/interface/trace",
-  "moonbit-community/opentelemetry/sdk/common",
 }
 
 // Values

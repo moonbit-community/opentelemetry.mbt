@@ -1752,6 +1752,530 @@ pub async fn SdkMeterProvider::shutdown(
 }
 
 ///|
+fn UInt64CounterBuilder::with_api_options(
+  self : UInt64CounterBuilder,
+  description : String?,
+  unit : String?,
+) -> UInt64CounterBuilder {
+  let mut builder = self
+  match description {
+    Some(description) => builder = builder.with_description(description)
+    None => ()
+  }
+  match unit {
+    Some(unit) => builder = builder.with_unit(unit)
+    None => ()
+  }
+  builder
+}
+
+///|
+fn DoubleCounterBuilder::with_api_options(
+  self : DoubleCounterBuilder,
+  description : String?,
+  unit : String?,
+) -> DoubleCounterBuilder {
+  let mut builder = self
+  match description {
+    Some(description) => builder = builder.with_description(description)
+    None => ()
+  }
+  match unit {
+    Some(unit) => builder = builder.with_unit(unit)
+    None => ()
+  }
+  builder
+}
+
+///|
+fn UpDownCounterBuilder::with_api_options(
+  self : UpDownCounterBuilder,
+  description : String?,
+  unit : String?,
+) -> UpDownCounterBuilder {
+  let mut builder = self
+  match description {
+    Some(description) => builder = builder.with_description(description)
+    None => ()
+  }
+  match unit {
+    Some(unit) => builder = builder.with_unit(unit)
+    None => ()
+  }
+  builder
+}
+
+///|
+fn DoubleUpDownCounterBuilder::with_api_options(
+  self : DoubleUpDownCounterBuilder,
+  description : String?,
+  unit : String?,
+) -> DoubleUpDownCounterBuilder {
+  let mut builder = self
+  match description {
+    Some(description) => builder = builder.with_description(description)
+    None => ()
+  }
+  match unit {
+    Some(unit) => builder = builder.with_unit(unit)
+    None => ()
+  }
+  builder
+}
+
+///|
+fn UInt64HistogramBuilder::with_api_options(
+  self : UInt64HistogramBuilder,
+  description : String?,
+  unit : String?,
+) -> UInt64HistogramBuilder {
+  let mut builder = self
+  match description {
+    Some(description) => builder = builder.with_description(description)
+    None => ()
+  }
+  match unit {
+    Some(unit) => builder = builder.with_unit(unit)
+    None => ()
+  }
+  builder
+}
+
+///|
+fn HistogramBuilder::with_api_options(
+  self : HistogramBuilder,
+  description : String?,
+  unit : String?,
+) -> HistogramBuilder {
+  let mut builder = self
+  match description {
+    Some(description) => builder = builder.with_description(description)
+    None => ()
+  }
+  match unit {
+    Some(unit) => builder = builder.with_unit(unit)
+    None => ()
+  }
+  builder
+}
+
+///|
+fn UInt64GaugeBuilder::with_api_options(
+  self : UInt64GaugeBuilder,
+  description : String?,
+  unit : String?,
+) -> UInt64GaugeBuilder {
+  let mut builder = self
+  match description {
+    Some(description) => builder = builder.with_description(description)
+    None => ()
+  }
+  match unit {
+    Some(unit) => builder = builder.with_unit(unit)
+    None => ()
+  }
+  builder
+}
+
+///|
+fn GaugeBuilder::with_api_options(
+  self : GaugeBuilder,
+  description : String?,
+  unit : String?,
+) -> GaugeBuilder {
+  let mut builder = self
+  match description {
+    Some(description) => builder = builder.with_description(description)
+    None => ()
+  }
+  match unit {
+    Some(unit) => builder = builder.with_unit(unit)
+    None => ()
+  }
+  builder
+}
+
+///|
+fn ObservableUInt64CounterBuilder::with_api_options(
+  self : ObservableUInt64CounterBuilder,
+  description : String?,
+  unit : String?,
+) -> ObservableUInt64CounterBuilder {
+  let mut builder = self
+  match description {
+    Some(description) => builder = builder.with_description(description)
+    None => ()
+  }
+  match unit {
+    Some(unit) => builder = builder.with_unit(unit)
+    None => ()
+  }
+  builder
+}
+
+///|
+fn ObservableDoubleCounterBuilder::with_api_options(
+  self : ObservableDoubleCounterBuilder,
+  description : String?,
+  unit : String?,
+) -> ObservableDoubleCounterBuilder {
+  let mut builder = self
+  match description {
+    Some(description) => builder = builder.with_description(description)
+    None => ()
+  }
+  match unit {
+    Some(unit) => builder = builder.with_unit(unit)
+    None => ()
+  }
+  builder
+}
+
+///|
+fn ObservableUpDownCounterBuilder::with_api_options(
+  self : ObservableUpDownCounterBuilder,
+  description : String?,
+  unit : String?,
+) -> ObservableUpDownCounterBuilder {
+  let mut builder = self
+  match description {
+    Some(description) => builder = builder.with_description(description)
+    None => ()
+  }
+  match unit {
+    Some(unit) => builder = builder.with_unit(unit)
+    None => ()
+  }
+  builder
+}
+
+///|
+fn ObservableDoubleUpDownCounterBuilder::with_api_options(
+  self : ObservableDoubleUpDownCounterBuilder,
+  description : String?,
+  unit : String?,
+) -> ObservableDoubleUpDownCounterBuilder {
+  let mut builder = self
+  match description {
+    Some(description) => builder = builder.with_description(description)
+    None => ()
+  }
+  match unit {
+    Some(unit) => builder = builder.with_unit(unit)
+    None => ()
+  }
+  builder
+}
+
+///|
+fn ObservableUInt64GaugeBuilder::with_api_options(
+  self : ObservableUInt64GaugeBuilder,
+  description : String?,
+  unit : String?,
+) -> ObservableUInt64GaugeBuilder {
+  let mut builder = self
+  match description {
+    Some(description) => builder = builder.with_description(description)
+    None => ()
+  }
+  match unit {
+    Some(unit) => builder = builder.with_unit(unit)
+    None => ()
+  }
+  builder
+}
+
+///|
+fn ObservableGaugeBuilder::with_api_options(
+  self : ObservableGaugeBuilder,
+  description : String?,
+  unit : String?,
+) -> ObservableGaugeBuilder {
+  let mut builder = self
+  match description {
+    Some(description) => builder = builder.with_description(description)
+    None => ()
+  }
+  match unit {
+    Some(unit) => builder = builder.with_unit(unit)
+    None => ()
+  }
+  builder
+}
+
+///|
+fn SdkMeter::into_api_meter(self : SdkMeter) -> @api.Meter {
+  @api.Meter::from_functions(
+    name => {
+      @api.CounterBuilder::from_functions((description, unit) => {
+        let counter = self
+          .u64_counter(name)
+          .with_api_options(description, unit)
+          .build()
+        @api.Counter::from_functions((value, attributes) => {
+          counter.add(value, attributes~)
+        })
+      })
+    },
+    name => {
+      @api.CounterBuilder::from_functions((description, unit) => {
+        let counter = self
+          .f64_counter(name)
+          .with_api_options(description, unit)
+          .build()
+        @api.Counter::from_functions((value, attributes) => {
+          counter.add(value, attributes~)
+        })
+      })
+    },
+    name => {
+      @api.UpDownCounterBuilder::from_functions((description, unit) => {
+        let counter = self
+          .up_down_counter(name)
+          .with_api_options(description, unit)
+          .build()
+        @api.UpDownCounter::from_functions((value, attributes) => {
+          counter.add(value, attributes~)
+        })
+      })
+    },
+    name => {
+      @api.UpDownCounterBuilder::from_functions((description, unit) => {
+        let counter = self
+          .f64_up_down_counter(name)
+          .with_api_options(description, unit)
+          .build()
+        @api.UpDownCounter::from_functions((value, attributes) => {
+          counter.add(value, attributes~)
+        })
+      })
+    },
+    name => {
+      @api.HistogramBuilder::from_functions((description, unit) => {
+        let histogram = self
+          .u64_histogram(name)
+          .with_api_options(description, unit)
+          .build()
+        @api.Histogram::from_functions((value, attributes) => {
+          histogram.record(value, attributes~)
+        })
+      })
+    },
+    name => {
+      @api.HistogramBuilder::from_functions((description, unit) => {
+        let histogram = self
+          .histogram(name)
+          .with_api_options(description, unit)
+          .build()
+        @api.Histogram::from_functions((value, attributes) => {
+          histogram.record(value, attributes~)
+        })
+      })
+    },
+    name => {
+      @api.GaugeBuilder::from_functions((description, unit) => {
+        let gauge = self
+          .u64_gauge(name)
+          .with_api_options(description, unit)
+          .build()
+        @api.Gauge::from_functions((value, attributes) => {
+          gauge.record(value, attributes~)
+        })
+      })
+    },
+    name => {
+      @api.GaugeBuilder::from_functions((description, unit) => {
+        let gauge = self.gauge(name).with_api_options(description, unit).build()
+        @api.Gauge::from_functions((value, attributes) => {
+          gauge.record(value.to_double(), attributes~)
+        })
+      })
+    },
+    name => {
+      @api.GaugeBuilder::from_functions((description, unit) => {
+        let gauge = self.gauge(name).with_api_options(description, unit).build()
+        @api.Gauge::from_functions((value, attributes) => {
+          gauge.record(value, attributes~)
+        })
+      })
+    },
+    name => {
+      @api.ObservableCounterBuilder::from_functions((
+        description,
+        unit,
+        callbacks,
+      ) => {
+        let mut builder = self
+          .u64_observable_counter(name)
+          .with_api_options(description, unit)
+        for callback in callbacks {
+          builder = builder.with_callback(observer => {
+            callback(
+              @api.ObservableCounter::from_functions((value, attributes) => {
+                observer.observe(value, attributes~)
+              }),
+            )
+          })
+        }
+        let observer = builder.build()
+        @api.ObservableCounter::from_functions((value, attributes) => {
+          observer.observe(value, attributes~)
+        })
+      })
+    },
+    name => {
+      @api.ObservableCounterBuilder::from_functions((
+        description,
+        unit,
+        callbacks,
+      ) => {
+        let mut builder = self
+          .f64_observable_counter(name)
+          .with_api_options(description, unit)
+        for callback in callbacks {
+          builder = builder.with_callback(observer => {
+            callback(
+              @api.ObservableCounter::from_functions((value, attributes) => {
+                observer.observe(value, attributes~)
+              }),
+            )
+          })
+        }
+        let observer = builder.build()
+        @api.ObservableCounter::from_functions((value, attributes) => {
+          observer.observe(value, attributes~)
+        })
+      })
+    },
+    name => {
+      @api.ObservableUpDownCounterBuilder::from_functions((
+        description,
+        unit,
+        callbacks,
+      ) => {
+        let mut builder = self
+          .observable_up_down_counter(name)
+          .with_api_options(description, unit)
+        for callback in callbacks {
+          builder = builder.with_callback(observer => {
+            callback(
+              @api.ObservableUpDownCounter::from_functions((value, attributes) => {
+                observer.observe(value, attributes~)
+              }),
+            )
+          })
+        }
+        let observer = builder.build()
+        @api.ObservableUpDownCounter::from_functions((value, attributes) => {
+          observer.observe(value, attributes~)
+        })
+      })
+    },
+    name => {
+      @api.ObservableUpDownCounterBuilder::from_functions((
+        description,
+        unit,
+        callbacks,
+      ) => {
+        let mut builder = self
+          .f64_observable_up_down_counter(name)
+          .with_api_options(description, unit)
+        for callback in callbacks {
+          builder = builder.with_callback(observer => {
+            callback(
+              @api.ObservableUpDownCounter::from_functions((value, attributes) => {
+                observer.observe(value, attributes~)
+              }),
+            )
+          })
+        }
+        let observer = builder.build()
+        @api.ObservableUpDownCounter::from_functions((value, attributes) => {
+          observer.observe(value, attributes~)
+        })
+      })
+    },
+    name => {
+      @api.ObservableGaugeBuilder::from_functions((description, unit, callbacks) => {
+        let mut builder = self
+          .u64_observable_gauge(name)
+          .with_api_options(description, unit)
+        for callback in callbacks {
+          builder = builder.with_callback(observer => {
+            callback(
+              @api.ObservableGauge::from_functions((value, attributes) => {
+                observer.observe(value, attributes~)
+              }),
+            )
+          })
+        }
+        let observer = builder.build()
+        @api.ObservableGauge::from_functions((value, attributes) => {
+          observer.observe(value, attributes~)
+        })
+      })
+    },
+    name => {
+      @api.ObservableGaugeBuilder::from_functions((description, unit, callbacks) => {
+        let mut builder = self
+          .observable_gauge(name)
+          .with_api_options(description, unit)
+        for callback in callbacks {
+          builder = builder.with_callback(observer => {
+            callback(
+              @api.ObservableGauge::from_functions((value, attributes) => {
+                observer.observe(value.to_double(), attributes~)
+              }),
+            )
+          })
+        }
+        let observer = builder.build()
+        @api.ObservableGauge::from_functions((value, attributes) => {
+          observer.observe(value.to_double(), attributes~)
+        })
+      })
+    },
+    name => {
+      @api.ObservableGaugeBuilder::from_functions((description, unit, callbacks) => {
+        let mut builder = self
+          .observable_gauge(name)
+          .with_api_options(description, unit)
+        for callback in callbacks {
+          builder = builder.with_callback(observer => {
+            callback(
+              @api.ObservableGauge::from_functions((value, attributes) => {
+                observer.observe(value, attributes~)
+              }),
+            )
+          })
+        }
+        let observer = builder.build()
+        @api.ObservableGauge::from_functions((value, attributes) => {
+          observer.observe(value, attributes~)
+        })
+      })
+    },
+  )
+}
+
+///|
+/// Erases this SDK provider into the public metrics API provider.
+pub fn SdkMeterProvider::into_meter_provider(
+  self : SdkMeterProvider,
+) -> @api.MeterProvider {
+  @api.MeterProvider::from_functions(scope => {
+    self
+    .meter(
+      scope.name(),
+      version=scope.version(),
+      schema_url=scope.schema_url(),
+      attributes=scope.attributes(),
+    )
+    .into_api_meter()
+  })
+}
+
+///|
 fn manual_reader_collect_result(
   reader : ManualReader,
 ) -> Result[Array[MetricData], @error.OTelSdkError] {

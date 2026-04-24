@@ -1,11 +1,11 @@
 import {
-  "moonbitlang/async",
-  "moonbit-community/opentelemetry/internal/utils" @utils,
-  "moonbit-community/opentelemetry/sdk/common" @common,
-  "moonbit-community/opentelemetry/sdk/context" @sdkcontext,
-  "moonbit-community/opentelemetry/sdk/error" @error,
-  "moonbit-community/opentelemetry/sdk/logs" @sdklogs,
+  "moonbit-community/opentelemetry/interface/common" @common,
 }
+
+import {
+  "moonbitlang/async",
+  "moonbit-community/opentelemetry/sdk/logs" @sdklogs,
+} for "test"
 
 options(
   backend: [ "native" ],

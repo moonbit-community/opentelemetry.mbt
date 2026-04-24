@@ -2,8 +2,8 @@
 package "moonbit-community/opentelemetry/sdk/trace"
 
 import {
-  "moonbit-community/opentelemetry/sdk/common",
-  "moonbit-community/opentelemetry/sdk/context",
+  "moonbit-community/opentelemetry/interface/common",
+  "moonbit-community/opentelemetry/interface/context",
   "moonbit-community/opentelemetry/sdk/error",
   "moonbit-community/opentelemetry/sdk/resource",
   "moonbitlang/async",
@@ -117,6 +117,7 @@ pub struct SdkTracerProvider {
 }
 pub fn SdkTracerProvider::builder() -> SdkTracerProviderBuilder
 pub async fn SdkTracerProvider::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn SdkTracerProvider::into_tracer_provider(Self) -> @moonbit-community/opentelemetry/interface/trace.TracerProvider
 pub fn SdkTracerProvider::resource(Self) -> @resource.Resource
 pub async fn SdkTracerProvider::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
 pub async fn SdkTracerProvider::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]

@@ -18,7 +18,7 @@ import {
   "moonbit-community/opentelemetry/protocol/metrics/v1" @otlpmetrics,
   "moonbit-community/opentelemetry/protocol/resource/v1" @otlpresource,
   "moonbit-community/opentelemetry/protocol/trace/v1" @otlptrace,
-  "moonbit-community/opentelemetry/sdk/common" @common,
+  "moonbit-community/opentelemetry/interface/common" @common,
   "moonbit-community/opentelemetry/sdk/error" @error,
   "moonbit-community/opentelemetry/sdk/logs" @sdklogs,
   "moonbit-community/opentelemetry/sdk/metrics" @sdkmetrics,
