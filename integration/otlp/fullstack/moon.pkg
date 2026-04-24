@@ -4,8 +4,6 @@ import {
   "moonbit-community/opentelemetry" @otel,
   "moonbit-community/opentelemetry/interface/global" @global,
   "moonbit-community/opentelemetry/interface/logs" @ilogs,
-  "moonbit-community/opentelemetry/interface/metrics" @imetrics,
-  "moonbit-community/opentelemetry/interface/trace" @trace,
   "moonbit-community/opentelemetry/otlp" @otlp,
   "moonbit-community/opentelemetry/protocol/common/v1" @otlp_common,
   "moonbit-community/opentelemetry/protocol/logs/v1" @otlp_logs,

@@ -107,18 +107,16 @@ When a field is omitted, `emit()` fills defaults:
 
 ## Provider And Logger Reference
 
-- `LoggerProvider::from_sdk(provider)` wraps an SDK logger provider.
 - `LoggerProvider::noop()` drops all emitted records.
 - `logger(name)` creates a logger for one instrumentation name.
 - `logger_with_scope(scope)` creates a logger from a full instrumentation scope.
-- `force_flush()` and `shutdown()` forward to the SDK provider; no-op providers
-  report success.
-- `spawn_batch_processor_tasks(group, allow_failure?)` starts batch log
-  processor loops owned by the provider.
 - `Logger::create_log_record()` creates a fresh mutable record.
-- `Logger::emit(record)` converts the record into the SDK log pipeline.
+- `Logger::emit(record)` forwards the record to the installed logger.
 - `Logger::event_enabled(severity, target, name?)` is the pre-construction guard
   for potentially expensive log records.
+
+Applications register SDK providers through `sdk.set_logger_provider(provider)`;
+the SDK facade updates `interface/global` for API callers.
 
 ## No-Op Behavior
 

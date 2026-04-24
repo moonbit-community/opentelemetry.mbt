@@ -40,7 +40,7 @@ pub type Context = @context.Context
 
 ///|
 /// SDK baggage map carried through context and propagation.
-pub type Baggage = @context.Baggage
+pub type Baggage = @baggage.Baggage
 
 ///|
 /// Error type returned by SDK exporters, processors, readers, and providers.
@@ -347,6 +347,30 @@ pub fn meter(
 }
 
 ///|
+/// Registers the global SDK tracer provider and updates the public API global.
+///
+/// Library instrumentation obtained through the root package or
+/// `interface/global` will create spans backed by this SDK provider.
+pub fn set_tracer_provider(provider : @trace.SdkTracerProvider) -> Unit {
+  @global.set_tracer_provider(provider)
+  @api_global.set_tracer_provider(provider.into_tracer_provider())
+}
+
+///|
+/// Registers the global SDK logger provider and updates the public API global.
+pub fn set_logger_provider(provider : @logs.SdkLoggerProvider) -> Unit {
+  @global.set_logger_provider(provider)
+  @api_global.set_logger_provider(provider.into_logger_provider())
+}
+
+///|
+/// Registers the global SDK meter provider and updates the public API global.
+pub fn set_meter_provider(provider : @metrics.SdkMeterProvider) -> Unit {
+  @global.set_meter_provider(provider)
+  @api_global.set_meter_provider(provider.into_meter_provider())
+}
+
+///|
 /// Spawns all `sdk/global` background workers needed by batch processors and
 /// periodic metric readers.
 ///
@@ -357,4 +381,16 @@ pub fn spawn_background_tasks(
   allow_failure? : Bool = false,
 ) -> Unit {
   @global.spawn_background_tasks(group, allow_failure~)
+}
+
+///|
+/// Flushes all globally registered SDK providers, ignoring individual errors.
+pub async fn force_flush() -> Unit {
+  @global.force_flush()
+}
+
+///|
+/// Shuts down all globally registered SDK providers, ignoring individual errors.
+pub async fn shutdown() -> Unit {
+  @global.shutdown()
 }

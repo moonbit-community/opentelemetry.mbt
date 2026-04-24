@@ -74,9 +74,10 @@ fn histogram_sum_u64(
 // Test method: Record synchronous and observable values, collect twice, and assert the exported sums match the current readings.
 test "wrapper floating-point counters use sdk-backed double sums" {
   let reader = @sdkmetrics.ManualReader::builder().build()
-  let provider = MeterProvider::from_sdk(
-    @sdkmetrics.SdkMeterProvider::builder().with_reader(reader).build(),
-  )
+  let provider = @sdkmetrics.SdkMeterProvider::builder()
+    .with_reader(reader)
+    .build()
+    .into_meter_provider()
   let meter = provider.meter("wrapper-metrics")
   let counter = meter.f64_counter("bytes").build()
   let active = meter.f64_up_down_counter("active").build()
@@ -109,9 +110,10 @@ test "wrapper floating-point counters use sdk-backed double sums" {
 // Test method: Record and observe a large u64 value through multiple instrument kinds, then assert every exported aggregate matches it.
 test "wrapper u64 instruments preserve full range" {
   let reader = @sdkmetrics.ManualReader::builder().build()
-  let provider = MeterProvider::from_sdk(
-    @sdkmetrics.SdkMeterProvider::builder().with_reader(reader).build(),
-  )
+  let provider = @sdkmetrics.SdkMeterProvider::builder()
+    .with_reader(reader)
+    .build()
+    .into_meter_provider()
   let meter = provider.meter("wrapper-u64")
   let counter = meter.u64_counter("bytes").build()
   let histogram = meter.u64_histogram("payload").build()

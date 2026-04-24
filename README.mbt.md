@@ -56,8 +56,8 @@ instrumentation do real work.
 
 ## Quick Start: Trace To Stdout
 
-The shortest useful setup is: build an SDK provider, register it as the global
-API provider, get a tracer, create spans, and shut the provider down.
+The shortest useful setup is: build an SDK provider, register it globally, get a
+tracer, create spans, and shut the provider down.
 
 ```mbt check
 ///|
@@ -67,7 +67,7 @@ async fn _readme_trace_to_stdout() -> Unit {
     .with_simple_exporter(exporter.into_span_exporter())
     .build()
 
-  @global.set_tracer_provider(@trace.TracerProvider::from_sdk(provider))
+  @sdk.set_tracer_provider(provider)
 
   let tracer = tracer("checkout-service", version=Some("1.0.0"))
   let span = tracer.start("charge-card")

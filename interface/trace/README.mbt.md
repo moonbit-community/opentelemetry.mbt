@@ -19,8 +19,7 @@ status, and a span context that can be propagated to downstream services.
 - `Event`: named timestamped occurrence during a span
 - `Link`: relationship to another span context, often from queues or fan-in
   workflows
-- `SpanKind`, `Status`, `StatusCode`: aliases for SDK-compatible trace
-  metadata
+- `SpanKind`, `Status`, `StatusCode`: API trace metadata
 
 ## Getting A Tracer
 
@@ -34,8 +33,8 @@ fn _trace_readme_get_tracer() -> Tracer {
 }
 ```
 
-Applications can wrap an SDK provider with `TracerProvider::from_sdk(provider)`
-and register it through `interface/global`.
+Applications register SDK providers through `sdk.set_tracer_provider(provider)`;
+the SDK facade updates `interface/global` for API callers.
 
 ## Creating Spans
 
@@ -101,14 +100,9 @@ enabled recording.
 
 ## Provider Reference
 
-- `TracerProvider::from_sdk(provider)` wraps an SDK trace provider.
 - `TracerProvider::noop()` creates non-recording spans.
 - `tracer(name)` creates a tracer for one instrumentation name.
 - `tracer_with_scope(scope)` creates a tracer from a full instrumentation scope.
-- `force_flush()` and `shutdown()` forward to the SDK provider; no-op providers
-  report success.
-- `spawn_batch_processor_tasks(group, allow_failure?)` starts batch span
-  processor loops owned by the provider.
 
 ## Span Reference
 

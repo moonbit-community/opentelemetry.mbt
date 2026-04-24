@@ -63,5 +63,5 @@ raise errors. The original baggage value is returned unchanged.
 ## When to use this package
 
 Use `interface/baggage` when you need the public OpenTelemetry baggage model.
-If you only need a simpler internal baggage map inside the SDK, `sdk/context`
-also exposes a lighter-weight baggage representation.
+The SDK uses the same public baggage and context types, so application and
+library code can pass baggage through `interface/context` without conversion.

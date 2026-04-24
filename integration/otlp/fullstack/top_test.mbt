@@ -229,9 +229,9 @@ async test "global APIs export correlated traces logs and metrics together" {
       build_metric_exporter().into_periodic_reader(interval_millis=60000),
     )
     .build()
-  @global.set_tracer_provider(@trace.TracerProvider::from_sdk(tracer_provider))
-  @global.set_logger_provider(@ilogs.LoggerProvider::from_sdk(logger_provider))
-  @global.set_meter_provider(@imetrics.MeterProvider::from_sdk(meter_provider))
+  @sdk.set_tracer_provider(tracer_provider)
+  @sdk.set_logger_provider(logger_provider)
+  @sdk.set_meter_provider(meter_provider)
 
   let tracer = @otel.tracer(
     trace_scope_name,
@@ -288,8 +288,8 @@ async test "global APIs export correlated traces logs and metrics together" {
   span.end_with_timestamp(220L)
 
   @async.sleep(0)
-  @global.force_flush()
-  @global.shutdown()
+  @sdk.force_flush()
+  @sdk.shutdown()
 
   let traces : @otlp_trace.TracesData = match
     @support.wait_for_latest_matching_record(

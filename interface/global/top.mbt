@@ -57,8 +57,9 @@ pub fn tracer_provider() -> @trace.TracerProvider {
 ///|
 /// Replaces the current global tracer provider.
 ///
-/// Call this during application startup after building an SDK tracer provider
-/// and wrapping it with `interface/trace.TracerProvider::from_sdk`.
+/// Call this during application startup after building an API provider. SDK
+/// applications normally use `sdk.set_tracer_provider()`, which updates this
+/// API global as well.
 pub fn set_tracer_provider(provider : @trace.TracerProvider) -> Unit {
   tracer_provider_ref.val = provider
 }
@@ -181,45 +182,6 @@ pub fn meter(
 /// Returns a meter for an already constructed instrumentation scope.
 pub fn meter_with_scope(scope : @common.InstrumentationScope) -> @metrics.Meter {
   meter_provider_ref.val.meter_with_scope(scope)
-}
-
-///|
-/// Spawns background loops for the currently registered global providers.
-///
-/// This activates batch span/log processors and periodic metric readers. No-op
-/// providers simply do nothing.
-///
-/// Call this only after provider registration; it uses the providers that are
-/// current at call time.
-pub fn spawn_background_tasks(
-  group : @async.TaskGroup[Unit],
-  allow_failure? : Bool = false,
-) -> Unit {
-  tracer_provider_ref.val.spawn_batch_processor_tasks(group, allow_failure~)
-  logger_provider_ref.val.spawn_batch_processor_tasks(group, allow_failure~)
-  meter_provider_ref.val.spawn_periodic_readers(group, allow_failure~)
-}
-
-///|
-/// Flushes all currently registered providers.
-///
-/// Individual provider errors are intentionally ignored so the call always
-/// completes with `Unit`.
-pub async fn force_flush() -> Unit {
-  ignore(tracer_provider_ref.val.force_flush())
-  ignore(logger_provider_ref.val.force_flush())
-  ignore(meter_provider_ref.val.force_flush())
-}
-
-///|
-/// Shuts down all currently registered providers.
-///
-/// Individual provider errors are intentionally ignored so the call always
-/// completes with `Unit`.
-pub async fn shutdown() -> Unit {
-  ignore(tracer_provider_ref.val.shutdown())
-  ignore(logger_provider_ref.val.shutdown())
-  ignore(meter_provider_ref.val.shutdown())
 }
 
 ///|

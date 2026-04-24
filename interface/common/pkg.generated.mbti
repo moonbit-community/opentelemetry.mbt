@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "moonbit-community/opentelemetry/sdk/common"
+package "moonbit-community/opentelemetry/interface/common"
 
 import {
   "moonbitlang/core/debug",

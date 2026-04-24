@@ -2,18 +2,21 @@
 package "moonbit-community/opentelemetry/sdk"
 
 import {
-  "moonbit-community/opentelemetry/sdk/common",
-  "moonbit-community/opentelemetry/sdk/context",
+  "moonbit-community/opentelemetry/interface/baggage",
+  "moonbit-community/opentelemetry/interface/common",
+  "moonbit-community/opentelemetry/interface/context",
+  "moonbit-community/opentelemetry/interface/propagation",
   "moonbit-community/opentelemetry/sdk/error",
   "moonbit-community/opentelemetry/sdk/logs",
   "moonbit-community/opentelemetry/sdk/metrics",
-  "moonbit-community/opentelemetry/sdk/propagation",
   "moonbit-community/opentelemetry/sdk/resource",
   "moonbit-community/opentelemetry/sdk/trace",
   "moonbitlang/async",
 }
 
 // Values
+pub async fn force_flush() -> Unit
+
 pub fn logger(StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> @logs.SdkLogger
 
 pub fn logger_provider_builder() -> @logs.SdkLoggerProviderBuilder
@@ -21,6 +24,14 @@ pub fn logger_provider_builder() -> @logs.SdkLoggerProviderBuilder
 pub fn meter(StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> @metrics.SdkMeter
 
 pub fn meter_provider_builder() -> @metrics.SdkMeterProviderBuilder
+
+pub fn set_logger_provider(@logs.SdkLoggerProvider) -> Unit
+
+pub fn set_meter_provider(@metrics.SdkMeterProvider) -> Unit
+
+pub fn set_tracer_provider(@trace.SdkTracerProvider) -> Unit
+
+pub async fn shutdown() -> Unit
 
 pub fn spawn_background_tasks(@async.TaskGroup[Unit], allow_failure? : Bool) -> Unit
 
@@ -35,7 +46,7 @@ pub fn tracer_provider_builder() -> @trace.SdkTracerProviderBuilder
 // Type aliases
 pub using @metrics {type Aggregation}
 
-pub type Baggage = Map[String, String]
+pub using @baggage {type Baggage}
 
 pub using @propagation {type BaggagePropagator}
 

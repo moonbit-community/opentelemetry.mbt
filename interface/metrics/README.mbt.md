@@ -81,14 +81,12 @@ callbacks are accepted but never collected by an SDK reader.
 
 ## Provider Reference
 
-- `MeterProvider::from_sdk(provider)` wraps an SDK meter provider.
 - `MeterProvider::noop()` creates no-op instruments.
 - `meter(name)` creates a meter for one instrumentation name.
 - `meter_with_scope(scope)` creates a meter from a full instrumentation scope.
-- `force_flush()` and `shutdown()` forward to the SDK provider; no-op providers
-  report success.
-- `spawn_periodic_readers(group, allow_failure?)` starts periodic metric reader
-  loops owned by the provider.
+
+Applications register SDK providers through `sdk.set_meter_provider(provider)`;
+the SDK facade updates `interface/global` for API callers.
 
 ## Instrument Reference
 

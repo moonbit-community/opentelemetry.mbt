@@ -1,9 +1,9 @@
 import {
   "moonbitlang/async",
-  "moonbit-community/opentelemetry/sdk/common" @common,
+  "moonbit-community/opentelemetry/interface/common" @common,
   "moonbit-community/opentelemetry/sdk/logs" @logs,
   "moonbit-community/opentelemetry/sdk/metrics" @metrics,
-  "moonbit-community/opentelemetry/sdk/propagation" @propagation,
+  "moonbit-community/opentelemetry/interface/propagation" @propagation,
   "moonbit-community/opentelemetry/sdk/trace" @trace,
 }
 

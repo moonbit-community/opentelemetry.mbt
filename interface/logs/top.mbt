@@ -47,11 +47,18 @@ pub(all) enum Severity {
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
+/// Structured log attribute key/value pair used by the public logging API.
+pub struct KeyValue {
+  key : @common.Key
+  value : AnyValue
+} derive(Eq, ToJson, Debug)
+
+///|
 /// Mutable log record builder used by `Logger::emit()`.
 ///
 /// Construct records only after checking `Logger::event_enabled()` when
 /// formatting or attribute construction is expensive. `emit()` fills missing
-/// timestamps and default body values.
+/// timestamps and default body values when an SDK logger is installed.
 pub struct LogRecord {
   mut event_name : String?
   mut target : String?
@@ -60,7 +67,7 @@ pub struct LogRecord {
   mut severity_text : String?
   mut severity_number : Severity?
   mut body : AnyValue?
-  attributes : Array[@sdklogs.KeyValue]
+  attributes : Array[KeyValue]
   mut trace_context : @common.SpanContext?
 } derive(Eq, ToJson, Debug)
 
@@ -70,24 +77,24 @@ pub struct LogRecord {
 /// A logger emits records for one instrumentation scope. When backed by a no-op
 /// provider, all emissions are silently dropped.
 pub struct Logger {
-  sdk_logger : @sdklogs.SdkLogger?
+  emit_fn : async (LogRecord) -> Unit
+  event_enabled_fn : (Severity, StringView, String?) -> Bool
 }
 
 ///|
-/// Public logger provider wrapper around the SDK provider.
+/// Public logger provider.
 ///
-/// A provider with `sdk_provider = None` behaves as a no-op provider.
-/// Applications install a real provider by wrapping an SDK logger provider with
-/// `LoggerProvider::from_sdk`.
+/// Applications install SDK-backed providers through the SDK facade while
+/// library code depends only on this API type.
 pub struct LoggerProvider {
-  sdk_provider : @sdklogs.SdkLoggerProvider?
+  logger_with_scope_fn : (@common.InstrumentationScope) -> Logger
 }
 
 ///|
 /// Returns the canonical uppercase text form for one severity variant.
 ///
-/// If `LogRecord::severity_text` is not set, `Logger::emit()` derives it from
-/// this method when a severity number exists.
+/// If `LogRecord::severity_text` is not set, SDK adapters derive it from this
+/// method when a severity number exists.
 pub fn Severity::name(self : Severity) -> String {
   match self {
     Severity::Trace => "TRACE"
@@ -118,37 +125,6 @@ pub fn Severity::name(self : Severity) -> String {
 }
 
 ///|
-fn to_sdk_severity(severity : Severity?) -> @sdklogs.SeverityNumber? {
-  match severity {
-    Some(Severity::Trace) => Some(@sdklogs.SeverityNumber::Trace)
-    Some(Severity::Trace2) => Some(@sdklogs.SeverityNumber::Trace2)
-    Some(Severity::Trace3) => Some(@sdklogs.SeverityNumber::Trace3)
-    Some(Severity::Trace4) => Some(@sdklogs.SeverityNumber::Trace4)
-    Some(Severity::Debug) => Some(@sdklogs.SeverityNumber::Debug)
-    Some(Severity::Debug2) => Some(@sdklogs.SeverityNumber::Debug2)
-    Some(Severity::Debug3) => Some(@sdklogs.SeverityNumber::Debug3)
-    Some(Severity::Debug4) => Some(@sdklogs.SeverityNumber::Debug4)
-    Some(Severity::Info) => Some(@sdklogs.SeverityNumber::Info)
-    Some(Severity::Info2) => Some(@sdklogs.SeverityNumber::Info2)
-    Some(Severity::Info3) => Some(@sdklogs.SeverityNumber::Info3)
-    Some(Severity::Info4) => Some(@sdklogs.SeverityNumber::Info4)
-    Some(Severity::Warn) => Some(@sdklogs.SeverityNumber::Warn)
-    Some(Severity::Warn2) => Some(@sdklogs.SeverityNumber::Warn2)
-    Some(Severity::Warn3) => Some(@sdklogs.SeverityNumber::Warn3)
-    Some(Severity::Warn4) => Some(@sdklogs.SeverityNumber::Warn4)
-    Some(Severity::Error) => Some(@sdklogs.SeverityNumber::Error)
-    Some(Severity::Error2) => Some(@sdklogs.SeverityNumber::Error2)
-    Some(Severity::Error3) => Some(@sdklogs.SeverityNumber::Error3)
-    Some(Severity::Error4) => Some(@sdklogs.SeverityNumber::Error4)
-    Some(Severity::Fatal) => Some(@sdklogs.SeverityNumber::Fatal)
-    Some(Severity::Fatal2) => Some(@sdklogs.SeverityNumber::Fatal2)
-    Some(Severity::Fatal3) => Some(@sdklogs.SeverityNumber::Fatal3)
-    Some(Severity::Fatal4) => Some(@sdklogs.SeverityNumber::Fatal4)
-    None => None
-  }
-}
-
-///|
 fn sorted_keys(values : Map[String, AnyValue]) -> Array[String] {
   let keys = values.keys().to_array()
   for i in 1..<keys.length() {
@@ -164,42 +140,45 @@ fn sorted_keys(values : Map[String, AnyValue]) -> Array[String] {
 }
 
 ///|
-fn any_value_to_sdk_value(value : AnyValue) -> @sdklogs.AnyValue {
+/// Converts a shared attribute value into a public log value.
+pub fn AnyValue::from_common(value : @common.Value) -> AnyValue {
   match value {
-    AnyValue::Int(value) => @sdklogs.AnyValue::Int64(value)
-    AnyValue::Double(value) => @sdklogs.AnyValue::Double(value)
-    AnyValue::String(value) => @sdklogs.AnyValue::String(value)
-    AnyValue::Boolean(value) => @sdklogs.AnyValue::Bool(value)
-    AnyValue::Bytes(value) => @sdklogs.AnyValue::Bytes(value)
-    AnyValue::ListAny(values) => {
+    @common.Value::Bool(value) => AnyValue::Boolean(value)
+    @common.Value::Int64(value) => AnyValue::Int(value)
+    @common.Value::Double(value) => AnyValue::Double(value)
+    @common.Value::String(value) => AnyValue::String(value)
+    @common.Value::Bytes(value) => AnyValue::Bytes(value)
+    @common.Value::Array(values) => {
       let converted = []
       for value in values {
-        converted.push(any_value_to_sdk_value(value))
+        converted.push(AnyValue::from_common(value))
       }
-      @sdklogs.AnyValue::Array(converted)
-    }
-    AnyValue::Map(values) => {
-      let converted = []
-      for key in sorted_keys(values) {
-        guard values.get(key) is Some(value)
-        converted.push(
-          @sdklogs.KeyValue::new(key, any_value_to_sdk_value(value)),
-        )
-      }
-      @sdklogs.AnyValue::Map(converted)
+      AnyValue::ListAny(converted)
     }
   }
 }
 
 ///|
-fn to_sdk_context(context : @common.SpanContext?) -> @sdkcontext.Context {
-  match context {
-    Some(span_context) if span_context.is_remote() =>
-      @sdkcontext.Context::empty().with_remote_span_context(span_context)
-    Some(span_context) =>
-      @sdkcontext.Context::empty().with_span_context(span_context)
-    None => @sdkcontext.Context::empty()
+/// Creates a structured log attribute.
+pub fn KeyValue::new(key : StringView, value : AnyValue) -> KeyValue {
+  { key: @common.Key::new(key), value }
+}
+
+///|
+/// Converts a shared attribute into a public log attribute.
+pub fn KeyValue::from_common(attribute : @common.KeyValue) -> KeyValue {
+  { key: attribute.key, value: AnyValue::from_common(attribute.value) }
+}
+
+///|
+/// Returns a map value with deterministic key insertion order.
+pub fn AnyValue::map(values : Map[String, AnyValue]) -> AnyValue {
+  let sorted : Map[String, AnyValue] = {}
+  for key in sorted_keys(values) {
+    guard values.get(key) is Some(value)
+    sorted[key] = value
   }
+  AnyValue::Map(sorted)
 }
 
 ///|
@@ -236,7 +215,7 @@ pub fn LogRecord::set_target(self : LogRecord, target : StringView) -> Unit {
 ///|
 /// Sets the event timestamp in Unix nanoseconds.
 ///
-/// When omitted, `Logger::emit()` uses the current time.
+/// When omitted, SDK-backed loggers use the current time.
 pub fn LogRecord::set_timestamp(
   self : LogRecord,
   timestamp_unix_nano : Int64,
@@ -247,7 +226,7 @@ pub fn LogRecord::set_timestamp(
 ///|
 /// Sets the observed timestamp in Unix nanoseconds.
 ///
-/// When omitted, `Logger::emit()` uses the current time.
+/// When omitted, SDK-backed loggers use the current time.
 pub fn LogRecord::set_observed_timestamp(
   self : LogRecord,
   observed_timestamp_unix_nano : Int64,
@@ -258,8 +237,8 @@ pub fn LogRecord::set_observed_timestamp(
 ///|
 /// Sets the exact severity text to export.
 ///
-/// If this is not set but a severity number is present, `Logger::emit()`
-/// derives the text from `Severity::name()`.
+/// If this is not set but a severity number is present, SDK-backed loggers
+/// derive the text from `Severity::name()`.
 pub fn LogRecord::set_severity_text(
   self : LogRecord,
   severity_text : StringView,
@@ -279,7 +258,7 @@ pub fn LogRecord::set_severity_number(
 ///|
 /// Sets the log body.
 ///
-/// If no body is set, `Logger::emit()` exports an empty string body.
+/// If no body is set, SDK-backed loggers export an empty string body.
 pub fn LogRecord::set_body(self : LogRecord, body : AnyValue) -> Unit {
   self.body = Some(body)
 }
@@ -294,9 +273,7 @@ pub fn LogRecord::add_attribute(
   key : StringView,
   value : AnyValue,
 ) -> Unit {
-  self.attributes.push(
-    @sdklogs.KeyValue::new(key, any_value_to_sdk_value(value)),
-  )
+  self.attributes.push(KeyValue::new(key, value))
 }
 
 ///|
@@ -306,7 +283,7 @@ pub fn LogRecord::add_attributes(
   attributes : ArrayView[@common.KeyValue],
 ) -> Unit {
   for attribute in attributes {
-    self.attributes.push(@sdklogs.KeyValue::from_common(attribute))
+    self.attributes.push(KeyValue::from_common(attribute))
   }
 }
 
@@ -339,11 +316,22 @@ pub impl Default for LogRecord with default() -> LogRecord {
 }
 
 ///|
-/// Wraps an SDK logger provider in the public API type.
-pub fn LoggerProvider::from_sdk(
-  provider : @sdklogs.SdkLoggerProvider,
+/// Builds a logger from emission and filtering callbacks.
+pub fn Logger::from_functions(
+  emit_fn : async (LogRecord) -> Unit,
+  event_enabled_fn? : (Severity, StringView, String?) -> Bool = (_, _, _) => {
+    true
+  },
+) -> Logger {
+  { emit_fn, event_enabled_fn }
+}
+
+///|
+/// Builds a logger provider from a scope-to-logger callback.
+pub fn LoggerProvider::from_functions(
+  logger_with_scope_fn : (@common.InstrumentationScope) -> Logger,
 ) -> LoggerProvider {
-  { sdk_provider: Some(provider) }
+  { logger_with_scope_fn, }
 }
 
 ///|
@@ -352,7 +340,9 @@ pub fn LoggerProvider::from_sdk(
 /// Loggers from this provider report `event_enabled() == false` and drop
 /// emitted records.
 pub fn LoggerProvider::noop() -> LoggerProvider {
-  { sdk_provider: None }
+  LoggerProvider::from_functions(_ => {
+    Logger::from_functions(_ => (), event_enabled_fn=(_, _, _) => false)
+  })
 }
 
 ///|
@@ -363,75 +353,19 @@ pub fn LoggerProvider::logger(
   self : LoggerProvider,
   name : StringView,
 ) -> Logger {
-  match self.sdk_provider {
-    Some(provider) => { sdk_logger: Some(provider.logger(name)) }
-    None => { sdk_logger: None }
-  }
+  self.logger_with_scope(@common.InstrumentationScope::builder(name).build())
 }
 
 ///|
 /// Returns a logger for a fully constructed instrumentation scope.
 ///
-/// The scope name, version, schema URL, and attributes are forwarded to the
-/// SDK provider as-is.
+/// The scope name, version, schema URL, and attributes are forwarded to the SDK
+/// provider by SDK adapters.
 pub fn LoggerProvider::logger_with_scope(
   self : LoggerProvider,
   scope : @common.InstrumentationScope,
 ) -> Logger {
-  match self.sdk_provider {
-    Some(provider) => {
-      let logger = provider.logger(
-        scope.name(),
-        version=scope.version(),
-        schema_url=scope.schema_url(),
-        attributes=scope.attributes(),
-      )
-      { sdk_logger: Some(logger) }
-    }
-    None => { sdk_logger: None }
-  }
-}
-
-///|
-/// Flushes the underlying SDK provider.
-///
-/// No-op providers report success.
-pub async fn LoggerProvider::force_flush(
-  self : LoggerProvider,
-) -> @error.OTelSdkResult {
-  match self.sdk_provider {
-    Some(provider) => provider.force_flush()
-    None => @error.ok()
-  }
-}
-
-///|
-/// Shuts down the underlying SDK provider.
-///
-/// No-op providers report success.
-pub async fn LoggerProvider::shutdown(
-  self : LoggerProvider,
-) -> @error.OTelSdkResult {
-  match self.sdk_provider {
-    Some(provider) => provider.shutdown()
-    None => @error.ok()
-  }
-}
-
-///|
-/// Spawns background loops for batch log processors owned by this provider.
-///
-/// No-op providers do nothing.
-pub fn LoggerProvider::spawn_batch_processor_tasks(
-  self : LoggerProvider,
-  group : @async.TaskGroup[Unit],
-  allow_failure? : Bool = false,
-) -> Unit {
-  match self.sdk_provider {
-    Some(provider) =>
-      provider.spawn_batch_processor_tasks(group, allow_failure~)
-    None => ()
-  }
+  (self.logger_with_scope_fn)(scope)
 }
 
 ///|
@@ -444,48 +378,17 @@ pub fn Logger::create_log_record(self : Logger) -> LogRecord {
 }
 
 ///|
-/// Emits one log record through the underlying SDK logger.
+/// Emits one log record through the underlying logger.
 ///
-/// Missing timestamps default to the current time. Missing severity text is
-/// derived from the severity number, and missing bodies are exported as empty
-/// strings. No-op loggers drop the record silently.
+/// Missing timestamps, severity text, and body defaults are supplied by SDK
+/// adapters. No-op loggers drop the record silently.
 pub async fn Logger::emit(self : Logger, record : LogRecord) -> Unit {
-  match self.sdk_logger {
-    Some(logger) => {
-      let severity_text = match record.severity_text {
-        Some(severity_text) => Some(severity_text)
-        None => record.severity_number.map(severity => severity.name())
-      }
-      logger.emit(
-        match record.body {
-          Some(body) => any_value_to_sdk_value(body)
-          None => @sdklogs.AnyValue::String("")
-        },
-        context=to_sdk_context(record.trace_context),
-        severity_number=to_sdk_severity(record.severity_number),
-        severity_text~,
-        event_name=record.event_name,
-        target=record.target,
-        attributes=record.attributes,
-        timestamp_unix_nano=match record.timestamp_unix_nano {
-          Some(timestamp_unix_nano) => timestamp_unix_nano
-          None => @utils.now_unix_nano()
-        },
-        observed_timestamp_unix_nano=match record.observed_timestamp_unix_nano {
-          Some(observed_timestamp_unix_nano) => observed_timestamp_unix_nano
-          None => @utils.now_unix_nano()
-        },
-      )
-    }
-    None => ()
-  }
+  (self.emit_fn)(record)
 }
 
 ///|
 /// Returns whether log emission is currently enabled for this logger.
 ///
-/// The current implementation only checks whether a real SDK logger exists; it
-/// does not apply severity-, target-, or name-based filtering yet.
 /// Use this as a guard before expensive message formatting or structured body
 /// construction.
 pub fn Logger::event_enabled(
@@ -494,8 +397,5 @@ pub fn Logger::event_enabled(
   target : StringView,
   name? : String? = None,
 ) -> Bool {
-  ignore(severity)
-  ignore(target)
-  ignore(name)
-  self.sdk_logger is Some(_)
+  (self.event_enabled_fn)(severity, target, name)
 }

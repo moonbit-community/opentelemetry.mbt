@@ -29,7 +29,7 @@ match exporter {
     let provider = @sdk.tracer_provider_builder()
       .with_batch_exporter(exporter.into_span_exporter())
       .build()
-    @global.set_tracer_provider(@trace.TracerProvider::from_sdk(provider))
+    @sdk.set_tracer_provider(provider)
   }
   Err(err) => fail(err.to_string())
 }

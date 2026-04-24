@@ -2,7 +2,7 @@
 package "moonbit-community/opentelemetry/sdk/metrics"
 
 import {
-  "moonbit-community/opentelemetry/sdk/common",
+  "moonbit-community/opentelemetry/interface/common",
   "moonbit-community/opentelemetry/sdk/error",
   "moonbit-community/opentelemetry/sdk/resource",
   "moonbitlang/async",
@@ -349,6 +349,7 @@ pub struct SdkMeterProvider {
 pub fn SdkMeterProvider::builder() -> SdkMeterProviderBuilder
 pub fn SdkMeterProvider::collect(Self) -> Array[MetricData]
 pub async fn SdkMeterProvider::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
+pub fn SdkMeterProvider::into_meter_provider(Self) -> @moonbit-community/opentelemetry/interface/metrics.MeterProvider
 pub fn SdkMeterProvider::manual_reader(Self) -> ManualReader
 pub fn SdkMeterProvider::meter(Self, StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> SdkMeter
 pub fn SdkMeterProvider::resource(Self) -> @resource.Resource

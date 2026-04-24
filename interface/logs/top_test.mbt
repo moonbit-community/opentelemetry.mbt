@@ -3,11 +3,10 @@
 // Test method: Emit a structured record through the wrapper logger and assert the in-memory exporter retains the expected fields and map values.
 async test "logger record preserves full severity and structured fields" {
   let exporter = @sdklogs.InMemoryLogExporter::new()
-  let provider = LoggerProvider::from_sdk(
-    @sdklogs.SdkLoggerProvider::builder()
+  let provider = @sdklogs.SdkLoggerProvider::builder()
     .with_simple_exporter(exporter.into_log_exporter())
-    .build(),
-  )
+    .build()
+    .into_logger_provider()
   let logger = provider.logger("root-logs")
   let record = logger.create_log_record()
   let body_map : Map[String, AnyValue] = {}

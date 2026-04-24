@@ -3,7 +3,7 @@ package "moonbit-community/opentelemetry/interface/context"
 
 import {
   "moonbit-community/opentelemetry/interface/baggage",
-  "moonbit-community/opentelemetry/sdk/common",
+  "moonbit-community/opentelemetry/interface/common",
   "moonbitlang/core/debug",
 }
 

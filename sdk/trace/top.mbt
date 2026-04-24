@@ -1447,6 +1447,115 @@ pub async fn SdkTracerProvider::shutdown(
 }
 
 ///|
+fn span_kind_from_api(kind : @api.SpanKind) -> SpanKind {
+  match kind {
+    @api.SpanKind::Internal => SpanKind::Internal
+    @api.SpanKind::Client => SpanKind::Client
+    @api.SpanKind::Server => SpanKind::Server
+    @api.SpanKind::Producer => SpanKind::Producer
+    @api.SpanKind::Consumer => SpanKind::Consumer
+  }
+}
+
+///|
+fn status_code_from_api(code : @api.StatusCode) -> StatusCode {
+  match code {
+    @api.StatusCode::Unset => StatusCode::Unset
+    @api.StatusCode::Ok => StatusCode::Ok
+    @api.StatusCode::Error => StatusCode::Error
+  }
+}
+
+///|
+fn status_from_api(status : @api.Status) -> Status {
+  Status::new(status_code_from_api(status.code), description=status.description)
+}
+
+///|
+fn span_link_from_api(link : @api.Link) -> SpanLink {
+  SpanLink::new(
+    link.span_context,
+    attributes=link.attributes,
+    dropped_attributes_count=link.dropped_attributes_count,
+  )
+}
+
+///|
+fn Span::into_api_span(
+  self : Span,
+  parent_context : @context.Context,
+) -> @api.Span {
+  let span_context = self.span_context()
+  let context = parent_context.with_span_context(span_context)
+  @api.Span::from_functions(
+    () => self.span_context(),
+    () => context,
+    () => self.is_recording(),
+    () => self.has_ended(),
+    (name, timestamp_unix_nano, attributes) => {
+      self.add_event(name, attributes~, timestamp_unix_nano~)
+    },
+    attribute => self.set_attribute(attribute.key.as_string(), attribute.value),
+    status => self.set_status(status_from_api(status)),
+    name => self.update_name(name),
+    (span_context, attributes) => self.add_link(span_context, attributes~),
+    timestamp_unix_nano => self.end(end_time_unix_nano=timestamp_unix_nano),
+  )
+}
+
+///|
+fn SdkTracer::into_api_tracer(self : SdkTracer) -> @api.Tracer {
+  @api.Tracer::from_functions((builder, parent_context) => {
+    let links = []
+    for link in builder.links {
+      if link.span_context.is_valid() {
+        links.push(span_link_from_api(link))
+      }
+    }
+    let span = self.start(
+      builder.name,
+      parent_context~,
+      kind=match builder.span_kind {
+        Some(kind) => span_kind_from_api(kind)
+        None => SpanKind::Internal
+      },
+      attributes=builder.attributes,
+      links~,
+      start_time_unix_nano=match builder.start_time_unix_nano {
+        Some(start_time) => start_time
+        None => @utils.now_unix_nano()
+      },
+    )
+    for event in builder.events {
+      span.add_event(
+        event.name,
+        attributes=event.attributes,
+        timestamp_unix_nano=event.timestamp_unix_nano,
+        dropped_attributes_count=event.dropped_attributes_count,
+      )
+    }
+    span.into_api_span(parent_context)
+  })
+}
+
+///|
+/// Erases this SDK provider into the public trace API provider.
+pub fn SdkTracerProvider::into_tracer_provider(
+  self : SdkTracerProvider,
+) -> @api.TracerProvider {
+  @api.TracerProvider::from_functions(scope => {
+    self
+    .tracer(
+      scope.name(),
+      version=scope.version(),
+      schema_url=scope.schema_url(),
+      attributes=scope.attributes(),
+    )
+    .into_api_tracer()
+  })
+}
+
+///|
 fn span_context_from_parent(
   parent_context : @context.Context,
 ) -> @common.SpanContext? {

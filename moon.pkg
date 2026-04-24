@@ -6,7 +6,7 @@ import {
   "moonbit-community/opentelemetry/interface/metrics" @metrics,
   "moonbit-community/opentelemetry/interface/propagation" @propagation,
   "moonbit-community/opentelemetry/interface/trace" @trace,
-  "moonbit-community/opentelemetry/sdk/common" @common,
+  "moonbit-community/opentelemetry/interface/common" @common,
 }
 
 import {

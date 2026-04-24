@@ -4,8 +4,9 @@ import {
   "moonbitlang/core/random",
   "moonbitlang/core/string",
   "moonbit-community/opentelemetry/internal/utils" @utils,
-  "moonbit-community/opentelemetry/sdk/common" @common,
-  "moonbit-community/opentelemetry/sdk/context" @context,
+  "moonbit-community/opentelemetry/interface/common" @common,
+  "moonbit-community/opentelemetry/interface/context" @context,
+  "moonbit-community/opentelemetry/interface/trace" @api,
   "moonbit-community/opentelemetry/sdk/error" @error,
   "moonbit-community/opentelemetry/sdk/resource" @resource,
 }

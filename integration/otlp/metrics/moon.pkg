@@ -4,7 +4,6 @@ import {
   "moonbitlang/core/env" @env,
   "moonbit-community/opentelemetry" @otel,
   "moonbit-community/opentelemetry/interface/global" @global,
-  "moonbit-community/opentelemetry/interface/metrics" @imetrics,
   "moonbit-community/opentelemetry/otlp" @otlp,
   "moonbit-community/opentelemetry/protocol/common/v1" @otlp_common,
   "moonbit-community/opentelemetry/protocol/metrics/v1" @otlp_metrics,

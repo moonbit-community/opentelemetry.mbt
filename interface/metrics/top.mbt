@@ -126,311 +126,306 @@ pub struct ObservableGaugeBuilder[T] {
 /// A meter creates reusable instruments for one instrumentation scope. Create
 /// instruments once and reuse them on hot paths.
 pub struct Meter {
-  sdk_meter : @sdkmetrics.SdkMeter?
+  u64_counter_fn : (String) -> CounterBuilder[UInt64]
+  f64_counter_fn : (String) -> CounterBuilder[Double]
+  i64_up_down_counter_fn : (String) -> UpDownCounterBuilder[Int64]
+  f64_up_down_counter_fn : (String) -> UpDownCounterBuilder[Double]
+  u64_histogram_fn : (String) -> HistogramBuilder[UInt64]
+  f64_histogram_fn : (String) -> HistogramBuilder[Double]
+  u64_gauge_fn : (String) -> GaugeBuilder[UInt64]
+  i64_gauge_fn : (String) -> GaugeBuilder[Int64]
+  f64_gauge_fn : (String) -> GaugeBuilder[Double]
+  u64_observable_counter_fn : (String) -> ObservableCounterBuilder[UInt64]
+  f64_observable_counter_fn : (String) -> ObservableCounterBuilder[Double]
+  i64_observable_up_down_counter_fn : (String) -> ObservableUpDownCounterBuilder[
+    Int64,
+  ]
+  f64_observable_up_down_counter_fn : (String) -> ObservableUpDownCounterBuilder[
+    Double,
+  ]
+  u64_observable_gauge_fn : (String) -> ObservableGaugeBuilder[UInt64]
+  i64_observable_gauge_fn : (String) -> ObservableGaugeBuilder[Int64]
+  f64_observable_gauge_fn : (String) -> ObservableGaugeBuilder[Double]
 }
 
 ///|
-/// Public meter provider wrapper around the SDK provider.
+/// Public meter provider.
 ///
-/// `sdk_provider = None` is the no-op implementation used until an application
-/// installs a real SDK meter provider.
+/// The default provider is no-op. Applications install SDK-backed providers
+/// through the SDK facade while library code depends only on this API type.
 pub struct MeterProvider {
-  sdk_provider : @sdkmetrics.SdkMeterProvider?
+  meter_with_scope_fn : (@common.InstrumentationScope) -> Meter
+}
+
+///|
+/// Builds a counter handle from an add callback.
+pub fn[T] Counter::from_functions(
+  add_fn : (T, ArrayView[@common.KeyValue]) -> Unit,
+) -> Counter[T] {
+  { add_fn, }
+}
+
+///|
+/// Builds an up-down counter handle from an add callback.
+pub fn[T] UpDownCounter::from_functions(
+  add_fn : (T, ArrayView[@common.KeyValue]) -> Unit,
+) -> UpDownCounter[T] {
+  { add_fn, }
+}
+
+///|
+/// Builds a histogram handle from a record callback.
+pub fn[T] Histogram::from_functions(
+  record_fn : (T, ArrayView[@common.KeyValue]) -> Unit,
+) -> Histogram[T] {
+  { record_fn, }
+}
+
+///|
+/// Builds a gauge handle from a record callback.
+pub fn[T] Gauge::from_functions(
+  record_fn : (T, ArrayView[@common.KeyValue]) -> Unit,
+) -> Gauge[T] {
+  { record_fn, }
+}
+
+///|
+/// Builds an observable counter handle from an observe callback.
+pub fn[T] ObservableCounter::from_functions(
+  observe_fn : (T, ArrayView[@common.KeyValue]) -> Unit,
+) -> ObservableCounter[T] {
+  { observe_fn, }
+}
+
+///|
+/// Builds an observable up-down counter handle from an observe callback.
+pub fn[T] ObservableUpDownCounter::from_functions(
+  observe_fn : (T, ArrayView[@common.KeyValue]) -> Unit,
+) -> ObservableUpDownCounter[T] {
+  { observe_fn, }
+}
+
+///|
+/// Builds an observable gauge handle from an observe callback.
+pub fn[T] ObservableGauge::from_functions(
+  observe_fn : (T, ArrayView[@common.KeyValue]) -> Unit,
+) -> ObservableGauge[T] {
+  { observe_fn, }
+}
+
+///|
+/// Builds a counter builder from a creation callback.
+pub fn[T] CounterBuilder::from_functions(
+  create_fn : (String?, String?) -> Counter[T],
+) -> CounterBuilder[T] {
+  { description: None, unit: None, create_fn }
+}
+
+///|
+/// Builds an up-down counter builder from a creation callback.
+pub fn[T] UpDownCounterBuilder::from_functions(
+  create_fn : (String?, String?) -> UpDownCounter[T],
+) -> UpDownCounterBuilder[T] {
+  { description: None, unit: None, create_fn }
+}
+
+///|
+/// Builds a histogram builder from a creation callback.
+pub fn[T] HistogramBuilder::from_functions(
+  create_fn : (String?, String?) -> Histogram[T],
+) -> HistogramBuilder[T] {
+  { description: None, unit: None, create_fn }
+}
+
+///|
+/// Builds a gauge builder from a creation callback.
+pub fn[T] GaugeBuilder::from_functions(
+  create_fn : (String?, String?) -> Gauge[T],
+) -> GaugeBuilder[T] {
+  { description: None, unit: None, create_fn }
+}
+
+///|
+/// Builds an observable counter builder from a creation callback.
+pub fn[T] ObservableCounterBuilder::from_functions(
+  create_fn : (String?, String?, Array[(ObservableCounter[T]) -> Unit]) -> ObservableCounter[
+    T,
+  ],
+) -> ObservableCounterBuilder[T] {
+  { description: None, unit: None, callbacks: [], create_fn }
+}
+
+///|
+/// Builds an observable up-down counter builder from a creation callback.
+pub fn[T] ObservableUpDownCounterBuilder::from_functions(
+  create_fn : (String?, String?, Array[(ObservableUpDownCounter[T]) -> Unit]) -> ObservableUpDownCounter[
+    T,
+  ],
+) -> ObservableUpDownCounterBuilder[T] {
+  { description: None, unit: None, callbacks: [], create_fn }
+}
+
+///|
+/// Builds an observable gauge builder from a creation callback.
+pub fn[T] ObservableGaugeBuilder::from_functions(
+  create_fn : (String?, String?, Array[(ObservableGauge[T]) -> Unit]) -> ObservableGauge[
+    T,
+  ],
+) -> ObservableGaugeBuilder[T] {
+  { description: None, unit: None, callbacks: [], create_fn }
 }
 
 ///|
 fn[T] noop_counter() -> Counter[T] {
-  { add_fn: (_, _) => () }
+  Counter::from_functions((_, _) => ())
 }
 
 ///|
 fn[T] noop_up_down_counter() -> UpDownCounter[T] {
-  { add_fn: (_, _) => () }
+  UpDownCounter::from_functions((_, _) => ())
 }
 
 ///|
 fn[T] noop_histogram() -> Histogram[T] {
-  { record_fn: (_, _) => () }
+  Histogram::from_functions((_, _) => ())
 }
 
 ///|
 fn[T] noop_gauge() -> Gauge[T] {
-  { record_fn: (_, _) => () }
+  Gauge::from_functions((_, _) => ())
 }
 
 ///|
 fn[T] noop_observable_counter() -> ObservableCounter[T] {
-  { observe_fn: (_, _) => () }
+  ObservableCounter::from_functions((_, _) => ())
 }
 
 ///|
 fn[T] noop_observable_up_down_counter() -> ObservableUpDownCounter[T] {
-  { observe_fn: (_, _) => () }
+  ObservableUpDownCounter::from_functions((_, _) => ())
 }
 
 ///|
 fn[T] noop_observable_gauge() -> ObservableGauge[T] {
-  { observe_fn: (_, _) => () }
+  ObservableGauge::from_functions((_, _) => ())
 }
 
 ///|
-fn with_double_counter_options(
-  builder : @sdkmetrics.DoubleCounterBuilder,
-  description : String?,
-  unit : String?,
-) -> @sdkmetrics.DoubleCounterBuilder {
-  let mut builder = builder
-  match description {
-    Some(description) => builder = builder.with_description(description)
-    None => ()
-  }
-  match unit {
-    Some(unit) => builder = builder.with_unit(unit)
-    None => ()
-  }
-  builder
+fn[T] noop_counter_builder() -> CounterBuilder[T] {
+  CounterBuilder::from_functions((_, _) => noop_counter())
 }
 
 ///|
-fn with_u64_counter_options(
-  builder : @sdkmetrics.UInt64CounterBuilder,
-  description : String?,
-  unit : String?,
-) -> @sdkmetrics.UInt64CounterBuilder {
-  let mut builder = builder
-  match description {
-    Some(description) => builder = builder.with_description(description)
-    None => ()
-  }
-  match unit {
-    Some(unit) => builder = builder.with_unit(unit)
-    None => ()
-  }
-  builder
+fn[T] noop_up_down_counter_builder() -> UpDownCounterBuilder[T] {
+  UpDownCounterBuilder::from_functions((_, _) => noop_up_down_counter())
 }
 
 ///|
-fn with_up_down_counter_options(
-  builder : @sdkmetrics.UpDownCounterBuilder,
-  description : String?,
-  unit : String?,
-) -> @sdkmetrics.UpDownCounterBuilder {
-  let mut builder = builder
-  match description {
-    Some(description) => builder = builder.with_description(description)
-    None => ()
-  }
-  match unit {
-    Some(unit) => builder = builder.with_unit(unit)
-    None => ()
-  }
-  builder
+fn[T] noop_histogram_builder() -> HistogramBuilder[T] {
+  HistogramBuilder::from_functions((_, _) => noop_histogram())
 }
 
 ///|
-fn with_double_up_down_counter_options(
-  builder : @sdkmetrics.DoubleUpDownCounterBuilder,
-  description : String?,
-  unit : String?,
-) -> @sdkmetrics.DoubleUpDownCounterBuilder {
-  let mut builder = builder
-  match description {
-    Some(description) => builder = builder.with_description(description)
-    None => ()
-  }
-  match unit {
-    Some(unit) => builder = builder.with_unit(unit)
-    None => ()
-  }
-  builder
+fn[T] noop_gauge_builder() -> GaugeBuilder[T] {
+  GaugeBuilder::from_functions((_, _) => noop_gauge())
 }
 
 ///|
-fn with_histogram_options(
-  builder : @sdkmetrics.HistogramBuilder,
-  description : String?,
-  unit : String?,
-) -> @sdkmetrics.HistogramBuilder {
-  let mut builder = builder
-  match description {
-    Some(description) => builder = builder.with_description(description)
-    None => ()
-  }
-  match unit {
-    Some(unit) => builder = builder.with_unit(unit)
-    None => ()
-  }
-  builder
+fn[T] noop_observable_counter_builder() -> ObservableCounterBuilder[T] {
+  ObservableCounterBuilder::from_functions((_, _, _) => {
+    noop_observable_counter()
+  })
 }
 
 ///|
-fn with_u64_histogram_options(
-  builder : @sdkmetrics.UInt64HistogramBuilder,
-  description : String?,
-  unit : String?,
-) -> @sdkmetrics.UInt64HistogramBuilder {
-  let mut builder = builder
-  match description {
-    Some(description) => builder = builder.with_description(description)
-    None => ()
-  }
-  match unit {
-    Some(unit) => builder = builder.with_unit(unit)
-    None => ()
-  }
-  builder
+fn[T] noop_observable_up_down_counter_builder() -> ObservableUpDownCounterBuilder[
+  T,
+] {
+  ObservableUpDownCounterBuilder::from_functions((_, _, _) => {
+    noop_observable_up_down_counter()
+  })
 }
 
 ///|
-fn with_gauge_options(
-  builder : @sdkmetrics.GaugeBuilder,
-  description : String?,
-  unit : String?,
-) -> @sdkmetrics.GaugeBuilder {
-  let mut builder = builder
-  match description {
-    Some(description) => builder = builder.with_description(description)
-    None => ()
-  }
-  match unit {
-    Some(unit) => builder = builder.with_unit(unit)
-    None => ()
-  }
-  builder
+fn[T] noop_observable_gauge_builder() -> ObservableGaugeBuilder[T] {
+  ObservableGaugeBuilder::from_functions((_, _, _) => noop_observable_gauge())
 }
 
 ///|
-fn with_u64_gauge_options(
-  builder : @sdkmetrics.UInt64GaugeBuilder,
-  description : String?,
-  unit : String?,
-) -> @sdkmetrics.UInt64GaugeBuilder {
-  let mut builder = builder
-  match description {
-    Some(description) => builder = builder.with_description(description)
-    None => ()
-  }
-  match unit {
-    Some(unit) => builder = builder.with_unit(unit)
-    None => ()
-  }
-  builder
+fn noop_meter() -> Meter {
+  Meter::from_functions(
+    _ => noop_counter_builder(),
+    _ => noop_counter_builder(),
+    _ => noop_up_down_counter_builder(),
+    _ => noop_up_down_counter_builder(),
+    _ => noop_histogram_builder(),
+    _ => noop_histogram_builder(),
+    _ => noop_gauge_builder(),
+    _ => noop_gauge_builder(),
+    _ => noop_gauge_builder(),
+    _ => noop_observable_counter_builder(),
+    _ => noop_observable_counter_builder(),
+    _ => noop_observable_up_down_counter_builder(),
+    _ => noop_observable_up_down_counter_builder(),
+    _ => noop_observable_gauge_builder(),
+    _ => noop_observable_gauge_builder(),
+    _ => noop_observable_gauge_builder(),
+  )
 }
 
 ///|
-fn with_observable_double_counter_options(
-  builder : @sdkmetrics.ObservableDoubleCounterBuilder,
-  description : String?,
-  unit : String?,
-) -> @sdkmetrics.ObservableDoubleCounterBuilder {
-  let mut builder = builder
-  match description {
-    Some(description) => builder = builder.with_description(description)
-    None => ()
+/// Builds a meter from instrument-builder callbacks.
+///
+/// SDK implementations use this to erase concrete meter types into the public
+/// API without making the API package depend on the SDK.
+pub fn Meter::from_functions(
+  u64_counter_fn : (String) -> CounterBuilder[UInt64],
+  f64_counter_fn : (String) -> CounterBuilder[Double],
+  i64_up_down_counter_fn : (String) -> UpDownCounterBuilder[Int64],
+  f64_up_down_counter_fn : (String) -> UpDownCounterBuilder[Double],
+  u64_histogram_fn : (String) -> HistogramBuilder[UInt64],
+  f64_histogram_fn : (String) -> HistogramBuilder[Double],
+  u64_gauge_fn : (String) -> GaugeBuilder[UInt64],
+  i64_gauge_fn : (String) -> GaugeBuilder[Int64],
+  f64_gauge_fn : (String) -> GaugeBuilder[Double],
+  u64_observable_counter_fn : (String) -> ObservableCounterBuilder[UInt64],
+  f64_observable_counter_fn : (String) -> ObservableCounterBuilder[Double],
+  i64_observable_up_down_counter_fn : (String) -> ObservableUpDownCounterBuilder[
+    Int64,
+  ],
+  f64_observable_up_down_counter_fn : (String) -> ObservableUpDownCounterBuilder[
+    Double,
+  ],
+  u64_observable_gauge_fn : (String) -> ObservableGaugeBuilder[UInt64],
+  i64_observable_gauge_fn : (String) -> ObservableGaugeBuilder[Int64],
+  f64_observable_gauge_fn : (String) -> ObservableGaugeBuilder[Double],
+) -> Meter {
+  {
+    u64_counter_fn,
+    f64_counter_fn,
+    i64_up_down_counter_fn,
+    f64_up_down_counter_fn,
+    u64_histogram_fn,
+    f64_histogram_fn,
+    u64_gauge_fn,
+    i64_gauge_fn,
+    f64_gauge_fn,
+    u64_observable_counter_fn,
+    f64_observable_counter_fn,
+    i64_observable_up_down_counter_fn,
+    f64_observable_up_down_counter_fn,
+    u64_observable_gauge_fn,
+    i64_observable_gauge_fn,
+    f64_observable_gauge_fn,
   }
-  match unit {
-    Some(unit) => builder = builder.with_unit(unit)
-    None => ()
-  }
-  builder
 }
 
 ///|
-fn with_observable_u64_counter_options(
-  builder : @sdkmetrics.ObservableUInt64CounterBuilder,
-  description : String?,
-  unit : String?,
-) -> @sdkmetrics.ObservableUInt64CounterBuilder {
-  let mut builder = builder
-  match description {
-    Some(description) => builder = builder.with_description(description)
-    None => ()
-  }
-  match unit {
-    Some(unit) => builder = builder.with_unit(unit)
-    None => ()
-  }
-  builder
-}
-
-///|
-fn with_observable_up_down_counter_options(
-  builder : @sdkmetrics.ObservableUpDownCounterBuilder,
-  description : String?,
-  unit : String?,
-) -> @sdkmetrics.ObservableUpDownCounterBuilder {
-  let mut builder = builder
-  match description {
-    Some(description) => builder = builder.with_description(description)
-    None => ()
-  }
-  match unit {
-    Some(unit) => builder = builder.with_unit(unit)
-    None => ()
-  }
-  builder
-}
-
-///|
-fn with_observable_double_up_down_counter_options(
-  builder : @sdkmetrics.ObservableDoubleUpDownCounterBuilder,
-  description : String?,
-  unit : String?,
-) -> @sdkmetrics.ObservableDoubleUpDownCounterBuilder {
-  let mut builder = builder
-  match description {
-    Some(description) => builder = builder.with_description(description)
-    None => ()
-  }
-  match unit {
-    Some(unit) => builder = builder.with_unit(unit)
-    None => ()
-  }
-  builder
-}
-
-///|
-fn with_observable_u64_gauge_options(
-  builder : @sdkmetrics.ObservableUInt64GaugeBuilder,
-  description : String?,
-  unit : String?,
-) -> @sdkmetrics.ObservableUInt64GaugeBuilder {
-  let mut builder = builder
-  match description {
-    Some(description) => builder = builder.with_description(description)
-    None => ()
-  }
-  match unit {
-    Some(unit) => builder = builder.with_unit(unit)
-    None => ()
-  }
-  builder
-}
-
-///|
-fn with_observable_gauge_options(
-  builder : @sdkmetrics.ObservableGaugeBuilder,
-  description : String?,
-  unit : String?,
-) -> @sdkmetrics.ObservableGaugeBuilder {
-  let mut builder = builder
-  match description {
-    Some(description) => builder = builder.with_description(description)
-    None => ()
-  }
-  match unit {
-    Some(unit) => builder = builder.with_unit(unit)
-    None => ()
-  }
-  builder
-}
-
-///|
-/// Wraps an SDK meter provider in the public API type.
-pub fn MeterProvider::from_sdk(
-  provider : @sdkmetrics.SdkMeterProvider,
+/// Builds a meter provider from a scope-to-meter callback.
+pub fn MeterProvider::from_functions(
+  meter_with_scope_fn : (@common.InstrumentationScope) -> Meter,
 ) -> MeterProvider {
-  { sdk_provider: Some(provider) }
+  { meter_with_scope_fn, }
 }
 
 ///|
@@ -439,7 +434,7 @@ pub fn MeterProvider::from_sdk(
 /// Meters from this provider create instruments that silently discard all
 /// measurements and never run observable callbacks.
 pub fn MeterProvider::noop() -> MeterProvider {
-  { sdk_provider: None }
+  MeterProvider::from_functions(_ => noop_meter())
 }
 
 ///|
@@ -447,10 +442,7 @@ pub fn MeterProvider::noop() -> MeterProvider {
 ///
 /// If the provider is no-op, the returned meter creates no-op instruments.
 pub fn MeterProvider::meter(self : MeterProvider, name : StringView) -> Meter {
-  match self.sdk_provider {
-    Some(provider) => { sdk_meter: Some(provider.meter(name)) }
-    None => { sdk_meter: None }
-  }
+  self.meter_with_scope(@common.InstrumentationScope::builder(name).build())
 }
 
 ///|
@@ -459,59 +451,7 @@ pub fn MeterProvider::meter_with_scope(
   self : MeterProvider,
   scope : @common.InstrumentationScope,
 ) -> Meter {
-  match self.sdk_provider {
-    Some(provider) => {
-      let meter = provider.meter(
-        scope.name(),
-        version=scope.version(),
-        schema_url=scope.schema_url(),
-        attributes=scope.attributes(),
-      )
-      { sdk_meter: Some(meter) }
-    }
-    None => { sdk_meter: None }
-  }
-}
-
-///|
-/// Flushes the underlying SDK provider.
-///
-/// No-op providers report success.
-pub async fn MeterProvider::force_flush(
-  self : MeterProvider,
-) -> @error.OTelSdkResult {
-  match self.sdk_provider {
-    Some(provider) => provider.force_flush()
-    None => @error.ok()
-  }
-}
-
-///|
-/// Shuts down the underlying SDK provider.
-///
-/// No-op providers report success.
-pub async fn MeterProvider::shutdown(
-  self : MeterProvider,
-) -> @error.OTelSdkResult {
-  match self.sdk_provider {
-    Some(provider) => provider.shutdown()
-    None => @error.ok()
-  }
-}
-
-///|
-/// Spawns background loops for periodic metric readers owned by this provider.
-///
-/// No-op providers do nothing.
-pub fn MeterProvider::spawn_periodic_readers(
-  self : MeterProvider,
-  group : @async.TaskGroup[Unit],
-  allow_failure? : Bool = false,
-) -> Unit {
-  match self.sdk_provider {
-    Some(provider) => provider.spawn_periodic_readers(group, allow_failure~)
-    None => ()
-  }
+  (self.meter_with_scope_fn)(scope)
 }
 
 ///|
@@ -835,23 +775,7 @@ pub fn Meter::u64_counter(
   self : Meter,
   name : StringView,
 ) -> CounterBuilder[UInt64] {
-  {
-    description: None,
-    unit: None,
-    create_fn: (description, unit) => {
-      match self.sdk_meter {
-        Some(meter) => {
-          let counter = with_u64_counter_options(
-            meter.u64_counter(name),
-            description,
-            unit,
-          ).build()
-          { add_fn: (value, attributes) => counter.add(value, attributes~) }
-        }
-        None => noop_counter()
-      }
-    },
-  }
+  (self.u64_counter_fn)(name.to_string())
 }
 
 ///|
@@ -862,23 +786,7 @@ pub fn Meter::f64_counter(
   self : Meter,
   name : StringView,
 ) -> CounterBuilder[Double] {
-  {
-    description: None,
-    unit: None,
-    create_fn: (description, unit) => {
-      match self.sdk_meter {
-        Some(meter) => {
-          let counter = with_double_counter_options(
-            meter.f64_counter(name),
-            description,
-            unit,
-          ).build()
-          { add_fn: (value, attributes) => counter.add(value, attributes~) }
-        }
-        None => noop_counter()
-      }
-    },
-  }
+  (self.f64_counter_fn)(name.to_string())
 }
 
 ///|
@@ -887,23 +795,7 @@ pub fn Meter::i64_up_down_counter(
   self : Meter,
   name : StringView,
 ) -> UpDownCounterBuilder[Int64] {
-  {
-    description: None,
-    unit: None,
-    create_fn: (description, unit) => {
-      match self.sdk_meter {
-        Some(meter) => {
-          let counter = with_up_down_counter_options(
-            meter.up_down_counter(name),
-            description,
-            unit,
-          ).build()
-          { add_fn: (value, attributes) => counter.add(value, attributes~) }
-        }
-        None => noop_up_down_counter()
-      }
-    },
-  }
+  (self.i64_up_down_counter_fn)(name.to_string())
 }
 
 ///|
@@ -912,23 +804,7 @@ pub fn Meter::f64_up_down_counter(
   self : Meter,
   name : StringView,
 ) -> UpDownCounterBuilder[Double] {
-  {
-    description: None,
-    unit: None,
-    create_fn: (description, unit) => {
-      match self.sdk_meter {
-        Some(meter) => {
-          let counter = with_double_up_down_counter_options(
-            meter.f64_up_down_counter(name),
-            description,
-            unit,
-          ).build()
-          { add_fn: (value, attributes) => counter.add(value, attributes~) }
-        }
-        None => noop_up_down_counter()
-      }
-    },
-  }
+  (self.f64_up_down_counter_fn)(name.to_string())
 }
 
 ///|
@@ -937,27 +813,7 @@ pub fn Meter::u64_histogram(
   self : Meter,
   name : StringView,
 ) -> HistogramBuilder[UInt64] {
-  {
-    description: None,
-    unit: None,
-    create_fn: (description, unit) => {
-      match self.sdk_meter {
-        Some(meter) => {
-          let histogram = with_u64_histogram_options(
-            meter.u64_histogram(name),
-            description,
-            unit,
-          ).build()
-          {
-            record_fn: (value, attributes) => {
-              histogram.record(value, attributes~)
-            },
-          }
-        }
-        None => noop_histogram()
-      }
-    },
-  }
+  (self.u64_histogram_fn)(name.to_string())
 }
 
 ///|
@@ -966,27 +822,7 @@ pub fn Meter::f64_histogram(
   self : Meter,
   name : StringView,
 ) -> HistogramBuilder[Double] {
-  {
-    description: None,
-    unit: None,
-    create_fn: (description, unit) => {
-      match self.sdk_meter {
-        Some(meter) => {
-          let histogram = with_histogram_options(
-            meter.histogram(name),
-            description,
-            unit,
-          ).build()
-          {
-            record_fn: (value, attributes) => {
-              histogram.record(value, attributes~)
-            },
-          }
-        }
-        None => noop_histogram()
-      }
-    },
-  }
+  (self.f64_histogram_fn)(name.to_string())
 }
 
 ///|
@@ -995,23 +831,7 @@ pub fn Meter::u64_gauge(
   self : Meter,
   name : StringView,
 ) -> GaugeBuilder[UInt64] {
-  {
-    description: None,
-    unit: None,
-    create_fn: (description, unit) => {
-      match self.sdk_meter {
-        Some(meter) => {
-          let gauge = with_u64_gauge_options(
-            meter.u64_gauge(name),
-            description,
-            unit,
-          ).build()
-          { record_fn: (value, attributes) => gauge.record(value, attributes~) }
-        }
-        None => noop_gauge()
-      }
-    },
-  }
+  (self.u64_gauge_fn)(name.to_string())
 }
 
 ///|
@@ -1019,23 +839,7 @@ pub fn Meter::u64_gauge(
 ///
 /// Values are converted to `Double` before they are forwarded to the SDK.
 pub fn Meter::i64_gauge(self : Meter, name : StringView) -> GaugeBuilder[Int64] {
-  {
-    description: None,
-    unit: None,
-    create_fn: (description, unit) => {
-      match self.sdk_meter {
-        Some(meter) => {
-          let gauge = with_gauge_options(meter.gauge(name), description, unit).build()
-          {
-            record_fn: (value, attributes) => {
-              gauge.record(value.to_double(), attributes~)
-            },
-          }
-        }
-        None => noop_gauge()
-      }
-    },
-  }
+  (self.i64_gauge_fn)(name.to_string())
 }
 
 ///|
@@ -1044,19 +848,7 @@ pub fn Meter::f64_gauge(
   self : Meter,
   name : StringView,
 ) -> GaugeBuilder[Double] {
-  {
-    description: None,
-    unit: None,
-    create_fn: (description, unit) => {
-      match self.sdk_meter {
-        Some(meter) => {
-          let gauge = with_gauge_options(meter.gauge(name), description, unit).build()
-          { record_fn: (value, attributes) => gauge.record(value, attributes~) }
-        }
-        None => noop_gauge()
-      }
-    },
-  }
+  (self.f64_gauge_fn)(name.to_string())
 }
 
 ///|
@@ -1065,39 +857,7 @@ pub fn Meter::u64_observable_counter(
   self : Meter,
   name : StringView,
 ) -> ObservableCounterBuilder[UInt64] {
-  {
-    description: None,
-    unit: None,
-    callbacks: [],
-    create_fn: (description, unit, callbacks) => {
-      match self.sdk_meter {
-        Some(meter) => {
-          let mut builder = with_observable_u64_counter_options(
-            meter.u64_observable_counter(name),
-            description,
-            unit,
-          )
-          for callback in callbacks {
-            builder = builder.with_callback(observer => {
-              let wrapped : ObservableCounter[UInt64] = {
-                observe_fn: (value, attributes) => {
-                  observer.observe(value, attributes~)
-                },
-              }
-              callback(wrapped)
-            })
-          }
-          let observer = builder.build()
-          {
-            observe_fn: (value, attributes) => {
-              observer.observe(value, attributes~)
-            },
-          }
-        }
-        None => noop_observable_counter()
-      }
-    },
-  }
+  (self.u64_observable_counter_fn)(name.to_string())
 }
 
 ///|
@@ -1106,39 +866,7 @@ pub fn Meter::f64_observable_counter(
   self : Meter,
   name : StringView,
 ) -> ObservableCounterBuilder[Double] {
-  {
-    description: None,
-    unit: None,
-    callbacks: [],
-    create_fn: (description, unit, callbacks) => {
-      match self.sdk_meter {
-        Some(meter) => {
-          let mut builder = with_observable_double_counter_options(
-            meter.f64_observable_counter(name),
-            description,
-            unit,
-          )
-          for callback in callbacks {
-            builder = builder.with_callback(observer => {
-              let wrapped : ObservableCounter[Double] = {
-                observe_fn: (value, attributes) => {
-                  observer.observe(value, attributes~)
-                },
-              }
-              callback(wrapped)
-            })
-          }
-          let observer = builder.build()
-          {
-            observe_fn: (value, attributes) => {
-              observer.observe(value, attributes~)
-            },
-          }
-        }
-        None => noop_observable_counter()
-      }
-    },
-  }
+  (self.f64_observable_counter_fn)(name.to_string())
 }
 
 ///|
@@ -1147,39 +875,7 @@ pub fn Meter::i64_observable_up_down_counter(
   self : Meter,
   name : StringView,
 ) -> ObservableUpDownCounterBuilder[Int64] {
-  {
-    description: None,
-    unit: None,
-    callbacks: [],
-    create_fn: (description, unit, callbacks) => {
-      match self.sdk_meter {
-        Some(meter) => {
-          let mut builder = with_observable_up_down_counter_options(
-            meter.observable_up_down_counter(name),
-            description,
-            unit,
-          )
-          for callback in callbacks {
-            builder = builder.with_callback(observer => {
-              let wrapped : ObservableUpDownCounter[Int64] = {
-                observe_fn: (value, attributes) => {
-                  observer.observe(value, attributes~)
-                },
-              }
-              callback(wrapped)
-            })
-          }
-          let observer = builder.build()
-          {
-            observe_fn: (value, attributes) => {
-              observer.observe(value, attributes~)
-            },
-          }
-        }
-        None => noop_observable_up_down_counter()
-      }
-    },
-  }
+  (self.i64_observable_up_down_counter_fn)(name.to_string())
 }
 
 ///|
@@ -1188,39 +884,7 @@ pub fn Meter::f64_observable_up_down_counter(
   self : Meter,
   name : StringView,
 ) -> ObservableUpDownCounterBuilder[Double] {
-  {
-    description: None,
-    unit: None,
-    callbacks: [],
-    create_fn: (description, unit, callbacks) => {
-      match self.sdk_meter {
-        Some(meter) => {
-          let mut builder = with_observable_double_up_down_counter_options(
-            meter.f64_observable_up_down_counter(name),
-            description,
-            unit,
-          )
-          for callback in callbacks {
-            builder = builder.with_callback(observer => {
-              let wrapped : ObservableUpDownCounter[Double] = {
-                observe_fn: (value, attributes) => {
-                  observer.observe(value, attributes~)
-                },
-              }
-              callback(wrapped)
-            })
-          }
-          let observer = builder.build()
-          {
-            observe_fn: (value, attributes) => {
-              observer.observe(value, attributes~)
-            },
-          }
-        }
-        None => noop_observable_up_down_counter()
-      }
-    },
-  }
+  (self.f64_observable_up_down_counter_fn)(name.to_string())
 }
 
 ///|
@@ -1229,39 +893,7 @@ pub fn Meter::u64_observable_gauge(
   self : Meter,
   name : StringView,
 ) -> ObservableGaugeBuilder[UInt64] {
-  {
-    description: None,
-    unit: None,
-    callbacks: [],
-    create_fn: (description, unit, callbacks) => {
-      match self.sdk_meter {
-        Some(meter) => {
-          let mut builder = with_observable_u64_gauge_options(
-            meter.u64_observable_gauge(name),
-            description,
-            unit,
-          )
-          for callback in callbacks {
-            builder = builder.with_callback(observer => {
-              let wrapped : ObservableGauge[UInt64] = {
-                observe_fn: (value, attributes) => {
-                  observer.observe(value, attributes~)
-                },
-              }
-              callback(wrapped)
-            })
-          }
-          let observer = builder.build()
-          {
-            observe_fn: (value, attributes) => {
-              observer.observe(value, attributes~)
-            },
-          }
-        }
-        None => noop_observable_gauge()
-      }
-    },
-  }
+  (self.u64_observable_gauge_fn)(name.to_string())
 }
 
 ///|
@@ -1273,39 +905,7 @@ pub fn Meter::i64_observable_gauge(
   self : Meter,
   name : StringView,
 ) -> ObservableGaugeBuilder[Int64] {
-  {
-    description: None,
-    unit: None,
-    callbacks: [],
-    create_fn: (description, unit, callbacks) => {
-      match self.sdk_meter {
-        Some(meter) => {
-          let mut builder = with_observable_gauge_options(
-            meter.observable_gauge(name),
-            description,
-            unit,
-          )
-          for callback in callbacks {
-            builder = builder.with_callback(observer => {
-              let wrapped : ObservableGauge[Int64] = {
-                observe_fn: (value, attributes) => {
-                  observer.observe(value.to_double(), attributes~)
-                },
-              }
-              callback(wrapped)
-            })
-          }
-          let observer = builder.build()
-          {
-            observe_fn: (value, attributes) => {
-              observer.observe(value.to_double(), attributes~)
-            },
-          }
-        }
-        None => noop_observable_gauge()
-      }
-    },
-  }
+  (self.i64_observable_gauge_fn)(name.to_string())
 }
 
 ///|
@@ -1314,37 +914,5 @@ pub fn Meter::f64_observable_gauge(
   self : Meter,
   name : StringView,
 ) -> ObservableGaugeBuilder[Double] {
-  {
-    description: None,
-    unit: None,
-    callbacks: [],
-    create_fn: (description, unit, callbacks) => {
-      match self.sdk_meter {
-        Some(meter) => {
-          let mut builder = with_observable_gauge_options(
-            meter.observable_gauge(name),
-            description,
-            unit,
-          )
-          for callback in callbacks {
-            builder = builder.with_callback(observer => {
-              let wrapped : ObservableGauge[Double] = {
-                observe_fn: (value, attributes) => {
-                  observer.observe(value, attributes~)
-                },
-              }
-              callback(wrapped)
-            })
-          }
-          let observer = builder.build()
-          {
-            observe_fn: (value, attributes) => {
-              observer.observe(value, attributes~)
-            },
-          }
-        }
-        None => noop_observable_gauge()
-      }
-    },
-  }
+  (self.f64_observable_gauge_fn)(name.to_string())
 }

@@ -3,7 +3,21 @@
 ///
 /// Use `Server` for inbound request handlers, `Client` for outbound requests,
 /// `Producer`/`Consumer` for messaging, and `Internal` for local work.
-pub type SpanKind = @sdktrace.SpanKind
+pub(all) enum SpanKind {
+  Internal
+  Client
+  Server
+  Producer
+  Consumer
+} derive(Eq, Compare, Hash, ToJson, Debug)
+
+///|
+/// Span status code: unset, ok, or error.
+pub(all) enum StatusCode {
+  Unset
+  Ok
+  Error
+} derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
 /// Span status with a code and optional description.
@@ -11,11 +25,10 @@ pub type SpanKind = @sdktrace.SpanKind
 /// Status represents the final outcome of the operation. Recording an exception
 /// event does not automatically set status; call `Span::set_status()` when the
 /// operation should be marked as an error.
-pub type Status = @sdktrace.Status
-
-///|
-/// Span status code: unset, ok, or error.
-pub type StatusCode = @sdktrace.StatusCode
+pub struct Status {
+  code : StatusCode
+  description : String?
+} derive(Eq, ToJson, Debug)
 
 ///|
 /// Event attached to a span builder.
@@ -62,10 +75,16 @@ pub struct SpanBuilder {
 /// the span still propagates a valid parent context but does not record data.
 /// End spans once the represented operation is complete.
 pub struct Span {
-  sdk_span : @sdktrace.Span?
-  propagated_span_context : @common.SpanContext
-  noop_ended : Ref[Bool]
-  context : @context.Context
+  span_context_fn : () -> @common.SpanContext
+  context_fn : () -> @context.Context
+  is_recording_fn : () -> Bool
+  has_ended_fn : () -> Bool
+  add_event_fn : (StringView, Int64, ArrayView[@common.KeyValue]) -> Unit
+  set_attribute_fn : (@common.KeyValue) -> Unit
+  set_status_fn : (Status) -> Unit
+  update_name_fn : (StringView) -> Unit
+  add_link_fn : (@common.SpanContext, ArrayView[@common.KeyValue]) -> Unit
+  end_fn : async (Int64) -> Unit
 }
 
 ///|
@@ -74,17 +93,45 @@ pub struct Span {
 /// A tracer creates spans for one instrumentation scope. Tracers are cheap
 /// handles; libraries normally keep or reacquire one by instrumentation name.
 pub struct Tracer {
-  sdk_tracer : @sdktrace.SdkTracer?
+  build_with_context_fn : (SpanBuilder, @context.Context) -> Span
 }
 
 ///|
-/// Public tracer provider wrapper around the SDK provider.
+/// Public tracer provider.
 ///
-/// `sdk_provider = None` is the public API no-op implementation. This lets
-/// libraries instrument unconditionally while applications decide whether to
-/// install a real SDK provider.
+/// The default provider is no-op. Applications install SDK-backed providers
+/// through the SDK facade while library code depends only on this API type.
 pub struct TracerProvider {
-  sdk_provider : @sdktrace.SdkTracerProvider?
+  tracer_with_scope_fn : (@common.InstrumentationScope) -> Tracer
+}
+
+///|
+/// Creates a span status.
+pub fn Status::new(code : StatusCode, description? : String? = None) -> Status {
+  { code, description }
+}
+
+///|
+/// Returns the default unset status.
+pub fn Status::unset() -> Status {
+  Status::new(StatusCode::Unset)
+}
+
+///|
+/// Returns an ok status.
+pub fn Status::ok() -> Status {
+  Status::new(StatusCode::Ok)
+}
+
+///|
+/// Returns an error status with an optional description.
+pub fn Status::error(description? : String? = None) -> Status {
+  Status::new(StatusCode::Error, description~)
+}
+
+///|
+pub impl Default for Status with default() -> Status {
+  Status::unset()
 }
 
 ///|
@@ -187,78 +234,11 @@ pub fn SpanBuilder::with_links(
 }
 
 ///|
-fn to_sdk_context(context : @context.Context) -> @context_sdk.Context {
-  let sdk_context = @context_sdk.Context::empty()
-  let sdk_context = match context.span_context() {
-    Some(span_context) if span_context.is_remote() =>
-      sdk_context.with_remote_span_context(span_context)
-    Some(span_context) => sdk_context.with_span_context(span_context)
-    None => sdk_context
-  }
-  let sdk_baggage = {}
-  for entry in context.baggage().entries() {
-    sdk_baggage[entry.key.as_string()] = entry.value
-  }
-  sdk_context
-  .with_baggage(sdk_baggage)
-  .with_telemetry_suppressed(suppressed=context.is_telemetry_suppressed())
-}
-
-///|
 fn propagated_context(
   parent_context : @context.Context,
   span_context : @common.SpanContext,
 ) -> @context.Context {
   parent_context.with_span_context(span_context)
-}
-
-///|
-fn build_sdk_span(
-  sdk_tracer : @sdktrace.SdkTracer,
-  builder : SpanBuilder,
-  parent_context : @context.Context,
-) -> Span {
-  let links = []
-  for link in builder.links {
-    if link.span_context.is_valid() {
-      links.push(
-        @sdktrace.SpanLink::new(
-          link.span_context,
-          attributes=link.attributes,
-          dropped_attributes_count=link.dropped_attributes_count,
-        ),
-      )
-    }
-  }
-  let sdk_span = sdk_tracer.start(
-    builder.name,
-    parent_context=to_sdk_context(parent_context),
-    kind=match builder.span_kind {
-      Some(kind) => kind
-      None => @sdktrace.SpanKind::Internal
-    },
-    attributes=builder.attributes,
-    links~,
-    start_time_unix_nano=match builder.start_time_unix_nano {
-      Some(start_time) => start_time
-      None => @utils.now_unix_nano()
-    },
-  )
-  for event in builder.events {
-    sdk_span.add_event(
-      event.name,
-      attributes=event.attributes,
-      timestamp_unix_nano=event.timestamp_unix_nano,
-      dropped_attributes_count=event.dropped_attributes_count,
-    )
-  }
-  let span_context = sdk_span.span_context()
-  {
-    sdk_span: Some(sdk_span),
-    propagated_span_context: span_context,
-    noop_ended: Ref::new(false),
-    context: propagated_context(parent_context, span_context),
-  }
 }
 
 ///|
@@ -271,20 +251,67 @@ fn build_noop_span(
     Some(span_context) if span_context.is_valid() => span_context
     _ => @common.SpanContext::empty()
   }
+  let ended = Ref::new(false)
+  let context = propagated_context(parent_context, propagated_span_context)
+  Span::from_functions(
+    () => propagated_span_context,
+    () => context,
+    () => false,
+    () => ended.val,
+    (_, _, _) => (),
+    _ => (),
+    _ => (),
+    _ => (),
+    (_, _) => (),
+    _ => ended.val = true,
+  )
+}
+
+///|
+/// Builds a span handle from callbacks.
+///
+/// SDK implementations use this to erase their concrete span type into the
+/// public API without making the API package depend on the SDK.
+pub fn Span::from_functions(
+  span_context_fn : () -> @common.SpanContext,
+  context_fn : () -> @context.Context,
+  is_recording_fn : () -> Bool,
+  has_ended_fn : () -> Bool,
+  add_event_fn : (StringView, Int64, ArrayView[@common.KeyValue]) -> Unit,
+  set_attribute_fn : (@common.KeyValue) -> Unit,
+  set_status_fn : (Status) -> Unit,
+  update_name_fn : (StringView) -> Unit,
+  add_link_fn : (@common.SpanContext, ArrayView[@common.KeyValue]) -> Unit,
+  end_fn : async (Int64) -> Unit,
+) -> Span {
   {
-    sdk_span: None,
-    propagated_span_context,
-    noop_ended: Ref::new(false),
-    context: propagated_context(parent_context, propagated_span_context),
+    span_context_fn,
+    context_fn,
+    is_recording_fn,
+    has_ended_fn,
+    add_event_fn,
+    set_attribute_fn,
+    set_status_fn,
+    update_name_fn,
+    add_link_fn,
+    end_fn,
   }
 }
 
 ///|
-/// Wraps an SDK tracer provider in the public API type.
-pub fn TracerProvider::from_sdk(
-  provider : @sdktrace.SdkTracerProvider,
+/// Builds a tracer from a span-building callback.
+pub fn Tracer::from_functions(
+  build_with_context_fn : (SpanBuilder, @context.Context) -> Span,
+) -> Tracer {
+  { build_with_context_fn, }
+}
+
+///|
+/// Builds a tracer provider from a scope-to-tracer callback.
+pub fn TracerProvider::from_functions(
+  tracer_with_scope_fn : (@common.InstrumentationScope) -> Tracer,
 ) -> TracerProvider {
-  { sdk_provider: Some(provider) }
+  { tracer_with_scope_fn, }
 }
 
 ///|
@@ -293,7 +320,11 @@ pub fn TracerProvider::from_sdk(
 /// Tracers from this provider create non-recording spans. Valid parent context
 /// is still propagated so downstream services can continue an existing trace.
 pub fn TracerProvider::noop() -> TracerProvider {
-  { sdk_provider: None }
+  TracerProvider::from_functions(_ => {
+    Tracer::from_functions((builder, parent_context) => {
+      build_noop_span(builder, parent_context)
+    })
+  })
 }
 
 ///|
@@ -304,10 +335,7 @@ pub fn TracerProvider::tracer(
   self : TracerProvider,
   name : StringView,
 ) -> Tracer {
-  match self.sdk_provider {
-    Some(provider) => { sdk_tracer: Some(provider.tracer(name)) }
-    None => { sdk_tracer: None }
-  }
+  self.tracer_with_scope(@common.InstrumentationScope::builder(name).build())
 }
 
 ///|
@@ -316,60 +344,7 @@ pub fn TracerProvider::tracer_with_scope(
   self : TracerProvider,
   scope : @common.InstrumentationScope,
 ) -> Tracer {
-  match self.sdk_provider {
-    Some(provider) => {
-      let tracer = provider.tracer(
-        scope.name(),
-        version=scope.version(),
-        schema_url=scope.schema_url(),
-        attributes=scope.attributes(),
-      )
-      { sdk_tracer: Some(tracer) }
-    }
-    None => { sdk_tracer: None }
-  }
-}
-
-///|
-/// Flushes the underlying SDK provider.
-///
-/// No-op providers report success.
-pub async fn TracerProvider::force_flush(
-  self : TracerProvider,
-) -> @error.OTelSdkResult {
-  match self.sdk_provider {
-    Some(provider) => provider.force_flush()
-    None => @error.ok()
-  }
-}
-
-///|
-/// Shuts down the underlying SDK provider.
-///
-/// No-op providers report success.
-pub async fn TracerProvider::shutdown(
-  self : TracerProvider,
-) -> @error.OTelSdkResult {
-  match self.sdk_provider {
-    Some(provider) => provider.shutdown()
-    None => @error.ok()
-  }
-}
-
-///|
-/// Spawns background loops for batch span processors owned by this provider.
-///
-/// No-op providers do nothing.
-pub fn TracerProvider::spawn_batch_processor_tasks(
-  self : TracerProvider,
-  group : @async.TaskGroup[Unit],
-  allow_failure? : Bool = false,
-) -> Unit {
-  match self.sdk_provider {
-    Some(provider) =>
-      provider.spawn_batch_processor_tasks(group, allow_failure~)
-    None => ()
-  }
+  (self.tracer_with_scope_fn)(scope)
 }
 
 ///|
@@ -420,10 +395,7 @@ pub fn Tracer::build_with_context(
   builder : SpanBuilder,
   parent_context : @context.Context,
 ) -> Span {
-  match self.sdk_tracer {
-    Some(sdk_tracer) => build_sdk_span(sdk_tracer, builder, parent_context)
-    None => build_noop_span(builder, parent_context)
-  }
+  (self.build_with_context_fn)(builder, parent_context)
 }
 
 ///|
@@ -476,16 +448,13 @@ pub async fn[T] Tracer::in_span_with_builder(
 /// For no-op spans this may be the valid incoming parent context rather than a
 /// newly recorded span context.
 pub fn Span::span_context(self : Span) -> @common.SpanContext {
-  match self.sdk_span {
-    Some(span) => span.span_context()
-    None => self.propagated_span_context
-  }
+  (self.span_context_fn)()
 }
 
 ///|
 /// Returns the context that carries this span as the active span.
 pub fn Span::context(self : Span) -> @context.Context {
-  self.context
+  (self.context_fn)()
 }
 
 ///|
@@ -494,19 +463,13 @@ pub fn Span::context(self : Span) -> @context.Context {
 /// No-op spans and sampled-out SDK spans report `false`. Use this to avoid
 /// constructing expensive attributes or events.
 pub fn Span::is_recording(self : Span) -> Bool {
-  match self.sdk_span {
-    Some(span) => span.is_recording()
-    None => false
-  }
+  (self.is_recording_fn)()
 }
 
 ///|
 /// Returns whether the span has already ended.
 pub fn Span::has_ended(self : Span) -> Bool {
-  match self.sdk_span {
-    Some(span) => span.has_ended()
-    None => self.noop_ended.val
-  }
+  (self.has_ended_fn)()
 }
 
 ///|
@@ -527,10 +490,7 @@ pub fn Span::add_event_with_timestamp(
   timestamp_unix_nano : Int64,
   attributes? : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
-  match self.sdk_span {
-    Some(span) => span.add_event(name, attributes~, timestamp_unix_nano~)
-    None => ()
-  }
+  (self.add_event_fn)(name, timestamp_unix_nano, attributes)
 }
 
 ///|
@@ -550,10 +510,7 @@ pub fn Span::record_error(self : Span, message : StringView) -> Unit {
 ///|
 /// Sets or replaces one span attribute.
 pub fn Span::set_attribute(self : Span, attribute : @common.KeyValue) -> Unit {
-  match self.sdk_span {
-    Some(span) => span.set_attribute(attribute.key.as_string(), attribute.value)
-    None => ()
-  }
+  (self.set_attribute_fn)(attribute)
 }
 
 ///|
@@ -570,19 +527,13 @@ pub fn Span::set_attributes(
 ///|
 /// Sets the span status.
 pub fn Span::set_status(self : Span, status : Status) -> Unit {
-  match self.sdk_span {
-    Some(span) => span.set_status(status)
-    None => ()
-  }
+  (self.set_status_fn)(status)
 }
 
 ///|
 /// Replaces the span name.
 pub fn Span::update_name(self : Span, new_name : StringView) -> Unit {
-  match self.sdk_span {
-    Some(span) => span.update_name(new_name)
-    None => ()
-  }
+  (self.update_name_fn)(new_name)
 }
 
 ///|
@@ -592,10 +543,7 @@ pub fn Span::add_link(
   span_context : @common.SpanContext,
   attributes? : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
-  match self.sdk_span {
-    Some(span) => span.add_link(span_context, attributes~)
-    None => ()
-  }
+  (self.add_link_fn)(span_context, attributes)
 }
 
 ///|
@@ -615,8 +563,5 @@ pub async fn Span::end_with_timestamp(
   self : Span,
   timestamp_unix_nano : Int64,
 ) -> Unit {
-  match self.sdk_span {
-    Some(span) => span.end(end_time_unix_nano=timestamp_unix_nano)
-    None => self.noop_ended.val = true
-  }
+  (self.end_fn)(timestamp_unix_nano)
 }

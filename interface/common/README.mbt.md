@@ -1,4 +1,4 @@
-# SDK Common Types
+# OpenTelemetry Common API Types
 
 This package contains data structures shared by traces, logs, metrics, resource
 detection, and propagation.

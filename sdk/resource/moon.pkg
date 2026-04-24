@@ -2,7 +2,7 @@ import {
   "moonbitlang/core/env",
   "moonbitlang/core/string",
   "moonbit-community/opentelemetry/internal/utils" @utils,
-  "moonbit-community/opentelemetry/sdk/common" @common,
+  "moonbit-community/opentelemetry/interface/common" @common,
 }
 
 options(

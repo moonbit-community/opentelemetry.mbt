@@ -215,10 +215,10 @@ async test "batch traces export over http protobuf via root API" {
       ),
     )
     .build()
-  @global.set_tracer_provider(@trace.TracerProvider::from_sdk(provider))
+  @sdk.set_tracer_provider(provider)
 
   @async.with_task_group(group => {
-    @global.spawn_background_tasks(group)
+    @sdk.spawn_background_tasks(group)
 
     let tracer = @otel.tracer(
       scope_name,
@@ -312,7 +312,7 @@ async test "force flushed traces export over http json via root API" {
       ),
     )
     .build()
-  @global.set_tracer_provider(@trace.TracerProvider::from_sdk(provider))
+  @sdk.set_tracer_provider(provider)
 
   let tracer = @otel.tracer(
     scope_name,
@@ -413,7 +413,7 @@ async test "trace builder overrides env and exports nested spans through root AP
       ),
     )
     .build()
-  @global.set_tracer_provider(@trace.TracerProvider::from_sdk(provider))
+  @sdk.set_tracer_provider(provider)
 
   let tracer = @otel.tracer(
     scope_name,
@@ -606,7 +606,7 @@ async test "trace force_flush times out against a delayed endpoint" {
       .with_resource(integration_resource("integration-traces-timeout"))
       .with_span_processor(span_processor)
       .build()
-    @global.set_tracer_provider(@trace.TracerProvider::from_sdk(provider))
+    @sdk.set_tracer_provider(provider)
 
     let tracer = @otel.tracer(scope_name)
     let span = tracer.start("checkout.timeout")
@@ -686,7 +686,7 @@ async test "signal-specific trace endpoint overrides invalid global endpoint" {
       ),
     )
     .build()
-  @global.set_tracer_provider(@trace.TracerProvider::from_sdk(provider))
+  @sdk.set_tracer_provider(provider)
 
   let tracer = @otel.tracer(
     scope_name,

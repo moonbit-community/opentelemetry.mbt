@@ -1,9 +1,10 @@
 import {
-  "moonbitlang/async",
-  "moonbit-community/opentelemetry/sdk/common" @common,
-  "moonbit-community/opentelemetry/sdk/error" @error,
-  "moonbit-community/opentelemetry/sdk/metrics" @sdkmetrics,
+  "moonbit-community/opentelemetry/interface/common" @common,
 }
+
+import {
+  "moonbit-community/opentelemetry/sdk/metrics" @sdkmetrics,
+} for "test"
 
 options(
   backend: [ "native" ],

@@ -2,10 +2,10 @@
 package "moonbit-community/opentelemetry/sdk/global"
 
 import {
-  "moonbit-community/opentelemetry/sdk/common",
+  "moonbit-community/opentelemetry/interface/common",
+  "moonbit-community/opentelemetry/interface/propagation",
   "moonbit-community/opentelemetry/sdk/logs",
   "moonbit-community/opentelemetry/sdk/metrics",
-  "moonbit-community/opentelemetry/sdk/propagation",
   "moonbit-community/opentelemetry/sdk/trace",
   "moonbitlang/async",
 }
