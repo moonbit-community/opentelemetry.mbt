@@ -1,9 +1,15 @@
 # OpenTelemetry SDK
 
-This package is the MoonBit SDK facade. It re-exports the implementation layer
-from `interface/common`, `interface/context`, `interface/propagation`,
-`sdk/resource`, `sdk/trace`, `sdk/logs`, and `sdk/metrics` so application code
-can configure telemetry through one import path.
+This package is the MoonBit SDK facade. It re-exports common API aliases and
+high-level SDK types from `interface/common`, `interface/context`,
+`interface/propagation`, `sdk/resource`, `sdk/trace`, `sdk/logs`, and
+`sdk/metrics` so application code can configure the usual telemetry pipeline
+from one import path.
+
+Signal-specific configuration that is not part of the facade still lives in
+the signal packages. Import `sdk/metrics` directly for metric views,
+temporality, streams, and concrete instrument builders. Import `sdk/logs`
+directly when configuring log batch options such as `BatchConfig`.
 
 The API layer answers "where should instrumentation write data?". The SDK layer
 answers "what should happen to that data?". Applications own the SDK layer:
@@ -133,7 +139,10 @@ facade helpers in this package delegate to `sdk/global`:
 Important distinction: root-package instrumentation uses `interface/global`,
 while `sdk.tracer()`, `sdk.logger()`, and `sdk.meter()` use `sdk/global`.
 Applications that want library instrumentation to light up should register SDK
-providers through `interface/global`.
+providers with `sdk.set_*_provider()`. Those helpers update `sdk/global` and
+also install the converted API providers into `interface/global`. Only call
+`interface/global.set_*_provider()` directly when you already have an API-layer
+provider, for example from `provider.into_*_provider()`.
 
 ## Environment Variables
 

@@ -12,7 +12,7 @@ OTLP/HTTP 请求并将结果写入 JSON 文件的 OpenTelemetry Collector。
 
 `integration/otlp/scripts/*.mjs` 下的辅助脚本依赖 Node.js。
 
-本文档中的 collector 版本示例统一固定为 `0.150.1`，用于减少环境漂移。
+本文档中的 collector 版本示例统一固定为 `0.150.1`。
 
 ## 统一约定
 
@@ -214,17 +214,17 @@ integration/otlp/otel-collector-config.yaml
 - 将配置文件和输出文件挂载进容器
 - 自动发现宿主机映射端口
 - 导出 `OTEL_EXPORTER_OTLP_ENDPOINT`
-- 顺序执行 `traces`、`logs`、`metrics` 测试
+- 顺序执行 `traces`、`logs`、`metrics`、`fullstack` 测试
 - 在退出时清理容器
 
-为避免使用 `latest` 带来的行为漂移，建议显式固定镜像版本。
 `integration/otlp/scripts/test_with_docker.mjs` 在未设置
-`OTEL_COLLECTOR_IMAGE` 时会回退到 `latest`。
+`OTEL_COLLECTOR_IMAGE` 时会使用脚本内固定的 collector 镜像。只有需要测试
+其他 collector 版本时才需要覆盖该变量。
 
-固定镜像版本示例：
+覆盖 collector 镜像示例：
 
 ```bash
-export OTEL_COLLECTOR_IMAGE=ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.150.1
+export OTEL_COLLECTOR_IMAGE="ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:<version>"
 ```
 
 ### 2. 使用
@@ -232,18 +232,15 @@ export OTEL_COLLECTOR_IMAGE=ghcr.io/open-telemetry/opentelemetry-collector-relea
 执行完整集成测试：
 
 ```bash
-OTEL_COLLECTOR_IMAGE=ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.150.1 \
-  integration/otlp/scripts/test_with_docker.mjs
+integration/otlp/scripts/test_with_docker.mjs
 ```
 
 执行部分信号：
 
 ```bash
-OTEL_COLLECTOR_IMAGE=ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.150.1 \
-  integration/otlp/scripts/test_with_docker.mjs traces
+integration/otlp/scripts/test_with_docker.mjs traces
 
-OTEL_COLLECTOR_IMAGE=ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.150.1 \
-  integration/otlp/scripts/test_with_docker.mjs logs metrics
+integration/otlp/scripts/test_with_docker.mjs logs metrics fullstack
 ```
 
 如果 `docker` 或 `moon` 不在默认路径，也可以覆盖：
@@ -251,7 +248,6 @@ OTEL_COLLECTOR_IMAGE=ghcr.io/open-telemetry/opentelemetry-collector-releases/ope
 ```bash
 DOCKER_BIN=/custom/path/docker \
 MOON_BIN=/custom/path/moon \
-OTEL_COLLECTOR_IMAGE=ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.150.1 \
   integration/otlp/scripts/test_with_docker.mjs
 ```
 
@@ -267,7 +263,7 @@ OTEL_COLLECTOR_IMAGE=ghcr.io/open-telemetry/opentelemetry-collector-releases/ope
 
 - 无 Docker 环境：使用“本地安装 `otelcol` 二进制”
 - 常规本地开发：优先使用 Docker 路径
-- CI 或自动化验证：使用 Docker 路径，并显式固定 `OTEL_COLLECTOR_IMAGE`
+- CI 或自动化验证：使用 Docker 路径；除非需要指定 collector 版本，否则保留默认固定镜像
 
 ## 排障
 

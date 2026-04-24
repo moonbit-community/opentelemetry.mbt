@@ -13,8 +13,7 @@ This document defines two supported workflows:
 
 The helper scripts under `integration/otlp/scripts/*.mjs` require Node.js.
 
-All examples pin the collector to version `0.150.1` to reduce environment
-drift.
+All examples pin the collector to version `0.150.1`.
 
 ## Shared Conventions
 
@@ -219,17 +218,17 @@ metrics to mounted `/testresults/*.json` files.
 - mounting the config file and output files into the container
 - discovering the mapped host port automatically
 - exporting `OTEL_EXPORTER_OTLP_ENDPOINT`
-- running `traces`, `logs`, and `metrics` sequentially
+- running `traces`, `logs`, `metrics`, and `fullstack` sequentially
 - cleaning up the container on exit
 
-To avoid drift from `latest`, pin the image explicitly.
-`integration/otlp/scripts/test_with_docker.mjs` falls back to `latest` when
-`OTEL_COLLECTOR_IMAGE` is unset.
+`integration/otlp/scripts/test_with_docker.mjs` uses a pinned collector image
+by default when `OTEL_COLLECTOR_IMAGE` is unset. Override the image only when
+you need to test another collector version.
 
-Example:
+Collector image override example:
 
 ```bash
-export OTEL_COLLECTOR_IMAGE=ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.150.1
+export OTEL_COLLECTOR_IMAGE="ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:<version>"
 ```
 
 ### 2. Usage
@@ -237,18 +236,15 @@ export OTEL_COLLECTOR_IMAGE=ghcr.io/open-telemetry/opentelemetry-collector-relea
 Run the full integration suite:
 
 ```bash
-OTEL_COLLECTOR_IMAGE=ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.150.1 \
-  integration/otlp/scripts/test_with_docker.mjs
+integration/otlp/scripts/test_with_docker.mjs
 ```
 
 Run a subset:
 
 ```bash
-OTEL_COLLECTOR_IMAGE=ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.150.1 \
-  integration/otlp/scripts/test_with_docker.mjs traces
+integration/otlp/scripts/test_with_docker.mjs traces
 
-OTEL_COLLECTOR_IMAGE=ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.150.1 \
-  integration/otlp/scripts/test_with_docker.mjs logs metrics
+integration/otlp/scripts/test_with_docker.mjs logs metrics fullstack
 ```
 
 If `docker` or `moon` is not on the default path, override them:
@@ -256,7 +252,6 @@ If `docker` or `moon` is not on the default path, override them:
 ```bash
 DOCKER_BIN=/custom/path/docker \
 MOON_BIN=/custom/path/moon \
-OTEL_COLLECTOR_IMAGE=ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.150.1 \
   integration/otlp/scripts/test_with_docker.mjs
 ```
 
@@ -272,8 +267,8 @@ Use this workflow when:
 
 - No Docker environment: use the local `otelcol` binary workflow
 - Typical local development: prefer the Docker workflow
-- CI or automated verification: use the Docker workflow and pin
-  `OTEL_COLLECTOR_IMAGE`
+- CI or automated verification: use the Docker workflow and keep the default
+  pinned collector image unless a specific version override is required
 
 ## Troubleshooting
 

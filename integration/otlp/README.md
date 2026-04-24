@@ -21,8 +21,9 @@ The suite exercises the public MoonBit API over the OTLP HTTP exporters:
 Each test drives the public API end to end:
 
 1. build an SDK provider with an OTLP exporter
-2. register it through the public `interface/global` wrapper
-3. emit telemetry through the root package API
+2. register it with `sdk.set_*_provider()`, which also updates
+   `interface/global`
+3. emit telemetry through the root package API or `interface/global`
 4. send data to a real OpenTelemetry Collector
 5. compare the collector file output against checked-in snapshots
 
@@ -34,11 +35,10 @@ Each test drives the public API end to end:
 
 ## Run
 
-From the repository root with Docker and a pinned collector image:
+From the repository root with Docker and the default pinned collector image:
 
 ```bash
-OTEL_COLLECTOR_IMAGE=ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.150.1 \
-  integration/otlp/scripts/test_with_docker.mjs
+integration/otlp/scripts/test_with_docker.mjs
 ```
 
 With a local `otelcol` binary installed in the standard path from `DEVENV.md`:
@@ -50,10 +50,8 @@ integration/otlp/scripts/test_with_binary.mjs
 To run a subset:
 
 ```bash
-OTEL_COLLECTOR_IMAGE=ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.150.1 \
-  integration/otlp/scripts/test_with_docker.mjs traces
-OTEL_COLLECTOR_IMAGE=ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.150.1 \
-  integration/otlp/scripts/test_with_docker.mjs logs metrics fullstack
+integration/otlp/scripts/test_with_docker.mjs traces
+integration/otlp/scripts/test_with_docker.mjs logs metrics fullstack
 integration/otlp/scripts/test_with_binary.mjs traces
 integration/otlp/scripts/test_with_binary.mjs logs metrics fullstack
 ```
@@ -61,5 +59,5 @@ integration/otlp/scripts/test_with_binary.mjs logs metrics fullstack
 The Docker runner starts one collector container with random host port mapping,
 exports `OTEL_EXPORTER_OTLP_ENDPOINT`, runs the selected packages
 sequentially, and then cleans the container up. If `OTEL_COLLECTOR_IMAGE` is
-unset it falls back to `latest`, so pin it explicitly when you want stable
-reproduction.
+unset it uses the script's pinned default collector image. Set
+`OTEL_COLLECTOR_IMAGE` only when you need to override that version.
