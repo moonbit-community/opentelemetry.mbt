@@ -48,7 +48,7 @@ instrumentation do real work.
 | `moonbit-community/opentelemetry/interface/propagation` | W3C trace-context and baggage propagation through text carriers such as HTTP headers. |
 | `moonbit-community/opentelemetry/interface/global` | Process-wide API providers. Libraries normally read from here indirectly through the root package. |
 | `moonbit-community/opentelemetry/sdk` | Application-side SDK facade for providers, processors, readers, resources, samplers, and global SDK helpers. |
-| `moonbit-community/opentelemetry/sdk/global` | Process-wide SDK providers used by the SDK facade. Prefer `interface/global` when wiring the public root package. |
+| `moonbit-community/opentelemetry/sdk/global` | Process-wide SDK providers used by the SDK facade. Use `sdk.set_*_provider()` to wire SDK providers into the public root package. |
 | `moonbit-community/opentelemetry/print` | Human-readable stdout exporters for examples, local debugging, and tests. |
 | `moonbit-community/opentelemetry/otlp` | OTLP HTTP exporters for traces, logs, and metrics. |
 | `moonbit-community/opentelemetry/semantics/*` | Generated semantic-convention constants for standard attribute and metric names. |
@@ -113,8 +113,9 @@ runtime no-op, not a compile-time removal of all instrumentation code.
 Applications configure one provider per signal:
 
 1. Build a trace, log, or metric provider in `sdk/*`.
-2. Register it into `interface/global` if code uses the root
-   `moonbit-community/opentelemetry` package.
+2. Register SDK providers with `sdk.set_*_provider()` if code uses the root
+   `moonbit-community/opentelemetry` package. These helpers also update
+   `interface/global` with API-layer providers.
 3. Spawn background tasks when using batch span/log processors or periodic
    metric readers.
 4. Flush and shut down providers during application teardown.
