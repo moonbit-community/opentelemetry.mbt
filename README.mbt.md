@@ -1,13 +1,8 @@
 # OpenTelemetry for MoonBit
 
-MoonBit implementation of [OpenTelemetry](https://opentelemetry.io/): APIs for
-instrumenting libraries and applications, SDK providers for processing telemetry,
-and exporters for getting telemetry out of the process.
+MoonBit implementation of [OpenTelemetry](https://opentelemetry.io/): APIs for instrumenting libraries and applications, SDK providers for processing telemetry, and exporters for getting telemetry out of the process.
 
-OpenTelemetry is not a tracing UI, metrics database, or log backend. It is the
-standard instrumentation and transport layer that lets your code produce
-portable telemetry data, then send it to tools such as the OpenTelemetry
-Collector, Jaeger, Prometheus, or a vendor backend.
+OpenTelemetry is the standard instrumentation and transport layer that lets your code produce portable telemetry data, then send it to tools such as the OpenTelemetry Collector, Jaeger, Prometheus, or a vendor backend.
 
 This repository contains:
 
