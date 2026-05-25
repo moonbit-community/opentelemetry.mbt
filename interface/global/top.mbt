@@ -50,6 +50,7 @@ fn build_scope(
 ///
 /// The default provider is no-op. Applications replace it during startup so
 /// library instrumentation obtained through the root package records spans.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#tracerprovider
 pub fn tracer_provider() -> @trace.TracerProvider {
   tracer_provider_ref.val
 }
@@ -60,6 +61,7 @@ pub fn tracer_provider() -> @trace.TracerProvider {
 /// Call this during application startup after building an API provider. SDK
 /// applications normally use `sdk.set_tracer_provider()`, which updates this
 /// API global as well.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#tracerprovider
 pub fn set_tracer_provider(provider : @trace.TracerProvider) -> Unit {
   tracer_provider_ref.val = provider
 }
@@ -68,6 +70,7 @@ pub fn set_tracer_provider(provider : @trace.TracerProvider) -> Unit {
 /// Returns the currently registered global logger provider.
 ///
 /// The default provider is no-op.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/api/#loggerprovider
 pub fn logger_provider() -> @logs.LoggerProvider {
   logger_provider_ref.val
 }
@@ -77,6 +80,7 @@ pub fn logger_provider() -> @logs.LoggerProvider {
 ///
 /// Call this during application startup to enable log export through the public
 /// logging bridge.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/api/#loggerprovider
 pub fn set_logger_provider(provider : @logs.LoggerProvider) -> Unit {
   logger_provider_ref.val = provider
 }
@@ -85,6 +89,7 @@ pub fn set_logger_provider(provider : @logs.LoggerProvider) -> Unit {
 /// Returns the currently registered global meter provider.
 ///
 /// The default provider is no-op.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#meterprovider
 pub fn meter_provider() -> @metrics.MeterProvider {
   meter_provider_ref.val
 }
@@ -94,6 +99,7 @@ pub fn meter_provider() -> @metrics.MeterProvider {
 ///
 /// Call this during application startup so root-package `meter()` calls create
 /// instruments backed by an SDK provider.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#meterprovider
 pub fn set_meter_provider(provider : @metrics.MeterProvider) -> Unit {
   meter_provider_ref.val = provider
 }
@@ -104,6 +110,7 @@ pub fn set_meter_provider(provider : @metrics.MeterProvider) -> Unit {
 /// The default propagator combines W3C trace context and baggage. Replace it
 /// only when your transport or interoperability requirements need a different
 /// propagation format.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#set-global-propagator
 pub fn set_text_map_propagator(
   propagator : @propagation.TextMapPropagator,
 ) -> Unit {
@@ -112,6 +119,7 @@ pub fn set_text_map_propagator(
 
 ///|
 /// Calls `f` with the current global text-map propagator.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#get-global-propagator
 pub fn[T] get_text_map_propagator(
   f : (@propagation.TextMapPropagator) -> T,
 ) -> T {
@@ -123,6 +131,7 @@ pub fn[T] get_text_map_propagator(
 ///
 /// The scope is built from `name`, `version`, `schema_url`, and `attributes`.
 /// This is what the root package delegates to.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#get-a-tracer
 pub fn tracer(
   name : StringView,
   version? : String? = None,
@@ -136,6 +145,7 @@ pub fn tracer(
 
 ///|
 /// Returns a tracer for an already constructed instrumentation scope.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#get-a-tracer
 pub fn tracer_with_scope(scope : @common.InstrumentationScope) -> @trace.Tracer {
   tracer_provider_ref.val.tracer_with_scope(scope)
 }
@@ -145,6 +155,7 @@ pub fn tracer_with_scope(scope : @common.InstrumentationScope) -> @trace.Tracer 
 ///
 /// The scope is built from `name`, `version`, `schema_url`, and `attributes`.
 /// This is what the root package delegates to.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/api/#get-a-logger
 pub fn logger(
   name : StringView,
   version? : String? = None,
@@ -158,6 +169,7 @@ pub fn logger(
 
 ///|
 /// Returns a logger for an already constructed instrumentation scope.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/api/#get-a-logger
 pub fn logger_with_scope(scope : @common.InstrumentationScope) -> @logs.Logger {
   logger_provider_ref.val.logger_with_scope(scope)
 }
@@ -167,6 +179,7 @@ pub fn logger_with_scope(scope : @common.InstrumentationScope) -> @logs.Logger {
 ///
 /// The scope is built from `name`, `version`, `schema_url`, and `attributes`.
 /// This is what the root package delegates to.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#get-a-meter
 pub fn meter(
   name : StringView,
   version? : String? = None,
@@ -180,6 +193,7 @@ pub fn meter(
 
 ///|
 /// Returns a meter for an already constructed instrumentation scope.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#get-a-meter
 pub fn meter_with_scope(scope : @common.InstrumentationScope) -> @metrics.Meter {
   meter_provider_ref.val.meter_with_scope(scope)
 }

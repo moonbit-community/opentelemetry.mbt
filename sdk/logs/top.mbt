@@ -3,6 +3,7 @@
 ///
 /// The 24 slots let bridges preserve finer-grained severity from existing
 /// logging frameworks.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-severitynumber
 pub(all) enum SeverityNumber {
   Trace
   Trace2
@@ -35,6 +36,7 @@ pub(all) enum SeverityNumber {
 ///
 /// Use `Map` and `Array` when the backend should receive structured payloads
 /// rather than preformatted strings.
+/// Spec: https://opentelemetry.io/docs/specs/otel/common/#anyvalue
 pub(all) enum AnyValue {
   Bool(Bool)
   Int64(Int64)
@@ -47,6 +49,7 @@ pub(all) enum AnyValue {
 
 ///|
 /// Structured log attribute key/value pair.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-attributes
 pub struct KeyValue {
   key : @common.Key
   value : AnyValue
@@ -54,6 +57,7 @@ pub struct KeyValue {
 
 ///|
 /// Immutable log payload exported by processors and exporters.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#additional-logrecord-interfaces
 pub struct LogRecord {
   event_name : String?
   target : String?
@@ -70,6 +74,7 @@ pub struct LogRecord {
 
 ///|
 /// Exporter callback wrapper for log batches.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#logrecordexporter
 pub struct LogExporter {
   export_fn : async (ArrayView[LogRecord]) -> @error.OTelSdkResult
   force_flush_fn : async () -> @error.OTelSdkResult
@@ -82,6 +87,7 @@ pub struct LogExporter {
 ///
 /// Processors receive immutable log snapshots after the logger attaches
 /// resource and instrumentation scope metadata.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#logrecordprocessor
 pub struct LogProcessor {
   emit_fn : async (LogRecord) -> Unit
   force_flush_fn : async () -> @error.OTelSdkResult
@@ -93,6 +99,7 @@ pub struct LogProcessor {
 ///
 /// Useful for tests and local debugging. Network exporters should usually be
 /// wrapped by `BatchLogProcessor`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#simple-processor
 pub struct SimpleLogProcessor {
   inner : LogProcessor
 }
@@ -102,6 +109,7 @@ pub struct SimpleLogProcessor {
 ///
 /// The background loop is not started automatically. Use global/facade
 /// `spawn_background_tasks()` after provider registration.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#batching-processor
 pub struct BatchLogProcessor {
   inner : LogProcessor
   state : Ref[BatchProcessorState]
@@ -109,6 +117,7 @@ pub struct BatchLogProcessor {
 
 ///|
 /// Configuration for batch log processing.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#batching-processor
 pub struct BatchConfig {
   max_queue_size : Int
   max_export_batch_size : Int
@@ -124,6 +133,7 @@ struct InMemoryLogExporterState {
 
 ///|
 /// Test exporter that keeps finished logs in memory.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#logrecordexporter
 pub struct InMemoryLogExporter {
   state : Ref[InMemoryLogExporterState]
 }
@@ -149,12 +159,14 @@ struct LoggerProviderState {
 ///
 /// Applications create one provider, configure processors/exporters, register it
 /// if needed, then shut it down during application teardown.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#loggerprovider
 pub struct SdkLoggerProvider {
   state : Ref[LoggerProviderState]
 }
 
 ///|
 /// Builder for `SdkLoggerProvider`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#loggerprovider
 pub struct SdkLoggerProviderBuilder {
   mut resource : @resource.Resource
   processors : Array[LogProcessor]
@@ -165,6 +177,7 @@ pub struct SdkLoggerProviderBuilder {
 /// Logger scoped to one instrumentation library.
 ///
 /// The instrumentation scope is copied onto every emitted log record.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#logger
 pub struct SdkLogger {
   provider : SdkLoggerProvider
   instrumentation_scope : @common.InstrumentationScope
@@ -172,12 +185,14 @@ pub struct SdkLogger {
 
 ///|
 /// Creates a structured log attribute.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-attributes
 pub fn KeyValue::new(key : StringView, value : AnyValue) -> KeyValue {
   { key: @common.Key::new(key), value }
 }
 
 ///|
 /// Converts a shared SDK attribute value into a log-specific structured value.
+/// Spec: https://opentelemetry.io/docs/specs/otel/common/#anyvalue
 pub fn AnyValue::from_common(value : @common.Value) -> AnyValue {
   match value {
     Bool(value) => Bool(value)
@@ -197,6 +212,7 @@ pub fn AnyValue::from_common(value : @common.Value) -> AnyValue {
 
 ///|
 /// Converts a shared SDK attribute into a log-specific structured attribute.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-attributes
 pub fn KeyValue::from_common(attribute : @common.KeyValue) -> KeyValue {
   { key: attribute.key, value: AnyValue::from_common(attribute.value) }
 }
@@ -207,6 +223,7 @@ pub fn KeyValue::from_common(attribute : @common.KeyValue) -> KeyValue {
 /// This is the immutable SDK-side representation. Public API users usually
 /// build `interface/logs.LogRecord` values and let `Logger::emit()` convert
 /// them into this type.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#additional-logrecord-interfaces
 pub fn LogRecord::new(
   body : AnyValue,
   timestamp_unix_nano? : Int64 = @utils.now_unix_nano(),
@@ -260,6 +277,7 @@ fn env_or(key : StringView, fallback : Int) -> Int {
 
 ///|
 /// Creates normalized batch log processor configuration.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#batching-processor
 pub fn BatchConfig::new(
   max_queue_size? : Int = 2048,
   max_export_batch_size? : Int = 512,
@@ -304,6 +322,7 @@ pub impl Default for BatchConfig with fn default() -> BatchConfig {
 
 ///|
 /// Builds a log exporter from callbacks.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#logrecordexporter
 pub fn LogExporter::new(
   export_fn : async (ArrayView[LogRecord]) -> @error.OTelSdkResult,
   force_flush_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
@@ -315,6 +334,7 @@ pub fn LogExporter::new(
 
 ///|
 /// Exports one batch of log records.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#export
 pub async fn LogExporter::export_batch(
   self : LogExporter,
   batch : ArrayView[LogRecord],
@@ -324,6 +344,7 @@ pub async fn LogExporter::export_batch(
 
 ///|
 /// Requests exporter flush.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#forceflush
 pub async fn LogExporter::force_flush(
   self : LogExporter,
 ) -> @error.OTelSdkResult {
@@ -332,6 +353,7 @@ pub async fn LogExporter::force_flush(
 
 ///|
 /// Requests exporter shutdown with an optional timeout budget in milliseconds.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#shutdown
 pub async fn LogExporter::shutdown_with_timeout(
   self : LogExporter,
   timeout_millis : Int,
@@ -342,18 +364,21 @@ pub async fn LogExporter::shutdown_with_timeout(
 
 ///|
 /// Requests exporter shutdown.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#shutdown
 pub async fn LogExporter::shutdown(self : LogExporter) -> @error.OTelSdkResult {
   self.shutdown_with_timeout(5000)
 }
 
 ///|
 /// Returns a human-readable exporter name.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#logrecordexporter
 pub fn LogExporter::name(self : LogExporter) -> String {
   (self.name_fn)()
 }
 
 ///|
 /// Builds a log processor from callbacks.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#logrecordprocessor
 pub fn LogProcessor::new(
   emit_fn? : async (LogRecord) -> Unit = _ => (),
   force_flush_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
@@ -364,6 +389,7 @@ pub fn LogProcessor::new(
 
 ///|
 /// Processes one log record.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#logrecordprocessor
 pub async fn LogProcessor::emit(
   self : LogProcessor,
   record : LogRecord,
@@ -373,6 +399,7 @@ pub async fn LogProcessor::emit(
 
 ///|
 /// Requests processor flush.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#logrecordprocessor
 pub async fn LogProcessor::force_flush(
   self : LogProcessor,
 ) -> @error.OTelSdkResult {
@@ -381,6 +408,7 @@ pub async fn LogProcessor::force_flush(
 
 ///|
 /// Requests processor shutdown with an optional timeout budget in milliseconds.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#logrecordprocessor
 pub async fn LogProcessor::shutdown_with_timeout(
   self : LogProcessor,
   timeout_millis : Int,
@@ -391,6 +419,7 @@ pub async fn LogProcessor::shutdown_with_timeout(
 
 ///|
 /// Requests processor shutdown.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#logrecordprocessor
 pub async fn LogProcessor::shutdown(
   self : LogProcessor,
 ) -> @error.OTelSdkResult {
@@ -399,12 +428,14 @@ pub async fn LogProcessor::shutdown(
 
 ///|
 /// Creates an empty in-memory log exporter.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#logrecordexporter
 pub fn InMemoryLogExporter::new() -> InMemoryLogExporter {
   { state: Ref({ finished_logs: [], is_shutdown: false }) }
 }
 
 ///|
 /// Returns the finished log records accumulated so far.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#logrecordexporter
 pub fn InMemoryLogExporter::finished_logs(
   self : InMemoryLogExporter,
 ) -> Array[LogRecord] {
@@ -413,12 +444,14 @@ pub fn InMemoryLogExporter::finished_logs(
 
 ///|
 /// Clears the in-memory log buffer.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#logrecordexporter
 pub fn InMemoryLogExporter::reset(self : InMemoryLogExporter) -> Unit {
   self.state.val = { ..self.state.val, finished_logs: [] }
 }
 
 ///|
 /// Erases the concrete in-memory exporter type into `LogExporter`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#export
 pub fn InMemoryLogExporter::into_log_exporter(
   self : InMemoryLogExporter,
 ) -> LogExporter {
@@ -447,6 +480,7 @@ pub fn InMemoryLogExporter::into_log_exporter(
 
 ///|
 /// Creates a simple processor that exports each emitted record immediately.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#simple-processor
 pub fn SimpleLogProcessor::new(exporter : LogExporter) -> SimpleLogProcessor {
   {
     inner: LogProcessor::new(
@@ -459,6 +493,7 @@ pub fn SimpleLogProcessor::new(exporter : LogExporter) -> SimpleLogProcessor {
 
 ///|
 /// Erases the concrete simple processor type into `LogProcessor`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#simple-processor
 pub fn SimpleLogProcessor::into_log_processor(
   self : SimpleLogProcessor,
 ) -> LogProcessor {
@@ -495,6 +530,7 @@ async fn flush_log_queue(
 
 ///|
 /// Creates a batch log processor with a bounded queue.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#batching-processor
 pub fn BatchLogProcessor::new(
   exporter : LogExporter,
   config? : BatchConfig = Default::default(),
@@ -547,6 +583,7 @@ pub fn BatchLogProcessor::new(
 
 ///|
 /// Erases the concrete batch processor type into `LogProcessor`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#batching-processor
 pub fn BatchLogProcessor::into_log_processor(
   self : BatchLogProcessor,
 ) -> LogProcessor {
@@ -555,6 +592,7 @@ pub fn BatchLogProcessor::into_log_processor(
 
 ///|
 /// Background loop for scheduled batch exports.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#batching-processor
 pub async fn BatchLogProcessor::run(self : BatchLogProcessor) -> Unit {
   while !self.state.val.is_shutdown {
     @async.sleep(self.state.val.config.scheduled_delay_millis)
@@ -571,6 +609,7 @@ pub async fn BatchLogProcessor::run(self : BatchLogProcessor) -> Unit {
 ///
 /// Add processors or exporters before calling `build()`. A provider with no
 /// processors accepts logs but exports nothing.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#loggerprovider
 pub fn SdkLoggerProvider::builder() -> SdkLoggerProviderBuilder {
   {
     resource: @resource.Resource::builder().build(),
@@ -581,6 +620,7 @@ pub fn SdkLoggerProvider::builder() -> SdkLoggerProviderBuilder {
 
 ///|
 /// Replaces the provider resource.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#loggerprovider
 pub fn SdkLoggerProviderBuilder::with_resource(
   self : SdkLoggerProviderBuilder,
   resource : @resource.Resource,
@@ -591,6 +631,7 @@ pub fn SdkLoggerProviderBuilder::with_resource(
 
 ///|
 /// Appends a processor to the logger pipeline.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#loggerprovider
 pub fn SdkLoggerProviderBuilder::with_log_processor(
   self : SdkLoggerProviderBuilder,
   processor : LogProcessor,
@@ -603,6 +644,7 @@ pub fn SdkLoggerProviderBuilder::with_log_processor(
 /// Appends a simple processor around the exporter.
 ///
 /// Each emitted log is exported from `SdkLogger::emit()`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#loggerprovider
 pub fn SdkLoggerProviderBuilder::with_simple_exporter(
   self : SdkLoggerProviderBuilder,
   exporter : LogExporter,
@@ -619,6 +661,7 @@ pub fn SdkLoggerProviderBuilder::with_simple_exporter(
 /// The processor is registered with the provider, but its export loop only runs
 /// after `spawn_batch_processor_tasks()` or the facade/global equivalent is
 /// called.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#loggerprovider
 pub fn SdkLoggerProviderBuilder::with_batch_exporter(
   self : SdkLoggerProviderBuilder,
   exporter : LogExporter,
@@ -631,6 +674,7 @@ pub fn SdkLoggerProviderBuilder::with_batch_exporter(
 
 ///|
 /// Builds the logger provider.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#loggerprovider
 pub fn SdkLoggerProviderBuilder::build(
   self : SdkLoggerProviderBuilder,
 ) -> SdkLoggerProvider {
@@ -646,6 +690,7 @@ pub fn SdkLoggerProviderBuilder::build(
 
 ///|
 /// Returns the provider resource.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#loggerprovider
 pub fn SdkLoggerProvider::resource(
   self : SdkLoggerProvider,
 ) -> @resource.Resource {
@@ -654,6 +699,7 @@ pub fn SdkLoggerProvider::resource(
 
 ///|
 /// Spawns background tasks for all configured batch processors.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#loggerprovider
 pub fn SdkLoggerProvider::spawn_batch_processor_tasks(
   self : SdkLoggerProvider,
   group : @async.TaskGroup[Unit],
@@ -666,6 +712,7 @@ pub fn SdkLoggerProvider::spawn_batch_processor_tasks(
 
 ///|
 /// Creates a logger scoped to the supplied instrumentation library metadata.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#logger-creation
 pub fn SdkLoggerProvider::logger(
   self : SdkLoggerProvider,
   name : StringView,
@@ -688,6 +735,7 @@ pub fn SdkLoggerProvider::logger(
 
 ///|
 /// Flushes every configured processor.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#forceflush
 pub async fn SdkLoggerProvider::force_flush(
   self : SdkLoggerProvider,
 ) -> @error.OTelSdkResult {
@@ -705,6 +753,7 @@ pub async fn SdkLoggerProvider::force_flush(
 
 ///|
 /// Shuts down every configured processor and marks the provider unusable.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#shutdown
 pub async fn SdkLoggerProvider::shutdown_with_timeout(
   self : SdkLoggerProvider,
   timeout_millis : Int,
@@ -724,6 +773,7 @@ pub async fn SdkLoggerProvider::shutdown_with_timeout(
 }
 
 ///|
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#shutdown
 pub async fn SdkLoggerProvider::shutdown(
   self : SdkLoggerProvider,
 ) -> @error.OTelSdkResult {
@@ -859,6 +909,7 @@ fn SdkLogger::into_api_logger(self : SdkLogger) -> @api.Logger {
 
 ///|
 /// Erases this SDK provider into the public logs API provider.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#loggerprovider
 pub fn SdkLoggerProvider::into_logger_provider(
   self : SdkLoggerProvider,
 ) -> @api.LoggerProvider {
@@ -891,6 +942,7 @@ fn trace_context_from_context(
 ///
 /// The logger attaches resource and instrumentation scope metadata before
 /// forwarding the record to processors.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/api/#emit-a-logrecord
 pub async fn SdkLogger::emit(
   self : SdkLogger,
   body : AnyValue,

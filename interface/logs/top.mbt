@@ -4,6 +4,7 @@
 /// Values remain structured when bridged into the SDK and OTLP exporters. Use
 /// scalar attributes for common query dimensions and structured bodies for
 /// payloads that should stay grouped.
+/// Spec: https://opentelemetry.io/docs/specs/otel/common/#anyvalue
 pub(all) enum AnyValue {
   Int(Int64)
   Double(Double)
@@ -19,6 +20,7 @@ pub(all) enum AnyValue {
 ///
 /// The variants map to OpenTelemetry's 24 severity slots. `Severity::name()`
 /// returns the canonical uppercase text such as `INFO`, `WARN3`, or `ERROR`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#severity-fields
 pub(all) enum Severity {
   Trace
   Trace2
@@ -48,6 +50,7 @@ pub(all) enum Severity {
 
 ///|
 /// Structured log attribute key/value pair used by the public logging API.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-attributes
 pub struct KeyValue {
   key : @common.Key
   value : AnyValue
@@ -59,6 +62,7 @@ pub struct KeyValue {
 /// Construct records only after checking `Logger::event_enabled()` when
 /// formatting or attribute construction is expensive. `emit()` fills missing
 /// timestamps and default body values when an SDK logger is installed.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#log-and-event-record-definition
 pub struct LogRecord {
   mut event_name : String?
   mut target : String?
@@ -76,6 +80,7 @@ pub struct LogRecord {
 ///
 /// A logger emits records for one instrumentation scope. When backed by a no-op
 /// provider, all emissions are silently dropped.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/api/#logger
 pub struct Logger {
   emit_fn : async (LogRecord) -> Unit
   event_enabled_fn : (Severity, StringView, String?) -> Bool
@@ -86,6 +91,7 @@ pub struct Logger {
 ///
 /// Applications install SDK-backed providers through the SDK facade while
 /// library code depends only on this API type.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/api/#loggerprovider
 pub struct LoggerProvider {
   logger_with_scope_fn : (@common.InstrumentationScope) -> Logger
 }
@@ -95,6 +101,7 @@ pub struct LoggerProvider {
 ///
 /// If `LogRecord::severity_text` is not set, SDK adapters derive it from this
 /// method when a severity number exists.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#mapping-of-severitynumber
 pub fn Severity::name(self : Severity) -> String {
   match self {
     Trace => "TRACE"
@@ -141,6 +148,7 @@ fn sorted_keys(values : Map[String, AnyValue]) -> Array[String] {
 
 ///|
 /// Converts a shared attribute value into a public log value.
+/// Spec: https://opentelemetry.io/docs/specs/otel/common/#anyvalue
 pub fn AnyValue::from_common(value : @common.Value) -> AnyValue {
   match value {
     Bool(value) => Boolean(value)
@@ -160,18 +168,21 @@ pub fn AnyValue::from_common(value : @common.Value) -> AnyValue {
 
 ///|
 /// Creates a structured log attribute.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-attributes
 pub fn KeyValue::new(key : StringView, value : AnyValue) -> KeyValue {
   { key: @common.Key::new(key), value }
 }
 
 ///|
 /// Converts a shared attribute into a public log attribute.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-attributes
 pub fn KeyValue::from_common(attribute : @common.KeyValue) -> KeyValue {
   { key: attribute.key, value: AnyValue::from_common(attribute.value) }
 }
 
 ///|
 /// Returns a map value with deterministic key insertion order.
+/// Spec: https://opentelemetry.io/docs/specs/otel/common/#anyvalue
 pub fn AnyValue::map(values : Map[String, AnyValue]) -> AnyValue {
   let sorted : Map[String, AnyValue] = {}
   for key in sorted_keys(values) {
@@ -185,6 +196,7 @@ pub fn AnyValue::map(values : Map[String, AnyValue]) -> AnyValue {
 /// Creates an empty mutable log record.
 ///
 /// The record is not tied to a logger until passed to `Logger::emit()`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#log-and-event-record-definition
 pub fn LogRecord::new() -> LogRecord {
   {
     event_name: None,
@@ -202,12 +214,14 @@ pub fn LogRecord::new() -> LogRecord {
 ///|
 /// Sets the event name that will later be exported through the OTLP
 /// `event_name` field.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-eventname
 pub fn LogRecord::set_event_name(self : LogRecord, name : StringView) -> Unit {
   self.event_name = Some(name.to_owned())
 }
 
 ///|
 /// Sets the log target used for export-time scope grouping.
+/// Related spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-instrumentationscope
 pub fn LogRecord::set_target(self : LogRecord, target : StringView) -> Unit {
   self.target = Some(target.to_owned())
 }
@@ -216,6 +230,7 @@ pub fn LogRecord::set_target(self : LogRecord, target : StringView) -> Unit {
 /// Sets the event timestamp in Unix nanoseconds.
 ///
 /// When omitted, SDK-backed loggers use the current time.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-timestamp
 pub fn LogRecord::set_timestamp(
   self : LogRecord,
   timestamp_unix_nano : Int64,
@@ -227,6 +242,7 @@ pub fn LogRecord::set_timestamp(
 /// Sets the observed timestamp in Unix nanoseconds.
 ///
 /// When omitted, SDK-backed loggers use the current time.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-observedtimestamp
 pub fn LogRecord::set_observed_timestamp(
   self : LogRecord,
   observed_timestamp_unix_nano : Int64,
@@ -239,6 +255,7 @@ pub fn LogRecord::set_observed_timestamp(
 ///
 /// If this is not set but a severity number is present, SDK-backed loggers
 /// derive the text from `Severity::name()`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-severitytext
 pub fn LogRecord::set_severity_text(
   self : LogRecord,
   severity_text : StringView,
@@ -248,6 +265,7 @@ pub fn LogRecord::set_severity_text(
 
 ///|
 /// Sets the structured severity number to export.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-severitynumber
 pub fn LogRecord::set_severity_number(
   self : LogRecord,
   severity_number : Severity,
@@ -259,6 +277,7 @@ pub fn LogRecord::set_severity_number(
 /// Sets the log body.
 ///
 /// If no body is set, SDK-backed loggers export an empty string body.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-body
 pub fn LogRecord::set_body(self : LogRecord, body : AnyValue) -> Unit {
   self.body = Some(body)
 }
@@ -268,6 +287,7 @@ pub fn LogRecord::set_body(self : LogRecord, body : AnyValue) -> Unit {
 ///
 /// Attribute keys should be stable names. Prefer scalar values for fields that
 /// users will search or group by.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-attributes
 pub fn LogRecord::add_attribute(
   self : LogRecord,
   key : StringView,
@@ -278,6 +298,7 @@ pub fn LogRecord::add_attribute(
 
 ///|
 /// Appends multiple pre-built attributes to the log record.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-attributes
 pub fn LogRecord::add_attributes(
   self : LogRecord,
   attributes : ArrayView[@common.KeyValue],
@@ -292,6 +313,7 @@ pub fn LogRecord::add_attributes(
 ///
 /// Use this when bridging logs from code that already knows the trace and span
 /// identifiers. When `trace_flags` is omitted, the trace flags default to zero.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#trace-context-fields
 pub fn LogRecord::set_trace_context(
   self : LogRecord,
   trace_id : @common.TraceId,
@@ -317,6 +339,7 @@ pub impl Default for LogRecord with fn default() -> LogRecord {
 
 ///|
 /// Builds a logger from emission and filtering callbacks.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/api/#logger
 pub fn Logger::from_functions(
   emit_fn : async (LogRecord) -> Unit,
   event_enabled_fn? : (Severity, StringView, String?) -> Bool = (_, _, _) => {
@@ -328,6 +351,7 @@ pub fn Logger::from_functions(
 
 ///|
 /// Builds a logger provider from a scope-to-logger callback.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/api/#loggerprovider
 pub fn LoggerProvider::from_functions(
   logger_with_scope_fn : (@common.InstrumentationScope) -> Logger,
 ) -> LoggerProvider {
@@ -339,6 +363,7 @@ pub fn LoggerProvider::from_functions(
 ///
 /// Loggers from this provider report `event_enabled() == false` and drop
 /// emitted records.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/api/#loggerprovider
 pub fn LoggerProvider::noop() -> LoggerProvider {
   LoggerProvider::from_functions(_ => {
     Logger::from_functions(_ => (), event_enabled_fn=(_, _, _) => false)
@@ -349,6 +374,7 @@ pub fn LoggerProvider::noop() -> LoggerProvider {
 /// Returns a logger for one instrumentation name.
 ///
 /// If the provider is no-op, the returned logger is also no-op.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/api/#get-a-logger
 pub fn LoggerProvider::logger(
   self : LoggerProvider,
   name : StringView,
@@ -361,6 +387,7 @@ pub fn LoggerProvider::logger(
 ///
 /// The scope name, version, schema URL, and attributes are forwarded to the SDK
 /// provider by SDK adapters.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/api/#get-a-logger
 pub fn LoggerProvider::logger_with_scope(
   self : LoggerProvider,
   scope : @common.InstrumentationScope,
@@ -372,6 +399,7 @@ pub fn LoggerProvider::logger_with_scope(
 /// Creates a fresh mutable `LogRecord`.
 ///
 /// The returned record is not pre-populated with scope or provider data.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/api/#emit-a-logrecord
 pub fn Logger::create_log_record(self : Logger) -> LogRecord {
   ignore(self)
   LogRecord::new()
@@ -382,6 +410,7 @@ pub fn Logger::create_log_record(self : Logger) -> LogRecord {
 ///
 /// Missing timestamps, severity text, and body defaults are supplied by SDK
 /// adapters. No-op loggers drop the record silently.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/api/#emit-a-logrecord
 pub async fn Logger::emit(self : Logger, record : LogRecord) -> Unit {
   (self.emit_fn)(record)
 }
@@ -391,6 +420,10 @@ pub async fn Logger::emit(self : Logger, record : LogRecord) -> Unit {
 ///
 /// Use this as a guard before expensive message formatting or structured body
 /// construction.
+///
+/// OTel specifies the enabled guard over context, severity, and event name;
+/// `target` is this API's local filtering dimension.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/api/#enabled
 pub fn Logger::event_enabled(
   self : Logger,
   severity : Severity,

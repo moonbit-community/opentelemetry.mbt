@@ -1,5 +1,6 @@
 ///|
 /// Immutable description of the entity producing telemetry.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/data-model/#resource-data-model
 pub struct Resource {
   attributes : Map[String, @common.Value]
   schema_url : String?
@@ -8,12 +9,14 @@ pub struct Resource {
 ///|
 /// Detector callback used to discover resource attributes from the runtime or
 /// environment.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#detecting-resource-information-from-the-environment
 pub struct ResourceDetector {
   detect_fn : () -> Resource
 }
 
 ///|
 /// Builder that combines explicit attributes with detector output.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#resource-creation
 pub struct ResourceBuilder {
   mut resource : Resource
   detectors : Array[ResourceDetector]
@@ -33,6 +36,7 @@ fn resource_from_attributes(
 
 ///|
 /// Returns an empty resource.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#the-empty-resource
 pub fn Resource::empty() -> Resource {
   { attributes: {}, schema_url: None }
 }
@@ -40,6 +44,7 @@ pub fn Resource::empty() -> Resource {
 ///|
 /// Starts building a resource with the SDK-provided, telemetry, and environment
 /// detectors enabled by default.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#create
 pub fn Resource::builder() -> ResourceBuilder {
   {
     resource: Resource::empty(),
@@ -53,42 +58,49 @@ pub fn Resource::builder() -> ResourceBuilder {
 
 ///|
 /// Starts building a resource without any default detectors.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#create
 pub fn Resource::builder_empty() -> ResourceBuilder {
   { resource: Resource::empty(), detectors: [] }
 }
 
 ///|
 /// Creates a resource from explicit attributes. Later duplicate keys win.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#create
 pub fn Resource::new(attributes : ArrayView[@common.KeyValue]) -> Resource {
   resource_from_attributes(attributes)
 }
 
 ///|
 /// Returns the optional schema URL attached to this resource.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#retrieve-attributes
 pub fn Resource::schema_url(self : Resource) -> String? {
   self.schema_url
 }
 
 ///|
 /// Returns the number of attributes stored in the resource.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#retrieve-attributes
 pub fn Resource::len(self : Resource) -> Int {
   self.attributes.length()
 }
 
 ///|
 /// Returns whether the resource carries no attributes.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#retrieve-attributes
 pub fn Resource::is_empty(self : Resource) -> Bool {
   self.attributes.is_empty()
 }
 
 ///|
 /// Looks up one resource attribute.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#retrieve-attributes
 pub fn Resource::get(self : Resource, key : StringView) -> @common.Value? {
   self.attributes.get_from_string(key)
 }
 
 ///|
 /// Returns a copy of all resource attributes.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#retrieve-attributes
 pub fn Resource::attributes(self : Resource) -> Map[String, @common.Value] {
   self.attributes.copy()
 }
@@ -96,6 +108,7 @@ pub fn Resource::attributes(self : Resource) -> Map[String, @common.Value] {
 ///|
 /// Merges two resources, preferring attributes from `other`. Conflicting schema
 /// URLs clear the merged schema URL.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#merge
 pub fn Resource::merge(self : Resource, other : Resource) -> Resource {
   if self.is_empty() && self.schema_url is None {
     return other
@@ -124,12 +137,14 @@ pub impl Default for Resource with fn default() -> Resource {
 
 ///|
 /// Creates a detector from a callback.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#detecting-resource-information-from-the-environment
 pub fn ResourceDetector::new(detect_fn : () -> Resource) -> ResourceDetector {
   { detect_fn, }
 }
 
 ///|
 /// Runs the detector and returns the discovered resource.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#detecting-resource-information-from-the-environment
 pub fn ResourceDetector::detect(self : ResourceDetector) -> Resource {
   (self.detect_fn)()
 }
@@ -148,6 +163,7 @@ fn default_service_name() -> String {
 ///|
 /// Detects the fallback `service.name` derived from the current executable or
 /// script name.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#sdk-provided-resource-attributes
 pub fn sdk_provided_resource_detector() -> ResourceDetector {
   ResourceDetector::new(() => {
     Resource::new([
@@ -158,6 +174,7 @@ pub fn sdk_provided_resource_detector() -> ResourceDetector {
 
 ///|
 /// Detects the standard `telemetry.sdk.*` attributes for this MoonBit SDK.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#sdk-provided-resource-attributes
 pub fn telemetry_resource_detector() -> ResourceDetector {
   ResourceDetector::new(() => {
     Resource::new([
@@ -192,6 +209,7 @@ fn parse_resource_attributes(
 /// Detects resources from `OTEL_RESOURCE_ATTRIBUTES` and `OTEL_SERVICE_NAME`.
 /// `OTEL_SERVICE_NAME` is merged last so it wins over `service.name` from the
 /// generic attribute list.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#specifying-resource-information-via-an-environment-variable
 pub fn env_resource_detector() -> ResourceDetector {
   ResourceDetector::new(() => {
     let mut resource = Resource::empty()
@@ -211,6 +229,7 @@ pub fn env_resource_detector() -> ResourceDetector {
 
 ///|
 /// Adds or replaces one attribute.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#resource-creation
 pub fn ResourceBuilder::with_attribute(
   self : ResourceBuilder,
   key : StringView,
@@ -224,6 +243,7 @@ pub fn ResourceBuilder::with_attribute(
 
 ///|
 /// Adds or replaces multiple attributes.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#resource-creation
 pub fn ResourceBuilder::with_attributes(
   self : ResourceBuilder,
   attributes : ArrayView[@common.KeyValue],
@@ -234,6 +254,7 @@ pub fn ResourceBuilder::with_attributes(
 
 ///|
 /// Sets `service.name` on the resource being built.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#resource-creation
 pub fn ResourceBuilder::with_service_name(
   self : ResourceBuilder,
   service_name : StringView,
@@ -243,6 +264,7 @@ pub fn ResourceBuilder::with_service_name(
 
 ///|
 /// Sets the schema URL on the resource being built.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#resource-creation
 pub fn ResourceBuilder::with_schema_url(
   self : ResourceBuilder,
   schema_url : StringView,
@@ -257,6 +279,7 @@ pub fn ResourceBuilder::with_schema_url(
 ///|
 /// Appends an additional detector that will run before explicit builder
 /// attributes are merged in.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#detecting-resource-information-from-the-environment
 pub fn ResourceBuilder::with_detector(
   self : ResourceBuilder,
   detector : ResourceDetector,
@@ -268,6 +291,7 @@ pub fn ResourceBuilder::with_detector(
 ///|
 /// Runs detectors in order and then merges in explicit builder attributes so
 /// direct configuration takes precedence.
+/// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#resource-creation
 pub fn ResourceBuilder::build(self : ResourceBuilder) -> Resource {
   let mut resource = Resource::empty()
   for detector in self.detectors {

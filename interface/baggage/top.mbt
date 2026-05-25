@@ -8,12 +8,14 @@ let max_len_of_all_pairs = 8192
 /// Metadata attached to one baggage entry.
 ///
 /// The stored text is trimmed when constructed.
+/// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#overview
 pub struct BaggageMetadata {
   metadata : String
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
 /// One baggage entry together with its metadata payload.
+/// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#overview
 pub struct KeyValueMetadata {
   key : @common.Key
   value : String
@@ -26,6 +28,7 @@ pub struct KeyValueMetadata {
 /// The implementation enforces OpenTelemetry-style limits on key count and
 /// serialized size. Updates that violate those limits leave the baggage
 /// unchanged.
+/// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#overview
 pub struct Baggage {
   entries : Map[String, KeyValueMetadata]
   kv_content_len : Int
@@ -34,12 +37,14 @@ pub struct Baggage {
 ///|
 /// Creates metadata from one text fragment after trimming surrounding
 /// whitespace.
+/// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#set-value
 pub fn BaggageMetadata::new(metadata : StringView) -> BaggageMetadata {
   { metadata: metadata.trim().to_owned() }
 }
 
 ///|
 /// Returns the stored metadata text.
+/// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#overview
 pub fn BaggageMetadata::as_string(self : BaggageMetadata) -> String {
   self.metadata
 }
@@ -54,6 +59,7 @@ pub impl Default for BaggageMetadata with fn default() -> BaggageMetadata {
 ///
 /// This only packages the data. Validation happens when the entry is inserted
 /// into a `Baggage`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#set-value
 pub fn KeyValueMetadata::new(
   key : StringView,
   value : StringView,
@@ -64,6 +70,7 @@ pub fn KeyValueMetadata::new(
 
 ///|
 /// Returns an empty baggage value.
+/// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#overview
 pub fn Baggage::new() -> Baggage {
   { entries: {}, kv_content_len: 0 }
 }
@@ -144,6 +151,7 @@ fn baggage_with_entries(entries : Map[String, KeyValueMetadata]) -> Baggage {
 ///
 /// Invalid keys or values, entry-count overflow, and total-size overflow leave
 /// the baggage unchanged.
+/// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#set-value
 pub fn Baggage::insert(
   self : Baggage,
   key : StringView,
@@ -157,6 +165,7 @@ pub fn Baggage::insert(
 ///
 /// Keys are trimmed before validation. Invalid data or limit violations return
 /// the original baggage unchanged.
+/// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#set-value
 pub fn Baggage::insert_with_metadata(
   self : Baggage,
   key : StringView,
@@ -197,6 +206,7 @@ pub fn Baggage::insert_with_metadata(
 ///
 /// Removing a missing key still returns a fresh baggage value with the same
 /// contents.
+/// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#remove-value
 pub fn Baggage::remove(self : Baggage, key : StringView) -> Baggage {
   let entries = self.entries.copy()
   ignore(entries.remove(key.to_owned()))
@@ -205,12 +215,14 @@ pub fn Baggage::remove(self : Baggage, key : StringView) -> Baggage {
 
 ///|
 /// Looks up the string value for `key`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#get-value
 pub fn Baggage::get(self : Baggage, key : StringView) -> String? {
   self.entries.get(key.to_owned()).map(entry => entry.value)
 }
 
 ///|
 /// Looks up the value and metadata for `key`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#get-all-values
 pub fn Baggage::get_with_metadata(
   self : Baggage,
   key : StringView,
@@ -222,6 +234,7 @@ pub fn Baggage::get_with_metadata(
 /// Returns all baggage entries as an array.
 ///
 /// The returned array is detached from the internal map.
+/// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#get-all-values
 pub fn Baggage::entries(self : Baggage) -> Array[KeyValueMetadata] {
   let entries = []
   for _, entry in self.entries {
@@ -232,12 +245,14 @@ pub fn Baggage::entries(self : Baggage) -> Array[KeyValueMetadata] {
 
 ///|
 /// Returns the current number of baggage entries.
+/// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#get-all-values
 pub fn Baggage::len(self : Baggage) -> Int {
   self.entries.length()
 }
 
 ///|
 /// Returns whether the baggage contains no entries.
+/// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#get-all-values
 pub fn Baggage::is_empty(self : Baggage) -> Bool {
   self.entries.is_empty()
 }

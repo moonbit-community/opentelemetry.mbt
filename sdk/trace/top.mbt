@@ -4,6 +4,7 @@
 /// Span kind describes the relationship between this operation and remote
 /// systems. It affects how backends render service maps and client/server
 /// relationships.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#spankind
 pub(all) enum SpanKind {
   Internal
   Client
@@ -14,6 +15,7 @@ pub(all) enum SpanKind {
 
 ///|
 /// OpenTelemetry status code attached to a completed span.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#set-status
 pub(all) enum StatusCode {
   Unset
   Ok
@@ -22,6 +24,7 @@ pub(all) enum StatusCode {
 
 ///|
 /// Span status consisting of a code and optional description.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#set-status
 pub struct Status {
   code : StatusCode
   description : String?
@@ -29,6 +32,7 @@ pub struct Status {
 
 ///|
 /// Event recorded on a span timeline.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#add-events
 pub struct SpanEvent {
   name : String
   timestamp_unix_nano : Int64
@@ -38,6 +42,7 @@ pub struct SpanEvent {
 
 ///|
 /// Link from one span to another span context.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#link
 pub struct SpanLink {
   span_context : @common.SpanContext
   attributes : Array[@common.KeyValue]
@@ -46,6 +51,7 @@ pub struct SpanLink {
 
 ///|
 /// Per-span limits for attributes, events, and links.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-limits
 pub struct SpanLimits {
   max_attributes_per_span : Int
   max_events_per_span : Int
@@ -60,6 +66,7 @@ pub struct SpanLimits {
 /// `Drop` creates a non-recording span context, `RecordOnly` records locally
 /// without setting the sampled flag, and `RecordAndSample` records and marks the
 /// context as sampled for downstream services.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#sampling
 pub(all) enum SamplingDecision {
   Drop
   RecordOnly
@@ -69,6 +76,7 @@ pub(all) enum SamplingDecision {
 ///|
 /// Full sampler output, including attributes and trace state to apply to the
 /// started span.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#sampling
 pub struct SamplingResult {
   decision : SamplingDecision
   attributes : Array[@common.KeyValue]
@@ -77,6 +85,7 @@ pub struct SamplingResult {
 
 ///|
 /// Inputs provided to a sampler when a span is started.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#sampling
 pub struct SamplingParameters {
   parent_context : @context.Context
   trace_id : @common.TraceId
@@ -88,6 +97,7 @@ pub struct SamplingParameters {
 
 ///|
 /// Sampling policy wrapper.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#sampling
 pub struct Sampler {
   should_sample_fn : (SamplingParameters) -> SamplingResult
   description_fn : () -> String
@@ -95,6 +105,7 @@ pub struct Sampler {
 
 ///|
 /// Strategy object for generating trace and span identifiers.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#id-generators
 pub struct IdGenerator {
   new_trace_id_fn : () -> @common.TraceId
   new_span_id_fn : () -> @common.SpanId
@@ -102,12 +113,14 @@ pub struct IdGenerator {
 
 ///|
 /// Default random ID generator.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#id-generators
 pub struct RandomIdGenerator {
   inner : IdGenerator
 }
 
 ///|
 /// Configuration for batch span processing.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#batching-processor
 pub struct BatchConfig {
   max_queue_size : Int
   max_export_batch_size : Int
@@ -120,6 +133,7 @@ pub struct BatchConfig {
 ///
 /// Configuration is read when a span starts. Builder methods override defaults
 /// derived from environment variables.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-provider
 pub struct Config {
   sampler : Sampler
   id_generator : IdGenerator
@@ -129,6 +143,7 @@ pub struct Config {
 
 ///|
 /// Immutable snapshot of a completed or in-flight span.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-exporter
 pub struct SpanData {
   name : String
   span_context : @common.SpanContext
@@ -149,6 +164,7 @@ pub struct SpanData {
 
 ///|
 /// Exporter callback wrapper for finished span batches.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-exporter
 pub struct SpanExporter {
   export_fn : async (ArrayView[SpanData]) -> @error.OTelSdkResult
   force_flush_fn : async () -> @error.OTelSdkResult
@@ -161,6 +177,7 @@ pub struct SpanExporter {
 ///
 /// Processors should avoid expensive work on `on_start`. Exporters usually run
 /// from `on_end` through simple or batch processor implementations.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-processor
 pub struct SpanProcessor {
   on_start_fn : (@context.Context, SpanData) -> Unit
   on_end_fn : async (SpanData) -> Unit
@@ -173,6 +190,7 @@ pub struct SpanProcessor {
 ///
 /// This is useful for tests and local debugging. For network exporters, prefer
 /// `BatchSpanProcessor` to reduce request-path latency.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#simple-processor
 pub struct SimpleSpanProcessor {
   inner : SpanProcessor
 }
@@ -182,6 +200,7 @@ pub struct SimpleSpanProcessor {
 ///
 /// The background loop is not started automatically. Register the provider
 /// globally and call `spawn_background_tasks()` from the application runtime.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#batching-processor
 pub struct BatchSpanProcessor {
   inner : SpanProcessor
   state : Ref[BatchProcessorState]
@@ -195,6 +214,7 @@ struct InMemorySpanExporterState {
 
 ///|
 /// Test exporter that keeps finished spans in memory.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-exporter
 pub struct InMemorySpanExporter {
   state : Ref[InMemorySpanExporterState]
 }
@@ -224,6 +244,7 @@ struct SpanState {
 
 ///|
 /// Mutable span handle used while an operation is in flight.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#span
 pub struct Span {
   state : Ref[SpanState]
 }
@@ -241,12 +262,14 @@ struct ProviderState {
 ///
 /// Applications create one provider, configure processors/exporters, and shut it
 /// down during application teardown.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-provider
 pub struct SdkTracerProvider {
   state : Ref[ProviderState]
 }
 
 ///|
 /// Builder for `SdkTracerProvider`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-provider
 pub struct SdkTracerProviderBuilder {
   mut config : Config
   processors : Array[SpanProcessor]
@@ -258,6 +281,7 @@ pub struct SdkTracerProviderBuilder {
 ///
 /// Tracers are lightweight handles. The instrumentation scope is attached to
 /// every span they create.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer
 pub struct SdkTracer {
   provider : SdkTracerProvider
   instrumentation_scope : @common.InstrumentationScope
@@ -265,24 +289,28 @@ pub struct SdkTracer {
 
 ///|
 /// Creates a span status.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#set-status
 pub fn Status::new(code : StatusCode, description? : String? = None) -> Status {
   { code, description }
 }
 
 ///|
 /// Returns the default unset status.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#set-status
 pub fn Status::unset() -> Status {
   Status::new(Unset)
 }
 
 ///|
 /// Returns an ok status.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#set-status
 pub fn Status::ok() -> Status {
   Status::new(Ok)
 }
 
 ///|
 /// Returns an error status with an optional description.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#set-status
 pub fn Status::error(description? : String? = None) -> Status {
   Status::new(Error, description~)
 }
@@ -294,6 +322,7 @@ pub impl Default for Status with fn default() -> Status {
 
 ///|
 /// Creates a span event.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#add-events
 pub fn SpanEvent::new(
   name : StringView,
   attributes? : ArrayView[@common.KeyValue] = [],
@@ -310,6 +339,7 @@ pub fn SpanEvent::new(
 
 ///|
 /// Creates a span link.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#link
 pub fn SpanLink::new(
   span_context : @common.SpanContext,
   attributes? : ArrayView[@common.KeyValue] = [],
@@ -320,6 +350,7 @@ pub fn SpanLink::new(
 
 ///|
 /// Creates bounded span limits.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-limits
 pub fn SpanLimits::new(
   max_attributes_per_span? : Int = 128,
   max_events_per_span? : Int = 128,
@@ -343,6 +374,7 @@ pub impl Default for SpanLimits with fn default() -> SpanLimits {
 
 ///|
 /// Creates a sampling result.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#sampling
 pub fn SamplingResult::new(
   decision : SamplingDecision,
   attributes? : ArrayView[@common.KeyValue] = [],
@@ -365,6 +397,7 @@ fn sampling_description(name : String) -> () -> String {
 
 ///|
 /// Builds a sampler from callbacks.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#sampling
 pub fn Sampler::new(
   should_sample_fn : (SamplingParameters) -> SamplingResult,
   description_fn : () -> String,
@@ -374,6 +407,7 @@ pub fn Sampler::new(
 
 ///|
 /// Evaluates the sampling policy.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#shouldsample
 pub fn Sampler::should_sample(
   self : Sampler,
   parameters : SamplingParameters,
@@ -383,6 +417,7 @@ pub fn Sampler::should_sample(
 
 ///|
 /// Returns a human-readable description of the sampler.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#sampling
 pub fn Sampler::description(self : Sampler) -> String {
   (self.description_fn)()
 }
@@ -392,6 +427,7 @@ pub fn Sampler::description(self : Sampler) -> String {
 ///
 /// This is useful for development but can be expensive in high-throughput
 /// production services.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#sampling
 pub fn Sampler::always_on() -> Sampler {
   Sampler::new(
     _ => SamplingResult::new(RecordAndSample),
@@ -404,6 +440,7 @@ pub fn Sampler::always_on() -> Sampler {
 ///
 /// Dropped spans still carry a valid context for propagation, but they do not
 /// record events, attributes, or processor callbacks.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#sampling
 pub fn Sampler::always_off() -> Sampler {
   Sampler::new(
     _ => SamplingResult::new(Drop),
@@ -543,6 +580,7 @@ fn span_limits_from_env() -> SpanLimits {
 
 ///|
 /// Sampler that records and samples according to a trace ID ratio.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#sampling
 pub fn Sampler::trace_id_ratio(ratio : Double) -> Sampler {
   let ratio = clamp_ratio(ratio)
   Sampler::new(
@@ -569,6 +607,7 @@ pub fn Sampler::trace_id_ratio(ratio : Double) -> Sampler {
 ///|
 /// Sampler that honors a valid parent sampling decision and otherwise delegates
 /// to the supplied root sampler.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#sampling
 pub fn Sampler::parent_based(root : Sampler) -> Sampler {
   let description = root.description()
   Sampler::new(
@@ -600,6 +639,7 @@ pub impl Default for Sampler with fn default() -> Sampler {
 
 ///|
 /// Builds an ID generator from callbacks.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#id-generators
 pub fn IdGenerator::new(
   new_trace_id_fn : () -> @common.TraceId,
   new_span_id_fn : () -> @common.SpanId,
@@ -609,12 +649,14 @@ pub fn IdGenerator::new(
 
 ///|
 /// Returns a new trace ID.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#id-generators
 pub fn IdGenerator::new_trace_id(self : IdGenerator) -> @common.TraceId {
   (self.new_trace_id_fn)()
 }
 
 ///|
 /// Returns a new span ID.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#id-generators
 pub fn IdGenerator::new_span_id(self : IdGenerator) -> @common.SpanId {
   (self.new_span_id_fn)()
 }
@@ -626,6 +668,7 @@ fn random_hex_16(random : @random.Rand) -> String {
 
 ///|
 /// Creates the default random ID generator.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#id-generators
 pub fn RandomIdGenerator::new() -> RandomIdGenerator {
   let random = Ref(@random.Rand::new())
   {
@@ -650,6 +693,7 @@ pub fn RandomIdGenerator::new() -> RandomIdGenerator {
 
 ///|
 /// Erases the concrete random generator type into `IdGenerator`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#id-generators
 pub fn RandomIdGenerator::into_id_generator(
   self : RandomIdGenerator,
 ) -> IdGenerator {
@@ -658,6 +702,7 @@ pub fn RandomIdGenerator::into_id_generator(
 
 ///|
 /// Creates normalized batch processor configuration.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#batching-processor
 pub fn BatchConfig::new(
   max_queue_size? : Int = 2048,
   max_export_batch_size? : Int = 512,
@@ -705,6 +750,7 @@ pub impl Default for BatchConfig with fn default() -> BatchConfig {
 ///
 /// Omitted arguments use default sampler, ID generator, span limits, and
 /// resource. Environment variables are applied through `Default`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-provider
 pub fn Config::new(
   sampler? : Sampler = Default::default(),
   id_generator? : IdGenerator = RandomIdGenerator::new().into_id_generator(),
@@ -721,6 +767,7 @@ pub impl Default for Config with fn default() -> Config {
 
 ///|
 /// Builds a span exporter from callbacks.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-exporter
 pub fn SpanExporter::new(
   export_fn : async (ArrayView[SpanData]) -> @error.OTelSdkResult,
   force_flush_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
@@ -732,6 +779,7 @@ pub fn SpanExporter::new(
 
 ///|
 /// Exports one batch of finished spans.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#interface-definition
 pub async fn SpanExporter::export_batch(
   self : SpanExporter,
   batch : ArrayView[SpanData],
@@ -741,6 +789,7 @@ pub async fn SpanExporter::export_batch(
 
 ///|
 /// Requests exporter flush.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#forceflush
 pub async fn SpanExporter::force_flush(
   self : SpanExporter,
 ) -> @error.OTelSdkResult {
@@ -749,6 +798,7 @@ pub async fn SpanExporter::force_flush(
 
 ///|
 /// Requests exporter shutdown with an optional timeout budget in milliseconds.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#shutdown
 pub async fn SpanExporter::shutdown_with_timeout(
   self : SpanExporter,
   timeout_millis : Int,
@@ -759,6 +809,7 @@ pub async fn SpanExporter::shutdown_with_timeout(
 
 ///|
 /// Requests exporter shutdown.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#shutdown
 pub async fn SpanExporter::shutdown(
   self : SpanExporter,
 ) -> @error.OTelSdkResult {
@@ -767,12 +818,14 @@ pub async fn SpanExporter::shutdown(
 
 ///|
 /// Returns a human-readable exporter name.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-exporter
 pub fn SpanExporter::name(self : SpanExporter) -> String {
   (self.name_fn)()
 }
 
 ///|
 /// Builds a span processor from callbacks.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-processor
 pub fn SpanProcessor::new(
   on_start_fn? : (@context.Context, SpanData) -> Unit = (_, _) => (),
   on_end_fn? : async (SpanData) -> Unit = _ => (),
@@ -784,6 +837,7 @@ pub fn SpanProcessor::new(
 
 ///|
 /// Invokes the processor start hook.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-processor
 pub fn SpanProcessor::on_start(
   self : SpanProcessor,
   parent_context : @context.Context,
@@ -794,6 +848,7 @@ pub fn SpanProcessor::on_start(
 
 ///|
 /// Invokes the processor end hook.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-processor
 pub async fn SpanProcessor::on_end(
   self : SpanProcessor,
   span_data : SpanData,
@@ -803,6 +858,7 @@ pub async fn SpanProcessor::on_end(
 
 ///|
 /// Requests processor flush.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-processor
 pub async fn SpanProcessor::force_flush(
   self : SpanProcessor,
 ) -> @error.OTelSdkResult {
@@ -811,6 +867,7 @@ pub async fn SpanProcessor::force_flush(
 
 ///|
 /// Requests processor shutdown with an optional timeout budget in milliseconds.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-processor
 pub async fn SpanProcessor::shutdown_with_timeout(
   self : SpanProcessor,
   timeout_millis : Int,
@@ -821,6 +878,7 @@ pub async fn SpanProcessor::shutdown_with_timeout(
 
 ///|
 /// Requests processor shutdown.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-processor
 pub async fn SpanProcessor::shutdown(
   self : SpanProcessor,
 ) -> @error.OTelSdkResult {
@@ -829,12 +887,14 @@ pub async fn SpanProcessor::shutdown(
 
 ///|
 /// Creates an empty in-memory span exporter.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-exporter
 pub fn InMemorySpanExporter::new() -> InMemorySpanExporter {
   { state: Ref({ finished_spans: [], is_shutdown: false }) }
 }
 
 ///|
 /// Returns the finished spans accumulated so far.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-exporter
 pub fn InMemorySpanExporter::finished_spans(
   self : InMemorySpanExporter,
 ) -> Array[SpanData] {
@@ -843,18 +903,21 @@ pub fn InMemorySpanExporter::finished_spans(
 
 ///|
 /// Clears the in-memory span buffer.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-exporter
 pub fn InMemorySpanExporter::reset(self : InMemorySpanExporter) -> Unit {
   self.state.val = { ..self.state.val, finished_spans: [] }
 }
 
 ///|
 /// Returns whether the exporter has been shut down.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#shutdown
 pub fn InMemorySpanExporter::is_shutdown(self : InMemorySpanExporter) -> Bool {
   self.state.val.is_shutdown
 }
 
 ///|
 /// Erases the concrete in-memory exporter type into `SpanExporter`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#interface-definition
 pub fn InMemorySpanExporter::into_span_exporter(
   self : InMemorySpanExporter,
 ) -> SpanExporter {
@@ -883,6 +946,7 @@ pub fn InMemorySpanExporter::into_span_exporter(
 
 ///|
 /// Creates a simple processor that exports each ended span immediately.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#simple-processor
 pub fn SimpleSpanProcessor::new(exporter : SpanExporter) -> SimpleSpanProcessor {
   {
     inner: SpanProcessor::new(
@@ -897,6 +961,7 @@ pub fn SimpleSpanProcessor::new(exporter : SpanExporter) -> SimpleSpanProcessor 
 
 ///|
 /// Erases the concrete simple processor type into `SpanProcessor`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#simple-processor
 pub fn SimpleSpanProcessor::into_span_processor(
   self : SimpleSpanProcessor,
 ) -> SpanProcessor {
@@ -941,6 +1006,7 @@ async fn flush_span_queue(
 
 ///|
 /// Creates a batch span processor with a bounded in-memory queue.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#batching-processor
 pub fn BatchSpanProcessor::new(
   exporter : SpanExporter,
   config? : BatchConfig = Default::default(),
@@ -993,6 +1059,7 @@ pub fn BatchSpanProcessor::new(
 
 ///|
 /// Erases the concrete batch processor type into `SpanProcessor`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#batching-processor
 pub fn BatchSpanProcessor::into_span_processor(
   self : BatchSpanProcessor,
 ) -> SpanProcessor {
@@ -1001,6 +1068,7 @@ pub fn BatchSpanProcessor::into_span_processor(
 
 ///|
 /// Background loop for scheduled batch exports.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#batching-processor
 pub async fn BatchSpanProcessor::run(self : BatchSpanProcessor) -> Unit {
   while !self.state.val.is_shutdown {
     @async.sleep(self.state.val.config.scheduled_delay_millis)
@@ -1090,30 +1158,35 @@ fn recording_from_decision(decision : SamplingDecision) -> Bool {
 
 ///|
 /// Returns the immutable span context.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#get-context
 pub fn Span::span_context(self : Span) -> @common.SpanContext {
   self.state.val.span_context
 }
 
 ///|
 /// Returns a context carrying this span as the active local span.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#get-context
 pub fn Span::context(self : Span) -> @context.Context {
   @context.Context::empty().with_span_context(self.span_context())
 }
 
 ///|
 /// Returns whether the span is still recording mutations.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#isrecording
 pub fn Span::is_recording(self : Span) -> Bool {
   self.state.val.is_recording && !self.state.val.has_ended
 }
 
 ///|
 /// Returns whether `end()` has already been called.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#end
 pub fn Span::has_ended(self : Span) -> Bool {
   self.state.val.has_ended
 }
 
 ///|
 /// Adds one attribute if the span is still recording.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#set-attributes
 pub fn Span::set_attribute(
   self : Span,
   key : StringView,
@@ -1136,6 +1209,7 @@ pub fn Span::set_attribute(
 
 ///|
 /// Adds one event if the span is still recording.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#add-events
 pub fn Span::add_event(
   self : Span,
   name : StringView,
@@ -1170,6 +1244,7 @@ pub fn Span::add_event(
 
 ///|
 /// Adds one link if the span is still recording.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#add-link
 pub fn Span::add_link(
   self : Span,
   span_context : @common.SpanContext,
@@ -1198,6 +1273,7 @@ pub fn Span::add_link(
 
 ///|
 /// Sets the span status if the span is still recording.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#set-status
 pub fn Span::set_status(self : Span, status : Status) -> Unit {
   if !self.is_recording() {
     return
@@ -1211,12 +1287,14 @@ pub fn Span::set_status(self : Span, status : Status) -> Unit {
 
 ///|
 /// Updates the span name.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#updatename
 pub fn Span::update_name(self : Span, name : StringView) -> Unit {
   self.state.val = { ..self.state.val, name: name.to_owned() }
 }
 
 ///|
 /// Returns an immutable snapshot of the current span state.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#span
 pub fn Span::snapshot(self : Span) -> SpanData {
   span_data_from_state(self.state.val)
 }
@@ -1224,6 +1302,7 @@ pub fn Span::snapshot(self : Span) -> SpanData {
 ///|
 /// Ends the span once and forwards the final snapshot to processors when the
 /// span is recording.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#end
 pub async fn Span::end(
   self : Span,
   end_time_unix_nano? : Int64 = @utils.now_unix_nano(),
@@ -1251,12 +1330,14 @@ pub async fn Span::end(
 /// Add processors or exporters before calling `build()`. A provider with no
 /// processors records spans in memory only long enough to return span handles;
 /// no telemetry is exported.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-provider
 pub fn SdkTracerProvider::builder() -> SdkTracerProviderBuilder {
   { config: Default::default(), processors: [], batch_processors: [] }
 }
 
 ///|
 /// Replaces the entire trace provider configuration.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-provider
 pub fn SdkTracerProviderBuilder::with_config(
   self : SdkTracerProviderBuilder,
   config : Config,
@@ -1267,6 +1348,7 @@ pub fn SdkTracerProviderBuilder::with_config(
 
 ///|
 /// Replaces the provider resource.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-provider
 pub fn SdkTracerProviderBuilder::with_resource(
   self : SdkTracerProviderBuilder,
   resource : @resource.Resource,
@@ -1277,6 +1359,7 @@ pub fn SdkTracerProviderBuilder::with_resource(
 
 ///|
 /// Replaces the sampler.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-provider
 pub fn SdkTracerProviderBuilder::with_sampler(
   self : SdkTracerProviderBuilder,
   sampler : Sampler,
@@ -1287,6 +1370,7 @@ pub fn SdkTracerProviderBuilder::with_sampler(
 
 ///|
 /// Replaces the ID generator.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-provider
 pub fn SdkTracerProviderBuilder::with_id_generator(
   self : SdkTracerProviderBuilder,
   id_generator : IdGenerator,
@@ -1297,6 +1381,7 @@ pub fn SdkTracerProviderBuilder::with_id_generator(
 
 ///|
 /// Replaces the span limits.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-provider
 pub fn SdkTracerProviderBuilder::with_span_limits(
   self : SdkTracerProviderBuilder,
   span_limits : SpanLimits,
@@ -1307,6 +1392,7 @@ pub fn SdkTracerProviderBuilder::with_span_limits(
 
 ///|
 /// Appends a span processor to the provider pipeline.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-provider
 pub fn SdkTracerProviderBuilder::with_span_processor(
   self : SdkTracerProviderBuilder,
   processor : SpanProcessor,
@@ -1319,6 +1405,7 @@ pub fn SdkTracerProviderBuilder::with_span_processor(
 /// Appends a simple processor around the exporter.
 ///
 /// Finished spans are exported from `Span::end()`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-provider
 pub fn SdkTracerProviderBuilder::with_simple_exporter(
   self : SdkTracerProviderBuilder,
   exporter : SpanExporter,
@@ -1335,6 +1422,7 @@ pub fn SdkTracerProviderBuilder::with_simple_exporter(
 /// The processor is registered with the provider, but its export loop only runs
 /// after `spawn_batch_processor_tasks()` or the facade/global equivalent is
 /// called.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-provider
 pub fn SdkTracerProviderBuilder::with_batch_exporter(
   self : SdkTracerProviderBuilder,
   exporter : SpanExporter,
@@ -1347,6 +1435,7 @@ pub fn SdkTracerProviderBuilder::with_batch_exporter(
 
 ///|
 /// Builds the tracer provider.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-provider
 pub fn SdkTracerProviderBuilder::build(
   self : SdkTracerProviderBuilder,
 ) -> SdkTracerProvider {
@@ -1362,6 +1451,7 @@ pub fn SdkTracerProviderBuilder::build(
 
 ///|
 /// Returns the provider resource.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-provider
 pub fn SdkTracerProvider::resource(
   self : SdkTracerProvider,
 ) -> @resource.Resource {
@@ -1370,6 +1460,7 @@ pub fn SdkTracerProvider::resource(
 
 ///|
 /// Spawns background tasks for all configured batch processors.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-provider
 pub fn SdkTracerProvider::spawn_batch_processor_tasks(
   self : SdkTracerProvider,
   group : @async.TaskGroup[Unit],
@@ -1382,6 +1473,7 @@ pub fn SdkTracerProvider::spawn_batch_processor_tasks(
 
 ///|
 /// Creates a tracer scoped to the supplied instrumentation library metadata.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-creation
 pub fn SdkTracerProvider::tracer(
   self : SdkTracerProvider,
   name : StringView,
@@ -1404,6 +1496,7 @@ pub fn SdkTracerProvider::tracer(
 
 ///|
 /// Flushes every configured span processor.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#forceflush
 pub async fn SdkTracerProvider::force_flush(
   self : SdkTracerProvider,
 ) -> @error.OTelSdkResult {
@@ -1421,6 +1514,7 @@ pub async fn SdkTracerProvider::force_flush(
 
 ///|
 /// Shuts down every configured span processor and marks the provider unusable.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#shutdown
 pub async fn SdkTracerProvider::shutdown_with_timeout(
   self : SdkTracerProvider,
   timeout_millis : Int,
@@ -1440,6 +1534,7 @@ pub async fn SdkTracerProvider::shutdown_with_timeout(
 }
 
 ///|
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#shutdown
 pub async fn SdkTracerProvider::shutdown(
   self : SdkTracerProvider,
 ) -> @error.OTelSdkResult {
@@ -1540,6 +1635,7 @@ fn SdkTracer::into_api_tracer(self : SdkTracer) -> @api.Tracer {
 
 ///|
 /// Erases this SDK provider into the public trace API provider.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-provider
 pub fn SdkTracerProvider::into_tracer_provider(
   self : SdkTracerProvider,
 ) -> @api.TracerProvider {
@@ -1608,6 +1704,7 @@ fn span_state(
 ///
 /// This evaluates the sampler, generates IDs, applies limits, and notifies
 /// processors when the span is recording.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer
 pub fn SdkTracer::start(
   self : SdkTracer,
   name : StringView,

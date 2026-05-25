@@ -11,12 +11,14 @@ struct MetricExporterState {
 
 ///|
 /// Stdout span exporter mirroring the debugging-oriented Rust stdout exporter.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk_exporters/stdout/#span-exporter---standard-output
 pub struct SpanExporter {
   state : Ref[SignalExporterState]
 }
 
 ///|
 /// Stdout log exporter mirroring the debugging-oriented Rust stdout exporter.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk_exporters/stdout/#logs-exporter---standard-output
 pub struct LogExporter {
   state : Ref[SignalExporterState]
 }
@@ -24,6 +26,7 @@ pub struct LogExporter {
 ///|
 /// Stdout metric exporter mirroring the debugging-oriented Rust stdout
 /// exporter.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/stdout/#metrics-exporter---standard-output
 pub struct MetricExporter {
   state : Ref[MetricExporterState]
   temporality : @sdkmetrics.Temporality
@@ -31,6 +34,7 @@ pub struct MetricExporter {
 
 ///|
 /// Builder for `MetricExporter`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/stdout/#metrics-exporter---standard-output
 pub struct MetricExporterBuilder {
   mut temporality : @sdkmetrics.Temporality
 }
@@ -470,24 +474,28 @@ pub impl Default for MetricExporter with fn default() -> MetricExporter {
 
 ///|
 /// Creates a stdout span exporter.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk_exporters/stdout/#span-exporter---standard-output
 pub fn SpanExporter::new() -> SpanExporter {
   Default::default()
 }
 
 ///|
 /// Creates a stdout log exporter.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk_exporters/stdout/#logs-exporter---standard-output
 pub fn LogExporter::new() -> LogExporter {
   Default::default()
 }
 
 ///|
 /// Starts building a stdout metric exporter.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/stdout/#metrics-exporter---standard-output
 pub fn MetricExporter::builder() -> MetricExporterBuilder {
   { temporality: Cumulative }
 }
 
 ///|
 /// Sets the temporality that `into_periodic_reader()` should use.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/stdout/#metrics-exporter---standard-output
 pub fn MetricExporterBuilder::with_temporality(
   self : MetricExporterBuilder,
   temporality : @sdkmetrics.Temporality,
@@ -498,6 +506,7 @@ pub fn MetricExporterBuilder::with_temporality(
 
 ///|
 /// Builds a stdout metric exporter.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/stdout/#metrics-exporter---standard-output
 pub fn MetricExporterBuilder::build(
   self : MetricExporterBuilder,
 ) -> MetricExporter {
@@ -506,6 +515,7 @@ pub fn MetricExporterBuilder::build(
 
 ///|
 /// Returns the configured temporality.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/stdout/#metrics-exporter---standard-output
 pub fn MetricExporter::temporality(
   self : MetricExporter,
 ) -> @sdkmetrics.Temporality {
@@ -514,6 +524,7 @@ pub fn MetricExporter::temporality(
 
 ///|
 /// Exports one batch of finished spans to stdout.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk_exporters/stdout/#span-exporter---standard-output
 pub fn SpanExporter::export_batch(
   self : SpanExporter,
   batch : ArrayView[@sdktrace.SpanData],
@@ -530,6 +541,7 @@ pub fn SpanExporter::export_batch(
 
 ///|
 /// Exports one batch of log records to stdout.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk_exporters/stdout/#logs-exporter---standard-output
 pub fn LogExporter::export_batch(
   self : LogExporter,
   batch : ArrayView[@sdklogs.LogRecord],
@@ -546,6 +558,7 @@ pub fn LogExporter::export_batch(
 
 ///|
 /// Exports one batch of metrics to stdout.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/stdout/#metrics-exporter---standard-output
 pub fn MetricExporter::export_batch(
   self : MetricExporter,
   batch : ArrayView[@sdkmetrics.MetricData],
@@ -559,6 +572,7 @@ pub fn MetricExporter::export_batch(
 
 ///|
 /// Requests span exporter flush.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk_exporters/stdout/#span-exporter---standard-output
 pub fn SpanExporter::force_flush(self : SpanExporter) -> @error.OTelSdkResult {
   if self.state.val.is_shutdown {
     @error.already_shutdown()
@@ -569,6 +583,7 @@ pub fn SpanExporter::force_flush(self : SpanExporter) -> @error.OTelSdkResult {
 
 ///|
 /// Requests log exporter flush.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk_exporters/stdout/#logs-exporter---standard-output
 pub fn LogExporter::force_flush(self : LogExporter) -> @error.OTelSdkResult {
   if self.state.val.is_shutdown {
     @error.already_shutdown()
@@ -579,6 +594,7 @@ pub fn LogExporter::force_flush(self : LogExporter) -> @error.OTelSdkResult {
 
 ///|
 /// Requests metric exporter flush.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/stdout/#metrics-exporter---standard-output
 pub fn MetricExporter::force_flush(
   self : MetricExporter,
 ) -> @error.OTelSdkResult {
@@ -592,6 +608,7 @@ pub fn MetricExporter::force_flush(
 ///|
 /// Requests span exporter shutdown with an optional timeout budget in
 /// milliseconds.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk_exporters/stdout/#span-exporter---standard-output
 pub fn SpanExporter::shutdown_with_timeout(
   self : SpanExporter,
   timeout_millis : Int,
@@ -607,6 +624,7 @@ pub fn SpanExporter::shutdown_with_timeout(
 ///|
 /// Requests log exporter shutdown with an optional timeout budget in
 /// milliseconds.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk_exporters/stdout/#logs-exporter---standard-output
 pub fn LogExporter::shutdown_with_timeout(
   self : LogExporter,
   timeout_millis : Int,
@@ -622,6 +640,7 @@ pub fn LogExporter::shutdown_with_timeout(
 ///|
 /// Requests metric exporter shutdown with an optional timeout budget in
 /// milliseconds.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/stdout/#metrics-exporter---standard-output
 pub fn MetricExporter::shutdown_with_timeout(
   self : MetricExporter,
   timeout_millis : Int,
@@ -636,24 +655,28 @@ pub fn MetricExporter::shutdown_with_timeout(
 
 ///|
 /// Requests span exporter shutdown.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk_exporters/stdout/#span-exporter---standard-output
 pub fn SpanExporter::shutdown(self : SpanExporter) -> @error.OTelSdkResult {
   self.shutdown_with_timeout(5000)
 }
 
 ///|
 /// Requests log exporter shutdown.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk_exporters/stdout/#logs-exporter---standard-output
 pub fn LogExporter::shutdown(self : LogExporter) -> @error.OTelSdkResult {
   self.shutdown_with_timeout(5000)
 }
 
 ///|
 /// Requests metric exporter shutdown.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/stdout/#metrics-exporter---standard-output
 pub fn MetricExporter::shutdown(self : MetricExporter) -> @error.OTelSdkResult {
   self.shutdown_with_timeout(5000)
 }
 
 ///|
 /// Returns a human-readable exporter name.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk_exporters/stdout/#span-exporter---standard-output
 pub fn SpanExporter::name(self : SpanExporter) -> String {
   ignore(self)
   "print"
@@ -661,6 +684,7 @@ pub fn SpanExporter::name(self : SpanExporter) -> String {
 
 ///|
 /// Returns a human-readable exporter name.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk_exporters/stdout/#logs-exporter---standard-output
 pub fn LogExporter::name(self : LogExporter) -> String {
   ignore(self)
   "print"
@@ -668,6 +692,7 @@ pub fn LogExporter::name(self : LogExporter) -> String {
 
 ///|
 /// Returns a human-readable exporter name.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/stdout/#metrics-exporter---standard-output
 pub fn MetricExporter::name(self : MetricExporter) -> String {
   ignore(self)
   "print"
@@ -675,6 +700,7 @@ pub fn MetricExporter::name(self : MetricExporter) -> String {
 
 ///|
 /// Erases the concrete span exporter type into `@sdktrace.SpanExporter`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk_exporters/stdout/#span-exporter---standard-output
 pub fn SpanExporter::into_span_exporter(
   self : SpanExporter,
 ) -> @sdktrace.SpanExporter {
@@ -688,6 +714,7 @@ pub fn SpanExporter::into_span_exporter(
 
 ///|
 /// Erases the concrete log exporter type into `@sdklogs.LogExporter`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk_exporters/stdout/#logs-exporter---standard-output
 pub fn LogExporter::into_log_exporter(
   self : LogExporter,
 ) -> @sdklogs.LogExporter {
@@ -701,6 +728,7 @@ pub fn LogExporter::into_log_exporter(
 
 ///|
 /// Erases the concrete metric exporter type into `@sdkmetrics.MetricExporter`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/stdout/#metrics-exporter---standard-output
 pub fn MetricExporter::into_metric_exporter(
   self : MetricExporter,
 ) -> @sdkmetrics.MetricExporter {
@@ -715,6 +743,7 @@ pub fn MetricExporter::into_metric_exporter(
 ///|
 /// Builds a periodic reader using this exporter's configured temporality. Use
 /// this when you want the builder temporality to affect collected metric data.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/stdout/#metrics-exporter---standard-output
 pub fn MetricExporter::into_periodic_reader(
   self : MetricExporter,
   interval_millis? : Int = -1,

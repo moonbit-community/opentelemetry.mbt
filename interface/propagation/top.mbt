@@ -3,6 +3,7 @@
 ///
 /// Implement this for HTTP header maps or other text carriers that need
 /// outgoing trace context and baggage injection.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#inject
 pub(open) trait Injector {
   fn set(Self, String, String) -> Unit
 }
@@ -13,6 +14,7 @@ pub(open) trait Injector {
 /// Implement this for HTTP header maps or other text carriers that need
 /// incoming trace context and baggage extraction. `keys()` is optional but lets
 /// propagators handle case-insensitive carriers more efficiently.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#extract
 pub(open) trait Extractor {
   fn get(Self, StringView) -> String?
   fn keys(Self) -> Array[String] = _
@@ -87,6 +89,7 @@ pub impl Extractor for Map[String, String] with fn keys(self) {
 ///
 /// Use this as the common type for concrete propagators and custom propagation
 /// formats.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#textmap-propagator
 pub struct TextMapPropagator {
   inject_fn : (@context.Context, &Injector) -> Unit
   extract_fn : (@context.Context, &Extractor) -> @context.Context
@@ -97,6 +100,7 @@ pub struct TextMapPropagator {
 /// W3C baggage propagator wrapper.
 ///
 /// Reads and writes the `baggage` header.
+/// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#propagation
 pub struct BaggagePropagator {
   inner : TextMapPropagator
 }
@@ -105,6 +109,7 @@ pub struct BaggagePropagator {
 /// W3C trace-context propagator wrapper.
 ///
 /// Reads and writes `traceparent` and `tracestate`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#w3c-trace-context-requirements
 pub struct TraceContextPropagator {
   inner : TextMapPropagator
 }
@@ -114,12 +119,14 @@ pub struct TraceContextPropagator {
 ///
 /// The default global propagator uses this to combine trace context and
 /// baggage.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#composite-propagator
 pub struct TextMapCompositePropagator {
   inner : TextMapPropagator
 }
 
 ///|
 /// Creates a custom text-map propagator from inject/extract/fields callbacks.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#textmap-propagator
 pub fn TextMapPropagator::from_functions(
   inject_fn : (@context.Context, &Injector) -> Unit,
   extract_fn : (@context.Context, &Extractor) -> @context.Context,
@@ -133,6 +140,7 @@ pub fn TextMapPropagator::from_functions(
 ///
 /// Call this before making an outbound request so downstream services can join
 /// the same trace and receive baggage.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#textmap-inject
 pub fn TextMapPropagator::inject_context(
   self : TextMapPropagator,
   context : @context.Context,
@@ -146,6 +154,7 @@ pub fn TextMapPropagator::inject_context(
 ///
 /// Call this when handling an inbound request, then use the returned context as
 /// the parent context for server spans and downstream work.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#textmap-extract
 pub fn TextMapPropagator::extract_with_context(
   self : TextMapPropagator,
   context : @context.Context,
@@ -156,6 +165,7 @@ pub fn TextMapPropagator::extract_with_context(
 
 ///|
 /// Returns the header names this propagator may read or write.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#fields
 pub fn TextMapPropagator::fields(self : TextMapPropagator) -> Array[String] {
   (self.fields_fn)()
 }
@@ -375,6 +385,7 @@ fn extract_span_context(extractor : &Extractor) -> @common.SpanContext? {
 ///
 /// Extraction is forgiving: malformed entries are ignored and valid entries are
 /// merged into the provided context.
+/// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#propagation
 pub fn BaggagePropagator::new() -> BaggagePropagator {
   {
     inner: TextMapPropagator::from_functions(
@@ -399,6 +410,7 @@ pub fn BaggagePropagator::new() -> BaggagePropagator {
 
 ///|
 /// Injects baggage from `context` into the carrier.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#textmap-inject
 pub fn BaggagePropagator::inject_context(
   self : BaggagePropagator,
   context : @context.Context,
@@ -409,6 +421,7 @@ pub fn BaggagePropagator::inject_context(
 
 ///|
 /// Extracts baggage from the carrier and returns an updated context.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#textmap-extract
 pub fn BaggagePropagator::extract_with_context(
   self : BaggagePropagator,
   context : @context.Context,
@@ -419,6 +432,7 @@ pub fn BaggagePropagator::extract_with_context(
 
 ///|
 /// Erases the concrete baggage propagator type into `TextMapPropagator`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#propagation
 pub fn BaggagePropagator::into_text_map(
   self : BaggagePropagator,
 ) -> TextMapPropagator {
@@ -430,6 +444,7 @@ pub fn BaggagePropagator::into_text_map(
 /// `tracestate`.
 ///
 /// Invalid headers are ignored and leave the incoming context unchanged.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#w3c-trace-context-requirements
 pub fn TraceContextPropagator::new() -> TraceContextPropagator {
   {
     inner: TextMapPropagator::from_functions(
@@ -460,6 +475,7 @@ pub fn TraceContextPropagator::new() -> TraceContextPropagator {
 
 ///|
 /// Injects the current span context into the carrier when it is valid.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#textmap-inject
 pub fn TraceContextPropagator::inject_context(
   self : TraceContextPropagator,
   context : @context.Context,
@@ -470,6 +486,7 @@ pub fn TraceContextPropagator::inject_context(
 
 ///|
 /// Extracts a remote span context from the carrier when the headers are valid.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#textmap-extract
 pub fn TraceContextPropagator::extract_with_context(
   self : TraceContextPropagator,
   context : @context.Context,
@@ -480,6 +497,7 @@ pub fn TraceContextPropagator::extract_with_context(
 
 ///|
 /// Erases the concrete trace-context propagator type into `TextMapPropagator`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#w3c-trace-context-requirements
 pub fn TraceContextPropagator::into_text_map(
   self : TraceContextPropagator,
 ) -> TextMapPropagator {
@@ -491,6 +509,7 @@ pub fn TraceContextPropagator::into_text_map(
 ///
 /// Injection runs every propagator. Extraction threads the context through the
 /// propagators from left to right. Reported fields are de-duplicated.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#composite-propagator
 pub fn TextMapCompositePropagator::new(
   propagators : ArrayView[TextMapPropagator],
 ) -> TextMapCompositePropagator {
@@ -524,6 +543,7 @@ pub fn TextMapCompositePropagator::new(
 
 ///|
 /// Injects using every child propagator in order.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#composite-propagator
 pub fn TextMapCompositePropagator::inject_context(
   self : TextMapCompositePropagator,
   context : @context.Context,
@@ -534,6 +554,7 @@ pub fn TextMapCompositePropagator::inject_context(
 
 ///|
 /// Extracts using every child propagator in order.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#composite-propagator
 pub fn TextMapCompositePropagator::extract_with_context(
   self : TextMapCompositePropagator,
   context : @context.Context,
@@ -544,6 +565,7 @@ pub fn TextMapCompositePropagator::extract_with_context(
 
 ///|
 /// Erases the concrete composite propagator type into `TextMapPropagator`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#composite-propagator
 pub fn TextMapCompositePropagator::into_text_map(
   self : TextMapCompositePropagator,
 ) -> TextMapPropagator {

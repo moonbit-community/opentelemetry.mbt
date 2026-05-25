@@ -29,48 +29,56 @@ let text_map_propagator_ref : Ref[@propagation.TextMapPropagator] = Ref(
 
 ///|
 /// Returns the currently registered global tracer provider.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-provider
 pub fn tracer_provider() -> @trace.SdkTracerProvider {
   tracer_provider_ref.val
 }
 
 ///|
 /// Replaces the global tracer provider.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-provider
 pub fn set_tracer_provider(provider : @trace.SdkTracerProvider) -> Unit {
   tracer_provider_ref.val = provider
 }
 
 ///|
 /// Returns the currently registered global logger provider.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#loggerprovider
 pub fn logger_provider() -> @logs.SdkLoggerProvider {
   logger_provider_ref.val
 }
 
 ///|
 /// Replaces the global logger provider.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#loggerprovider
 pub fn set_logger_provider(provider : @logs.SdkLoggerProvider) -> Unit {
   logger_provider_ref.val = provider
 }
 
 ///|
 /// Returns the currently registered global meter provider.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#meterprovider
 pub fn meter_provider() -> @metrics.SdkMeterProvider {
   meter_provider_ref.val
 }
 
 ///|
 /// Replaces the global meter provider.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#meterprovider
 pub fn set_meter_provider(provider : @metrics.SdkMeterProvider) -> Unit {
   meter_provider_ref.val = provider
 }
 
 ///|
 /// Returns the current text map propagator.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#get-global-propagator
 pub fn text_map_propagator() -> @propagation.TextMapPropagator {
   text_map_propagator_ref.val
 }
 
 ///|
 /// Replaces the global text map propagator.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#set-global-propagator
 pub fn set_text_map_propagator(
   propagator : @propagation.TextMapPropagator,
 ) -> Unit {
@@ -79,6 +87,7 @@ pub fn set_text_map_propagator(
 
 ///|
 /// Creates a tracer from the current global tracer provider.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-creation
 pub fn tracer(
   name : StringView,
   version? : String? = None,
@@ -90,6 +99,7 @@ pub fn tracer(
 
 ///|
 /// Creates a logger from the current global logger provider.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#logger-creation
 pub fn logger(
   name : StringView,
   version? : String? = None,
@@ -101,6 +111,7 @@ pub fn logger(
 
 ///|
 /// Creates a meter from the current global meter provider.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#meter
 pub fn meter(
   name : StringView,
   version? : String? = None,
@@ -113,6 +124,10 @@ pub fn meter(
 ///|
 /// Spawns the background loops needed by global batch processors and periodic
 /// readers.
+/// Specs:
+/// - https://opentelemetry.io/docs/specs/otel/trace/sdk/#batching-processor
+/// - https://opentelemetry.io/docs/specs/otel/logs/sdk/#batching-processor
+/// - https://opentelemetry.io/docs/specs/otel/metrics/sdk/#periodic-exporting-metricreader
 pub fn spawn_background_tasks(
   group : @async.TaskGroup[Unit],
   allow_failure? : Bool = false,
@@ -124,6 +139,10 @@ pub fn spawn_background_tasks(
 
 ///|
 /// Flushes all globally registered providers, ignoring individual errors.
+/// Specs:
+/// - https://opentelemetry.io/docs/specs/otel/trace/sdk/#forceflush
+/// - https://opentelemetry.io/docs/specs/otel/logs/sdk/#forceflush
+/// - https://opentelemetry.io/docs/specs/otel/metrics/sdk/#forceflush
 pub async fn force_flush() -> Unit {
   ignore(tracer_provider_ref.val.force_flush())
   ignore(logger_provider_ref.val.force_flush())
@@ -132,6 +151,10 @@ pub async fn force_flush() -> Unit {
 
 ///|
 /// Shuts down all globally registered providers, ignoring individual errors.
+/// Specs:
+/// - https://opentelemetry.io/docs/specs/otel/trace/sdk/#shutdown
+/// - https://opentelemetry.io/docs/specs/otel/logs/sdk/#shutdown
+/// - https://opentelemetry.io/docs/specs/otel/metrics/sdk/#shutdown
 pub async fn shutdown() -> Unit {
   ignore(tracer_provider_ref.val.shutdown())
   ignore(logger_provider_ref.val.shutdown())
