@@ -272,23 +272,23 @@ pub fn Status::new(code : StatusCode, description? : String? = None) -> Status {
 ///|
 /// Returns the default unset status.
 pub fn Status::unset() -> Status {
-  Status::new(StatusCode::Unset)
+  Status::new(Unset)
 }
 
 ///|
 /// Returns an ok status.
 pub fn Status::ok() -> Status {
-  Status::new(StatusCode::Ok)
+  Status::new(Ok)
 }
 
 ///|
 /// Returns an error status with an optional description.
 pub fn Status::error(description? : String? = None) -> Status {
-  Status::new(StatusCode::Error, description~)
+  Status::new(Error, description~)
 }
 
 ///|
-pub impl Default for Status with default() -> Status {
+pub impl Default for Status with fn default() -> Status {
   Status::unset()
 }
 
@@ -301,9 +301,9 @@ pub fn SpanEvent::new(
   dropped_attributes_count? : Int = 0,
 ) -> SpanEvent {
   {
-    name: name.to_string(),
+    name: name.to_owned(),
     timestamp_unix_nano,
-    attributes: attributes.to_array(),
+    attributes: attributes.to_owned(),
     dropped_attributes_count,
   }
 }
@@ -315,7 +315,7 @@ pub fn SpanLink::new(
   attributes? : ArrayView[@common.KeyValue] = [],
   dropped_attributes_count? : Int = 0,
 ) -> SpanLink {
-  { span_context, attributes: attributes.to_array(), dropped_attributes_count }
+  { span_context, attributes: attributes.to_owned(), dropped_attributes_count }
 }
 
 ///|
@@ -337,7 +337,7 @@ pub fn SpanLimits::new(
 }
 
 ///|
-pub impl Default for SpanLimits with default() -> SpanLimits {
+pub impl Default for SpanLimits with fn default() -> SpanLimits {
   SpanLimits::new()
 }
 
@@ -348,14 +348,14 @@ pub fn SamplingResult::new(
   attributes? : ArrayView[@common.KeyValue] = [],
   trace_state? : @common.TraceState = Default::default(),
 ) -> SamplingResult {
-  { decision, attributes: attributes.to_array(), trace_state }
+  { decision, attributes: attributes.to_owned(), trace_state }
 }
 
 ///|
 /// Converts a sampling decision into trace flags for the created span context.
 fn sampled_trace_flags(decision : SamplingDecision) -> @common.TraceFlags {
   let trace_flags : @common.TraceFlags = Default::default()
-  trace_flags.with_sampled(decision == SamplingDecision::RecordAndSample)
+  trace_flags.with_sampled(decision == RecordAndSample)
 }
 
 ///|
@@ -394,7 +394,7 @@ pub fn Sampler::description(self : Sampler) -> String {
 /// production services.
 pub fn Sampler::always_on() -> Sampler {
   Sampler::new(
-    _ => SamplingResult::new(SamplingDecision::RecordAndSample),
+    _ => SamplingResult::new(RecordAndSample),
     sampling_description("always_on"),
   )
 }
@@ -406,7 +406,7 @@ pub fn Sampler::always_on() -> Sampler {
 /// record events, attributes, or processor callbacks.
 pub fn Sampler::always_off() -> Sampler {
   Sampler::new(
-    _ => SamplingResult::new(SamplingDecision::Drop),
+    _ => SamplingResult::new(Drop),
     sampling_description("always_off"),
   )
 }
@@ -424,7 +424,7 @@ fn clamp_ratio(ratio : Double) -> Double {
 
 ///|
 fn trace_id_prefix(trace_id : @common.TraceId) -> Int {
-  @string.parse_int(trace_id.to_hex()[:8].to_string(), base=16) catch {
+  @string.parse_int(trace_id.to_hex()[:8].to_owned(), base=16) catch {
     _ => 0
   }
 }
@@ -437,7 +437,7 @@ fn parse_env_int(key : StringView) -> Int? {
       if value == "" {
         None
       } else {
-        Some(@string.parse_int(value.to_string()) catch { _ => return None })
+        Some(@string.parse_int(value.to_owned()) catch { _ => return None })
       }
     }
     None => None
@@ -548,17 +548,17 @@ pub fn Sampler::trace_id_ratio(ratio : Double) -> Sampler {
   Sampler::new(
     (parameters : SamplingParameters) => {
       if ratio <= 0.0 {
-        SamplingResult::new(SamplingDecision::Drop)
+        SamplingResult::new(Drop)
       } else if ratio >= 1.0 {
-        SamplingResult::new(SamplingDecision::RecordAndSample)
+        SamplingResult::new(RecordAndSample)
       } else {
         // Match the common OpenTelemetry approach of using the high 32 bits of
         // the trace ID as a deterministic sampling source.
         let threshold = (ratio * 4294967295.0).to_int()
         if trace_id_prefix(parameters.trace_id) <= threshold {
-          SamplingResult::new(SamplingDecision::RecordAndSample)
+          SamplingResult::new(RecordAndSample)
         } else {
-          SamplingResult::new(SamplingDecision::Drop)
+          SamplingResult::new(Drop)
         }
       }
     },
@@ -577,12 +577,12 @@ pub fn Sampler::parent_based(root : Sampler) -> Sampler {
         Some(parent_span_context) if parent_span_context.is_valid() =>
           if parent_span_context.is_sampled() {
             SamplingResult::new(
-              SamplingDecision::RecordAndSample,
+              RecordAndSample,
               trace_state=parent_span_context.trace_state(),
             )
           } else {
             SamplingResult::new(
-              SamplingDecision::Drop,
+              Drop,
               trace_state=parent_span_context.trace_state(),
             )
           }
@@ -594,7 +594,7 @@ pub fn Sampler::parent_based(root : Sampler) -> Sampler {
 }
 
 ///|
-pub impl Default for Sampler with default() -> Sampler {
+pub impl Default for Sampler with fn default() -> Sampler {
   Sampler::parent_based(Sampler::always_on())
 }
 
@@ -627,7 +627,7 @@ fn random_hex_16(random : @random.Rand) -> String {
 ///|
 /// Creates the default random ID generator.
 pub fn RandomIdGenerator::new() -> RandomIdGenerator {
-  let random = Ref::new(@random.Rand::new())
+  let random = Ref(@random.Rand::new())
   {
     inner: IdGenerator::new(
       () => {
@@ -691,7 +691,7 @@ pub fn BatchConfig::new(
 }
 
 ///|
-pub impl Default for BatchConfig with default() -> BatchConfig {
+pub impl Default for BatchConfig with fn default() -> BatchConfig {
   BatchConfig::new(
     max_queue_size=env_or("OTEL_BSP_MAX_QUEUE_SIZE", 2048),
     max_export_batch_size=env_or("OTEL_BSP_MAX_EXPORT_BATCH_SIZE", 512),
@@ -715,7 +715,7 @@ pub fn Config::new(
 }
 
 ///|
-pub impl Default for Config with default() -> Config {
+pub impl Default for Config with fn default() -> Config {
   Config::new(sampler=sampler_from_env(), span_limits=span_limits_from_env())
 }
 
@@ -830,7 +830,7 @@ pub async fn SpanProcessor::shutdown(
 ///|
 /// Creates an empty in-memory span exporter.
 pub fn InMemorySpanExporter::new() -> InMemorySpanExporter {
-  { state: Ref::new({ finished_spans: [], is_shutdown: false }) }
+  { state: Ref({ finished_spans: [], is_shutdown: false }) }
 }
 
 ///|
@@ -945,7 +945,7 @@ pub fn BatchSpanProcessor::new(
   exporter : SpanExporter,
   config? : BatchConfig = Default::default(),
 ) -> BatchSpanProcessor {
-  let state : Ref[BatchProcessorState] = Ref::new({
+  let state : Ref[BatchProcessorState] = Ref({
     exporter,
     config,
     queue: [],
@@ -1058,7 +1058,7 @@ fn truncate_attributes(
   limit : Int,
   dropped_attributes_count? : Int = 0,
 ) -> (Array[@common.KeyValue], Int) {
-  let copied = attributes.to_array()
+  let copied = attributes.to_owned()
   if limit <= 0 {
     return ([], copied.length() + dropped_attributes_count)
   }
@@ -1066,7 +1066,7 @@ fn truncate_attributes(
     return (copied, dropped_attributes_count)
   }
   (
-    copied[:limit].to_array(),
+    copied[:limit].to_owned(),
     copied.length() - limit + dropped_attributes_count,
   )
 }
@@ -1074,16 +1074,16 @@ fn truncate_attributes(
 ///|
 fn status_priority(code : StatusCode) -> Int {
   match code {
-    StatusCode::Unset => 0
-    StatusCode::Error => 1
-    StatusCode::Ok => 2
+    Unset => 0
+    Error => 1
+    Ok => 2
   }
 }
 
 ///|
 fn recording_from_decision(decision : SamplingDecision) -> Bool {
   match decision {
-    SamplingDecision::Drop => false
+    Drop => false
     _ => true
   }
 }
@@ -1212,7 +1212,7 @@ pub fn Span::set_status(self : Span, status : Status) -> Unit {
 ///|
 /// Updates the span name.
 pub fn Span::update_name(self : Span, name : StringView) -> Unit {
-  self.state.val = { ..self.state.val, name: name.to_string() }
+  self.state.val = { ..self.state.val, name: name.to_owned() }
 }
 
 ///|
@@ -1351,7 +1351,7 @@ pub fn SdkTracerProviderBuilder::build(
   self : SdkTracerProviderBuilder,
 ) -> SdkTracerProvider {
   {
-    state: Ref::new({
+    state: Ref({
       config: self.config,
       processors: self.processors.copy(),
       batch_processors: self.batch_processors.copy(),
@@ -1449,20 +1449,20 @@ pub async fn SdkTracerProvider::shutdown(
 ///|
 fn span_kind_from_api(kind : @api.SpanKind) -> SpanKind {
   match kind {
-    @api.SpanKind::Internal => SpanKind::Internal
-    @api.SpanKind::Client => SpanKind::Client
-    @api.SpanKind::Server => SpanKind::Server
-    @api.SpanKind::Producer => SpanKind::Producer
-    @api.SpanKind::Consumer => SpanKind::Consumer
+    Internal => Internal
+    Client => Client
+    Server => Server
+    Producer => Producer
+    Consumer => Consumer
   }
 }
 
 ///|
 fn status_code_from_api(code : @api.StatusCode) -> StatusCode {
   match code {
-    @api.StatusCode::Unset => StatusCode::Unset
-    @api.StatusCode::Ok => StatusCode::Ok
-    @api.StatusCode::Error => StatusCode::Error
+    Unset => Unset
+    Ok => Ok
+    Error => Error
   }
 }
 
@@ -1517,7 +1517,7 @@ fn SdkTracer::into_api_tracer(self : SdkTracer) -> @api.Tracer {
       parent_context~,
       kind=match builder.span_kind {
         Some(kind) => span_kind_from_api(kind)
-        None => SpanKind::Internal
+        None => Internal
       },
       attributes=builder.attributes,
       links~,
@@ -1612,7 +1612,7 @@ pub fn SdkTracer::start(
   self : SdkTracer,
   name : StringView,
   parent_context? : @context.Context = Default::default(),
-  kind? : SpanKind = SpanKind::Internal,
+  kind? : SpanKind = Internal,
   attributes? : ArrayView[@common.KeyValue] = [],
   links? : ArrayView[SpanLink] = [],
   start_time_unix_nano? : Int64 = @utils.now_unix_nano(),
@@ -1620,9 +1620,9 @@ pub fn SdkTracer::start(
   let provider_state = self.provider.state.val
   if provider_state.is_shutdown {
     return {
-      state: Ref::new(
+      state: Ref(
         span_state(
-          name.to_string(),
+          name.to_owned(),
           Default::default(),
           None,
           kind,
@@ -1646,10 +1646,10 @@ pub fn SdkTracer::start(
   let sampling_parameters : SamplingParameters = {
     parent_context,
     trace_id,
-    name: name.to_string(),
+    name: name.to_owned(),
     kind,
-    attributes: attributes.to_array(),
-    links: links.to_array(),
+    attributes: attributes.to_owned(),
+    links: links.to_owned(),
   }
   let sampling_result = provider_state.config.sampler.should_sample(
     sampling_parameters,
@@ -1671,7 +1671,7 @@ pub fn SdkTracer::start(
     provider_state.config.span_limits.max_attributes_per_span {
     dropped_attributes_count = span_attributes.length() -
       provider_state.config.span_limits.max_attributes_per_span
-    span_attributes = span_attributes[:provider_state.config.span_limits.max_attributes_per_span].to_array()
+    span_attributes = span_attributes[:provider_state.config.span_limits.max_attributes_per_span].to_owned()
   }
   let mut dropped_links_count = 0
   let span_links = []
@@ -1693,9 +1693,9 @@ pub fn SdkTracer::start(
     })
   }
   let span : Span = {
-    state: Ref::new({
+    state: Ref({
       ..span_state(
-        name.to_string(),
+        name.to_owned(),
         span_context,
         parent_span_context,
         kind,

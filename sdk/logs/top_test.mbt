@@ -31,26 +31,32 @@ async test "logger exports trace-aware log records" {
     .build()
   let logger = provider.logger("logs-test")
   logger.emit(
-    AnyValue::String("request failed"),
+    String("request failed"),
     context~,
-    severity_number=Some(SeverityNumber::Error3),
+    severity_number=Some(Error3),
     severity_text=Some("ERROR3"),
     event_name=Some("checkout.failed"),
     target=Some("api"),
-    attributes=[KeyValue::new("http.status_code", AnyValue::Int64(500))],
+    attributes=[KeyValue::new("http.status_code", Int64(500))],
   )
 
   let records = exporter.finished_logs()
-  assert_eq(records.length(), 1)
-  assert_eq(records[0].event_name, Some("checkout.failed"))
-  assert_eq(records[0].target, Some("api"))
+  @debug.assert_eq(records.length(), 1)
+  @debug.assert_eq(records[0].event_name, Some("checkout.failed"))
+  @debug.assert_eq(records[0].target, Some("api"))
   guard records[0].trace_context is Some(trace_context) else {
     fail("expected trace context on log record")
   }
-  assert_eq(trace_context.trace_id().to_hex(), span_context.trace_id().to_hex())
-  assert_eq(trace_context.span_id().to_hex(), span_context.span_id().to_hex())
-  assert_eq(records[0].attributes.length(), 1)
-  assert_true(records[0].severity_number is Some(SeverityNumber::Error3))
+  @debug.assert_eq(
+    trace_context.trace_id().to_hex(),
+    span_context.trace_id().to_hex(),
+  )
+  @debug.assert_eq(
+    trace_context.span_id().to_hex(),
+    span_context.span_id().to_hex(),
+  )
+  @debug.assert_eq(records[0].attributes.length(), 1)
+  assert_true(records[0].severity_number is Some(Error3))
 }
 
 ///|
@@ -71,9 +77,9 @@ async test "batch log processor flushes on scheduled delay in background" {
   @async.with_task_group(group => {
     provider.spawn_batch_processor_tasks(group)
     let logger = provider.logger("logs-background")
-    logger.emit(AnyValue::String("background flush"))
+    logger.emit(String("background flush"))
     @async.sleep(40)
-    assert_eq(exporter.finished_logs().length(), 1)
+    @debug.assert_eq(exporter.finished_logs().length(), 1)
     ignore(provider.shutdown())
   })
 }
@@ -97,10 +103,10 @@ test "default batch log config reads environment variables" {
   @env.set_env_var("OTEL_BLRP_MAX_EXPORT_BATCH_SIZE", "23")
 
   let config : BatchConfig = Default::default()
-  assert_eq(config.scheduled_delay_millis, 13)
-  assert_eq(config.export_timeout_millis, 17)
-  assert_eq(config.max_queue_size, 19)
-  assert_eq(config.max_export_batch_size, 19)
+  @debug.assert_eq(config.scheduled_delay_millis, 13)
+  @debug.assert_eq(config.export_timeout_millis, 17)
+  @debug.assert_eq(config.max_queue_size, 19)
+  @debug.assert_eq(config.max_export_batch_size, 19)
 }
 
 ///|
@@ -114,7 +120,7 @@ async test "logger provider shutdown with timeout marks provider unavailable" {
   guard provider.shutdown_with_timeout(1) is Ok(_) else {
     fail("expected shutdown_with_timeout to succeed")
   }
-  guard provider.shutdown() is Err(@error.OTelSdkError::AlreadyShutdown) else {
+  guard provider.shutdown() is Err(AlreadyShutdown) else {
     fail("expected provider to stay shut down")
   }
 }

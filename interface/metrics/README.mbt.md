@@ -47,10 +47,10 @@ fn _metrics_readme_record() -> Unit {
   let latency = meter.f64_histogram("request.duration").with_unit("ms").build()
 
   counter.add(1UL, attributes=[
-    @common.KeyValue::new("http.request.method", @common.Value::String("GET")),
+    @common.KeyValue::new("http.request.method", String("GET")),
   ])
   latency.record(12.5, attributes=[
-    @common.KeyValue::new("http.route", @common.Value::String("/health")),
+    @common.KeyValue::new("http.route", String("/health")),
   ])
 }
 ```

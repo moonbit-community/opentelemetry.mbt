@@ -79,8 +79,8 @@ pub(all) enum Protocol {
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
-pub impl Default for Protocol with default() -> Protocol {
-  Protocol::HttpBinary
+pub impl Default for Protocol with fn default() -> Protocol {
+  HttpBinary
 }
 
 ///|
@@ -219,20 +219,20 @@ fn percent_decode(value : StringView) -> String {
       index + 2 < value.length() &&
       is_hex_digit(value[index + 1:index + 2]) &&
       is_hex_digit(value[index + 2:index + 3]) {
-      let part = value[index + 1:index + 3].to_string()
+      let part = value[index + 1:index + 3].to_owned()
       let decoded = @string.parse_int(part, base=16) catch { _ => -1 }
       if decoded >= 0 && decoded < 128 {
         match decoded.to_char() {
           Some(decoded_char) => builder.write_char(decoded_char)
-          None => builder.write_string(value[index:index + 3].to_string())
+          None => builder.write_string(value[index:index + 3].to_owned())
         }
       } else {
-        builder.write_string(value[index:index + 3].to_string())
+        builder.write_string(value[index:index + 3].to_owned())
       }
       index = index + 3
       continue
     }
-    builder.write_string(ch.to_string())
+    builder.write_string(ch.to_owned())
     index = index + 1
   }
   builder.to_string()
@@ -294,7 +294,7 @@ fn strip_trailing_slashes(value : StringView) -> String {
   while end > 0 && value[end - 1:end] == "/" {
     end = end - 1
   }
-  value[:end].to_string()
+  value[:end].to_owned()
 }
 
 ///|
@@ -303,38 +303,35 @@ fn strip_leading_slashes(value : StringView) -> String {
   while start < value.length() && value[start:start + 1] == "/" {
     start = start + 1
   }
-  value[start:].to_string()
+  value[start:].to_owned()
 }
 
 ///|
 fn protocol_to_string(protocol : Protocol) -> String {
   match protocol {
-    Protocol::Grpc => OTEL_EXPORTER_OTLP_PROTOCOL_GRPC
-    Protocol::HttpBinary => OTEL_EXPORTER_OTLP_PROTOCOL_HTTP_PROTOBUF
-    Protocol::HttpJson => OTEL_EXPORTER_OTLP_PROTOCOL_HTTP_JSON
+    Grpc => OTEL_EXPORTER_OTLP_PROTOCOL_GRPC
+    HttpBinary => OTEL_EXPORTER_OTLP_PROTOCOL_HTTP_PROTOBUF
+    HttpJson => OTEL_EXPORTER_OTLP_PROTOCOL_HTTP_JSON
   }
 }
 
 ///|
 fn compression_to_string(compression : Compression) -> String {
   match compression {
-    Compression::Gzip => "gzip"
-    Compression::Zstd => "zstd"
+    Gzip => "gzip"
+    Zstd => "zstd"
   }
 }
 
 ///|
 fn parse_protocol(value : StringView) -> Result[Protocol, ExporterBuildError] {
   match normalize_ascii_lower(value) {
-    OTEL_EXPORTER_OTLP_PROTOCOL_GRPC => Ok(Protocol::Grpc)
-    OTEL_EXPORTER_OTLP_PROTOCOL_HTTP_PROTOBUF => Ok(Protocol::HttpBinary)
-    OTEL_EXPORTER_OTLP_PROTOCOL_HTTP_JSON => Ok(Protocol::HttpJson)
+    OTEL_EXPORTER_OTLP_PROTOCOL_GRPC => Ok(Grpc)
+    OTEL_EXPORTER_OTLP_PROTOCOL_HTTP_PROTOBUF => Ok(HttpBinary)
+    OTEL_EXPORTER_OTLP_PROTOCOL_HTTP_JSON => Ok(HttpJson)
     other =>
       Err(
-        ExporterBuildError::InvalidConfig(
-          OTEL_EXPORTER_OTLP_PROTOCOL,
-          "unsupported value \{other}",
-        ),
+        InvalidConfig(OTEL_EXPORTER_OTLP_PROTOCOL, "unsupported value \{other}"),
       )
   }
 }
@@ -344,9 +341,9 @@ fn parse_compression(
   value : StringView,
 ) -> Result[Compression, ExporterBuildError] {
   match normalize_ascii_lower(value) {
-    "gzip" => Ok(Compression::Gzip)
-    "zstd" => Ok(Compression::Zstd)
-    other => Err(ExporterBuildError::UnsupportedCompressionAlgorithm(other))
+    "gzip" => Ok(Gzip)
+    "zstd" => Ok(Zstd)
+    other => Err(UnsupportedCompressionAlgorithm(other))
   }
 }
 
@@ -357,21 +354,16 @@ fn parse_positive_int(
 ) -> Result[Int, ExporterBuildError] {
   let value = value.trim()
   if value == "" {
-    return Err(
-      ExporterBuildError::InvalidConfig(key, "value must not be empty"),
-    )
+    return Err(InvalidConfig(key, "value must not be empty"))
   }
-  let parsed = @string.parse_int(value.to_string()) catch {
+  let parsed = @string.parse_int(value.to_owned()) catch {
     _ =>
       return Err(
-        ExporterBuildError::InvalidConfig(
-          key,
-          "value \{value.to_string()} is not an integer",
-        ),
+        InvalidConfig(key, "value \{value.to_owned()} is not an integer"),
       )
   }
   if parsed <= 0 {
-    Err(ExporterBuildError::InvalidConfig(key, "value must be > 0"))
+    Err(InvalidConfig(key, "value must be > 0"))
   } else {
     Ok(parsed)
   }
@@ -390,13 +382,12 @@ fn resolve_protocol(
             Ok(protocol) => protocol
             Err(err) => return Err(err)
           }
-        None => Protocol::HttpBinary
+        None => HttpBinary
       }
   }
   match protocol {
-    Protocol::HttpBinary | Protocol::HttpJson => Ok(protocol)
-    Protocol::Grpc =>
-      Err(ExporterBuildError::UnsupportedProtocol(protocol_to_string(protocol)))
+    HttpBinary | HttpJson => Ok(protocol)
+    Grpc => Err(UnsupportedProtocol(protocol_to_string(protocol)))
   }
 }
 
@@ -427,18 +418,14 @@ fn validate_endpoint(
 ) -> Result[String, ExporterBuildError] {
   let value = value.trim()
   if value == "" {
-    return Err(
-      ExporterBuildError::InvalidConfig(key, "endpoint must not be empty"),
-    )
+    return Err(InvalidConfig(key, "endpoint must not be empty"))
   }
   if !is_http_endpoint(value) {
     return Err(
-      ExporterBuildError::InvalidConfig(
-        key, "endpoint must start with http:// or https://",
-      ),
+      InvalidConfig(key, "endpoint must start with http:// or https://"),
     )
   }
-  Ok(value.to_string())
+  Ok(value.to_owned())
 }
 
 ///|
@@ -526,11 +513,7 @@ fn resolve_compression(
   }
   match compression {
     Some(compression) =>
-      Err(
-        ExporterBuildError::UnsupportedCompressionAlgorithm(
-          compression_to_string(compression),
-        ),
-      )
+      Err(UnsupportedCompressionAlgorithm(compression_to_string(compression)))
     None => Ok(())
   }
 }
@@ -541,20 +524,20 @@ fn use_delta_temporality(
   temporality : @sdkmetrics.Temporality,
 ) -> Bool {
   match temporality {
-    @sdkmetrics.Temporality::Cumulative => false
-    @sdkmetrics.Temporality::Delta =>
+    Cumulative => false
+    Delta =>
       match kind {
-        @sdkmetrics.InstrumentKind::Counter => true
-        @sdkmetrics.InstrumentKind::Histogram => true
-        @sdkmetrics.InstrumentKind::ObservableCounter => true
-        @sdkmetrics.InstrumentKind::Gauge => true
-        @sdkmetrics.InstrumentKind::ObservableGauge => true
+        Counter => true
+        Histogram => true
+        ObservableCounter => true
+        Gauge => true
+        ObservableGauge => true
         _ => false
       }
-    @sdkmetrics.Temporality::LowMemory =>
+    LowMemory =>
       match kind {
-        @sdkmetrics.InstrumentKind::Counter => true
-        @sdkmetrics.InstrumentKind::Histogram => true
+        Counter => true
+        Histogram => true
         _ => false
       }
   }
@@ -565,12 +548,12 @@ fn parse_temporality(
   value : StringView,
 ) -> Result[@sdkmetrics.Temporality, ExporterBuildError] {
   match normalize_ascii_lower(value) {
-    "cumulative" => Ok(@sdkmetrics.Temporality::Cumulative)
-    "delta" => Ok(@sdkmetrics.Temporality::Delta)
-    "lowmemory" => Ok(@sdkmetrics.Temporality::LowMemory)
+    "cumulative" => Ok(Cumulative)
+    "delta" => Ok(Delta)
+    "lowmemory" => Ok(LowMemory)
     other =>
       Err(
-        ExporterBuildError::InvalidConfig(
+        InvalidConfig(
           OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE,
           "unsupported value \{other}",
         ),
@@ -588,7 +571,7 @@ fn resolve_temporality(
       match
         @env.get_env_var(OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE) {
         Some(value) => parse_temporality(value)
-        None => Ok(@sdkmetrics.Temporality::Cumulative)
+        None => Ok(Cumulative)
       }
   }
 }
@@ -696,17 +679,13 @@ fn trace_state_header(trace_state : @common.TraceState) -> String {
 ///|
 fn any_value_from_sdk(value : @common.Value) -> @otlpcommon.AnyValue {
   let value = match value {
-    @common.Value::Bool(value) => @otlpcommon.AnyValue_Value::BoolValue(value)
-    @common.Value::Int64(value) => @otlpcommon.AnyValue_Value::IntValue(value)
-    @common.Value::Double(value) =>
-      @otlpcommon.AnyValue_Value::DoubleValue(value)
-    @common.Value::String(value) =>
-      @otlpcommon.AnyValue_Value::StringValue(value)
-    @common.Value::Bytes(value) => @otlpcommon.AnyValue_Value::BytesValue(value)
-    @common.Value::Array(values) =>
-      @otlpcommon.AnyValue_Value::ArrayValue(
-        @otlpcommon.ArrayValue::new(values.map(any_value_from_sdk)),
-      )
+    Bool(value) => @otlpcommon.AnyValue_Value::BoolValue(value)
+    Int64(value) => IntValue(value)
+    Double(value) => DoubleValue(value)
+    String(value) => StringValue(value)
+    Bytes(value) => BytesValue(value)
+    Array(values) =>
+      ArrayValue(@otlpcommon.ArrayValue::new(values.map(any_value_from_sdk)))
   }
   @otlpcommon.AnyValue::new(value~)
 }
@@ -714,22 +693,17 @@ fn any_value_from_sdk(value : @common.Value) -> @otlpcommon.AnyValue {
 ///|
 fn log_any_value_from_sdk(value : @sdklogs.AnyValue) -> @otlpcommon.AnyValue {
   let value = match value {
-    @sdklogs.AnyValue::Bool(value) =>
-      @otlpcommon.AnyValue_Value::BoolValue(value)
-    @sdklogs.AnyValue::Int64(value) =>
-      @otlpcommon.AnyValue_Value::IntValue(value)
-    @sdklogs.AnyValue::Double(value) =>
-      @otlpcommon.AnyValue_Value::DoubleValue(value)
-    @sdklogs.AnyValue::String(value) =>
-      @otlpcommon.AnyValue_Value::StringValue(value)
-    @sdklogs.AnyValue::Bytes(value) =>
-      @otlpcommon.AnyValue_Value::BytesValue(value)
-    @sdklogs.AnyValue::Array(values) =>
-      @otlpcommon.AnyValue_Value::ArrayValue(
+    Bool(value) => @otlpcommon.AnyValue_Value::BoolValue(value)
+    Int64(value) => IntValue(value)
+    Double(value) => DoubleValue(value)
+    String(value) => StringValue(value)
+    Bytes(value) => BytesValue(value)
+    Array(values) =>
+      ArrayValue(
         @otlpcommon.ArrayValue::new(values.map(log_any_value_from_sdk)),
       )
-    @sdklogs.AnyValue::Map(values) =>
-      @otlpcommon.AnyValue_Value::KvlistValue(
+    Map(values) =>
+      KvlistValue(
         @otlpcommon.KeyValueList::new(values.map(log_key_value_from_sdk)),
       )
   }
@@ -806,11 +780,11 @@ fn otlp_scope(
 ///|
 fn otlp_span_kind(kind : @sdktrace.SpanKind) -> @otlptrace.Span_SpanKind {
   match kind {
-    @sdktrace.SpanKind::Internal => @otlptrace.Span_SpanKind::SPAN_KIND_INTERNAL
-    @sdktrace.SpanKind::Client => @otlptrace.Span_SpanKind::SPAN_KIND_CLIENT
-    @sdktrace.SpanKind::Server => @otlptrace.Span_SpanKind::SPAN_KIND_SERVER
-    @sdktrace.SpanKind::Producer => @otlptrace.Span_SpanKind::SPAN_KIND_PRODUCER
-    @sdktrace.SpanKind::Consumer => @otlptrace.Span_SpanKind::SPAN_KIND_CONSUMER
+    Internal => SPAN_KIND_INTERNAL
+    Client => SPAN_KIND_CLIENT
+    Server => SPAN_KIND_SERVER
+    Producer => SPAN_KIND_PRODUCER
+    Consumer => SPAN_KIND_CONSUMER
   }
 }
 
@@ -819,11 +793,9 @@ fn otlp_status_code(
   code : @sdktrace.StatusCode,
 ) -> @otlptrace.Status_StatusCode {
   match code {
-    @sdktrace.StatusCode::Unset =>
-      @otlptrace.Status_StatusCode::STATUS_CODE_UNSET
-    @sdktrace.StatusCode::Ok => @otlptrace.Status_StatusCode::STATUS_CODE_OK
-    @sdktrace.StatusCode::Error =>
-      @otlptrace.Status_StatusCode::STATUS_CODE_ERROR
+    Unset => STATUS_CODE_UNSET
+    Ok => STATUS_CODE_OK
+    Error => STATUS_CODE_ERROR
   }
 }
 
@@ -894,55 +866,31 @@ fn otlp_severity_number(
   severity_number : @sdklogs.SeverityNumber?,
 ) -> @otlplogs.SeverityNumber {
   match severity_number {
-    Some(@sdklogs.SeverityNumber::Trace) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_TRACE
-    Some(@sdklogs.SeverityNumber::Trace2) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_TRACE2
-    Some(@sdklogs.SeverityNumber::Trace3) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_TRACE3
-    Some(@sdklogs.SeverityNumber::Trace4) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_TRACE4
-    Some(@sdklogs.SeverityNumber::Debug) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_DEBUG
-    Some(@sdklogs.SeverityNumber::Debug2) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_DEBUG2
-    Some(@sdklogs.SeverityNumber::Debug3) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_DEBUG3
-    Some(@sdklogs.SeverityNumber::Debug4) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_DEBUG4
-    Some(@sdklogs.SeverityNumber::Info) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_INFO
-    Some(@sdklogs.SeverityNumber::Info2) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_INFO2
-    Some(@sdklogs.SeverityNumber::Info3) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_INFO3
-    Some(@sdklogs.SeverityNumber::Info4) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_INFO4
-    Some(@sdklogs.SeverityNumber::Warn) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_WARN
-    Some(@sdklogs.SeverityNumber::Warn2) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_WARN2
-    Some(@sdklogs.SeverityNumber::Warn3) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_WARN3
-    Some(@sdklogs.SeverityNumber::Warn4) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_WARN4
-    Some(@sdklogs.SeverityNumber::Error) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_ERROR
-    Some(@sdklogs.SeverityNumber::Error2) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_ERROR2
-    Some(@sdklogs.SeverityNumber::Error3) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_ERROR3
-    Some(@sdklogs.SeverityNumber::Error4) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_ERROR4
-    Some(@sdklogs.SeverityNumber::Fatal) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_FATAL
-    Some(@sdklogs.SeverityNumber::Fatal2) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_FATAL2
-    Some(@sdklogs.SeverityNumber::Fatal3) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_FATAL3
-    Some(@sdklogs.SeverityNumber::Fatal4) =>
-      @otlplogs.SeverityNumber::SEVERITY_NUMBER_FATAL4
-    None => @otlplogs.SeverityNumber::SEVERITY_NUMBER_UNSPECIFIED
+    Some(Trace) => SEVERITY_NUMBER_TRACE
+    Some(Trace2) => SEVERITY_NUMBER_TRACE2
+    Some(Trace3) => SEVERITY_NUMBER_TRACE3
+    Some(Trace4) => SEVERITY_NUMBER_TRACE4
+    Some(Debug) => SEVERITY_NUMBER_DEBUG
+    Some(Debug2) => SEVERITY_NUMBER_DEBUG2
+    Some(Debug3) => SEVERITY_NUMBER_DEBUG3
+    Some(Debug4) => SEVERITY_NUMBER_DEBUG4
+    Some(Info) => SEVERITY_NUMBER_INFO
+    Some(Info2) => SEVERITY_NUMBER_INFO2
+    Some(Info3) => SEVERITY_NUMBER_INFO3
+    Some(Info4) => SEVERITY_NUMBER_INFO4
+    Some(Warn) => SEVERITY_NUMBER_WARN
+    Some(Warn2) => SEVERITY_NUMBER_WARN2
+    Some(Warn3) => SEVERITY_NUMBER_WARN3
+    Some(Warn4) => SEVERITY_NUMBER_WARN4
+    Some(Error) => SEVERITY_NUMBER_ERROR
+    Some(Error2) => SEVERITY_NUMBER_ERROR2
+    Some(Error3) => SEVERITY_NUMBER_ERROR3
+    Some(Error4) => SEVERITY_NUMBER_ERROR4
+    Some(Fatal) => SEVERITY_NUMBER_FATAL
+    Some(Fatal2) => SEVERITY_NUMBER_FATAL2
+    Some(Fatal3) => SEVERITY_NUMBER_FATAL3
+    Some(Fatal4) => SEVERITY_NUMBER_FATAL4
+    None => SEVERITY_NUMBER_UNSPECIFIED
   }
 }
 
@@ -978,17 +926,17 @@ fn otlp_aggregation_temporality(
   temporality : @sdkmetrics.Temporality,
 ) -> @otlpmetrics.AggregationTemporality {
   if use_delta_temporality(kind, temporality) {
-    @otlpmetrics.AggregationTemporality::AGGREGATION_TEMPORALITY_DELTA
+    AGGREGATION_TEMPORALITY_DELTA
   } else {
-    @otlpmetrics.AggregationTemporality::AGGREGATION_TEMPORALITY_CUMULATIVE
+    AGGREGATION_TEMPORALITY_CUMULATIVE
   }
 }
 
 ///|
 fn metric_is_monotonic(kind : @sdkmetrics.InstrumentKind) -> Bool {
   match kind {
-    @sdkmetrics.InstrumentKind::Counter => true
-    @sdkmetrics.InstrumentKind::ObservableCounter => true
+    Counter => true
+    ObservableCounter => true
     _ => false
   }
 }
@@ -996,9 +944,9 @@ fn metric_is_monotonic(kind : @sdkmetrics.InstrumentKind) -> Bool {
 ///|
 fn sdkmetrics_number_to_double(number : @sdkmetrics.Number) -> Double {
   match number {
-    @sdkmetrics.Number::Int64(value) => value.to_double()
-    @sdkmetrics.Number::UInt64(value) => value.to_double()
-    @sdkmetrics.Number::Double(value) => value
+    Int64(value) => value.to_double()
+    UInt64(value) => value.to_double()
+    Double(value) => value
   }
 }
 
@@ -1007,16 +955,14 @@ fn otlp_number_value(
   number : @sdkmetrics.Number,
 ) -> @otlpmetrics.NumberDataPoint_Value {
   match number {
-    @sdkmetrics.Number::Int64(value) =>
-      @otlpmetrics.NumberDataPoint_Value::AsInt(value)
-    @sdkmetrics.Number::UInt64(value) =>
+    Int64(value) => AsInt(value)
+    UInt64(value) =>
       if value <= 9223372036854775807UL {
-        @otlpmetrics.NumberDataPoint_Value::AsInt(value.reinterpret_as_int64())
+        AsInt(value.reinterpret_as_int64())
       } else {
-        @otlpmetrics.NumberDataPoint_Value::AsDouble(value.to_double())
+        AsDouble(value.to_double())
       }
-    @sdkmetrics.Number::Double(value) =>
-      @otlpmetrics.NumberDataPoint_Value::AsDouble(value)
+    Double(value) => AsDouble(value)
   }
 }
 
@@ -1062,20 +1008,20 @@ fn otlp_metric(
   temporality : @sdkmetrics.Temporality,
 ) -> @otlpmetrics.Metric {
   let data = match metric.aggregation {
-    @sdkmetrics.Aggregation::Gauge(number) =>
+    Gauge(number) =>
       @otlpmetrics.Metric_Data::Gauge(
         @otlpmetrics.Gauge::new([otlp_number_point(metric, number)]),
       )
-    @sdkmetrics.Aggregation::Sum(number) =>
-      @otlpmetrics.Metric_Data::Sum(
+    Sum(number) =>
+      Sum(
         @otlpmetrics.Sum::new(
           [otlp_number_point(metric, number)],
           otlp_aggregation_temporality(metric.kind, temporality),
           metric_is_monotonic(metric.kind),
         ),
       )
-    @sdkmetrics.Aggregation::Histogram(summary) =>
-      @otlpmetrics.Metric_Data::Histogram(
+    Histogram(summary) =>
+      Histogram(
         @otlpmetrics.Histogram::new(
           [otlp_histogram_point(metric, summary)],
           otlp_aggregation_temporality(metric.kind, temporality),
@@ -1094,7 +1040,7 @@ fn otlp_metric(
 ///|
 fn[T : @protobuf.Write] encode_protobuf(message : T) -> Result[Bytes, String] {
   try {
-    let buffer = @buffer.new()
+    let buffer = Buffer()
     @protobuf.Write::write(message, buffer)
     Ok(buffer.to_bytes())
   } catch {
@@ -1370,7 +1316,7 @@ fn build_logs_request(
       Some(group) => group.val.log_records.push(otlp_record)
       None =>
         groups.push(
-          Ref::new({
+          Ref({
             resource_key,
             scope_key,
             resource: otlp_resource(record.resource),
@@ -1470,18 +1416,17 @@ fn validate_trace_response(
     return Ok(())
   }
   let response : @collectortrace.ExportTraceServiceResponse = match protocol {
-    Protocol::HttpBinary =>
+    HttpBinary =>
       match decode_trace_response(body) {
         Ok(response) => response
         Err(err) => return Err(err)
       }
-    Protocol::HttpJson =>
+    HttpJson =>
       match decode_json_message(body) {
         Ok(response) => response
         Err(err) => return Err(err)
       }
-    Protocol::Grpc =>
-      return Err("grpc transport is not supported by HTTP exporters")
+    Grpc => return Err("grpc transport is not supported by HTTP exporters")
   }
   let partial_success = response.partial_success
   if partial_success.rejected_spans > 0L || partial_success.error_message != "" {
@@ -1502,18 +1447,17 @@ fn validate_logs_response(
     return Ok(())
   }
   let response : @collectorlogs.ExportLogsServiceResponse = match protocol {
-    Protocol::HttpBinary =>
+    HttpBinary =>
       match decode_logs_response(body) {
         Ok(response) => response
         Err(err) => return Err(err)
       }
-    Protocol::HttpJson =>
+    HttpJson =>
       match decode_json_message(body) {
         Ok(response) => response
         Err(err) => return Err(err)
       }
-    Protocol::Grpc =>
-      return Err("grpc transport is not supported by HTTP exporters")
+    Grpc => return Err("grpc transport is not supported by HTTP exporters")
   }
   let partial_success = response.partial_success
   if partial_success.rejected_log_records > 0L ||
@@ -1536,18 +1480,17 @@ fn validate_metrics_response(
   }
   let response : @collectormetrics.ExportMetricsServiceResponse = match
     protocol {
-    Protocol::HttpBinary =>
+    HttpBinary =>
       match decode_metrics_response(body) {
         Ok(response) => response
         Err(err) => return Err(err)
       }
-    Protocol::HttpJson =>
+    HttpJson =>
       match decode_json_message(body) {
         Ok(response) => response
         Err(err) => return Err(err)
       }
-    Protocol::Grpc =>
-      return Err("grpc transport is not supported by HTTP exporters")
+    Grpc => return Err("grpc transport is not supported by HTTP exporters")
   }
   let partial_success = response.partial_success
   if partial_success.rejected_data_points > 0L ||
@@ -1620,7 +1563,7 @@ pub fn MetricExporter::new() -> Result[MetricExporter, ExporterBuildError] {
 pub fn SpanExporterBuilder::with_http(
   self : SpanExporterBuilder,
 ) -> SpanExporterBuilder {
-  self.protocol = Some(Protocol::HttpBinary)
+  self.protocol = Some(HttpBinary)
   self
 }
 
@@ -1629,7 +1572,7 @@ pub fn SpanExporterBuilder::with_http(
 pub fn LogExporterBuilder::with_http(
   self : LogExporterBuilder,
 ) -> LogExporterBuilder {
-  self.protocol = Some(Protocol::HttpBinary)
+  self.protocol = Some(HttpBinary)
   self
 }
 
@@ -1638,7 +1581,7 @@ pub fn LogExporterBuilder::with_http(
 pub fn MetricExporterBuilder::with_http(
   self : MetricExporterBuilder,
 ) -> MetricExporterBuilder {
-  self.protocol = Some(Protocol::HttpBinary)
+  self.protocol = Some(HttpBinary)
   self
 }
 
@@ -1650,7 +1593,7 @@ pub fn SpanExporterBuilder::with_endpoint(
   self : SpanExporterBuilder,
   endpoint : StringView,
 ) -> SpanExporterBuilder {
-  self.endpoint = Some(endpoint.to_string())
+  self.endpoint = Some(endpoint.to_owned())
   self
 }
 
@@ -1662,7 +1605,7 @@ pub fn LogExporterBuilder::with_endpoint(
   self : LogExporterBuilder,
   endpoint : StringView,
 ) -> LogExporterBuilder {
-  self.endpoint = Some(endpoint.to_string())
+  self.endpoint = Some(endpoint.to_owned())
   self
 }
 
@@ -1674,7 +1617,7 @@ pub fn MetricExporterBuilder::with_endpoint(
   self : MetricExporterBuilder,
   endpoint : StringView,
 ) -> MetricExporterBuilder {
-  self.endpoint = Some(endpoint.to_string())
+  self.endpoint = Some(endpoint.to_owned())
   self
 }
 
@@ -1856,7 +1799,7 @@ pub fn SpanExporterBuilder::build(
     self.compression,
   )
   match config {
-    Ok(config) => Ok({ state: Ref::new({ is_shutdown: false }), config })
+    Ok(config) => Ok({ state: Ref({ is_shutdown: false }), config })
     Err(err) => Err(err)
   }
 }
@@ -1882,7 +1825,7 @@ pub fn LogExporterBuilder::build(
     self.compression,
   )
   match config {
-    Ok(config) => Ok({ state: Ref::new({ is_shutdown: false }), config })
+    Ok(config) => Ok({ state: Ref({ is_shutdown: false }), config })
     Err(err) => Err(err)
   }
 }
@@ -1910,7 +1853,7 @@ pub fn MetricExporterBuilder::build(
   let temporality = resolve_temporality(self.temporality)
   match (config, temporality) {
     (Ok(config), Ok(temporality)) =>
-      Ok({ state: Ref::new({ is_shutdown: false }), config, temporality })
+      Ok({ state: Ref({ is_shutdown: false }), config, temporality })
     (Err(err), _) => Err(err)
     (_, Err(err)) => Err(err)
   }
@@ -1962,7 +1905,7 @@ pub async fn SpanExporter::export_batch(
   }
   let request = build_trace_request(batch)
   let (payload, content_type) = match self.config.protocol {
-    Protocol::HttpBinary =>
+    HttpBinary =>
       match encode_protobuf(request) {
         Ok(payload) => (payload, "application/x-protobuf")
         Err(message) =>
@@ -1971,8 +1914,8 @@ pub async fn SpanExporter::export_batch(
             "failed to encode trace request: \{message}",
           )
       }
-    Protocol::HttpJson => (encode_json_message(request), "application/json")
-    Protocol::Grpc =>
+    HttpJson => (encode_json_message(request), "application/json")
+    Grpc =>
       return @error.export_failure(
         self.name(),
         "grpc transport is not supported by HTTP exporters",
@@ -2006,7 +1949,7 @@ pub async fn LogExporter::export_batch(
   }
   let request = build_logs_request(batch)
   let (payload, content_type) = match self.config.protocol {
-    Protocol::HttpBinary =>
+    HttpBinary =>
       match encode_protobuf(request) {
         Ok(payload) => (payload, "application/x-protobuf")
         Err(message) =>
@@ -2015,8 +1958,8 @@ pub async fn LogExporter::export_batch(
             "failed to encode logs request: \{message}",
           )
       }
-    Protocol::HttpJson => (encode_json_message(request), "application/json")
-    Protocol::Grpc =>
+    HttpJson => (encode_json_message(request), "application/json")
+    Grpc =>
       return @error.export_failure(
         self.name(),
         "grpc transport is not supported by HTTP exporters",
@@ -2050,7 +1993,7 @@ pub async fn MetricExporter::export_batch(
   }
   let request = build_metrics_request(batch, self.temporality)
   let (payload, content_type) = match self.config.protocol {
-    Protocol::HttpBinary =>
+    HttpBinary =>
       match encode_protobuf(request) {
         Ok(payload) => (payload, "application/x-protobuf")
         Err(message) =>
@@ -2059,8 +2002,8 @@ pub async fn MetricExporter::export_batch(
             "failed to encode metrics request: \{message}",
           )
       }
-    Protocol::HttpJson => (encode_json_message(request), "application/json")
-    Protocol::Grpc =>
+    HttpJson => (encode_json_message(request), "application/json")
+    Grpc =>
       return @error.export_failure(
         self.name(),
         "grpc transport is not supported by HTTP exporters",

@@ -59,8 +59,8 @@ pub async fn start_delayed_http_server(
   ) catch {
     _ => abort("expected delayed http server to start")
   }
-  let request_count = Ref::new(0)
-  let request_path = Ref::new("")
+  let request_count = Ref(0)
+  let request_path = Ref("")
   group.spawn_bg(no_wait=true, () => {
     server.run_forever(
       (request, body, _conn) => {
@@ -93,7 +93,7 @@ fn strip_trailing_slashes(value : StringView) -> String {
   while end > 0 && value[end - 1:end] == "/" {
     end = end - 1
   }
-  value[:end].to_string()
+  value[:end].to_owned()
 }
 
 ///|
@@ -102,7 +102,7 @@ fn strip_leading_slashes(value : StringView) -> String {
   while start < value.length() && value[start:start + 1] == "/" {
     start = start + 1
   }
-  value[start:].to_string()
+  value[start:].to_owned()
 }
 
 ///|
@@ -150,7 +150,7 @@ fn non_empty_lines(text : String) -> Array[String] {
     }
     let trimmed = builder.to_string().trim()
     if !trimmed.is_empty() {
-      lines.push(trimmed.to_string())
+      lines.push(trimmed.to_owned())
     }
   }
   lines
@@ -224,7 +224,7 @@ pub async fn[T : @json.FromJson] wait_for_latest_matching_record(
         continue
       }
     }
-    match read_latest_matching_record(text, matches, description.to_string()) {
+    match read_latest_matching_record(text, matches, description.to_owned()) {
       Ok(value) => return Ok(value)
       Err(err) => last_error = err
     }
@@ -251,7 +251,7 @@ pub async fn wait_for_latest_matching_json(
         continue
       }
     }
-    match read_latest_matching_json(text, matches, description.to_string()) {
+    match read_latest_matching_json(text, matches, description.to_owned()) {
       Ok(value) => return Ok(value)
       Err(err) => last_error = err
     }
@@ -265,7 +265,7 @@ pub fn traces_data_has_scope(
   data : @otlp_trace.TracesData,
   scope_name : StringView,
 ) -> Bool {
-  let scope_name = scope_name.to_string()
+  let scope_name = scope_name.to_owned()
   for resource_spans in data.resource_spans {
     for scope_spans in resource_spans.scope_spans {
       if scope_spans.scope.name == scope_name {
@@ -281,7 +281,7 @@ pub fn logs_data_has_scope(
   data : @otlp_logs.LogsData,
   scope_name : StringView,
 ) -> Bool {
-  let scope_name = scope_name.to_string()
+  let scope_name = scope_name.to_owned()
   for resource_logs in data.resource_logs {
     for scope_logs in resource_logs.scope_logs {
       if scope_logs.scope.name == scope_name {
@@ -324,7 +324,7 @@ pub fn metrics_json_has_scope(json : Json, scope_name : StringView) -> Bool {
     json,
     "resourceMetrics",
     "scopeMetrics",
-    scope_name.to_string(),
+    scope_name.to_owned(),
   )
 }
 

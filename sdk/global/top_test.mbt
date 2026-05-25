@@ -14,7 +14,7 @@ async test "global tracer provider can be replaced" {
   let span = tracer.start("global-span")
   span.end()
 
-  assert_eq(exporter.finished_spans().length(), 1)
+  @debug.assert_eq(exporter.finished_spans().length(), 1)
   reset_for_test()
 }
 
@@ -53,7 +53,7 @@ async test "global background tasks drive batch and periodic exporters" {
     let counter = meter("global-background").counter("global-jobs").build()
     counter.add(1)
     @async.sleep(40)
-    assert_eq(span_exporter.finished_spans().length(), 1)
+    @debug.assert_eq(span_exporter.finished_spans().length(), 1)
     assert_true(metric_exporter.finished_metrics().length() > 0)
     ignore(tracer_provider.shutdown())
     ignore(meter_provider.shutdown())

@@ -180,17 +180,17 @@ pub fn KeyValue::new(key : StringView, value : AnyValue) -> KeyValue {
 /// Converts a shared SDK attribute value into a log-specific structured value.
 pub fn AnyValue::from_common(value : @common.Value) -> AnyValue {
   match value {
-    @common.Value::Bool(value) => AnyValue::Bool(value)
-    @common.Value::Int64(value) => AnyValue::Int64(value)
-    @common.Value::Double(value) => AnyValue::Double(value)
-    @common.Value::String(value) => AnyValue::String(value)
-    @common.Value::Bytes(value) => AnyValue::Bytes(value)
-    @common.Value::Array(values) => {
+    Bool(value) => Bool(value)
+    Int64(value) => Int64(value)
+    Double(value) => Double(value)
+    String(value) => String(value)
+    Bytes(value) => Bytes(value)
+    Array(values) => {
       let converted = []
       for value in values {
         converted.push(AnyValue::from_common(value))
       }
-      AnyValue::Array(converted)
+      Array(converted)
     }
   }
 }
@@ -228,7 +228,7 @@ pub fn LogRecord::new(
     observed_timestamp_unix_nano,
     severity_number,
     severity_text,
-    attributes: attributes.to_array(),
+    attributes: attributes.to_owned(),
     trace_context,
     resource,
     instrumentation_scope,
@@ -243,7 +243,7 @@ fn parse_env_int(key : StringView) -> Int? {
       if value == "" {
         None
       } else {
-        Some(@string.parse_int(value.to_string()) catch { _ => return None })
+        Some(@string.parse_int(value.to_owned()) catch { _ => return None })
       }
     }
     None => None
@@ -293,7 +293,7 @@ pub fn BatchConfig::new(
 }
 
 ///|
-pub impl Default for BatchConfig with default() -> BatchConfig {
+pub impl Default for BatchConfig with fn default() -> BatchConfig {
   BatchConfig::new(
     max_queue_size=env_or("OTEL_BLRP_MAX_QUEUE_SIZE", 2048),
     max_export_batch_size=env_or("OTEL_BLRP_MAX_EXPORT_BATCH_SIZE", 512),
@@ -400,7 +400,7 @@ pub async fn LogProcessor::shutdown(
 ///|
 /// Creates an empty in-memory log exporter.
 pub fn InMemoryLogExporter::new() -> InMemoryLogExporter {
-  { state: Ref::new({ finished_logs: [], is_shutdown: false }) }
+  { state: Ref({ finished_logs: [], is_shutdown: false }) }
 }
 
 ///|
@@ -499,7 +499,7 @@ pub fn BatchLogProcessor::new(
   exporter : LogExporter,
   config? : BatchConfig = Default::default(),
 ) -> BatchLogProcessor {
-  let state : Ref[BatchProcessorState] = Ref::new({
+  let state : Ref[BatchProcessorState] = Ref({
     exporter,
     config,
     queue: [],
@@ -635,7 +635,7 @@ pub fn SdkLoggerProviderBuilder::build(
   self : SdkLoggerProviderBuilder,
 ) -> SdkLoggerProvider {
   {
-    state: Ref::new({
+    state: Ref({
       resource: self.resource,
       processors: self.processors.copy(),
       batch_processors: self.batch_processors.copy(),
@@ -748,25 +748,25 @@ fn api_sorted_keys(values : Map[String, @api.AnyValue]) -> Array[String] {
 ///|
 fn any_value_from_api(value : @api.AnyValue) -> AnyValue {
   match value {
-    @api.AnyValue::Int(value) => AnyValue::Int64(value)
-    @api.AnyValue::Double(value) => AnyValue::Double(value)
-    @api.AnyValue::String(value) => AnyValue::String(value)
-    @api.AnyValue::Boolean(value) => AnyValue::Bool(value)
-    @api.AnyValue::Bytes(value) => AnyValue::Bytes(value)
-    @api.AnyValue::ListAny(values) => {
+    Int(value) => Int64(value)
+    Double(value) => Double(value)
+    String(value) => String(value)
+    Boolean(value) => Bool(value)
+    Bytes(value) => Bytes(value)
+    ListAny(values) => {
       let converted = []
       for value in values {
         converted.push(any_value_from_api(value))
       }
-      AnyValue::Array(converted)
+      Array(converted)
     }
-    @api.AnyValue::Map(values) => {
+    Map(values) => {
       let converted = []
       for key in api_sorted_keys(values) {
         guard values.get(key) is Some(value)
         converted.push(KeyValue::new(key, any_value_from_api(value)))
       }
-      AnyValue::Map(converted)
+      Map(converted)
     }
   }
 }
@@ -779,30 +779,30 @@ fn key_value_from_api(attribute : @api.KeyValue) -> KeyValue {
 ///|
 fn severity_from_api(severity : @api.Severity?) -> SeverityNumber? {
   match severity {
-    Some(@api.Severity::Trace) => Some(SeverityNumber::Trace)
-    Some(@api.Severity::Trace2) => Some(SeverityNumber::Trace2)
-    Some(@api.Severity::Trace3) => Some(SeverityNumber::Trace3)
-    Some(@api.Severity::Trace4) => Some(SeverityNumber::Trace4)
-    Some(@api.Severity::Debug) => Some(SeverityNumber::Debug)
-    Some(@api.Severity::Debug2) => Some(SeverityNumber::Debug2)
-    Some(@api.Severity::Debug3) => Some(SeverityNumber::Debug3)
-    Some(@api.Severity::Debug4) => Some(SeverityNumber::Debug4)
-    Some(@api.Severity::Info) => Some(SeverityNumber::Info)
-    Some(@api.Severity::Info2) => Some(SeverityNumber::Info2)
-    Some(@api.Severity::Info3) => Some(SeverityNumber::Info3)
-    Some(@api.Severity::Info4) => Some(SeverityNumber::Info4)
-    Some(@api.Severity::Warn) => Some(SeverityNumber::Warn)
-    Some(@api.Severity::Warn2) => Some(SeverityNumber::Warn2)
-    Some(@api.Severity::Warn3) => Some(SeverityNumber::Warn3)
-    Some(@api.Severity::Warn4) => Some(SeverityNumber::Warn4)
-    Some(@api.Severity::Error) => Some(SeverityNumber::Error)
-    Some(@api.Severity::Error2) => Some(SeverityNumber::Error2)
-    Some(@api.Severity::Error3) => Some(SeverityNumber::Error3)
-    Some(@api.Severity::Error4) => Some(SeverityNumber::Error4)
-    Some(@api.Severity::Fatal) => Some(SeverityNumber::Fatal)
-    Some(@api.Severity::Fatal2) => Some(SeverityNumber::Fatal2)
-    Some(@api.Severity::Fatal3) => Some(SeverityNumber::Fatal3)
-    Some(@api.Severity::Fatal4) => Some(SeverityNumber::Fatal4)
+    Some(Trace) => Some(Trace)
+    Some(Trace2) => Some(Trace2)
+    Some(Trace3) => Some(Trace3)
+    Some(Trace4) => Some(Trace4)
+    Some(Debug) => Some(Debug)
+    Some(Debug2) => Some(Debug2)
+    Some(Debug3) => Some(Debug3)
+    Some(Debug4) => Some(Debug4)
+    Some(Info) => Some(Info)
+    Some(Info2) => Some(Info2)
+    Some(Info3) => Some(Info3)
+    Some(Info4) => Some(Info4)
+    Some(Warn) => Some(Warn)
+    Some(Warn2) => Some(Warn2)
+    Some(Warn3) => Some(Warn3)
+    Some(Warn4) => Some(Warn4)
+    Some(Error) => Some(Error)
+    Some(Error2) => Some(Error2)
+    Some(Error3) => Some(Error3)
+    Some(Error4) => Some(Error4)
+    Some(Fatal) => Some(Fatal)
+    Some(Fatal2) => Some(Fatal2)
+    Some(Fatal3) => Some(Fatal3)
+    Some(Fatal4) => Some(Fatal4)
     None => None
   }
 }
@@ -835,7 +835,7 @@ fn SdkLogger::into_api_logger(self : SdkLogger) -> @api.Logger {
       self.emit(
         match record.body {
           Some(body) => any_value_from_api(body)
-          None => AnyValue::String("")
+          None => String("")
         },
         context=context_from_api_trace_context(record.trace_context),
         severity_number=severity_from_api(record.severity_number),

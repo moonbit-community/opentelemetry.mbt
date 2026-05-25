@@ -1,10 +1,11 @@
 import {
+  "moonbitlang/core/debug",
   "moonbitlang/async",
-  "moonbit-community/opentelemetry/interface/common" @common,
-  "moonbit-community/opentelemetry/sdk/logs" @logs,
-  "moonbit-community/opentelemetry/sdk/metrics" @metrics,
-  "moonbit-community/opentelemetry/interface/propagation" @propagation,
-  "moonbit-community/opentelemetry/sdk/trace" @trace,
+  "moonbit-community/opentelemetry/interface/common",
+  "moonbit-community/opentelemetry/sdk/logs",
+  "moonbit-community/opentelemetry/sdk/metrics",
+  "moonbit-community/opentelemetry/interface/propagation",
+  "moonbit-community/opentelemetry/sdk/trace",
 }
 
 options(

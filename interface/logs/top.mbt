@@ -97,30 +97,30 @@ pub struct LoggerProvider {
 /// method when a severity number exists.
 pub fn Severity::name(self : Severity) -> String {
   match self {
-    Severity::Trace => "TRACE"
-    Severity::Trace2 => "TRACE2"
-    Severity::Trace3 => "TRACE3"
-    Severity::Trace4 => "TRACE4"
-    Severity::Debug => "DEBUG"
-    Severity::Debug2 => "DEBUG2"
-    Severity::Debug3 => "DEBUG3"
-    Severity::Debug4 => "DEBUG4"
-    Severity::Info => "INFO"
-    Severity::Info2 => "INFO2"
-    Severity::Info3 => "INFO3"
-    Severity::Info4 => "INFO4"
-    Severity::Warn => "WARN"
-    Severity::Warn2 => "WARN2"
-    Severity::Warn3 => "WARN3"
-    Severity::Warn4 => "WARN4"
-    Severity::Error => "ERROR"
-    Severity::Error2 => "ERROR2"
-    Severity::Error3 => "ERROR3"
-    Severity::Error4 => "ERROR4"
-    Severity::Fatal => "FATAL"
-    Severity::Fatal2 => "FATAL2"
-    Severity::Fatal3 => "FATAL3"
-    Severity::Fatal4 => "FATAL4"
+    Trace => "TRACE"
+    Trace2 => "TRACE2"
+    Trace3 => "TRACE3"
+    Trace4 => "TRACE4"
+    Debug => "DEBUG"
+    Debug2 => "DEBUG2"
+    Debug3 => "DEBUG3"
+    Debug4 => "DEBUG4"
+    Info => "INFO"
+    Info2 => "INFO2"
+    Info3 => "INFO3"
+    Info4 => "INFO4"
+    Warn => "WARN"
+    Warn2 => "WARN2"
+    Warn3 => "WARN3"
+    Warn4 => "WARN4"
+    Error => "ERROR"
+    Error2 => "ERROR2"
+    Error3 => "ERROR3"
+    Error4 => "ERROR4"
+    Fatal => "FATAL"
+    Fatal2 => "FATAL2"
+    Fatal3 => "FATAL3"
+    Fatal4 => "FATAL4"
   }
 }
 
@@ -143,17 +143,17 @@ fn sorted_keys(values : Map[String, AnyValue]) -> Array[String] {
 /// Converts a shared attribute value into a public log value.
 pub fn AnyValue::from_common(value : @common.Value) -> AnyValue {
   match value {
-    @common.Value::Bool(value) => AnyValue::Boolean(value)
-    @common.Value::Int64(value) => AnyValue::Int(value)
-    @common.Value::Double(value) => AnyValue::Double(value)
-    @common.Value::String(value) => AnyValue::String(value)
-    @common.Value::Bytes(value) => AnyValue::Bytes(value)
-    @common.Value::Array(values) => {
+    Bool(value) => Boolean(value)
+    Int64(value) => Int(value)
+    Double(value) => Double(value)
+    String(value) => String(value)
+    Bytes(value) => Bytes(value)
+    Array(values) => {
       let converted = []
       for value in values {
         converted.push(AnyValue::from_common(value))
       }
-      AnyValue::ListAny(converted)
+      ListAny(converted)
     }
   }
 }
@@ -178,7 +178,7 @@ pub fn AnyValue::map(values : Map[String, AnyValue]) -> AnyValue {
     guard values.get(key) is Some(value)
     sorted[key] = value
   }
-  AnyValue::Map(sorted)
+  Map(sorted)
 }
 
 ///|
@@ -203,13 +203,13 @@ pub fn LogRecord::new() -> LogRecord {
 /// Sets the event name that will later be exported through the OTLP
 /// `event_name` field.
 pub fn LogRecord::set_event_name(self : LogRecord, name : StringView) -> Unit {
-  self.event_name = Some(name.to_string())
+  self.event_name = Some(name.to_owned())
 }
 
 ///|
 /// Sets the log target used for export-time scope grouping.
 pub fn LogRecord::set_target(self : LogRecord, target : StringView) -> Unit {
-  self.target = Some(target.to_string())
+  self.target = Some(target.to_owned())
 }
 
 ///|
@@ -243,7 +243,7 @@ pub fn LogRecord::set_severity_text(
   self : LogRecord,
   severity_text : StringView,
 ) -> Unit {
-  self.severity_text = Some(severity_text.to_string())
+  self.severity_text = Some(severity_text.to_owned())
 }
 
 ///|
@@ -311,7 +311,7 @@ pub fn LogRecord::set_trace_context(
 }
 
 ///|
-pub impl Default for LogRecord with default() -> LogRecord {
+pub impl Default for LogRecord with fn default() -> LogRecord {
   LogRecord::new()
 }
 

@@ -5,23 +5,18 @@ let schema_url = "https://opentelemetry.io/schemas/1.25.0"
 fn integration_resource(service_name : StringView) -> @resource.Resource {
   @resource.Resource::builder_empty()
   .with_service_name(service_name)
-  .with_attribute(
-    "deployment.environment.name",
-    @otel.Value::String("integration"),
-  )
+  .with_attribute("deployment.environment.name", String("integration"))
   .with_schema_url(schema_url)
   .build()
 }
 
 ///|
 fn build_metric_exporter(protocol : @otlp.Protocol) -> @otlp.MetricExporter {
-  let builder = @otlp.MetricExporter::builder().with_temporality(
-    @sdkmetrics.Temporality::Cumulative,
-  )
+  let builder = @otlp.MetricExporter::builder().with_temporality(Cumulative)
   let builder = match protocol {
-    @otlp.Protocol::HttpBinary => builder.with_http()
-    @otlp.Protocol::HttpJson => builder.with_protocol(protocol)
-    @otlp.Protocol::Grpc => abort("grpc is not part of the integration suite")
+    HttpBinary => builder.with_http()
+    HttpJson => builder.with_protocol(protocol)
+    Grpc => abort("grpc is not part of the integration suite")
   }
   guard builder.build() is Ok(exporter) else {
     abort("expected metric exporter to build")
@@ -43,20 +38,18 @@ fn emit_metrics(scope_name : StringView) -> Unit {
     scope_name,
     version=Some("1.0.0"),
     schema_url=Some(schema_url),
-    attributes=[
-      @otel.KeyValue::new("scope.attr", @otel.Value::String("integration")),
-    ],
+    attributes=[@otel.KeyValue::new("scope.attr", String("integration"))],
   )
   let counter = meter.u64_counter("requests").with_unit("1").build()
   counter.add(7UL, attributes=[
-    @otel.KeyValue::new("route", @otel.Value::String("/checkout")),
+    @otel.KeyValue::new("route", String("/checkout")),
   ])
   let histogram = meter.f64_histogram("latency.ms").with_unit("ms").build()
   histogram.record(12.5, attributes=[
-    @otel.KeyValue::new("route", @otel.Value::String("/checkout")),
+    @otel.KeyValue::new("route", String("/checkout")),
   ])
   histogram.record(18.0, attributes=[
-    @otel.KeyValue::new("route", @otel.Value::String("/checkout")),
+    @otel.KeyValue::new("route", String("/checkout")),
   ])
 }
 
@@ -65,7 +58,7 @@ fn metrics_data_has_scope(
   data : @otlp_metrics.MetricsData,
   scope_name : StringView,
 ) -> Bool {
-  let scope_name = scope_name.to_string()
+  let scope_name = scope_name.to_owned()
   for resource_metrics in data.resource_metrics {
     for scope_metrics in resource_metrics.scope_metrics {
       if scope_metrics.scope.name == scope_name {
@@ -81,7 +74,7 @@ fn find_scope_metrics(
   data : @otlp_metrics.MetricsData,
   scope_name : StringView,
 ) -> Array[@otlp_metrics.Metric] {
-  let scope_name = scope_name.to_string()
+  let scope_name = scope_name.to_owned()
   let metrics : Array[@otlp_metrics.Metric] = []
   for resource_metrics in data.resource_metrics {
     for scope_metrics in resource_metrics.scope_metrics {
@@ -100,7 +93,7 @@ fn find_metric(
   metrics : ArrayView[@otlp_metrics.Metric],
   name : StringView,
 ) -> @otlp_metrics.Metric? {
-  let name = name.to_string()
+  let name = name.to_owned()
   for metric in metrics {
     if metric.name == name {
       return Some(metric)
@@ -115,13 +108,12 @@ fn point_has_string_attribute(
   key : StringView,
   expected : StringView,
 ) -> Bool {
-  let key = key.to_string()
-  let expected = expected.to_string()
+  let key = key.to_owned()
+  let expected = expected.to_owned()
   for attribute in point.attributes {
     if attribute.key == key {
       match attribute.value.value {
-        @otlp_common.AnyValue_Value::StringValue(value) =>
-          return value == expected
+        StringValue(value) => return value == expected
         _ => return false
       }
     }
@@ -141,9 +133,7 @@ async test "periodic metrics export over http protobuf via root API" {
   let provider = @sdk.meter_provider_builder()
     .with_resource(integration_resource("integration-metrics-protobuf"))
     .with_periodic_reader(
-      build_metric_exporter(@otlp.Protocol::HttpBinary).into_periodic_reader(
-        interval_millis=20,
-      ),
+      build_metric_exporter(HttpBinary).into_periodic_reader(interval_millis=20),
     )
     .build()
   @sdk.set_meter_provider(provider)
@@ -193,7 +183,7 @@ async test "force flushed metrics export over http json via root API" {
   let provider = @sdk.meter_provider_builder()
     .with_resource(integration_resource("integration-metrics-json"))
     .with_periodic_reader(
-      build_metric_exporter(@otlp.Protocol::HttpJson).into_periodic_reader(
+      build_metric_exporter(HttpJson).into_periodic_reader(
         interval_millis=60000,
       ),
     )
@@ -269,7 +259,7 @@ async test "rich metrics export covers sync and observable instruments" {
       "x-integration-test": "metrics-rich",
       "x-scope": "builder-overrides",
     })
-    .with_temporality(@sdkmetrics.Temporality::Cumulative)
+    .with_temporality(Cumulative)
     .build() {
     Ok(exporter) => exporter
     Err(err) =>
@@ -277,13 +267,13 @@ async test "rich metrics export covers sync and observable instruments" {
         "expected metric exporter build to succeed: \{@debug.to_string(err)}",
       )
   }
-  assert_true(exporter.temporality() == @sdkmetrics.Temporality::Cumulative)
+  assert_true(exporter.temporality() == Cumulative)
   let provider = @sdk.meter_provider_builder()
     .with_resource(integration_resource("integration-metrics-rich"))
     .with_periodic_reader(
       @sdkmetrics.PeriodicMetricReader::builder(exporter.into_metric_exporter())
       .with_interval(60000)
-      .with_temporality(@sdkmetrics.Temporality::Cumulative)
+      .with_temporality(Cumulative)
       .build(),
     )
     .build()
@@ -293,19 +283,15 @@ async test "rich metrics export covers sync and observable instruments" {
     scope_name,
     version=Some("1.1.0"),
     schema_url=Some(schema_url),
-    attributes=[@otel.KeyValue::new("scope.attr", @otel.Value::String("rich"))],
+    attributes=[@otel.KeyValue::new("scope.attr", String("rich"))],
   )
   let depth = meter
     .i64_up_down_counter("queue.depth")
     .with_description("queue depth")
     .with_unit("1")
     .build()
-  depth.add(5L, attributes=[
-    @otel.KeyValue::new("state", @otel.Value::String("ready")),
-  ])
-  depth.add(-2L, attributes=[
-    @otel.KeyValue::new("state", @otel.Value::String("ready")),
-  ])
+  depth.add(5L, attributes=[@otel.KeyValue::new("state", String("ready"))])
+  depth.add(-2L, attributes=[@otel.KeyValue::new("state", String("ready"))])
 
   let temperature = meter
     .f64_gauge("worker.temperature")
@@ -313,12 +299,12 @@ async test "rich metrics export covers sync and observable instruments" {
     .with_unit("C")
     .build()
   temperature.record(42.5, attributes=[
-    @otel.KeyValue::new("worker", @otel.Value::String("alpha")),
+    @otel.KeyValue::new("worker", String("alpha")),
   ])
 
-  let observed_jobs_calls = Ref::new(0)
-  let observed_pressure_calls = Ref::new(0)
-  let observed_lag_calls = Ref::new(0)
+  let observed_jobs_calls = Ref(0)
+  let observed_pressure_calls = Ref(0)
+  let observed_lag_calls = Ref(0)
   let observed_jobs = meter
     .u64_observable_counter("jobs.processed")
     .with_description("processed jobs")
@@ -326,7 +312,7 @@ async test "rich metrics export covers sync and observable instruments" {
     .with_callback(observer => {
       observed_jobs_calls.val = observed_jobs_calls.val + 1
       observer.observe(12UL, attributes=[
-        @otel.KeyValue::new("worker", @otel.Value::String("alpha")),
+        @otel.KeyValue::new("worker", String("alpha")),
       ])
     })
     .build()
@@ -337,7 +323,7 @@ async test "rich metrics export covers sync and observable instruments" {
     .with_callback(observer => {
       observed_pressure_calls.val = observed_pressure_calls.val + 1
       observer.observe(101.3, attributes=[
-        @otel.KeyValue::new("worker", @otel.Value::String("alpha")),
+        @otel.KeyValue::new("worker", String("alpha")),
       ])
     })
     .build()
@@ -348,7 +334,7 @@ async test "rich metrics export covers sync and observable instruments" {
     .with_callback(observer => {
       observed_lag_calls.val = observed_lag_calls.val + 1
       observer.observe(-1L, attributes=[
-        @otel.KeyValue::new("worker", @otel.Value::String("alpha")),
+        @otel.KeyValue::new("worker", String("alpha")),
       ])
     })
     .build()
@@ -384,7 +370,7 @@ async test "rich metrics export covers sync and observable instruments" {
     Err(message) => fail(message)
   }
   let metrics = find_scope_metrics(actual, scope_name)
-  assert_eq(metrics.length(), 5)
+  @debug.assert_eq(metrics.length(), 5)
 
   let depth_metric = match find_metric(metrics, "queue.depth") {
     Some(metric) => metric
@@ -407,83 +393,67 @@ async test "rich metrics export covers sync and observable instruments" {
     None => fail("expected worker.pressure metric")
   }
 
-  assert_eq(depth_metric.description, "queue depth")
-  assert_eq(depth_metric.unit, "1")
+  @debug.assert_eq(depth_metric.description, "queue depth")
+  @debug.assert_eq(depth_metric.unit, "1")
   match depth_metric.data {
-    @otlp_metrics.Metric_Data::Sum(sum) => {
+    Sum(sum) => {
       assert_true(
-        sum.aggregation_temporality ==
-        @otlp_metrics.AggregationTemporality::AGGREGATION_TEMPORALITY_CUMULATIVE,
+        sum.aggregation_temporality == AGGREGATION_TEMPORALITY_CUMULATIVE,
       )
       assert_true(!sum.is_monotonic)
-      assert_eq(sum.data_points.length(), 1)
+      @debug.assert_eq(sum.data_points.length(), 1)
       assert_true(
         point_has_string_attribute(sum.data_points[0], "state", "ready"),
       )
-      assert_true(
-        sum.data_points[0].value ==
-        @otlp_metrics.NumberDataPoint_Value::AsInt(3L),
-      )
+      assert_true(sum.data_points[0].value == AsInt(3L))
     }
     _ => fail("expected queue.depth to export as a sum")
   }
 
-  assert_eq(temperature_metric.description, "worker temperature")
-  assert_eq(temperature_metric.unit, "C")
+  @debug.assert_eq(temperature_metric.description, "worker temperature")
+  @debug.assert_eq(temperature_metric.unit, "C")
   match temperature_metric.data {
-    @otlp_metrics.Metric_Data::Gauge(gauge) => {
-      assert_eq(gauge.data_points.length(), 1)
+    Gauge(gauge) => {
+      @debug.assert_eq(gauge.data_points.length(), 1)
       assert_true(
         point_has_string_attribute(gauge.data_points[0], "worker", "alpha"),
       )
-      assert_true(
-        gauge.data_points[0].value ==
-        @otlp_metrics.NumberDataPoint_Value::AsDouble(42.5),
-      )
+      assert_true(gauge.data_points[0].value == AsDouble(42.5))
     }
     _ => fail("expected worker.temperature to export as a gauge")
   }
 
   match jobs_metric.data {
-    @otlp_metrics.Metric_Data::Sum(sum) => {
+    Sum(sum) => {
       assert_true(sum.is_monotonic)
-      assert_eq(sum.data_points.length(), 1)
+      @debug.assert_eq(sum.data_points.length(), 1)
       assert_true(
         point_has_string_attribute(sum.data_points[0], "worker", "alpha"),
       )
-      assert_true(
-        sum.data_points[0].value ==
-        @otlp_metrics.NumberDataPoint_Value::AsInt(12L),
-      )
+      assert_true(sum.data_points[0].value == AsInt(12L))
     }
     _ => fail("expected jobs.processed to export as a sum")
   }
 
   match lag_metric.data {
-    @otlp_metrics.Metric_Data::Sum(sum) => {
+    Sum(sum) => {
       assert_true(!sum.is_monotonic)
-      assert_eq(sum.data_points.length(), 1)
+      @debug.assert_eq(sum.data_points.length(), 1)
       assert_true(
         point_has_string_attribute(sum.data_points[0], "worker", "alpha"),
       )
-      assert_true(
-        sum.data_points[0].value ==
-        @otlp_metrics.NumberDataPoint_Value::AsInt(-1L),
-      )
+      assert_true(sum.data_points[0].value == AsInt(-1L))
     }
     _ => fail("expected queue.lag to export as a sum")
   }
 
   match pressure_metric.data {
-    @otlp_metrics.Metric_Data::Gauge(gauge) => {
-      assert_eq(gauge.data_points.length(), 1)
+    Gauge(gauge) => {
+      @debug.assert_eq(gauge.data_points.length(), 1)
       assert_true(
         point_has_string_attribute(gauge.data_points[0], "worker", "alpha"),
       )
-      assert_true(
-        gauge.data_points[0].value ==
-        @otlp_metrics.NumberDataPoint_Value::AsDouble(101.3),
-      )
+      assert_true(gauge.data_points[0].value == AsDouble(101.3))
     }
     _ => fail("expected worker.pressure to export as a gauge")
   }
@@ -506,7 +476,7 @@ async test "metric force_flush times out against a delayed endpoint" {
         @support.append_signal_path(server.endpoint(), "/v1/metrics"),
       )
       .with_timeout(100)
-      .with_temporality(@sdkmetrics.Temporality::Cumulative)
+      .with_temporality(Cumulative)
       .build() {
       Ok(exporter) => exporter
       Err(err) =>
@@ -518,7 +488,7 @@ async test "metric force_flush times out against a delayed endpoint" {
         exporter.into_metric_exporter(),
       )
       .with_interval(60000)
-      .with_temporality(@sdkmetrics.Temporality::Cumulative)
+      .with_temporality(Cumulative)
       .build()
     let provider = @sdk.meter_provider_builder()
       .with_resource(integration_resource("integration-metrics-timeout"))
@@ -528,8 +498,7 @@ async test "metric force_flush times out against a delayed endpoint" {
 
     emit_metrics(scope_name)
 
-    guard provider.force_flush()
-      is Err(@error.OTelSdkError::ExportFailure(_, message)) else {
+    guard provider.force_flush() is Err(ExportFailure(_, message)) else {
       fail("expected metric force_flush to fail with ExportFailure")
     }
     assert_true(message.contains("metrics export timed out after 100ms"))
@@ -538,9 +507,9 @@ async test "metric force_flush times out against a delayed endpoint" {
       Ok(request_path) => request_path
       Err(message) => fail(message)
     }
-    assert_eq(request_path, "/v1/metrics")
-    assert_eq(server.request_count(), 1)
-    assert_eq(server.request_path(), "/v1/metrics")
+    @debug.assert_eq(request_path, "/v1/metrics")
+    @debug.assert_eq(server.request_count(), 1)
+    @debug.assert_eq(server.request_path(), "/v1/metrics")
 
     match reader.shutdown() {
       Ok(_) => ()
@@ -549,7 +518,7 @@ async test "metric force_flush times out against a delayed endpoint" {
           "expected periodic metric reader shutdown to succeed: \{@debug.to_string(err)}",
         )
     }
-    assert_eq(server.request_count(), 1)
+    @debug.assert_eq(server.request_count(), 1)
   })
 }
 

@@ -114,23 +114,23 @@ pub fn Status::new(code : StatusCode, description? : String? = None) -> Status {
 ///|
 /// Returns the default unset status.
 pub fn Status::unset() -> Status {
-  Status::new(StatusCode::Unset)
+  Status::new(Unset)
 }
 
 ///|
 /// Returns an ok status.
 pub fn Status::ok() -> Status {
-  Status::new(StatusCode::Ok)
+  Status::new(Ok)
 }
 
 ///|
 /// Returns an error status with an optional description.
 pub fn Status::error(description? : String? = None) -> Status {
-  Status::new(StatusCode::Error, description~)
+  Status::new(Error, description~)
 }
 
 ///|
-pub impl Default for Status with default() -> Status {
+pub impl Default for Status with fn default() -> Status {
   Status::unset()
 }
 
@@ -146,9 +146,9 @@ pub fn Event::new(
   dropped_attributes_count? : Int = 0,
 ) -> Event {
   {
-    name: name.to_string(),
+    name: name.to_owned(),
     timestamp_unix_nano,
-    attributes: attributes.to_array(),
+    attributes: attributes.to_owned(),
     dropped_attributes_count,
   }
 }
@@ -163,7 +163,7 @@ pub fn Link::new(
   attributes? : ArrayView[@common.KeyValue] = [],
   dropped_attributes_count? : Int = 0,
 ) -> Link {
-  { span_context, attributes: attributes.to_array(), dropped_attributes_count }
+  { span_context, attributes: attributes.to_owned(), dropped_attributes_count }
 }
 
 ///|
@@ -174,7 +174,7 @@ pub fn Link::new(
 pub fn SpanBuilder::from_name(name : StringView) -> SpanBuilder {
   {
     span_kind: None,
-    name: name.to_string(),
+    name: name.to_owned(),
     start_time_unix_nano: None,
     attributes: [],
     events: [],
@@ -208,7 +208,7 @@ pub fn SpanBuilder::with_attributes(
   self : SpanBuilder,
   attributes : ArrayView[@common.KeyValue],
 ) -> SpanBuilder {
-  { ..self, attributes: attributes.to_array() }
+  { ..self, attributes: attributes.to_owned() }
 }
 
 ///|
@@ -219,7 +219,7 @@ pub fn SpanBuilder::with_events(
   self : SpanBuilder,
   events : ArrayView[Event],
 ) -> SpanBuilder {
-  { ..self, events: events.to_array() }
+  { ..self, events: events.to_owned() }
 }
 
 ///|
@@ -230,7 +230,7 @@ pub fn SpanBuilder::with_links(
   self : SpanBuilder,
   links : ArrayView[Link],
 ) -> SpanBuilder {
-  { ..self, links: links.to_array() }
+  { ..self, links: links.to_owned() }
 }
 
 ///|
@@ -251,7 +251,7 @@ fn build_noop_span(
     Some(span_context) if span_context.is_valid() => span_context
     _ => @common.SpanContext::empty()
   }
-  let ended = Ref::new(false)
+  let ended = Ref(false)
   let context = propagated_context(parent_context, propagated_span_context)
   Span::from_functions(
     () => propagated_span_context,
@@ -500,10 +500,7 @@ pub fn Span::add_event_with_timestamp(
 /// `set_status(Status::error(...))` if the operation should be marked failed.
 pub fn Span::record_error(self : Span, message : StringView) -> Unit {
   self.add_event("exception", attributes=[
-    @common.KeyValue::new(
-      "exception.message",
-      @common.Value::String(message.to_string()),
-    ),
+    @common.KeyValue::new("exception.message", String(message.to_owned())),
   ])
 }
 

@@ -14,6 +14,6 @@ test "root package exposes common aliases and global helpers" {
   guard baggage.get_with_metadata("user_id") is Some((value, metadata)) else {
     fail("expected baggage entry")
   }
-  assert_eq(value, "42")
-  assert_eq(metadata.as_string(), "source=test")
+  @debug.assert_eq(value, "42")
+  @debug.assert_eq(metadata.as_string(), "source=test")
 }

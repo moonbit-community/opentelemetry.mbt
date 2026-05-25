@@ -1,11 +1,11 @@
 ///|
 /// Trivial tracer provider that always produces non-recording spans.
-pub struct NoopTracerProvider {}
+pub struct NoopTracerProvider {} derive(Default)
 
 ///|
 /// Creates a no-op tracer provider.
 pub fn NoopTracerProvider::new() -> NoopTracerProvider {
-  NoopTracerProvider::{  }
+  Default::default()
 }
 
 ///|

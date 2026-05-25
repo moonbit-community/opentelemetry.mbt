@@ -9,67 +9,62 @@ pub(all) enum SpanFlags {
 ///|
 pub fn SpanFlags::to_enum(self : SpanFlags) -> @protobuf.Enum {
   match self {
-    SpanFlags::SPAN_FLAGS_DO_NOT_USE => 0
-    SpanFlags::SPAN_FLAGS_TRACE_FLAGS_MASK => 255
-    SpanFlags::SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK => 256
-    SpanFlags::SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK => 512
+    SPAN_FLAGS_DO_NOT_USE => 0
+    SPAN_FLAGS_TRACE_FLAGS_MASK => 255
+    SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK => 256
+    SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK => 512
   }
 }
 
 ///|
 pub fn SpanFlags::from_enum(i : @protobuf.Enum) -> SpanFlags {
   match i.0 {
-    0 => SpanFlags::SPAN_FLAGS_DO_NOT_USE
-    255 => SpanFlags::SPAN_FLAGS_TRACE_FLAGS_MASK
-    256 => SpanFlags::SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK
-    512 => SpanFlags::SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK
+    0 => SPAN_FLAGS_DO_NOT_USE
+    255 => SPAN_FLAGS_TRACE_FLAGS_MASK
+    256 => SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK
+    512 => SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK
     _ => Default::default()
   }
 }
 
 ///|
-pub impl Default for SpanFlags with default() -> SpanFlags {
-  SpanFlags::SPAN_FLAGS_DO_NOT_USE
+pub impl Default for SpanFlags with fn default() -> SpanFlags {
+  SPAN_FLAGS_DO_NOT_USE
 }
 
 ///|
-pub impl @protobuf.Sized for SpanFlags with size_of(self : SpanFlags) {
+pub impl @protobuf.Sized for SpanFlags with fn size_of(self : SpanFlags) {
   @protobuf.Sized::size_of(self.to_enum())
 }
 
 ///|
-pub impl @json.FromJson for SpanFlags with from_json(
+pub impl @json.FromJson for SpanFlags with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> SpanFlags raise {
   match json {
-    String("SPAN_FLAGS_DO_NOT_USE") => SpanFlags::SPAN_FLAGS_DO_NOT_USE
-    String("SPAN_FLAGS_TRACE_FLAGS_MASK") =>
-      SpanFlags::SPAN_FLAGS_TRACE_FLAGS_MASK
+    String("SPAN_FLAGS_DO_NOT_USE") => SPAN_FLAGS_DO_NOT_USE
+    String("SPAN_FLAGS_TRACE_FLAGS_MASK") => SPAN_FLAGS_TRACE_FLAGS_MASK
     String("SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK") =>
-      SpanFlags::SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK
+      SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK
     String("SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK") =>
-      SpanFlags::SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK
-    Number(0, ..) => SpanFlags::SPAN_FLAGS_DO_NOT_USE
-    Number(255, ..) => SpanFlags::SPAN_FLAGS_TRACE_FLAGS_MASK
-    Number(256, ..) => SpanFlags::SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK
-    Number(512, ..) => SpanFlags::SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK
-    _ =>
-      raise @json.JsonDecodeError(
-        (path, "Expected a number or string for enum"),
-      )
+      SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK
+    Number(0, ..) => SPAN_FLAGS_DO_NOT_USE
+    Number(255, ..) => SPAN_FLAGS_TRACE_FLAGS_MASK
+    Number(256, ..) => SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK
+    Number(512, ..) => SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK
+    _ => raise JsonDecodeError((path, "Expected a number or string for enum"))
   }
 }
 
 ///|
-pub impl ToJson for SpanFlags with to_json(self : SpanFlags) -> Json {
+pub impl ToJson for SpanFlags with fn to_json(self : SpanFlags) -> Json {
   match self {
-    SpanFlags::SPAN_FLAGS_DO_NOT_USE => "SPAN_FLAGS_DO_NOT_USE"
-    SpanFlags::SPAN_FLAGS_TRACE_FLAGS_MASK => "SPAN_FLAGS_TRACE_FLAGS_MASK"
-    SpanFlags::SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK =>
+    SPAN_FLAGS_DO_NOT_USE => "SPAN_FLAGS_DO_NOT_USE"
+    SPAN_FLAGS_TRACE_FLAGS_MASK => "SPAN_FLAGS_TRACE_FLAGS_MASK"
+    SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK =>
       "SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK"
-    SpanFlags::SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK =>
-      "SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK"
+    SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK => "SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK"
   }
 }
 
@@ -79,7 +74,7 @@ pub(all) struct TracesData {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for TracesData with size_of(self) {
+pub impl @protobuf.Sized for TracesData with fn size_of(self) {
   let mut size = 0U
   for s in self.resource_spans {
     let s = @protobuf.size_of(s)
@@ -89,17 +84,17 @@ pub impl @protobuf.Sized for TracesData with size_of(self) {
 }
 
 ///|
-pub impl Default for TracesData with default() -> TracesData {
-  TracesData::{ resource_spans: [] }
+pub impl Default for TracesData with fn default() -> TracesData {
+  { resource_spans: [] }
 }
 
 ///|
 pub fn TracesData::new(resource_spans : Array[ResourceSpans]) -> TracesData {
-  TracesData::{ resource_spans, }
+  { resource_spans, }
 }
 
 ///|
-pub impl @protobuf.Read for TracesData with read_with_limit(
+pub impl @protobuf.Read for TracesData with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> TracesData raise {
   let msg = TracesData::default()
@@ -121,7 +116,7 @@ pub impl @protobuf.Read for TracesData with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for TracesData with write(
+pub impl @protobuf.Write for TracesData with fn write(
   self : TracesData,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -133,7 +128,7 @@ pub impl @protobuf.Write for TracesData with write(
 }
 
 ///|
-pub impl ToJson for TracesData with to_json(self) {
+pub impl ToJson for TracesData with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.resource_spans != Default::default() {
     json["resourceSpans"] = self.resource_spans.to_json()
@@ -142,26 +137,26 @@ pub impl ToJson for TracesData with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for TracesData with from_json(
+pub impl @json.FromJson for TracesData with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> TracesData raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for TracesData"))
+    raise JsonDecodeError((path, "Expected an object for TracesData"))
   }
   let message = TracesData::default()
   for key, value in obj {
     match (key, value) {
       ("resourceSpans", Array(value)) =>
         message.resource_spans = value.map(v => @json.from_json(v, path~))
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for TracesData with read_with_limit(
+pub impl @protobuf.AsyncRead for TracesData with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> TracesData raise {
   let msg = TracesData::default()
@@ -183,7 +178,7 @@ pub impl @protobuf.AsyncRead for TracesData with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for TracesData with write(
+pub impl @protobuf.AsyncWrite for TracesData with fn write(
   self : TracesData,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -202,7 +197,7 @@ pub(all) struct ResourceSpans {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for ResourceSpans with size_of(self) {
+pub impl @protobuf.Sized for ResourceSpans with fn size_of(self) {
   let mut size = 0U
   size += 1U +
     ({
@@ -222,8 +217,8 @@ pub impl @protobuf.Sized for ResourceSpans with size_of(self) {
 }
 
 ///|
-pub impl Default for ResourceSpans with default() -> ResourceSpans {
-  ResourceSpans::{
+pub impl Default for ResourceSpans with fn default() -> ResourceSpans {
+  {
     resource: @v11.Resource::default(),
     scope_spans: [],
     schema_url: String::default(),
@@ -236,11 +231,11 @@ pub fn ResourceSpans::new(
   scope_spans : Array[ScopeSpans],
   schema_url : String,
 ) -> ResourceSpans {
-  ResourceSpans::{ resource, scope_spans, schema_url }
+  { resource, scope_spans, schema_url }
 }
 
 ///|
-pub impl @protobuf.Read for ResourceSpans with read_with_limit(
+pub impl @protobuf.Read for ResourceSpans with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ResourceSpans raise {
   let msg = ResourceSpans::default()
@@ -265,7 +260,7 @@ pub impl @protobuf.Read for ResourceSpans with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for ResourceSpans with write(
+pub impl @protobuf.Write for ResourceSpans with fn write(
   self : ResourceSpans,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -282,7 +277,7 @@ pub impl @protobuf.Write for ResourceSpans with write(
 }
 
 ///|
-pub impl ToJson for ResourceSpans with to_json(self) {
+pub impl ToJson for ResourceSpans with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.resource != Default::default() {
     json["resource"] = self.resource.to_json()
@@ -297,12 +292,12 @@ pub impl ToJson for ResourceSpans with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for ResourceSpans with from_json(
+pub impl @json.FromJson for ResourceSpans with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> ResourceSpans raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for ResourceSpans"))
+    raise JsonDecodeError((path, "Expected an object for ResourceSpans"))
   }
   let message = ResourceSpans::default()
   for key, value in obj {
@@ -311,14 +306,14 @@ pub impl @json.FromJson for ResourceSpans with from_json(
       ("scopeSpans", Array(value)) =>
         message.scope_spans = value.map(v => @json.from_json(v, path~))
       ("schemaUrl", value) => message.schema_url = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for ResourceSpans with read_with_limit(
+pub impl @protobuf.AsyncRead for ResourceSpans with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ResourceSpans raise {
   let msg = ResourceSpans::default()
@@ -344,7 +339,7 @@ pub impl @protobuf.AsyncRead for ResourceSpans with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for ResourceSpans with write(
+pub impl @protobuf.AsyncWrite for ResourceSpans with fn write(
   self : ResourceSpans,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -368,7 +363,7 @@ pub(all) struct ScopeSpans {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for ScopeSpans with size_of(self) {
+pub impl @protobuf.Sized for ScopeSpans with fn size_of(self) {
   let mut size = 0U
   size += 1U +
     ({
@@ -388,8 +383,8 @@ pub impl @protobuf.Sized for ScopeSpans with size_of(self) {
 }
 
 ///|
-pub impl Default for ScopeSpans with default() -> ScopeSpans {
-  ScopeSpans::{
+pub impl Default for ScopeSpans with fn default() -> ScopeSpans {
+  {
     scope: @v1_dep.InstrumentationScope::default(),
     spans: [],
     schema_url: String::default(),
@@ -402,11 +397,11 @@ pub fn ScopeSpans::new(
   spans : Array[Span],
   schema_url : String,
 ) -> ScopeSpans {
-  ScopeSpans::{ scope, spans, schema_url }
+  { scope, spans, schema_url }
 }
 
 ///|
-pub impl @protobuf.Read for ScopeSpans with read_with_limit(
+pub impl @protobuf.Read for ScopeSpans with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ScopeSpans raise {
   let msg = ScopeSpans::default()
@@ -429,7 +424,7 @@ pub impl @protobuf.Read for ScopeSpans with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for ScopeSpans with write(
+pub impl @protobuf.Write for ScopeSpans with fn write(
   self : ScopeSpans,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -446,7 +441,7 @@ pub impl @protobuf.Write for ScopeSpans with write(
 }
 
 ///|
-pub impl ToJson for ScopeSpans with to_json(self) {
+pub impl ToJson for ScopeSpans with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.scope != Default::default() {
     json["scope"] = self.scope.to_json()
@@ -461,12 +456,12 @@ pub impl ToJson for ScopeSpans with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for ScopeSpans with from_json(
+pub impl @json.FromJson for ScopeSpans with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> ScopeSpans raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for ScopeSpans"))
+    raise JsonDecodeError((path, "Expected an object for ScopeSpans"))
   }
   let message = ScopeSpans::default()
   for key, value in obj {
@@ -475,14 +470,14 @@ pub impl @json.FromJson for ScopeSpans with from_json(
       ("spans", Array(value)) =>
         message.spans = value.map(v => @json.from_json(v, path~))
       ("schemaUrl", value) => message.schema_url = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for ScopeSpans with read_with_limit(
+pub impl @protobuf.AsyncRead for ScopeSpans with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ScopeSpans raise {
   let msg = ScopeSpans::default()
@@ -507,7 +502,7 @@ pub impl @protobuf.AsyncRead for ScopeSpans with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for ScopeSpans with write(
+pub impl @protobuf.AsyncWrite for ScopeSpans with fn write(
   self : ScopeSpans,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -536,72 +531,69 @@ pub(all) enum Span_SpanKind {
 ///|
 pub fn Span_SpanKind::to_enum(self : Span_SpanKind) -> @protobuf.Enum {
   match self {
-    Span_SpanKind::SPAN_KIND_UNSPECIFIED => 0
-    Span_SpanKind::SPAN_KIND_INTERNAL => 1
-    Span_SpanKind::SPAN_KIND_SERVER => 2
-    Span_SpanKind::SPAN_KIND_CLIENT => 3
-    Span_SpanKind::SPAN_KIND_PRODUCER => 4
-    Span_SpanKind::SPAN_KIND_CONSUMER => 5
+    SPAN_KIND_UNSPECIFIED => 0
+    SPAN_KIND_INTERNAL => 1
+    SPAN_KIND_SERVER => 2
+    SPAN_KIND_CLIENT => 3
+    SPAN_KIND_PRODUCER => 4
+    SPAN_KIND_CONSUMER => 5
   }
 }
 
 ///|
 pub fn Span_SpanKind::from_enum(i : @protobuf.Enum) -> Span_SpanKind {
   match i.0 {
-    0 => Span_SpanKind::SPAN_KIND_UNSPECIFIED
-    1 => Span_SpanKind::SPAN_KIND_INTERNAL
-    2 => Span_SpanKind::SPAN_KIND_SERVER
-    3 => Span_SpanKind::SPAN_KIND_CLIENT
-    4 => Span_SpanKind::SPAN_KIND_PRODUCER
-    5 => Span_SpanKind::SPAN_KIND_CONSUMER
+    0 => SPAN_KIND_UNSPECIFIED
+    1 => SPAN_KIND_INTERNAL
+    2 => SPAN_KIND_SERVER
+    3 => SPAN_KIND_CLIENT
+    4 => SPAN_KIND_PRODUCER
+    5 => SPAN_KIND_CONSUMER
     _ => Default::default()
   }
 }
 
 ///|
-pub impl Default for Span_SpanKind with default() -> Span_SpanKind {
-  Span_SpanKind::SPAN_KIND_UNSPECIFIED
+pub impl Default for Span_SpanKind with fn default() -> Span_SpanKind {
+  SPAN_KIND_UNSPECIFIED
 }
 
 ///|
-pub impl @protobuf.Sized for Span_SpanKind with size_of(self : Span_SpanKind) {
+pub impl @protobuf.Sized for Span_SpanKind with fn size_of(self : Span_SpanKind) {
   @protobuf.Sized::size_of(self.to_enum())
 }
 
 ///|
-pub impl @json.FromJson for Span_SpanKind with from_json(
+pub impl @json.FromJson for Span_SpanKind with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> Span_SpanKind raise {
   match json {
-    String("SPAN_KIND_UNSPECIFIED") => Span_SpanKind::SPAN_KIND_UNSPECIFIED
-    String("SPAN_KIND_INTERNAL") => Span_SpanKind::SPAN_KIND_INTERNAL
-    String("SPAN_KIND_SERVER") => Span_SpanKind::SPAN_KIND_SERVER
-    String("SPAN_KIND_CLIENT") => Span_SpanKind::SPAN_KIND_CLIENT
-    String("SPAN_KIND_PRODUCER") => Span_SpanKind::SPAN_KIND_PRODUCER
-    String("SPAN_KIND_CONSUMER") => Span_SpanKind::SPAN_KIND_CONSUMER
-    Number(0, ..) => Span_SpanKind::SPAN_KIND_UNSPECIFIED
-    Number(1, ..) => Span_SpanKind::SPAN_KIND_INTERNAL
-    Number(2, ..) => Span_SpanKind::SPAN_KIND_SERVER
-    Number(3, ..) => Span_SpanKind::SPAN_KIND_CLIENT
-    Number(4, ..) => Span_SpanKind::SPAN_KIND_PRODUCER
-    Number(5, ..) => Span_SpanKind::SPAN_KIND_CONSUMER
-    _ =>
-      raise @json.JsonDecodeError(
-        (path, "Expected a number or string for enum"),
-      )
+    String("SPAN_KIND_UNSPECIFIED") => SPAN_KIND_UNSPECIFIED
+    String("SPAN_KIND_INTERNAL") => SPAN_KIND_INTERNAL
+    String("SPAN_KIND_SERVER") => SPAN_KIND_SERVER
+    String("SPAN_KIND_CLIENT") => SPAN_KIND_CLIENT
+    String("SPAN_KIND_PRODUCER") => SPAN_KIND_PRODUCER
+    String("SPAN_KIND_CONSUMER") => SPAN_KIND_CONSUMER
+    Number(0, ..) => SPAN_KIND_UNSPECIFIED
+    Number(1, ..) => SPAN_KIND_INTERNAL
+    Number(2, ..) => SPAN_KIND_SERVER
+    Number(3, ..) => SPAN_KIND_CLIENT
+    Number(4, ..) => SPAN_KIND_PRODUCER
+    Number(5, ..) => SPAN_KIND_CONSUMER
+    _ => raise JsonDecodeError((path, "Expected a number or string for enum"))
   }
 }
 
 ///|
-pub impl ToJson for Span_SpanKind with to_json(self : Span_SpanKind) -> Json {
+pub impl ToJson for Span_SpanKind with fn to_json(self : Span_SpanKind) -> Json {
   match self {
-    Span_SpanKind::SPAN_KIND_UNSPECIFIED => "SPAN_KIND_UNSPECIFIED"
-    Span_SpanKind::SPAN_KIND_INTERNAL => "SPAN_KIND_INTERNAL"
-    Span_SpanKind::SPAN_KIND_SERVER => "SPAN_KIND_SERVER"
-    Span_SpanKind::SPAN_KIND_CLIENT => "SPAN_KIND_CLIENT"
-    Span_SpanKind::SPAN_KIND_PRODUCER => "SPAN_KIND_PRODUCER"
-    Span_SpanKind::SPAN_KIND_CONSUMER => "SPAN_KIND_CONSUMER"
+    SPAN_KIND_UNSPECIFIED => "SPAN_KIND_UNSPECIFIED"
+    SPAN_KIND_INTERNAL => "SPAN_KIND_INTERNAL"
+    SPAN_KIND_SERVER => "SPAN_KIND_SERVER"
+    SPAN_KIND_CLIENT => "SPAN_KIND_CLIENT"
+    SPAN_KIND_PRODUCER => "SPAN_KIND_PRODUCER"
+    SPAN_KIND_CONSUMER => "SPAN_KIND_CONSUMER"
   }
 }
 
@@ -614,7 +606,7 @@ pub(all) struct Span_Event {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for Span_Event with size_of(self) {
+pub impl @protobuf.Sized for Span_Event with fn size_of(self) {
   let mut size = 0U
   size += 1U + 8U
   size += 1U +
@@ -631,8 +623,8 @@ pub impl @protobuf.Sized for Span_Event with size_of(self) {
 }
 
 ///|
-pub impl Default for Span_Event with default() -> Span_Event {
-  Span_Event::{
+pub impl Default for Span_Event with fn default() -> Span_Event {
+  {
     time_unix_nano: UInt64::default(),
     name: String::default(),
     attributes: [],
@@ -647,11 +639,11 @@ pub fn Span_Event::new(
   attributes : Array[@v1_dep.KeyValue],
   dropped_attributes_count : UInt,
 ) -> Span_Event {
-  Span_Event::{ time_unix_nano, name, attributes, dropped_attributes_count }
+  { time_unix_nano, name, attributes, dropped_attributes_count }
 }
 
 ///|
-pub impl @protobuf.Read for Span_Event with read_with_limit(
+pub impl @protobuf.Read for Span_Event with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Span_Event raise {
   let msg = Span_Event::default()
@@ -677,7 +669,7 @@ pub impl @protobuf.Read for Span_Event with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for Span_Event with write(
+pub impl @protobuf.Write for Span_Event with fn write(
   self : Span_Event,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -695,7 +687,7 @@ pub impl @protobuf.Write for Span_Event with write(
 }
 
 ///|
-pub impl ToJson for Span_Event with to_json(self) {
+pub impl ToJson for Span_Event with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.time_unix_nano != Default::default() {
     json["timeUnixNano"] = self.time_unix_nano.to_json()
@@ -713,12 +705,12 @@ pub impl ToJson for Span_Event with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for Span_Event with from_json(
+pub impl @json.FromJson for Span_Event with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> Span_Event raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for Span_Event"))
+    raise JsonDecodeError((path, "Expected an object for Span_Event"))
   }
   let message = Span_Event::default()
   for key, value in obj {
@@ -730,14 +722,14 @@ pub impl @json.FromJson for Span_Event with from_json(
         message.attributes = value.map(v => @json.from_json(v, path~))
       ("droppedAttributesCount", value) =>
         message.dropped_attributes_count = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for Span_Event with read_with_limit(
+pub impl @protobuf.AsyncRead for Span_Event with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Span_Event raise {
   let msg = Span_Event::default()
@@ -763,7 +755,7 @@ pub impl @protobuf.AsyncRead for Span_Event with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for Span_Event with write(
+pub impl @protobuf.AsyncWrite for Span_Event with fn write(
   self : Span_Event,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -791,7 +783,7 @@ pub(all) struct Span_Link {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for Span_Link with size_of(self) {
+pub impl @protobuf.Sized for Span_Link with fn size_of(self) {
   let mut size = 0U
   size += 1U +
     ({
@@ -818,8 +810,8 @@ pub impl @protobuf.Sized for Span_Link with size_of(self) {
 }
 
 ///|
-pub impl Default for Span_Link with default() -> Span_Link {
-  Span_Link::{
+pub impl Default for Span_Link with fn default() -> Span_Link {
+  {
     trace_id: Bytes::default(),
     span_id: Bytes::default(),
     trace_state: String::default(),
@@ -838,7 +830,7 @@ pub fn Span_Link::new(
   dropped_attributes_count : UInt,
   flags : UInt,
 ) -> Span_Link {
-  Span_Link::{
+  {
     trace_id,
     span_id,
     trace_state,
@@ -849,7 +841,7 @@ pub fn Span_Link::new(
 }
 
 ///|
-pub impl @protobuf.Read for Span_Link with read_with_limit(
+pub impl @protobuf.Read for Span_Link with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Span_Link raise {
   let msg = Span_Link::default()
@@ -877,7 +869,7 @@ pub impl @protobuf.Read for Span_Link with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for Span_Link with write(
+pub impl @protobuf.Write for Span_Link with fn write(
   self : Span_Link,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -899,7 +891,7 @@ pub impl @protobuf.Write for Span_Link with write(
 }
 
 ///|
-pub impl ToJson for Span_Link with to_json(self) {
+pub impl ToJson for Span_Link with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.trace_id != Default::default() {
     json["traceId"] = @protobuf.base64_encode(self.trace_id).to_json()
@@ -923,12 +915,12 @@ pub impl ToJson for Span_Link with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for Span_Link with from_json(
+pub impl @json.FromJson for Span_Link with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> Span_Link raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for Span_Link"))
+    raise JsonDecodeError((path, "Expected an object for Span_Link"))
   }
   let message = Span_Link::default()
   for key, value in obj {
@@ -944,14 +936,14 @@ pub impl @json.FromJson for Span_Link with from_json(
       ("droppedAttributesCount", value) =>
         message.dropped_attributes_count = @json.from_json(value, path~)
       ("flags", value) => message.flags = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for Span_Link with read_with_limit(
+pub impl @protobuf.AsyncRead for Span_Link with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Span_Link raise {
   let msg = Span_Link::default()
@@ -979,7 +971,7 @@ pub impl @protobuf.AsyncRead for Span_Link with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for Span_Link with write(
+pub impl @protobuf.AsyncWrite for Span_Link with fn write(
   self : Span_Link,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -1021,7 +1013,7 @@ pub(all) struct Span {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for Span with size_of(self) {
+pub impl @protobuf.Sized for Span with fn size_of(self) {
   let mut size = 0U
   size += 1U +
     ({
@@ -1076,8 +1068,8 @@ pub impl @protobuf.Sized for Span with size_of(self) {
 }
 
 ///|
-pub impl Default for Span with default() -> Span {
-  Span::{
+pub impl Default for Span with fn default() -> Span {
+  {
     trace_id: Bytes::default(),
     span_id: Bytes::default(),
     trace_state: String::default(),
@@ -1116,7 +1108,7 @@ pub fn Span::new(
   dropped_links_count : UInt,
   status : Status,
 ) -> Span {
-  Span::{
+  {
     trace_id,
     span_id,
     trace_state,
@@ -1137,7 +1129,7 @@ pub fn Span::new(
 }
 
 ///|
-pub impl @protobuf.Read for Span with read_with_limit(
+pub impl @protobuf.Read for Span with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Span raise {
   let msg = Span::default()
@@ -1178,7 +1170,7 @@ pub impl @protobuf.Read for Span with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for Span with write(
+pub impl @protobuf.Write for Span with fn write(
   self : Span,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -1227,7 +1219,7 @@ pub impl @protobuf.Write for Span with write(
 }
 
 ///|
-pub impl ToJson for Span with to_json(self) {
+pub impl ToJson for Span with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.trace_id != Default::default() {
     json["traceId"] = @protobuf.base64_encode(self.trace_id).to_json()
@@ -1281,12 +1273,12 @@ pub impl ToJson for Span with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for Span with from_json(
+pub impl @json.FromJson for Span with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> Span raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for Span"))
+    raise JsonDecodeError((path, "Expected an object for Span"))
   }
   let message = Span::default()
   for key, value in obj {
@@ -1319,14 +1311,14 @@ pub impl @json.FromJson for Span with from_json(
       ("droppedLinksCount", value) =>
         message.dropped_links_count = @json.from_json(value, path~)
       ("status", value) => message.status = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for Span with read_with_limit(
+pub impl @protobuf.AsyncRead for Span with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Span raise {
   let msg = Span::default()
@@ -1376,7 +1368,7 @@ pub impl @protobuf.AsyncRead for Span with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for Span with write(
+pub impl @protobuf.AsyncWrite for Span with fn write(
   self : Span,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -1434,59 +1426,56 @@ pub(all) enum Status_StatusCode {
 ///|
 pub fn Status_StatusCode::to_enum(self : Status_StatusCode) -> @protobuf.Enum {
   match self {
-    Status_StatusCode::STATUS_CODE_UNSET => 0
-    Status_StatusCode::STATUS_CODE_OK => 1
-    Status_StatusCode::STATUS_CODE_ERROR => 2
+    STATUS_CODE_UNSET => 0
+    STATUS_CODE_OK => 1
+    STATUS_CODE_ERROR => 2
   }
 }
 
 ///|
 pub fn Status_StatusCode::from_enum(i : @protobuf.Enum) -> Status_StatusCode {
   match i.0 {
-    0 => Status_StatusCode::STATUS_CODE_UNSET
-    1 => Status_StatusCode::STATUS_CODE_OK
-    2 => Status_StatusCode::STATUS_CODE_ERROR
+    0 => STATUS_CODE_UNSET
+    1 => STATUS_CODE_OK
+    2 => STATUS_CODE_ERROR
     _ => Default::default()
   }
 }
 
 ///|
-pub impl Default for Status_StatusCode with default() -> Status_StatusCode {
-  Status_StatusCode::STATUS_CODE_UNSET
+pub impl Default for Status_StatusCode with fn default() -> Status_StatusCode {
+  STATUS_CODE_UNSET
 }
 
 ///|
-pub impl @protobuf.Sized for Status_StatusCode with size_of(
+pub impl @protobuf.Sized for Status_StatusCode with fn size_of(
   self : Status_StatusCode,
 ) {
   @protobuf.Sized::size_of(self.to_enum())
 }
 
 ///|
-pub impl @json.FromJson for Status_StatusCode with from_json(
+pub impl @json.FromJson for Status_StatusCode with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> Status_StatusCode raise {
   match json {
-    String("STATUS_CODE_UNSET") => Status_StatusCode::STATUS_CODE_UNSET
-    String("STATUS_CODE_OK") => Status_StatusCode::STATUS_CODE_OK
-    String("STATUS_CODE_ERROR") => Status_StatusCode::STATUS_CODE_ERROR
-    Number(0, ..) => Status_StatusCode::STATUS_CODE_UNSET
-    Number(1, ..) => Status_StatusCode::STATUS_CODE_OK
-    Number(2, ..) => Status_StatusCode::STATUS_CODE_ERROR
-    _ =>
-      raise @json.JsonDecodeError(
-        (path, "Expected a number or string for enum"),
-      )
+    String("STATUS_CODE_UNSET") => STATUS_CODE_UNSET
+    String("STATUS_CODE_OK") => STATUS_CODE_OK
+    String("STATUS_CODE_ERROR") => STATUS_CODE_ERROR
+    Number(0, ..) => STATUS_CODE_UNSET
+    Number(1, ..) => STATUS_CODE_OK
+    Number(2, ..) => STATUS_CODE_ERROR
+    _ => raise JsonDecodeError((path, "Expected a number or string for enum"))
   }
 }
 
 ///|
-pub impl ToJson for Status_StatusCode with to_json(self : Status_StatusCode) -> Json {
+pub impl ToJson for Status_StatusCode with fn to_json(self : Status_StatusCode) -> Json {
   match self {
-    Status_StatusCode::STATUS_CODE_UNSET => "STATUS_CODE_UNSET"
-    Status_StatusCode::STATUS_CODE_OK => "STATUS_CODE_OK"
-    Status_StatusCode::STATUS_CODE_ERROR => "STATUS_CODE_ERROR"
+    STATUS_CODE_UNSET => "STATUS_CODE_UNSET"
+    STATUS_CODE_OK => "STATUS_CODE_OK"
+    STATUS_CODE_ERROR => "STATUS_CODE_ERROR"
   }
 }
 
@@ -1497,7 +1486,7 @@ pub(all) struct Status {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for Status with size_of(self) {
+pub impl @protobuf.Sized for Status with fn size_of(self) {
   let mut size = 0U
   size += 1U +
     ({
@@ -1509,17 +1498,17 @@ pub impl @protobuf.Sized for Status with size_of(self) {
 }
 
 ///|
-pub impl Default for Status with default() -> Status {
-  Status::{ message: String::default(), code: Status_StatusCode::default() }
+pub impl Default for Status with fn default() -> Status {
+  { message: String::default(), code: Status_StatusCode::default() }
 }
 
 ///|
 pub fn Status::new(message : String, code : Status_StatusCode) -> Status {
-  Status::{ message, code }
+  { message, code }
 }
 
 ///|
-pub impl @protobuf.Read for Status with read_with_limit(
+pub impl @protobuf.Read for Status with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Status raise {
   let msg = Status::default()
@@ -1542,7 +1531,7 @@ pub impl @protobuf.Read for Status with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for Status with write(
+pub impl @protobuf.Write for Status with fn write(
   self : Status,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -1553,7 +1542,7 @@ pub impl @protobuf.Write for Status with write(
 }
 
 ///|
-pub impl ToJson for Status with to_json(self) {
+pub impl ToJson for Status with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.message != Default::default() {
     json["message"] = self.message.to_json()
@@ -1565,26 +1554,26 @@ pub impl ToJson for Status with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for Status with from_json(
+pub impl @json.FromJson for Status with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> Status raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for Status"))
+    raise JsonDecodeError((path, "Expected an object for Status"))
   }
   let message = Status::default()
   for key, value in obj {
     match (key, value) {
       ("message", value) => message.message = @json.from_json(value, path~)
       ("code", value) => message.code = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for Status with read_with_limit(
+pub impl @protobuf.AsyncRead for Status with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Status raise {
   let msg = Status::default()
@@ -1607,7 +1596,7 @@ pub impl @protobuf.AsyncRead for Status with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for Status with write(
+pub impl @protobuf.AsyncWrite for Status with fn write(
   self : Status,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {

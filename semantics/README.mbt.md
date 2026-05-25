@@ -24,7 +24,7 @@ metric name:
 ```mbt check
 ///|
 fn _trace_attr_example() -> @sdk.KeyValue {
-  @sdk.KeyValue::new(@trace.HTTP_REQUEST_METHOD, @sdk.Value::String("GET"))
+  @sdk.KeyValue::new(@trace.HTTP_REQUEST_METHOD, String("GET"))
 }
 ```
 

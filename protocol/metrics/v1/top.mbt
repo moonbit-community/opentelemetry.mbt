@@ -10,9 +10,9 @@ pub fn AggregationTemporality::to_enum(
   self : AggregationTemporality,
 ) -> @protobuf.Enum {
   match self {
-    AggregationTemporality::AGGREGATION_TEMPORALITY_UNSPECIFIED => 0
-    AggregationTemporality::AGGREGATION_TEMPORALITY_DELTA => 1
-    AggregationTemporality::AGGREGATION_TEMPORALITY_CUMULATIVE => 2
+    AGGREGATION_TEMPORALITY_UNSPECIFIED => 0
+    AGGREGATION_TEMPORALITY_DELTA => 1
+    AGGREGATION_TEMPORALITY_CUMULATIVE => 2
   }
 }
 
@@ -21,58 +21,51 @@ pub fn AggregationTemporality::from_enum(
   i : @protobuf.Enum,
 ) -> AggregationTemporality {
   match i.0 {
-    0 => AggregationTemporality::AGGREGATION_TEMPORALITY_UNSPECIFIED
-    1 => AggregationTemporality::AGGREGATION_TEMPORALITY_DELTA
-    2 => AggregationTemporality::AGGREGATION_TEMPORALITY_CUMULATIVE
+    0 => AGGREGATION_TEMPORALITY_UNSPECIFIED
+    1 => AGGREGATION_TEMPORALITY_DELTA
+    2 => AGGREGATION_TEMPORALITY_CUMULATIVE
     _ => Default::default()
   }
 }
 
 ///|
-pub impl Default for AggregationTemporality with default() -> AggregationTemporality {
-  AggregationTemporality::AGGREGATION_TEMPORALITY_UNSPECIFIED
+pub impl Default for AggregationTemporality with fn default() -> AggregationTemporality {
+  AGGREGATION_TEMPORALITY_UNSPECIFIED
 }
 
 ///|
-pub impl @protobuf.Sized for AggregationTemporality with size_of(
+pub impl @protobuf.Sized for AggregationTemporality with fn size_of(
   self : AggregationTemporality,
 ) {
   @protobuf.Sized::size_of(self.to_enum())
 }
 
 ///|
-pub impl @json.FromJson for AggregationTemporality with from_json(
+pub impl @json.FromJson for AggregationTemporality with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> AggregationTemporality raise {
   match json {
     String("AGGREGATION_TEMPORALITY_UNSPECIFIED") =>
-      AggregationTemporality::AGGREGATION_TEMPORALITY_UNSPECIFIED
-    String("AGGREGATION_TEMPORALITY_DELTA") =>
-      AggregationTemporality::AGGREGATION_TEMPORALITY_DELTA
+      AGGREGATION_TEMPORALITY_UNSPECIFIED
+    String("AGGREGATION_TEMPORALITY_DELTA") => AGGREGATION_TEMPORALITY_DELTA
     String("AGGREGATION_TEMPORALITY_CUMULATIVE") =>
-      AggregationTemporality::AGGREGATION_TEMPORALITY_CUMULATIVE
-    Number(0, ..) => AggregationTemporality::AGGREGATION_TEMPORALITY_UNSPECIFIED
-    Number(1, ..) => AggregationTemporality::AGGREGATION_TEMPORALITY_DELTA
-    Number(2, ..) => AggregationTemporality::AGGREGATION_TEMPORALITY_CUMULATIVE
-    _ =>
-      raise @json.JsonDecodeError(
-        (path, "Expected a number or string for enum"),
-      )
+      AGGREGATION_TEMPORALITY_CUMULATIVE
+    Number(0, ..) => AGGREGATION_TEMPORALITY_UNSPECIFIED
+    Number(1, ..) => AGGREGATION_TEMPORALITY_DELTA
+    Number(2, ..) => AGGREGATION_TEMPORALITY_CUMULATIVE
+    _ => raise JsonDecodeError((path, "Expected a number or string for enum"))
   }
 }
 
 ///|
-pub impl ToJson for AggregationTemporality with to_json(
+pub impl ToJson for AggregationTemporality with fn to_json(
   self : AggregationTemporality,
 ) -> Json {
   match self {
-    AggregationTemporality::AGGREGATION_TEMPORALITY_UNSPECIFIED =>
-      "AGGREGATION_TEMPORALITY_UNSPECIFIED"
-    AggregationTemporality::AGGREGATION_TEMPORALITY_DELTA =>
-      "AGGREGATION_TEMPORALITY_DELTA"
-    AggregationTemporality::AGGREGATION_TEMPORALITY_CUMULATIVE =>
-      "AGGREGATION_TEMPORALITY_CUMULATIVE"
+    AGGREGATION_TEMPORALITY_UNSPECIFIED => "AGGREGATION_TEMPORALITY_UNSPECIFIED"
+    AGGREGATION_TEMPORALITY_DELTA => "AGGREGATION_TEMPORALITY_DELTA"
+    AGGREGATION_TEMPORALITY_CUMULATIVE => "AGGREGATION_TEMPORALITY_CUMULATIVE"
   }
 }
 
@@ -85,54 +78,52 @@ pub(all) enum DataPointFlags {
 ///|
 pub fn DataPointFlags::to_enum(self : DataPointFlags) -> @protobuf.Enum {
   match self {
-    DataPointFlags::DATA_POINT_FLAGS_DO_NOT_USE => 0
-    DataPointFlags::DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK => 1
+    DATA_POINT_FLAGS_DO_NOT_USE => 0
+    DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK => 1
   }
 }
 
 ///|
 pub fn DataPointFlags::from_enum(i : @protobuf.Enum) -> DataPointFlags {
   match i.0 {
-    0 => DataPointFlags::DATA_POINT_FLAGS_DO_NOT_USE
-    1 => DataPointFlags::DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK
+    0 => DATA_POINT_FLAGS_DO_NOT_USE
+    1 => DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK
     _ => Default::default()
   }
 }
 
 ///|
-pub impl Default for DataPointFlags with default() -> DataPointFlags {
-  DataPointFlags::DATA_POINT_FLAGS_DO_NOT_USE
+pub impl Default for DataPointFlags with fn default() -> DataPointFlags {
+  DATA_POINT_FLAGS_DO_NOT_USE
 }
 
 ///|
-pub impl @protobuf.Sized for DataPointFlags with size_of(self : DataPointFlags) {
+pub impl @protobuf.Sized for DataPointFlags with fn size_of(
+  self : DataPointFlags,
+) {
   @protobuf.Sized::size_of(self.to_enum())
 }
 
 ///|
-pub impl @json.FromJson for DataPointFlags with from_json(
+pub impl @json.FromJson for DataPointFlags with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> DataPointFlags raise {
   match json {
-    String("DATA_POINT_FLAGS_DO_NOT_USE") =>
-      DataPointFlags::DATA_POINT_FLAGS_DO_NOT_USE
+    String("DATA_POINT_FLAGS_DO_NOT_USE") => DATA_POINT_FLAGS_DO_NOT_USE
     String("DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK") =>
-      DataPointFlags::DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK
-    Number(0, ..) => DataPointFlags::DATA_POINT_FLAGS_DO_NOT_USE
-    Number(1, ..) => DataPointFlags::DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK
-    _ =>
-      raise @json.JsonDecodeError(
-        (path, "Expected a number or string for enum"),
-      )
+      DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK
+    Number(0, ..) => DATA_POINT_FLAGS_DO_NOT_USE
+    Number(1, ..) => DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK
+    _ => raise JsonDecodeError((path, "Expected a number or string for enum"))
   }
 }
 
 ///|
-pub impl ToJson for DataPointFlags with to_json(self : DataPointFlags) -> Json {
+pub impl ToJson for DataPointFlags with fn to_json(self : DataPointFlags) -> Json {
   match self {
-    DataPointFlags::DATA_POINT_FLAGS_DO_NOT_USE => "DATA_POINT_FLAGS_DO_NOT_USE"
-    DataPointFlags::DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK =>
+    DATA_POINT_FLAGS_DO_NOT_USE => "DATA_POINT_FLAGS_DO_NOT_USE"
+    DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK =>
       "DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK"
   }
 }
@@ -143,7 +134,7 @@ pub(all) struct MetricsData {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for MetricsData with size_of(self) {
+pub impl @protobuf.Sized for MetricsData with fn size_of(self) {
   let mut size = 0U
   for s in self.resource_metrics {
     let s = @protobuf.size_of(s)
@@ -153,19 +144,19 @@ pub impl @protobuf.Sized for MetricsData with size_of(self) {
 }
 
 ///|
-pub impl Default for MetricsData with default() -> MetricsData {
-  MetricsData::{ resource_metrics: [] }
+pub impl Default for MetricsData with fn default() -> MetricsData {
+  { resource_metrics: [] }
 }
 
 ///|
 pub fn MetricsData::new(
   resource_metrics : Array[ResourceMetrics],
 ) -> MetricsData {
-  MetricsData::{ resource_metrics, }
+  { resource_metrics, }
 }
 
 ///|
-pub impl @protobuf.Read for MetricsData with read_with_limit(
+pub impl @protobuf.Read for MetricsData with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> MetricsData raise {
   let msg = MetricsData::default()
@@ -187,7 +178,7 @@ pub impl @protobuf.Read for MetricsData with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for MetricsData with write(
+pub impl @protobuf.Write for MetricsData with fn write(
   self : MetricsData,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -199,7 +190,7 @@ pub impl @protobuf.Write for MetricsData with write(
 }
 
 ///|
-pub impl ToJson for MetricsData with to_json(self) {
+pub impl ToJson for MetricsData with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.resource_metrics != Default::default() {
     json["resourceMetrics"] = self.resource_metrics.to_json()
@@ -208,26 +199,26 @@ pub impl ToJson for MetricsData with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for MetricsData with from_json(
+pub impl @json.FromJson for MetricsData with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> MetricsData raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for MetricsData"))
+    raise JsonDecodeError((path, "Expected an object for MetricsData"))
   }
   let message = MetricsData::default()
   for key, value in obj {
     match (key, value) {
       ("resourceMetrics", Array(value)) =>
         message.resource_metrics = value.map(v => @json.from_json(v, path~))
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for MetricsData with read_with_limit(
+pub impl @protobuf.AsyncRead for MetricsData with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> MetricsData raise {
   let msg = MetricsData::default()
@@ -249,7 +240,7 @@ pub impl @protobuf.AsyncRead for MetricsData with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for MetricsData with write(
+pub impl @protobuf.AsyncWrite for MetricsData with fn write(
   self : MetricsData,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -268,7 +259,7 @@ pub(all) struct ResourceMetrics {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for ResourceMetrics with size_of(self) {
+pub impl @protobuf.Sized for ResourceMetrics with fn size_of(self) {
   let mut size = 0U
   size += 1U +
     ({
@@ -288,8 +279,8 @@ pub impl @protobuf.Sized for ResourceMetrics with size_of(self) {
 }
 
 ///|
-pub impl Default for ResourceMetrics with default() -> ResourceMetrics {
-  ResourceMetrics::{
+pub impl Default for ResourceMetrics with fn default() -> ResourceMetrics {
+  {
     resource: @v11.Resource::default(),
     scope_metrics: [],
     schema_url: String::default(),
@@ -302,11 +293,11 @@ pub fn ResourceMetrics::new(
   scope_metrics : Array[ScopeMetrics],
   schema_url : String,
 ) -> ResourceMetrics {
-  ResourceMetrics::{ resource, scope_metrics, schema_url }
+  { resource, scope_metrics, schema_url }
 }
 
 ///|
-pub impl @protobuf.Read for ResourceMetrics with read_with_limit(
+pub impl @protobuf.Read for ResourceMetrics with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ResourceMetrics raise {
   let msg = ResourceMetrics::default()
@@ -331,7 +322,7 @@ pub impl @protobuf.Read for ResourceMetrics with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for ResourceMetrics with write(
+pub impl @protobuf.Write for ResourceMetrics with fn write(
   self : ResourceMetrics,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -348,7 +339,7 @@ pub impl @protobuf.Write for ResourceMetrics with write(
 }
 
 ///|
-pub impl ToJson for ResourceMetrics with to_json(self) {
+pub impl ToJson for ResourceMetrics with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.resource != Default::default() {
     json["resource"] = self.resource.to_json()
@@ -363,14 +354,12 @@ pub impl ToJson for ResourceMetrics with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for ResourceMetrics with from_json(
+pub impl @json.FromJson for ResourceMetrics with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> ResourceMetrics raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError(
-      (path, "Expected an object for ResourceMetrics"),
-    )
+    raise JsonDecodeError((path, "Expected an object for ResourceMetrics"))
   }
   let message = ResourceMetrics::default()
   for key, value in obj {
@@ -379,14 +368,14 @@ pub impl @json.FromJson for ResourceMetrics with from_json(
       ("scopeMetrics", Array(value)) =>
         message.scope_metrics = value.map(v => @json.from_json(v, path~))
       ("schemaUrl", value) => message.schema_url = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for ResourceMetrics with read_with_limit(
+pub impl @protobuf.AsyncRead for ResourceMetrics with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ResourceMetrics raise {
   let msg = ResourceMetrics::default()
@@ -412,7 +401,7 @@ pub impl @protobuf.AsyncRead for ResourceMetrics with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for ResourceMetrics with write(
+pub impl @protobuf.AsyncWrite for ResourceMetrics with fn write(
   self : ResourceMetrics,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -436,7 +425,7 @@ pub(all) struct ScopeMetrics {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for ScopeMetrics with size_of(self) {
+pub impl @protobuf.Sized for ScopeMetrics with fn size_of(self) {
   let mut size = 0U
   size += 1U +
     ({
@@ -456,8 +445,8 @@ pub impl @protobuf.Sized for ScopeMetrics with size_of(self) {
 }
 
 ///|
-pub impl Default for ScopeMetrics with default() -> ScopeMetrics {
-  ScopeMetrics::{
+pub impl Default for ScopeMetrics with fn default() -> ScopeMetrics {
+  {
     scope: @v1_dep.InstrumentationScope::default(),
     metrics: [],
     schema_url: String::default(),
@@ -470,11 +459,11 @@ pub fn ScopeMetrics::new(
   metrics : Array[Metric],
   schema_url : String,
 ) -> ScopeMetrics {
-  ScopeMetrics::{ scope, metrics, schema_url }
+  { scope, metrics, schema_url }
 }
 
 ///|
-pub impl @protobuf.Read for ScopeMetrics with read_with_limit(
+pub impl @protobuf.Read for ScopeMetrics with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ScopeMetrics raise {
   let msg = ScopeMetrics::default()
@@ -498,7 +487,7 @@ pub impl @protobuf.Read for ScopeMetrics with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for ScopeMetrics with write(
+pub impl @protobuf.Write for ScopeMetrics with fn write(
   self : ScopeMetrics,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -515,7 +504,7 @@ pub impl @protobuf.Write for ScopeMetrics with write(
 }
 
 ///|
-pub impl ToJson for ScopeMetrics with to_json(self) {
+pub impl ToJson for ScopeMetrics with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.scope != Default::default() {
     json["scope"] = self.scope.to_json()
@@ -530,12 +519,12 @@ pub impl ToJson for ScopeMetrics with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for ScopeMetrics with from_json(
+pub impl @json.FromJson for ScopeMetrics with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> ScopeMetrics raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for ScopeMetrics"))
+    raise JsonDecodeError((path, "Expected an object for ScopeMetrics"))
   }
   let message = ScopeMetrics::default()
   for key, value in obj {
@@ -544,14 +533,14 @@ pub impl @json.FromJson for ScopeMetrics with from_json(
       ("metrics", Array(value)) =>
         message.metrics = value.map(v => @json.from_json(v, path~))
       ("schemaUrl", value) => message.schema_url = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for ScopeMetrics with read_with_limit(
+pub impl @protobuf.AsyncRead for ScopeMetrics with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ScopeMetrics raise {
   let msg = ScopeMetrics::default()
@@ -576,7 +565,7 @@ pub impl @protobuf.AsyncRead for ScopeMetrics with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for ScopeMetrics with write(
+pub impl @protobuf.AsyncWrite for ScopeMetrics with fn write(
   self : ScopeMetrics,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -612,12 +601,12 @@ pub(all) enum Metric_Data {
 } derive(Eq)
 
 ///|
-pub impl Default for Metric_Data with default() -> Metric_Data {
+pub impl Default for Metric_Data with fn default() -> Metric_Data {
   NotSet
 }
 
 ///|
-pub impl @json.FromJson for Metric_Data with from_json(
+pub impl @json.FromJson for Metric_Data with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> Metric_Data raise {
@@ -646,23 +635,23 @@ pub impl @json.FromJson for Metric_Data with from_json(
   } noraise {
     v => return v
   }
-  Metric_Data::NotSet
+  NotSet
 }
 
 ///|
-pub impl ToJson for Metric_Data with to_json(self : Metric_Data) -> Json {
+pub impl ToJson for Metric_Data with fn to_json(self : Metric_Data) -> Json {
   match self {
-    Metric_Data::Gauge(v) => v.to_json()
-    Metric_Data::Sum(v) => v.to_json()
-    Metric_Data::Histogram(v) => v.to_json()
-    Metric_Data::ExponentialHistogram(v) => v.to_json()
-    Metric_Data::Summary(v) => v.to_json()
-    Metric_Data::NotSet => Json::null()
+    Gauge(v) => v.to_json()
+    Sum(v) => v.to_json()
+    Histogram(v) => v.to_json()
+    ExponentialHistogram(v) => v.to_json()
+    Summary(v) => v.to_json()
+    NotSet => Json::null()
   }
 }
 
 ///|
-pub impl @protobuf.Sized for Metric with size_of(self) {
+pub impl @protobuf.Sized for Metric with fn size_of(self) {
   let mut size = 0U
   size += 1U +
     ({
@@ -720,13 +709,13 @@ pub impl @protobuf.Sized for Metric with size_of(self) {
 }
 
 ///|
-pub impl Default for Metric with default() -> Metric {
-  Metric::{
+pub impl Default for Metric with fn default() -> Metric {
+  {
     name: String::default(),
     description: String::default(),
     unit: String::default(),
     metadata: [],
-    data: Metric_Data::NotSet,
+    data: NotSet,
   }
 }
 
@@ -736,13 +725,13 @@ pub fn Metric::new(
   description : String,
   unit : String,
   metadata : Array[@v1_dep.KeyValue],
-  data? : Metric_Data = Metric_Data::NotSet,
+  data? : Metric_Data = NotSet,
 ) -> Metric {
-  Metric::{ name, description, unit, metadata, data }
+  { name, description, unit, metadata, data }
 }
 
 ///|
-pub impl @protobuf.Read for Metric with read_with_limit(
+pub impl @protobuf.Read for Metric with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Metric raise {
   let msg = Metric::default()
@@ -757,20 +746,16 @@ pub impl @protobuf.Read for Metric with read_with_limit(
             (reader |> @protobuf.read_message() : @v1_dep.KeyValue),
           )
         (5, _) =>
-          msg.data = (reader |> @protobuf.read_message() : Gauge)
-            |> Metric_Data::Gauge
-        (7, _) =>
-          msg.data = (reader |> @protobuf.read_message() : Sum)
-            |> Metric_Data::Sum
+          msg.data = (reader |> @protobuf.read_message() : Gauge) |> Gauge
+        (7, _) => msg.data = (reader |> @protobuf.read_message() : Sum) |> Sum
         (9, _) =>
           msg.data = (reader |> @protobuf.read_message() : Histogram)
-            |> Metric_Data::Histogram
+            |> Histogram
         (10, _) =>
           msg.data = (reader |> @protobuf.read_message() : ExponentialHistogram)
-            |> Metric_Data::ExponentialHistogram
+            |> ExponentialHistogram
         (11, _) =>
-          msg.data = (reader |> @protobuf.read_message() : Summary)
-            |> Metric_Data::Summary
+          msg.data = (reader |> @protobuf.read_message() : Summary) |> Summary
         (_, wire) => reader |> @protobuf.read_unknown(wire)
       }
     }
@@ -782,7 +767,7 @@ pub impl @protobuf.Read for Metric with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for Metric with write(
+pub impl @protobuf.Write for Metric with fn write(
   self : Metric,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -798,37 +783,37 @@ pub impl @protobuf.Write for Metric with write(
     @protobuf.Write::write(item, writer)
   }
   match self.data {
-    Metric_Data::Gauge(v) => {
+    Gauge(v) => {
       writer |> @protobuf.write_varint(42UL)
       writer |> @protobuf.write_uint32(@protobuf.size_of(v))
       @protobuf.Write::write(v, writer)
     }
-    Metric_Data::Sum(v) => {
+    Sum(v) => {
       writer |> @protobuf.write_varint(58UL)
       writer |> @protobuf.write_uint32(@protobuf.size_of(v))
       @protobuf.Write::write(v, writer)
     }
-    Metric_Data::Histogram(v) => {
+    Histogram(v) => {
       writer |> @protobuf.write_varint(74UL)
       writer |> @protobuf.write_uint32(@protobuf.size_of(v))
       @protobuf.Write::write(v, writer)
     }
-    Metric_Data::ExponentialHistogram(v) => {
+    ExponentialHistogram(v) => {
       writer |> @protobuf.write_varint(82UL)
       writer |> @protobuf.write_uint32(@protobuf.size_of(v))
       @protobuf.Write::write(v, writer)
     }
-    Metric_Data::Summary(v) => {
+    Summary(v) => {
       writer |> @protobuf.write_varint(90UL)
       writer |> @protobuf.write_uint32(@protobuf.size_of(v))
       @protobuf.Write::write(v, writer)
     }
-    Metric_Data::NotSet => ()
+    NotSet => ()
   }
 }
 
 ///|
-pub impl ToJson for Metric with to_json(self) {
+pub impl ToJson for Metric with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.name != Default::default() {
     json["name"] = self.name.to_json()
@@ -854,12 +839,12 @@ pub impl ToJson for Metric with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for Metric with from_json(
+pub impl @json.FromJson for Metric with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> Metric raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for Metric"))
+    raise JsonDecodeError((path, "Expected an object for Metric"))
   }
   let message = Metric::default()
   for key, value in obj {
@@ -876,14 +861,14 @@ pub impl @json.FromJson for Metric with from_json(
       ("exponentialHistogram", value) =>
         message.data = @json.from_json(value, path~)
       ("summary", value) => message.data = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for Metric with read_with_limit(
+pub impl @protobuf.AsyncRead for Metric with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Metric raise {
   let msg = Metric::default()
@@ -898,21 +883,19 @@ pub impl @protobuf.AsyncRead for Metric with read_with_limit(
             (reader |> @protobuf.async_read_message() : @v1_dep.KeyValue),
           )
         (5, _) =>
-          msg.data = (reader |> @protobuf.async_read_message() : Gauge)
-            |> Metric_Data::Gauge
+          msg.data = (reader |> @protobuf.async_read_message() : Gauge) |> Gauge
         (7, _) =>
-          msg.data = (reader |> @protobuf.async_read_message() : Sum)
-            |> Metric_Data::Sum
+          msg.data = (reader |> @protobuf.async_read_message() : Sum) |> Sum
         (9, _) =>
           msg.data = (reader |> @protobuf.async_read_message() : Histogram)
-            |> Metric_Data::Histogram
+            |> Histogram
         (10, _) =>
           msg.data = (
               reader |> @protobuf.async_read_message() : ExponentialHistogram)
-            |> Metric_Data::ExponentialHistogram
+            |> ExponentialHistogram
         (11, _) =>
           msg.data = (reader |> @protobuf.async_read_message() : Summary)
-            |> Metric_Data::Summary
+            |> Summary
         (_, wire) => reader |> @protobuf.async_read_unknown(wire)
       }
     }
@@ -924,7 +907,7 @@ pub impl @protobuf.AsyncRead for Metric with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for Metric with write(
+pub impl @protobuf.AsyncWrite for Metric with fn write(
   self : Metric,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -940,32 +923,32 @@ pub impl @protobuf.AsyncWrite for Metric with write(
     @protobuf.AsyncWrite::write(item, writer)
   }
   match self.data {
-    Metric_Data::Gauge(v) => {
+    Gauge(v) => {
       writer |> @protobuf.async_write_varint(42UL)
       writer |> @protobuf.async_write_uint32(@protobuf.size_of(v))
       @protobuf.AsyncWrite::write(v, writer)
     }
-    Metric_Data::Sum(v) => {
+    Sum(v) => {
       writer |> @protobuf.async_write_varint(58UL)
       writer |> @protobuf.async_write_uint32(@protobuf.size_of(v))
       @protobuf.AsyncWrite::write(v, writer)
     }
-    Metric_Data::Histogram(v) => {
+    Histogram(v) => {
       writer |> @protobuf.async_write_varint(74UL)
       writer |> @protobuf.async_write_uint32(@protobuf.size_of(v))
       @protobuf.AsyncWrite::write(v, writer)
     }
-    Metric_Data::ExponentialHistogram(v) => {
+    ExponentialHistogram(v) => {
       writer |> @protobuf.async_write_varint(82UL)
       writer |> @protobuf.async_write_uint32(@protobuf.size_of(v))
       @protobuf.AsyncWrite::write(v, writer)
     }
-    Metric_Data::Summary(v) => {
+    Summary(v) => {
       writer |> @protobuf.async_write_varint(90UL)
       writer |> @protobuf.async_write_uint32(@protobuf.size_of(v))
       @protobuf.AsyncWrite::write(v, writer)
     }
-    Metric_Data::NotSet => ()
+    NotSet => ()
   }
 }
 
@@ -975,7 +958,7 @@ pub(all) struct Gauge {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for Gauge with size_of(self) {
+pub impl @protobuf.Sized for Gauge with fn size_of(self) {
   let mut size = 0U
   for s in self.data_points {
     let s = @protobuf.size_of(s)
@@ -985,17 +968,17 @@ pub impl @protobuf.Sized for Gauge with size_of(self) {
 }
 
 ///|
-pub impl Default for Gauge with default() -> Gauge {
-  Gauge::{ data_points: [] }
+pub impl Default for Gauge with fn default() -> Gauge {
+  { data_points: [] }
 }
 
 ///|
 pub fn Gauge::new(data_points : Array[NumberDataPoint]) -> Gauge {
-  Gauge::{ data_points, }
+  { data_points, }
 }
 
 ///|
-pub impl @protobuf.Read for Gauge with read_with_limit(
+pub impl @protobuf.Read for Gauge with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Gauge raise {
   let msg = Gauge::default()
@@ -1017,7 +1000,7 @@ pub impl @protobuf.Read for Gauge with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for Gauge with write(
+pub impl @protobuf.Write for Gauge with fn write(
   self : Gauge,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -1029,7 +1012,7 @@ pub impl @protobuf.Write for Gauge with write(
 }
 
 ///|
-pub impl ToJson for Gauge with to_json(self) {
+pub impl ToJson for Gauge with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.data_points != Default::default() {
     json["dataPoints"] = self.data_points.to_json()
@@ -1038,26 +1021,26 @@ pub impl ToJson for Gauge with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for Gauge with from_json(
+pub impl @json.FromJson for Gauge with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> Gauge raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for Gauge"))
+    raise JsonDecodeError((path, "Expected an object for Gauge"))
   }
   let message = Gauge::default()
   for key, value in obj {
     match (key, value) {
       ("dataPoints", Array(value)) =>
         message.data_points = value.map(v => @json.from_json(v, path~))
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for Gauge with read_with_limit(
+pub impl @protobuf.AsyncRead for Gauge with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Gauge raise {
   let msg = Gauge::default()
@@ -1079,7 +1062,7 @@ pub impl @protobuf.AsyncRead for Gauge with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for Gauge with write(
+pub impl @protobuf.AsyncWrite for Gauge with fn write(
   self : Gauge,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -1098,7 +1081,7 @@ pub(all) struct Sum {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for Sum with size_of(self) {
+pub impl @protobuf.Sized for Sum with fn size_of(self) {
   let mut size = 0U
   for s in self.data_points {
     let s = @protobuf.size_of(s)
@@ -1110,8 +1093,8 @@ pub impl @protobuf.Sized for Sum with size_of(self) {
 }
 
 ///|
-pub impl Default for Sum with default() -> Sum {
-  Sum::{
+pub impl Default for Sum with fn default() -> Sum {
+  {
     data_points: [],
     aggregation_temporality: AggregationTemporality::default(),
     is_monotonic: Bool::default(),
@@ -1124,11 +1107,11 @@ pub fn Sum::new(
   aggregation_temporality : AggregationTemporality,
   is_monotonic : Bool,
 ) -> Sum {
-  Sum::{ data_points, aggregation_temporality, is_monotonic }
+  { data_points, aggregation_temporality, is_monotonic }
 }
 
 ///|
-pub impl @protobuf.Read for Sum with read_with_limit(
+pub impl @protobuf.Read for Sum with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Sum raise {
   let msg = Sum::default()
@@ -1155,7 +1138,7 @@ pub impl @protobuf.Read for Sum with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for Sum with write(
+pub impl @protobuf.Write for Sum with fn write(
   self : Sum,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -1171,7 +1154,7 @@ pub impl @protobuf.Write for Sum with write(
 }
 
 ///|
-pub impl ToJson for Sum with to_json(self) {
+pub impl ToJson for Sum with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.data_points != Default::default() {
     json["dataPoints"] = self.data_points.to_json()
@@ -1186,12 +1169,12 @@ pub impl ToJson for Sum with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for Sum with from_json(
+pub impl @json.FromJson for Sum with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> Sum raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for Sum"))
+    raise JsonDecodeError((path, "Expected an object for Sum"))
   }
   let message = Sum::default()
   for key, value in obj {
@@ -1202,14 +1185,14 @@ pub impl @json.FromJson for Sum with from_json(
         message.aggregation_temporality = @json.from_json(value, path~)
       ("isMonotonic", value) =>
         message.is_monotonic = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for Sum with read_with_limit(
+pub impl @protobuf.AsyncRead for Sum with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Sum raise {
   let msg = Sum::default()
@@ -1236,7 +1219,7 @@ pub impl @protobuf.AsyncRead for Sum with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for Sum with write(
+pub impl @protobuf.AsyncWrite for Sum with fn write(
   self : Sum,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -1258,7 +1241,7 @@ pub(all) struct Histogram {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for Histogram with size_of(self) {
+pub impl @protobuf.Sized for Histogram with fn size_of(self) {
   let mut size = 0U
   for s in self.data_points {
     let s = @protobuf.size_of(s)
@@ -1269,8 +1252,8 @@ pub impl @protobuf.Sized for Histogram with size_of(self) {
 }
 
 ///|
-pub impl Default for Histogram with default() -> Histogram {
-  Histogram::{
+pub impl Default for Histogram with fn default() -> Histogram {
+  {
     data_points: [],
     aggregation_temporality: AggregationTemporality::default(),
   }
@@ -1281,11 +1264,11 @@ pub fn Histogram::new(
   data_points : Array[HistogramDataPoint],
   aggregation_temporality : AggregationTemporality,
 ) -> Histogram {
-  Histogram::{ data_points, aggregation_temporality }
+  { data_points, aggregation_temporality }
 }
 
 ///|
-pub impl @protobuf.Read for Histogram with read_with_limit(
+pub impl @protobuf.Read for Histogram with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Histogram raise {
   let msg = Histogram::default()
@@ -1311,7 +1294,7 @@ pub impl @protobuf.Read for Histogram with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for Histogram with write(
+pub impl @protobuf.Write for Histogram with fn write(
   self : Histogram,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -1325,7 +1308,7 @@ pub impl @protobuf.Write for Histogram with write(
 }
 
 ///|
-pub impl ToJson for Histogram with to_json(self) {
+pub impl ToJson for Histogram with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.data_points != Default::default() {
     json["dataPoints"] = self.data_points.to_json()
@@ -1337,12 +1320,12 @@ pub impl ToJson for Histogram with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for Histogram with from_json(
+pub impl @json.FromJson for Histogram with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> Histogram raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for Histogram"))
+    raise JsonDecodeError((path, "Expected an object for Histogram"))
   }
   let message = Histogram::default()
   for key, value in obj {
@@ -1351,14 +1334,14 @@ pub impl @json.FromJson for Histogram with from_json(
         message.data_points = value.map(v => @json.from_json(v, path~))
       ("aggregationTemporality", value) =>
         message.aggregation_temporality = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for Histogram with read_with_limit(
+pub impl @protobuf.AsyncRead for Histogram with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Histogram raise {
   let msg = Histogram::default()
@@ -1384,7 +1367,7 @@ pub impl @protobuf.AsyncRead for Histogram with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for Histogram with write(
+pub impl @protobuf.AsyncWrite for Histogram with fn write(
   self : Histogram,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -1404,7 +1387,7 @@ pub(all) struct ExponentialHistogram {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for ExponentialHistogram with size_of(self) {
+pub impl @protobuf.Sized for ExponentialHistogram with fn size_of(self) {
   let mut size = 0U
   for s in self.data_points {
     let s = @protobuf.size_of(s)
@@ -1415,8 +1398,8 @@ pub impl @protobuf.Sized for ExponentialHistogram with size_of(self) {
 }
 
 ///|
-pub impl Default for ExponentialHistogram with default() -> ExponentialHistogram {
-  ExponentialHistogram::{
+pub impl Default for ExponentialHistogram with fn default() -> ExponentialHistogram {
+  {
     data_points: [],
     aggregation_temporality: AggregationTemporality::default(),
   }
@@ -1427,11 +1410,11 @@ pub fn ExponentialHistogram::new(
   data_points : Array[ExponentialHistogramDataPoint],
   aggregation_temporality : AggregationTemporality,
 ) -> ExponentialHistogram {
-  ExponentialHistogram::{ data_points, aggregation_temporality }
+  { data_points, aggregation_temporality }
 }
 
 ///|
-pub impl @protobuf.Read for ExponentialHistogram with read_with_limit(
+pub impl @protobuf.Read for ExponentialHistogram with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ExponentialHistogram raise {
   let msg = ExponentialHistogram::default()
@@ -1457,7 +1440,7 @@ pub impl @protobuf.Read for ExponentialHistogram with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for ExponentialHistogram with write(
+pub impl @protobuf.Write for ExponentialHistogram with fn write(
   self : ExponentialHistogram,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -1471,7 +1454,7 @@ pub impl @protobuf.Write for ExponentialHistogram with write(
 }
 
 ///|
-pub impl ToJson for ExponentialHistogram with to_json(self) {
+pub impl ToJson for ExponentialHistogram with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.data_points != Default::default() {
     json["dataPoints"] = self.data_points.to_json()
@@ -1483,14 +1466,12 @@ pub impl ToJson for ExponentialHistogram with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for ExponentialHistogram with from_json(
+pub impl @json.FromJson for ExponentialHistogram with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> ExponentialHistogram raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError(
-      (path, "Expected an object for ExponentialHistogram"),
-    )
+    raise JsonDecodeError((path, "Expected an object for ExponentialHistogram"))
   }
   let message = ExponentialHistogram::default()
   for key, value in obj {
@@ -1499,14 +1480,14 @@ pub impl @json.FromJson for ExponentialHistogram with from_json(
         message.data_points = value.map(v => @json.from_json(v, path~))
       ("aggregationTemporality", value) =>
         message.aggregation_temporality = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for ExponentialHistogram with read_with_limit(
+pub impl @protobuf.AsyncRead for ExponentialHistogram with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ExponentialHistogram raise {
   let msg = ExponentialHistogram::default()
@@ -1534,7 +1515,7 @@ pub impl @protobuf.AsyncRead for ExponentialHistogram with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for ExponentialHistogram with write(
+pub impl @protobuf.AsyncWrite for ExponentialHistogram with fn write(
   self : ExponentialHistogram,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -1553,7 +1534,7 @@ pub(all) struct Summary {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for Summary with size_of(self) {
+pub impl @protobuf.Sized for Summary with fn size_of(self) {
   let mut size = 0U
   for s in self.data_points {
     let s = @protobuf.size_of(s)
@@ -1563,17 +1544,17 @@ pub impl @protobuf.Sized for Summary with size_of(self) {
 }
 
 ///|
-pub impl Default for Summary with default() -> Summary {
-  Summary::{ data_points: [] }
+pub impl Default for Summary with fn default() -> Summary {
+  { data_points: [] }
 }
 
 ///|
 pub fn Summary::new(data_points : Array[SummaryDataPoint]) -> Summary {
-  Summary::{ data_points, }
+  { data_points, }
 }
 
 ///|
-pub impl @protobuf.Read for Summary with read_with_limit(
+pub impl @protobuf.Read for Summary with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Summary raise {
   let msg = Summary::default()
@@ -1595,7 +1576,7 @@ pub impl @protobuf.Read for Summary with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for Summary with write(
+pub impl @protobuf.Write for Summary with fn write(
   self : Summary,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -1607,7 +1588,7 @@ pub impl @protobuf.Write for Summary with write(
 }
 
 ///|
-pub impl ToJson for Summary with to_json(self) {
+pub impl ToJson for Summary with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.data_points != Default::default() {
     json["dataPoints"] = self.data_points.to_json()
@@ -1616,26 +1597,26 @@ pub impl ToJson for Summary with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for Summary with from_json(
+pub impl @json.FromJson for Summary with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> Summary raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for Summary"))
+    raise JsonDecodeError((path, "Expected an object for Summary"))
   }
   let message = Summary::default()
   for key, value in obj {
     match (key, value) {
       ("dataPoints", Array(value)) =>
         message.data_points = value.map(v => @json.from_json(v, path~))
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for Summary with read_with_limit(
+pub impl @protobuf.AsyncRead for Summary with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Summary raise {
   let msg = Summary::default()
@@ -1657,7 +1638,7 @@ pub impl @protobuf.AsyncRead for Summary with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for Summary with write(
+pub impl @protobuf.AsyncWrite for Summary with fn write(
   self : Summary,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -1686,12 +1667,12 @@ pub(all) enum NumberDataPoint_Value {
 } derive(Eq)
 
 ///|
-pub impl Default for NumberDataPoint_Value with default() -> NumberDataPoint_Value {
+pub impl Default for NumberDataPoint_Value with fn default() -> NumberDataPoint_Value {
   NotSet
 }
 
 ///|
-pub impl @json.FromJson for NumberDataPoint_Value with from_json(
+pub impl @json.FromJson for NumberDataPoint_Value with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> NumberDataPoint_Value raise {
@@ -1705,22 +1686,22 @@ pub impl @json.FromJson for NumberDataPoint_Value with from_json(
   } noraise {
     v => return v
   }
-  NumberDataPoint_Value::NotSet
+  NotSet
 }
 
 ///|
-pub impl ToJson for NumberDataPoint_Value with to_json(
+pub impl ToJson for NumberDataPoint_Value with fn to_json(
   self : NumberDataPoint_Value,
 ) -> Json {
   match self {
-    NumberDataPoint_Value::AsDouble(v) => v.to_json()
-    NumberDataPoint_Value::AsInt(v) => v.to_json()
-    NumberDataPoint_Value::NotSet => Json::null()
+    AsDouble(v) => v.to_json()
+    AsInt(v) => v.to_json()
+    NotSet => Json::null()
   }
 }
 
 ///|
-pub impl @protobuf.Sized for NumberDataPoint with size_of(self) {
+pub impl @protobuf.Sized for NumberDataPoint with fn size_of(self) {
   let mut size = 0U
   for s in self.attributes {
     let s = @protobuf.size_of(s)
@@ -1742,14 +1723,14 @@ pub impl @protobuf.Sized for NumberDataPoint with size_of(self) {
 }
 
 ///|
-pub impl Default for NumberDataPoint with default() -> NumberDataPoint {
-  NumberDataPoint::{
+pub impl Default for NumberDataPoint with fn default() -> NumberDataPoint {
+  {
     attributes: [],
     start_time_unix_nano: UInt64::default(),
     time_unix_nano: UInt64::default(),
     exemplars: [],
     flags: UInt::default(),
-    value: NumberDataPoint_Value::NotSet,
+    value: NotSet,
   }
 }
 
@@ -1760,20 +1741,13 @@ pub fn NumberDataPoint::new(
   time_unix_nano : UInt64,
   exemplars : Array[Exemplar],
   flags : UInt,
-  value? : NumberDataPoint_Value = NumberDataPoint_Value::NotSet,
+  value? : NumberDataPoint_Value = NotSet,
 ) -> NumberDataPoint {
-  NumberDataPoint::{
-    attributes,
-    start_time_unix_nano,
-    time_unix_nano,
-    exemplars,
-    flags,
-    value,
-  }
+  { attributes, start_time_unix_nano, time_unix_nano, exemplars, flags, value }
 }
 
 ///|
-pub impl @protobuf.Read for NumberDataPoint with read_with_limit(
+pub impl @protobuf.Read for NumberDataPoint with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> NumberDataPoint raise {
   let msg = NumberDataPoint::default()
@@ -1789,14 +1763,8 @@ pub impl @protobuf.Read for NumberDataPoint with read_with_limit(
         (5, _) =>
           msg.exemplars.push((reader |> @protobuf.read_message() : Exemplar))
         (8, _) => msg.flags = reader |> @protobuf.read_uint32()
-        (4, _) =>
-          msg.value = reader
-            |> @protobuf.read_double()
-            |> NumberDataPoint_Value::AsDouble
-        (6, _) =>
-          msg.value = reader
-            |> @protobuf.read_sfixed64()
-            |> NumberDataPoint_Value::AsInt
+        (4, _) => msg.value = reader |> @protobuf.read_double() |> AsDouble
+        (6, _) => msg.value = reader |> @protobuf.read_sfixed64() |> AsInt
         (_, wire) => reader |> @protobuf.read_unknown(wire)
       }
     }
@@ -1808,7 +1776,7 @@ pub impl @protobuf.Read for NumberDataPoint with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for NumberDataPoint with write(
+pub impl @protobuf.Write for NumberDataPoint with fn write(
   self : NumberDataPoint,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -1829,20 +1797,20 @@ pub impl @protobuf.Write for NumberDataPoint with write(
   writer |> @protobuf.write_varint(64UL)
   writer |> @protobuf.write_uint32(self.flags)
   match self.value {
-    NumberDataPoint_Value::AsDouble(v) => {
+    AsDouble(v) => {
       writer |> @protobuf.write_varint(33UL)
       writer |> @protobuf.write_double(v)
     }
-    NumberDataPoint_Value::AsInt(v) => {
+    AsInt(v) => {
       writer |> @protobuf.write_varint(49UL)
       writer |> @protobuf.write_sfixed64(v)
     }
-    NumberDataPoint_Value::NotSet => ()
+    NotSet => ()
   }
 }
 
 ///|
-pub impl ToJson for NumberDataPoint with to_json(self) {
+pub impl ToJson for NumberDataPoint with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.attributes != Default::default() {
     json["attributes"] = self.attributes.to_json()
@@ -1868,14 +1836,12 @@ pub impl ToJson for NumberDataPoint with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for NumberDataPoint with from_json(
+pub impl @json.FromJson for NumberDataPoint with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> NumberDataPoint raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError(
-      (path, "Expected an object for NumberDataPoint"),
-    )
+    raise JsonDecodeError((path, "Expected an object for NumberDataPoint"))
   }
   let message = NumberDataPoint::default()
   for key, value in obj {
@@ -1891,14 +1857,14 @@ pub impl @json.FromJson for NumberDataPoint with from_json(
       ("flags", value) => message.flags = @json.from_json(value, path~)
       ("asDouble", value) => message.value = @json.from_json(value, path~)
       ("asInt", value) => message.value = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for NumberDataPoint with read_with_limit(
+pub impl @protobuf.AsyncRead for NumberDataPoint with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> NumberDataPoint raise {
   let msg = NumberDataPoint::default()
@@ -1918,13 +1884,8 @@ pub impl @protobuf.AsyncRead for NumberDataPoint with read_with_limit(
           )
         (8, _) => msg.flags = reader |> @protobuf.async_read_uint32()
         (4, _) =>
-          msg.value = reader
-            |> @protobuf.async_read_double()
-            |> NumberDataPoint_Value::AsDouble
-        (6, _) =>
-          msg.value = reader
-            |> @protobuf.async_read_sfixed64()
-            |> NumberDataPoint_Value::AsInt
+          msg.value = reader |> @protobuf.async_read_double() |> AsDouble
+        (6, _) => msg.value = reader |> @protobuf.async_read_sfixed64() |> AsInt
         (_, wire) => reader |> @protobuf.async_read_unknown(wire)
       }
     }
@@ -1936,7 +1897,7 @@ pub impl @protobuf.AsyncRead for NumberDataPoint with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for NumberDataPoint with write(
+pub impl @protobuf.AsyncWrite for NumberDataPoint with fn write(
   self : NumberDataPoint,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -1957,15 +1918,15 @@ pub impl @protobuf.AsyncWrite for NumberDataPoint with write(
   writer |> @protobuf.async_write_varint(64UL)
   writer |> @protobuf.async_write_uint32(self.flags)
   match self.value {
-    NumberDataPoint_Value::AsDouble(v) => {
+    AsDouble(v) => {
       writer |> @protobuf.async_write_varint(33UL)
       writer |> @protobuf.async_write_double(v)
     }
-    NumberDataPoint_Value::AsInt(v) => {
+    AsInt(v) => {
       writer |> @protobuf.async_write_varint(49UL)
       writer |> @protobuf.async_write_sfixed64(v)
     }
-    NumberDataPoint_Value::NotSet => ()
+    NotSet => ()
   }
 }
 
@@ -1985,7 +1946,7 @@ pub(all) struct HistogramDataPoint {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for HistogramDataPoint with size_of(self) {
+pub impl @protobuf.Sized for HistogramDataPoint with fn size_of(self) {
   let mut size = 0U
   for s in self.attributes {
     let s = @protobuf.size_of(s)
@@ -2022,8 +1983,8 @@ pub impl @protobuf.Sized for HistogramDataPoint with size_of(self) {
 }
 
 ///|
-pub impl Default for HistogramDataPoint with default() -> HistogramDataPoint {
-  HistogramDataPoint::{
+pub impl Default for HistogramDataPoint with fn default() -> HistogramDataPoint {
+  {
     attributes: [],
     start_time_unix_nano: UInt64::default(),
     time_unix_nano: UInt64::default(),
@@ -2052,7 +2013,7 @@ pub fn HistogramDataPoint::new(
   min? : Double,
   max? : Double,
 ) -> HistogramDataPoint {
-  HistogramDataPoint::{
+  {
     attributes,
     start_time_unix_nano,
     time_unix_nano,
@@ -2068,7 +2029,7 @@ pub fn HistogramDataPoint::new(
 }
 
 ///|
-pub impl @protobuf.Read for HistogramDataPoint with read_with_limit(
+pub impl @protobuf.Read for HistogramDataPoint with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> HistogramDataPoint raise {
   let msg = HistogramDataPoint::default()
@@ -2107,7 +2068,7 @@ pub impl @protobuf.Read for HistogramDataPoint with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for HistogramDataPoint with write(
+pub impl @protobuf.Write for HistogramDataPoint with fn write(
   self : HistogramDataPoint,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -2156,7 +2117,7 @@ pub impl @protobuf.Write for HistogramDataPoint with write(
 }
 
 ///|
-pub impl ToJson for HistogramDataPoint with to_json(self) {
+pub impl ToJson for HistogramDataPoint with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.attributes != Default::default() {
     json["attributes"] = self.attributes.to_json()
@@ -2198,14 +2159,12 @@ pub impl ToJson for HistogramDataPoint with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for HistogramDataPoint with from_json(
+pub impl @json.FromJson for HistogramDataPoint with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> HistogramDataPoint raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError(
-      (path, "Expected an object for HistogramDataPoint"),
-    )
+    raise JsonDecodeError((path, "Expected an object for HistogramDataPoint"))
   }
   let message = HistogramDataPoint::default()
   for key, value in obj {
@@ -2227,14 +2186,14 @@ pub impl @json.FromJson for HistogramDataPoint with from_json(
       ("flags", value) => message.flags = @json.from_json(value, path~)
       ("min", value) => message.min = Some(@json.from_json(value, path~))
       ("max", value) => message.max = Some(@json.from_json(value, path~))
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for HistogramDataPoint with read_with_limit(
+pub impl @protobuf.AsyncRead for HistogramDataPoint with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> HistogramDataPoint raise {
   let msg = HistogramDataPoint::default()
@@ -2281,7 +2240,7 @@ pub impl @protobuf.AsyncRead for HistogramDataPoint with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for HistogramDataPoint with write(
+pub impl @protobuf.AsyncWrite for HistogramDataPoint with fn write(
   self : HistogramDataPoint,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -2336,7 +2295,7 @@ pub(all) struct ExponentialHistogramDataPoint_Buckets {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for ExponentialHistogramDataPoint_Buckets with size_of(
+pub impl @protobuf.Sized for ExponentialHistogramDataPoint_Buckets with fn size_of(
   self,
 ) {
   let mut size = 0U
@@ -2353,11 +2312,8 @@ pub impl @protobuf.Sized for ExponentialHistogramDataPoint_Buckets with size_of(
 }
 
 ///|
-pub impl Default for ExponentialHistogramDataPoint_Buckets with default() -> ExponentialHistogramDataPoint_Buckets {
-  ExponentialHistogramDataPoint_Buckets::{
-    offset: Int::default(),
-    bucket_counts: [],
-  }
+pub impl Default for ExponentialHistogramDataPoint_Buckets with fn default() -> ExponentialHistogramDataPoint_Buckets {
+  { offset: Int::default(), bucket_counts: [] }
 }
 
 ///|
@@ -2365,11 +2321,11 @@ pub fn ExponentialHistogramDataPoint_Buckets::new(
   offset : Int,
   bucket_counts : Array[UInt64],
 ) -> ExponentialHistogramDataPoint_Buckets {
-  ExponentialHistogramDataPoint_Buckets::{ offset, bucket_counts }
+  { offset, bucket_counts }
 }
 
 ///|
-pub impl @protobuf.Read for ExponentialHistogramDataPoint_Buckets with read_with_limit(
+pub impl @protobuf.Read for ExponentialHistogramDataPoint_Buckets with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ExponentialHistogramDataPoint_Buckets raise {
   let msg = ExponentialHistogramDataPoint_Buckets::default()
@@ -2392,7 +2348,7 @@ pub impl @protobuf.Read for ExponentialHistogramDataPoint_Buckets with read_with
 }
 
 ///|
-pub impl @protobuf.Write for ExponentialHistogramDataPoint_Buckets with write(
+pub impl @protobuf.Write for ExponentialHistogramDataPoint_Buckets with fn write(
   self : ExponentialHistogramDataPoint_Buckets,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -2410,7 +2366,7 @@ pub impl @protobuf.Write for ExponentialHistogramDataPoint_Buckets with write(
 }
 
 ///|
-pub impl ToJson for ExponentialHistogramDataPoint_Buckets with to_json(self) {
+pub impl ToJson for ExponentialHistogramDataPoint_Buckets with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.offset != Default::default() {
     json["offset"] = self.offset.to_json()
@@ -2422,12 +2378,12 @@ pub impl ToJson for ExponentialHistogramDataPoint_Buckets with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for ExponentialHistogramDataPoint_Buckets with from_json(
+pub impl @json.FromJson for ExponentialHistogramDataPoint_Buckets with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> ExponentialHistogramDataPoint_Buckets raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError(
+    raise JsonDecodeError(
       (path, "Expected an object for ExponentialHistogramDataPoint_Buckets"),
     )
   }
@@ -2437,14 +2393,14 @@ pub impl @json.FromJson for ExponentialHistogramDataPoint_Buckets with from_json
       ("offset", value) => message.offset = @json.from_json(value, path~)
       ("bucketCounts", Array(value)) =>
         message.bucket_counts = value.map(v => @json.from_json(v, path~))
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for ExponentialHistogramDataPoint_Buckets with read_with_limit(
+pub impl @protobuf.AsyncRead for ExponentialHistogramDataPoint_Buckets with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ExponentialHistogramDataPoint_Buckets raise {
   let msg = ExponentialHistogramDataPoint_Buckets::default()
@@ -2468,7 +2424,7 @@ pub impl @protobuf.AsyncRead for ExponentialHistogramDataPoint_Buckets with read
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for ExponentialHistogramDataPoint_Buckets with write(
+pub impl @protobuf.AsyncWrite for ExponentialHistogramDataPoint_Buckets with fn write(
   self : ExponentialHistogramDataPoint_Buckets,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -2504,7 +2460,7 @@ pub(all) struct ExponentialHistogramDataPoint {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for ExponentialHistogramDataPoint with size_of(self) {
+pub impl @protobuf.Sized for ExponentialHistogramDataPoint with fn size_of(self) {
   let mut size = 0U
   for s in self.attributes {
     let s = @protobuf.size_of(s)
@@ -2544,8 +2500,8 @@ pub impl @protobuf.Sized for ExponentialHistogramDataPoint with size_of(self) {
 }
 
 ///|
-pub impl Default for ExponentialHistogramDataPoint with default() -> ExponentialHistogramDataPoint {
-  ExponentialHistogramDataPoint::{
+pub impl Default for ExponentialHistogramDataPoint with fn default() -> ExponentialHistogramDataPoint {
+  {
     attributes: [],
     start_time_unix_nano: UInt64::default(),
     time_unix_nano: UInt64::default(),
@@ -2580,7 +2536,7 @@ pub fn ExponentialHistogramDataPoint::new(
   max? : Double,
   zero_threshold : Double,
 ) -> ExponentialHistogramDataPoint {
-  ExponentialHistogramDataPoint::{
+  {
     attributes,
     start_time_unix_nano,
     time_unix_nano,
@@ -2599,7 +2555,7 @@ pub fn ExponentialHistogramDataPoint::new(
 }
 
 ///|
-pub impl @protobuf.Read for ExponentialHistogramDataPoint with read_with_limit(
+pub impl @protobuf.Read for ExponentialHistogramDataPoint with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ExponentialHistogramDataPoint raise {
   let msg = ExponentialHistogramDataPoint::default()
@@ -2641,7 +2597,7 @@ pub impl @protobuf.Read for ExponentialHistogramDataPoint with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for ExponentialHistogramDataPoint with write(
+pub impl @protobuf.Write for ExponentialHistogramDataPoint with fn write(
   self : ExponentialHistogramDataPoint,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -2690,7 +2646,7 @@ pub impl @protobuf.Write for ExponentialHistogramDataPoint with write(
 }
 
 ///|
-pub impl ToJson for ExponentialHistogramDataPoint with to_json(self) {
+pub impl ToJson for ExponentialHistogramDataPoint with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.attributes != Default::default() {
     json["attributes"] = self.attributes.to_json()
@@ -2741,12 +2697,12 @@ pub impl ToJson for ExponentialHistogramDataPoint with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for ExponentialHistogramDataPoint with from_json(
+pub impl @json.FromJson for ExponentialHistogramDataPoint with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> ExponentialHistogramDataPoint raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError(
+    raise JsonDecodeError(
       (path, "Expected an object for ExponentialHistogramDataPoint"),
     )
   }
@@ -2772,14 +2728,14 @@ pub impl @json.FromJson for ExponentialHistogramDataPoint with from_json(
       ("max", value) => message.max = Some(@json.from_json(value, path~))
       ("zeroThreshold", value) =>
         message.zero_threshold = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for ExponentialHistogramDataPoint with read_with_limit(
+pub impl @protobuf.AsyncRead for ExponentialHistogramDataPoint with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ExponentialHistogramDataPoint raise {
   let msg = ExponentialHistogramDataPoint::default()
@@ -2824,7 +2780,7 @@ pub impl @protobuf.AsyncRead for ExponentialHistogramDataPoint with read_with_li
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for ExponentialHistogramDataPoint with write(
+pub impl @protobuf.AsyncWrite for ExponentialHistogramDataPoint with fn write(
   self : ExponentialHistogramDataPoint,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -2879,7 +2835,7 @@ pub(all) struct SummaryDataPoint_ValueAtQuantile {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for SummaryDataPoint_ValueAtQuantile with size_of(
+pub impl @protobuf.Sized for SummaryDataPoint_ValueAtQuantile with fn size_of(
   _self,
 ) {
   let mut size = 0U
@@ -2889,11 +2845,8 @@ pub impl @protobuf.Sized for SummaryDataPoint_ValueAtQuantile with size_of(
 }
 
 ///|
-pub impl Default for SummaryDataPoint_ValueAtQuantile with default() -> SummaryDataPoint_ValueAtQuantile {
-  SummaryDataPoint_ValueAtQuantile::{
-    quantile: Double::default(),
-    value: Double::default(),
-  }
+pub impl Default for SummaryDataPoint_ValueAtQuantile with fn default() -> SummaryDataPoint_ValueAtQuantile {
+  { quantile: Double::default(), value: Double::default() }
 }
 
 ///|
@@ -2901,11 +2854,11 @@ pub fn SummaryDataPoint_ValueAtQuantile::new(
   quantile : Double,
   value : Double,
 ) -> SummaryDataPoint_ValueAtQuantile {
-  SummaryDataPoint_ValueAtQuantile::{ quantile, value }
+  { quantile, value }
 }
 
 ///|
-pub impl @protobuf.Read for SummaryDataPoint_ValueAtQuantile with read_with_limit(
+pub impl @protobuf.Read for SummaryDataPoint_ValueAtQuantile with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> SummaryDataPoint_ValueAtQuantile raise {
   let msg = SummaryDataPoint_ValueAtQuantile::default()
@@ -2925,7 +2878,7 @@ pub impl @protobuf.Read for SummaryDataPoint_ValueAtQuantile with read_with_limi
 }
 
 ///|
-pub impl @protobuf.Write for SummaryDataPoint_ValueAtQuantile with write(
+pub impl @protobuf.Write for SummaryDataPoint_ValueAtQuantile with fn write(
   self : SummaryDataPoint_ValueAtQuantile,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -2936,7 +2889,7 @@ pub impl @protobuf.Write for SummaryDataPoint_ValueAtQuantile with write(
 }
 
 ///|
-pub impl ToJson for SummaryDataPoint_ValueAtQuantile with to_json(self) {
+pub impl ToJson for SummaryDataPoint_ValueAtQuantile with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.quantile != Default::default() {
     json["quantile"] = self.quantile.to_json()
@@ -2948,12 +2901,12 @@ pub impl ToJson for SummaryDataPoint_ValueAtQuantile with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for SummaryDataPoint_ValueAtQuantile with from_json(
+pub impl @json.FromJson for SummaryDataPoint_ValueAtQuantile with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> SummaryDataPoint_ValueAtQuantile raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError(
+    raise JsonDecodeError(
       (path, "Expected an object for SummaryDataPoint_ValueAtQuantile"),
     )
   }
@@ -2962,14 +2915,14 @@ pub impl @json.FromJson for SummaryDataPoint_ValueAtQuantile with from_json(
     match (key, value) {
       ("quantile", value) => message.quantile = @json.from_json(value, path~)
       ("value", value) => message.value = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for SummaryDataPoint_ValueAtQuantile with read_with_limit(
+pub impl @protobuf.AsyncRead for SummaryDataPoint_ValueAtQuantile with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> SummaryDataPoint_ValueAtQuantile raise {
   let msg = SummaryDataPoint_ValueAtQuantile::default()
@@ -2989,7 +2942,7 @@ pub impl @protobuf.AsyncRead for SummaryDataPoint_ValueAtQuantile with read_with
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for SummaryDataPoint_ValueAtQuantile with write(
+pub impl @protobuf.AsyncWrite for SummaryDataPoint_ValueAtQuantile with fn write(
   self : SummaryDataPoint_ValueAtQuantile,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -3011,7 +2964,7 @@ pub(all) struct SummaryDataPoint {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for SummaryDataPoint with size_of(self) {
+pub impl @protobuf.Sized for SummaryDataPoint with fn size_of(self) {
   let mut size = 0U
   for s in self.attributes {
     let s = @protobuf.size_of(s)
@@ -3030,8 +2983,8 @@ pub impl @protobuf.Sized for SummaryDataPoint with size_of(self) {
 }
 
 ///|
-pub impl Default for SummaryDataPoint with default() -> SummaryDataPoint {
-  SummaryDataPoint::{
+pub impl Default for SummaryDataPoint with fn default() -> SummaryDataPoint {
+  {
     attributes: [],
     start_time_unix_nano: UInt64::default(),
     time_unix_nano: UInt64::default(),
@@ -3052,7 +3005,7 @@ pub fn SummaryDataPoint::new(
   quantile_values : Array[SummaryDataPoint_ValueAtQuantile],
   flags : UInt,
 ) -> SummaryDataPoint {
-  SummaryDataPoint::{
+  {
     attributes,
     start_time_unix_nano,
     time_unix_nano,
@@ -3064,7 +3017,7 @@ pub fn SummaryDataPoint::new(
 }
 
 ///|
-pub impl @protobuf.Read for SummaryDataPoint with read_with_limit(
+pub impl @protobuf.Read for SummaryDataPoint with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> SummaryDataPoint raise {
   let msg = SummaryDataPoint::default()
@@ -3097,7 +3050,7 @@ pub impl @protobuf.Read for SummaryDataPoint with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for SummaryDataPoint with write(
+pub impl @protobuf.Write for SummaryDataPoint with fn write(
   self : SummaryDataPoint,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -3124,7 +3077,7 @@ pub impl @protobuf.Write for SummaryDataPoint with write(
 }
 
 ///|
-pub impl ToJson for SummaryDataPoint with to_json(self) {
+pub impl ToJson for SummaryDataPoint with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.attributes != Default::default() {
     json["attributes"] = self.attributes.to_json()
@@ -3151,14 +3104,12 @@ pub impl ToJson for SummaryDataPoint with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for SummaryDataPoint with from_json(
+pub impl @json.FromJson for SummaryDataPoint with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> SummaryDataPoint raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError(
-      (path, "Expected an object for SummaryDataPoint"),
-    )
+    raise JsonDecodeError((path, "Expected an object for SummaryDataPoint"))
   }
   let message = SummaryDataPoint::default()
   for key, value in obj {
@@ -3174,14 +3125,14 @@ pub impl @json.FromJson for SummaryDataPoint with from_json(
       ("quantileValues", Array(value)) =>
         message.quantile_values = value.map(v => @json.from_json(v, path~))
       ("flags", value) => message.flags = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for SummaryDataPoint with read_with_limit(
+pub impl @protobuf.AsyncRead for SummaryDataPoint with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> SummaryDataPoint raise {
   let msg = SummaryDataPoint::default()
@@ -3215,7 +3166,7 @@ pub impl @protobuf.AsyncRead for SummaryDataPoint with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for SummaryDataPoint with write(
+pub impl @protobuf.AsyncWrite for SummaryDataPoint with fn write(
   self : SummaryDataPoint,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -3258,12 +3209,12 @@ pub(all) enum Exemplar_Value {
 } derive(Eq)
 
 ///|
-pub impl Default for Exemplar_Value with default() -> Exemplar_Value {
+pub impl Default for Exemplar_Value with fn default() -> Exemplar_Value {
   NotSet
 }
 
 ///|
-pub impl @json.FromJson for Exemplar_Value with from_json(
+pub impl @json.FromJson for Exemplar_Value with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> Exemplar_Value raise {
@@ -3277,20 +3228,20 @@ pub impl @json.FromJson for Exemplar_Value with from_json(
   } noraise {
     v => return v
   }
-  Exemplar_Value::NotSet
+  NotSet
 }
 
 ///|
-pub impl ToJson for Exemplar_Value with to_json(self : Exemplar_Value) -> Json {
+pub impl ToJson for Exemplar_Value with fn to_json(self : Exemplar_Value) -> Json {
   match self {
-    Exemplar_Value::AsDouble(v) => v.to_json()
-    Exemplar_Value::AsInt(v) => v.to_json()
-    Exemplar_Value::NotSet => Json::null()
+    AsDouble(v) => v.to_json()
+    AsInt(v) => v.to_json()
+    NotSet => Json::null()
   }
 }
 
 ///|
-pub impl @protobuf.Sized for Exemplar with size_of(self) {
+pub impl @protobuf.Sized for Exemplar with fn size_of(self) {
   let mut size = 0U
   for s in self.filtered_attributes {
     let s = @protobuf.size_of(s)
@@ -3316,13 +3267,13 @@ pub impl @protobuf.Sized for Exemplar with size_of(self) {
 }
 
 ///|
-pub impl Default for Exemplar with default() -> Exemplar {
-  Exemplar::{
+pub impl Default for Exemplar with fn default() -> Exemplar {
+  {
     filtered_attributes: [],
     time_unix_nano: UInt64::default(),
     span_id: Bytes::default(),
     trace_id: Bytes::default(),
-    value: Exemplar_Value::NotSet,
+    value: NotSet,
   }
 }
 
@@ -3332,13 +3283,13 @@ pub fn Exemplar::new(
   time_unix_nano : UInt64,
   span_id : Bytes,
   trace_id : Bytes,
-  value? : Exemplar_Value = Exemplar_Value::NotSet,
+  value? : Exemplar_Value = NotSet,
 ) -> Exemplar {
-  Exemplar::{ filtered_attributes, time_unix_nano, span_id, trace_id, value }
+  { filtered_attributes, time_unix_nano, span_id, trace_id, value }
 }
 
 ///|
-pub impl @protobuf.Read for Exemplar with read_with_limit(
+pub impl @protobuf.Read for Exemplar with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Exemplar raise {
   let msg = Exemplar::default()
@@ -3352,14 +3303,8 @@ pub impl @protobuf.Read for Exemplar with read_with_limit(
         (2, _) => msg.time_unix_nano = reader |> @protobuf.read_fixed64()
         (4, _) => msg.span_id = reader |> @protobuf.read_bytes()
         (5, _) => msg.trace_id = reader |> @protobuf.read_bytes()
-        (3, _) =>
-          msg.value = reader
-            |> @protobuf.read_double()
-            |> Exemplar_Value::AsDouble
-        (6, _) =>
-          msg.value = reader
-            |> @protobuf.read_sfixed64()
-            |> Exemplar_Value::AsInt
+        (3, _) => msg.value = reader |> @protobuf.read_double() |> AsDouble
+        (6, _) => msg.value = reader |> @protobuf.read_sfixed64() |> AsInt
         (_, wire) => reader |> @protobuf.read_unknown(wire)
       }
     }
@@ -3371,7 +3316,7 @@ pub impl @protobuf.Read for Exemplar with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for Exemplar with write(
+pub impl @protobuf.Write for Exemplar with fn write(
   self : Exemplar,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -3387,20 +3332,20 @@ pub impl @protobuf.Write for Exemplar with write(
   writer |> @protobuf.write_varint(42UL)
   writer |> @protobuf.write_bytes(self.trace_id)
   match self.value {
-    Exemplar_Value::AsDouble(v) => {
+    AsDouble(v) => {
       writer |> @protobuf.write_varint(25UL)
       writer |> @protobuf.write_double(v)
     }
-    Exemplar_Value::AsInt(v) => {
+    AsInt(v) => {
       writer |> @protobuf.write_varint(49UL)
       writer |> @protobuf.write_sfixed64(v)
     }
-    Exemplar_Value::NotSet => ()
+    NotSet => ()
   }
 }
 
 ///|
-pub impl ToJson for Exemplar with to_json(self) {
+pub impl ToJson for Exemplar with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.filtered_attributes != Default::default() {
     json["filteredAttributes"] = self.filtered_attributes.to_json()
@@ -3423,12 +3368,12 @@ pub impl ToJson for Exemplar with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for Exemplar with from_json(
+pub impl @json.FromJson for Exemplar with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> Exemplar raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for Exemplar"))
+    raise JsonDecodeError((path, "Expected an object for Exemplar"))
   }
   let message = Exemplar::default()
   for key, value in obj {
@@ -3443,14 +3388,14 @@ pub impl @json.FromJson for Exemplar with from_json(
         message.trace_id = @protobuf.base64_decode(value)
       ("asDouble", value) => message.value = @json.from_json(value, path~)
       ("asInt", value) => message.value = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for Exemplar with read_with_limit(
+pub impl @protobuf.AsyncRead for Exemplar with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Exemplar raise {
   let msg = Exemplar::default()
@@ -3465,13 +3410,8 @@ pub impl @protobuf.AsyncRead for Exemplar with read_with_limit(
         (4, _) => msg.span_id = reader |> @protobuf.async_read_bytes()
         (5, _) => msg.trace_id = reader |> @protobuf.async_read_bytes()
         (3, _) =>
-          msg.value = reader
-            |> @protobuf.async_read_double()
-            |> Exemplar_Value::AsDouble
-        (6, _) =>
-          msg.value = reader
-            |> @protobuf.async_read_sfixed64()
-            |> Exemplar_Value::AsInt
+          msg.value = reader |> @protobuf.async_read_double() |> AsDouble
+        (6, _) => msg.value = reader |> @protobuf.async_read_sfixed64() |> AsInt
         (_, wire) => reader |> @protobuf.async_read_unknown(wire)
       }
     }
@@ -3483,7 +3423,7 @@ pub impl @protobuf.AsyncRead for Exemplar with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for Exemplar with write(
+pub impl @protobuf.AsyncWrite for Exemplar with fn write(
   self : Exemplar,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -3499,14 +3439,14 @@ pub impl @protobuf.AsyncWrite for Exemplar with write(
   writer |> @protobuf.async_write_varint(42UL)
   writer |> @protobuf.async_write_bytes(self.trace_id)
   match self.value {
-    Exemplar_Value::AsDouble(v) => {
+    AsDouble(v) => {
       writer |> @protobuf.async_write_varint(25UL)
       writer |> @protobuf.async_write_double(v)
     }
-    Exemplar_Value::AsInt(v) => {
+    AsInt(v) => {
       writer |> @protobuf.async_write_varint(49UL)
       writer |> @protobuf.async_write_sfixed64(v)
     }
-    Exemplar_Value::NotSet => ()
+    NotSet => ()
   }
 }

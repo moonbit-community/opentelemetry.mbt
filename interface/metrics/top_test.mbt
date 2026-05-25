@@ -4,10 +4,9 @@ fn sum_double(
   name : StringView,
 ) -> Double? {
   for metric in metrics {
-    if metric.name == name.to_string() {
+    if metric.name == name.to_owned() {
       match metric.aggregation {
-        @sdkmetrics.Aggregation::Sum(@sdkmetrics.Number::Double(value)) =>
-          return Some(value)
+        Sum(Double(value)) => return Some(value)
         _ => return None
       }
     }
@@ -21,10 +20,9 @@ fn sum_u64(
   name : StringView,
 ) -> UInt64? {
   for metric in metrics {
-    if metric.name == name.to_string() {
+    if metric.name == name.to_owned() {
       match metric.aggregation {
-        @sdkmetrics.Aggregation::Sum(@sdkmetrics.Number::UInt64(value)) =>
-          return Some(value)
+        Sum(UInt64(value)) => return Some(value)
         _ => return None
       }
     }
@@ -38,10 +36,9 @@ fn gauge_u64(
   name : StringView,
 ) -> UInt64? {
   for metric in metrics {
-    if metric.name == name.to_string() {
+    if metric.name == name.to_owned() {
       match metric.aggregation {
-        @sdkmetrics.Aggregation::Gauge(@sdkmetrics.Number::UInt64(value)) =>
-          return Some(value)
+        Gauge(UInt64(value)) => return Some(value)
         _ => return None
       }
     }
@@ -55,11 +52,11 @@ fn histogram_sum_u64(
   name : StringView,
 ) -> UInt64? {
   for metric in metrics {
-    if metric.name == name.to_string() {
+    if metric.name == name.to_owned() {
       match metric.aggregation {
-        @sdkmetrics.Aggregation::Histogram(summary) =>
+        Histogram(summary) =>
           match summary.sum {
-            @sdkmetrics.Number::UInt64(value) => return Some(value)
+            UInt64(value) => return Some(value)
             _ => return None
           }
         _ => return None
@@ -81,7 +78,7 @@ test "wrapper floating-point counters use sdk-backed double sums" {
   let meter = provider.meter("wrapper-metrics")
   let counter = meter.f64_counter("bytes").build()
   let active = meter.f64_up_down_counter("active").build()
-  let current_rate = Ref::new(1.25)
+  let current_rate = Ref(1.25)
   ignore(
     meter
     .f64_observable_counter("rate")
@@ -96,13 +93,13 @@ test "wrapper floating-point counters use sdk-backed double sums" {
   active.add(-1.5)
 
   let first = reader.collect()
-  assert_eq(sum_double(first, "bytes"), Some(3.5))
-  assert_eq(sum_double(first, "active"), Some(3.5))
-  assert_eq(sum_double(first, "rate"), Some(1.25))
+  @debug.assert_eq(sum_double(first, "bytes"), Some(3.5))
+  @debug.assert_eq(sum_double(first, "active"), Some(3.5))
+  @debug.assert_eq(sum_double(first, "rate"), Some(1.25))
 
   current_rate.val = 2.75
   let second = reader.collect()
-  assert_eq(sum_double(second, "rate"), Some(2.75))
+  @debug.assert_eq(sum_double(second, "rate"), Some(2.75))
 }
 
 ///|
@@ -118,7 +115,7 @@ test "wrapper u64 instruments preserve full range" {
   let counter = meter.u64_counter("bytes").build()
   let histogram = meter.u64_histogram("payload").build()
   let gauge = meter.u64_gauge("load").build()
-  let current = Ref::new(9223372036854775809UL)
+  let current = Ref(9223372036854775809UL)
   ignore(
     meter
     .u64_observable_counter("rate")
@@ -137,9 +134,9 @@ test "wrapper u64 instruments preserve full range" {
   gauge.record(current.val)
 
   let metrics = reader.collect()
-  assert_eq(sum_u64(metrics, "bytes"), Some(current.val))
-  assert_eq(histogram_sum_u64(metrics, "payload"), Some(current.val))
-  assert_eq(gauge_u64(metrics, "load"), Some(current.val))
-  assert_eq(sum_u64(metrics, "rate"), Some(current.val))
-  assert_eq(gauge_u64(metrics, "current"), Some(current.val))
+  @debug.assert_eq(sum_u64(metrics, "bytes"), Some(current.val))
+  @debug.assert_eq(histogram_sum_u64(metrics, "payload"), Some(current.val))
+  @debug.assert_eq(gauge_u64(metrics, "load"), Some(current.val))
+  @debug.assert_eq(sum_u64(metrics, "rate"), Some(current.val))
+  @debug.assert_eq(gauge_u64(metrics, "current"), Some(current.val))
 }

@@ -10,7 +10,7 @@ fn restore_env_var(key : String, value : String?) -> Unit {
 fn sample_resource() -> @resource.Resource {
   @resource.Resource::builder_empty()
   .with_service_name("otlp-test")
-  .with_attribute("deployment.environment", @common.Value::String("test"))
+  .with_attribute("deployment.environment", String("test"))
   .with_schema_url("https://opentelemetry.io/schemas/1.0.0")
   .build()
 }
@@ -20,9 +20,7 @@ fn sample_scope() -> @common.InstrumentationScope {
   @common.InstrumentationScope::builder("otlp-test")
   .with_version("1.2.3")
   .with_schema_url("https://opentelemetry.io/schemas/1.0.0")
-  .with_attributes([
-    @common.KeyValue::new("scope.attr", @common.Value::String("demo")),
-  ])
+  .with_attributes([@common.KeyValue::new("scope.attr", String("demo"))])
   .build()
 }
 
@@ -61,21 +59,13 @@ async fn sample_span_data() -> @sdktrace.SpanData {
     "otlp-test",
     version=Some("1.2.3"),
     schema_url=Some("https://opentelemetry.io/schemas/1.0.0"),
-    attributes=[
-      @common.KeyValue::new("scope.attr", @common.Value::String("demo")),
-    ],
+    attributes=[@common.KeyValue::new("scope.attr", String("demo"))],
   )
-  let span = tracer.start(
-    "request",
-    kind=@sdktrace.SpanKind::Server,
-    start_time_unix_nano=100L,
-  )
-  span.set_attribute("http.method", @common.Value::String("GET"))
+  let span = tracer.start("request", kind=Server, start_time_unix_nano=100L)
+  span.set_attribute("http.method", String("GET"))
   span.add_event(
     "connected",
-    attributes=[
-      @common.KeyValue::new("net.transport", @common.Value::String("tcp")),
-    ],
+    attributes=[@common.KeyValue::new("net.transport", String("tcp"))],
     timestamp_unix_nano=150L,
   )
   span.add_link(
@@ -84,7 +74,7 @@ async fn sample_span_data() -> @sdktrace.SpanData {
       "00f067aa0ba902b8",
       is_remote=true,
     ),
-    attributes=[@common.KeyValue::new("linked", @common.Value::String("yes"))],
+    attributes=[@common.KeyValue::new("linked", String("yes"))],
   )
   span.set_status(@sdktrace.Status::error(description=Some("boom")))
   span.end(end_time_unix_nano=200L)
@@ -102,26 +92,15 @@ fn sample_log_record_with_timestamp(
   observed_timestamp_unix_nano : Int64,
 ) -> @sdklogs.LogRecord {
   @sdklogs.LogRecord::new(
-    @sdklogs.AnyValue::Map([
-      @sdklogs.KeyValue::new(
-        "message",
-        @sdklogs.AnyValue::String("request failed"),
-      ),
-      @sdklogs.KeyValue::new(
-        "codes",
-        @sdklogs.AnyValue::Array([
-          @sdklogs.AnyValue::Int64(7L),
-          @sdklogs.AnyValue::Int64(9L),
-        ]),
-      ),
+    Map([
+      @sdklogs.KeyValue::new("message", String("request failed")),
+      @sdklogs.KeyValue::new("codes", Array([Int64(7L), Int64(9L)])),
     ]),
-    severity_number=Some(@sdklogs.SeverityNumber::Error3),
+    severity_number=Some(Error3),
     severity_text=Some("ERROR3"),
     event_name=Some("checkout.failed"),
     target=Some("my-target"),
-    attributes=[
-      @sdklogs.KeyValue::new("http.status_code", @sdklogs.AnyValue::Int64(500L)),
-    ],
+    attributes=[@sdklogs.KeyValue::new("http.status_code", Int64(500L))],
     trace_context=Some(
       sample_span_context(
         "4bf92f3577b34da6a3ce929d0e0e4736", "00f067aa0ba902b7",
@@ -165,31 +144,27 @@ fn sample_metrics() -> Array[@sdkmetrics.MetricData] {
     "otlp-test",
     version=Some("1.2.3"),
     schema_url=Some("https://opentelemetry.io/schemas/1.0.0"),
-    attributes=[
-      @common.KeyValue::new("scope.attr", @common.Value::String("demo")),
-    ],
+    attributes=[@common.KeyValue::new("scope.attr", String("demo"))],
   )
   let counter = meter
     .counter("requests")
     .with_description("request count")
     .with_unit("1")
     .build()
-  counter.add(5, attributes=[
-    @common.KeyValue::new("route", @common.Value::String("/health")),
-  ])
+  counter.add(5, attributes=[@common.KeyValue::new("route", String("/health"))])
   let histogram = meter
     .histogram("latency")
     .with_description("request latency")
     .with_unit("ms")
     .build()
   histogram.record(1.0, attributes=[
-    @common.KeyValue::new("route", @common.Value::String("/health")),
+    @common.KeyValue::new("route", String("/health")),
   ])
   histogram.record(3.5, attributes=[
-    @common.KeyValue::new("route", @common.Value::String("/health")),
+    @common.KeyValue::new("route", String("/health")),
   ])
   histogram.record(8.0, attributes=[
-    @common.KeyValue::new("route", @common.Value::String("/health")),
+    @common.KeyValue::new("route", String("/health")),
   ])
   provider.manual_reader().collect()
 }
@@ -283,12 +258,18 @@ test "span exporter builder resolves env precedence" {
   guard SpanExporter::builder().build() is Ok(exporter) else {
     fail("expected span exporter build to succeed")
   }
-  assert_eq(exporter.config.endpoint, "http://collector:4318/root/v1/traces")
-  assert_eq(
+  @debug.assert_eq(
+    exporter.config.endpoint,
+    "http://collector:4318/root/v1/traces",
+  )
+  @debug.assert_eq(
     exporter.config.headers.get_from_string("authorization"),
     Some("Basic abc"),
   )
-  assert_eq(exporter.config.headers.get_from_string("x-trace"), Some("1"))
+  @debug.assert_eq(
+    exporter.config.headers.get_from_string("x-trace"),
+    Some("1"),
+  )
 
   @env.set_env_var(
     OTEL_EXPORTER_OTLP_TRACES_ENDPOINT,
@@ -297,7 +278,10 @@ test "span exporter builder resolves env precedence" {
   guard SpanExporter::builder().build() is Ok(signal_exporter) else {
     fail("expected signal-specific endpoint to build")
   }
-  assert_eq(signal_exporter.config.endpoint, "http://collector:4318/custom")
+  @debug.assert_eq(
+    signal_exporter.config.endpoint,
+    "http://collector:4318/custom",
+  )
 }
 
 ///|
@@ -318,7 +302,7 @@ test "metric exporter resolves temporality preference" {
   guard MetricExporter::builder().build() is Ok(exporter) else {
     fail("expected metric exporter build to succeed")
   }
-  assert_true(exporter.temporality() == @sdkmetrics.Temporality::LowMemory)
+  assert_true(exporter.temporality() == LowMemory)
 }
 
 ///|
@@ -332,18 +316,18 @@ test "span exporter builder resolves http json protocol" {
   guard SpanExporter::builder().build() is Ok(env_exporter) else {
     fail("expected http/json env protocol to build")
   }
-  assert_true(env_exporter.config.protocol == Protocol::HttpJson)
+  assert_true(env_exporter.config.protocol == HttpJson)
 
   guard SpanExporter::builder().with_http().build() is Ok(binary_exporter) else {
     fail("expected with_http to force binary protocol")
   }
-  assert_true(binary_exporter.config.protocol == Protocol::HttpBinary)
+  assert_true(binary_exporter.config.protocol == HttpBinary)
 
-  guard SpanExporter::builder().with_protocol(Protocol::HttpJson).build()
+  guard SpanExporter::builder().with_protocol(HttpJson).build()
     is Ok(json_exporter) else {
     fail("expected explicit http/json protocol to build")
   }
-  assert_true(json_exporter.config.protocol == Protocol::HttpJson)
+  assert_true(json_exporter.config.protocol == HttpJson)
 }
 
 ///|
@@ -351,27 +335,31 @@ test "span exporter builder resolves http json protocol" {
 // Test method: Build a trace export request from representative span data and assert the resulting protobuf structure contains the expected fields.
 async test "trace request encodes span data" {
   let request = build_trace_request([sample_span_data()])
-  assert_eq(request.resource_spans.length(), 1)
+  @debug.assert_eq(request.resource_spans.length(), 1)
   let resource_spans = request.resource_spans[0]
-  assert_eq(resource_spans.schema_url, "https://opentelemetry.io/schemas/1.0.0")
-  assert_eq(resource_spans.scope_spans.length(), 1)
+  @debug.assert_eq(
+    resource_spans.schema_url,
+    "https://opentelemetry.io/schemas/1.0.0",
+  )
+  @debug.assert_eq(resource_spans.scope_spans.length(), 1)
   let scope_spans = resource_spans.scope_spans[0]
-  assert_eq(scope_spans.schema_url, "https://opentelemetry.io/schemas/1.0.0")
+  @debug.assert_eq(
+    scope_spans.schema_url,
+    "https://opentelemetry.io/schemas/1.0.0",
+  )
   let span = scope_spans.spans[0]
-  assert_eq(span.name, "request")
-  assert_eq(span.trace_state, "")
-  assert_eq(span.attributes.length(), 1)
-  assert_eq(span.events.length(), 1)
-  assert_eq(span.links.length(), 1)
-  assert_eq(span.dropped_attributes_count, 0U)
-  assert_eq(span.dropped_events_count, 0U)
-  assert_eq(span.dropped_links_count, 0U)
-  assert_eq(span.links[0].trace_state, "tenant=blue")
+  @debug.assert_eq(span.name, "request")
+  @debug.assert_eq(span.trace_state, "")
+  @debug.assert_eq(span.attributes.length(), 1)
+  @debug.assert_eq(span.events.length(), 1)
+  @debug.assert_eq(span.links.length(), 1)
+  @debug.assert_eq(span.dropped_attributes_count, 0U)
+  @debug.assert_eq(span.dropped_events_count, 0U)
+  @debug.assert_eq(span.dropped_links_count, 0U)
+  @debug.assert_eq(span.links[0].trace_state, "tenant=blue")
   assert_true((span.flags & 0x1U) == 0x1U)
   assert_true((span.flags & 0x100U) == 0x100U)
-  assert_true(
-    span.status.code == @otlptrace.Status_StatusCode::STATUS_CODE_ERROR,
-  )
+  assert_true(span.status.code == STATUS_CODE_ERROR)
 }
 
 ///|
@@ -412,19 +400,19 @@ async test "trace request json roundtrips" {
   guard @common.TraceId::from_hex(trace_id) is Some(_) else {
     fail("expected span traceId to use OTLP hex encoding")
   }
-  assert_eq(trace_id.length(), 32)
+  @debug.assert_eq(trace_id.length(), 32)
   let span_id = json_string(json_field(span, "spanId", "span"), "span spanId")
   guard @common.SpanId::from_hex(span_id) is Some(_) else {
     fail("expected span spanId to use OTLP hex encoding")
   }
-  assert_eq(span_id.length(), 16)
+  @debug.assert_eq(span_id.length(), 16)
   let links = json_array(json_field(span, "links", "span"), "links")
   let link = json_object(links[0], "first link")
-  assert_eq(
+  @debug.assert_eq(
     json_string(json_field(link, "traceId", "first link"), "link traceId"),
     "4bf92f3577b34da6a3ce929d0e0e4737",
   )
-  assert_eq(
+  @debug.assert_eq(
     json_string(json_field(link, "spanId", "first link"), "link spanId"),
     "00f067aa0ba902b8",
   )
@@ -433,8 +421,11 @@ async test "trace request json roundtrips" {
     Ok(request) => request
     Err(message) => fail("expected valid trace json payload: \{message}")
   }
-  assert_eq(request.resource_spans.length(), 1)
-  assert_eq(request.resource_spans[0].scope_spans[0].spans[0].name, "request")
+  @debug.assert_eq(request.resource_spans.length(), 1)
+  @debug.assert_eq(
+    request.resource_spans[0].scope_spans[0].spans[0].name,
+    "request",
+  )
 }
 
 ///|
@@ -442,22 +433,23 @@ async test "trace request json roundtrips" {
 // Test method: Build one log export request from representative log data and assert the resulting protobuf record contains the expected fields.
 test "logs request encodes severity and trace context" {
   let request = build_logs_request([sample_log_record()])
-  assert_eq(request.resource_logs.length(), 1)
-  assert_eq(request.resource_logs[0].scope_logs[0].scope.name, "my-target")
-  let record = request.resource_logs[0].scope_logs[0].log_records[0]
-  assert_true(
-    record.severity_number == @otlplogs.SeverityNumber::SEVERITY_NUMBER_ERROR3,
+  @debug.assert_eq(request.resource_logs.length(), 1)
+  @debug.assert_eq(
+    request.resource_logs[0].scope_logs[0].scope.name,
+    "my-target",
   )
-  assert_eq(record.severity_text, "ERROR3")
-  assert_eq(record.event_name, "checkout.failed")
-  assert_eq(record.attributes.length(), 1)
+  let record = request.resource_logs[0].scope_logs[0].log_records[0]
+  assert_true(record.severity_number == SEVERITY_NUMBER_ERROR3)
+  @debug.assert_eq(record.severity_text, "ERROR3")
+  @debug.assert_eq(record.event_name, "checkout.failed")
+  @debug.assert_eq(record.attributes.length(), 1)
   assert_true(record.trace_id.length() == 16)
   assert_true(record.span_id.length() == 8)
   assert_true((record.flags & 0x1U) == 0x1U)
-  guard record.body.value is @otlpcommon.AnyValue_Value::KvlistValue(body) else {
+  guard record.body.value is KvlistValue(body) else {
     fail("expected log body to be encoded as a structured map")
   }
-  assert_eq(body.values.length(), 2)
+  @debug.assert_eq(body.values.length(), 2)
 }
 
 ///|
@@ -491,14 +483,14 @@ test "logs request json roundtrips" {
     "logRecords",
   )
   let record_json = json_object(log_records[0], "first log record")
-  assert_eq(
+  @debug.assert_eq(
     json_string(
       json_field(record_json, "traceId", "first log record"),
       "log record traceId",
     ),
     "4bf92f3577b34da6a3ce929d0e0e4736",
   )
-  assert_eq(
+  @debug.assert_eq(
     json_string(
       json_field(record_json, "spanId", "first log record"),
       "log record spanId",
@@ -511,9 +503,9 @@ test "logs request json roundtrips" {
     Err(message) => fail("expected valid logs json payload: \{message}")
   }
   let record = request.resource_logs[0].scope_logs[0].log_records[0]
-  assert_eq(record.severity_text, "ERROR3")
-  assert_eq(record.event_name, "checkout.failed")
-  assert_eq(record.attributes.length(), 1)
+  @debug.assert_eq(record.severity_text, "ERROR3")
+  @debug.assert_eq(record.event_name, "checkout.failed")
+  @debug.assert_eq(record.attributes.length(), 1)
 }
 
 ///|
@@ -523,10 +515,16 @@ test "logs request groups identical target and resource into one scope" {
   let first = sample_log_record()
   let second = sample_log_record_with_timestamp(302L, 303L)
   let request = build_logs_request([first, second])
-  assert_eq(request.resource_logs.length(), 1)
-  assert_eq(request.resource_logs[0].scope_logs.length(), 1)
-  assert_eq(request.resource_logs[0].scope_logs[0].log_records.length(), 2)
-  assert_eq(request.resource_logs[0].scope_logs[0].scope.name, "my-target")
+  @debug.assert_eq(request.resource_logs.length(), 1)
+  @debug.assert_eq(request.resource_logs[0].scope_logs.length(), 1)
+  @debug.assert_eq(
+    request.resource_logs[0].scope_logs[0].log_records.length(),
+    2,
+  )
+  @debug.assert_eq(
+    request.resource_logs[0].scope_logs[0].scope.name,
+    "my-target",
+  )
 }
 
 ///|
@@ -535,37 +533,32 @@ test "logs request groups identical target and resource into one scope" {
 test "metrics request encodes sums and histograms" {
   let request = build_metrics_request(
     [sample_counter_metric(), sample_histogram_metric()],
-    @sdkmetrics.Temporality::LowMemory,
+    LowMemory,
   )
-  assert_eq(request.resource_metrics.length(), 2)
+  @debug.assert_eq(request.resource_metrics.length(), 2)
 
   let counter_metric = request.resource_metrics[0].scope_metrics[0].metrics[0]
-  guard counter_metric.data is @otlpmetrics.Metric_Data::Sum(sum) else {
+  guard counter_metric.data is Sum(sum) else {
     fail("expected counter metric to encode as sum")
   }
-  assert_true(
-    sum.aggregation_temporality ==
-    @otlpmetrics.AggregationTemporality::AGGREGATION_TEMPORALITY_DELTA,
-  )
+  assert_true(sum.aggregation_temporality == AGGREGATION_TEMPORALITY_DELTA)
   assert_true(sum.is_monotonic)
-  guard sum.data_points[0].value
-    is @otlpmetrics.NumberDataPoint_Value::AsInt(value) else {
+  guard sum.data_points[0].value is AsInt(value) else {
     fail("expected counter datapoint to encode as int")
   }
-  assert_eq(value, 5L)
+  @debug.assert_eq(value, 5L)
 
   let histogram_metric = request.resource_metrics[1].scope_metrics[0].metrics[0]
-  guard histogram_metric.data is @otlpmetrics.Metric_Data::Histogram(histogram) else {
+  guard histogram_metric.data is Histogram(histogram) else {
     fail("expected histogram metric to encode as histogram")
   }
   assert_true(
-    histogram.aggregation_temporality ==
-    @otlpmetrics.AggregationTemporality::AGGREGATION_TEMPORALITY_DELTA,
+    histogram.aggregation_temporality == AGGREGATION_TEMPORALITY_DELTA,
   )
-  assert_eq(histogram.data_points[0].bucket_counts, [3UL])
-  assert_eq(histogram.data_points[0].sum, Some(12.5))
-  assert_eq(histogram.data_points[0].min, Some(1.0))
-  assert_eq(histogram.data_points[0].max, Some(8.0))
+  @debug.assert_eq(histogram.data_points[0].bucket_counts, [3UL])
+  @debug.assert_eq(histogram.data_points[0].sum, Some(12.5))
+  @debug.assert_eq(histogram.data_points[0].min, Some(1.0))
+  @debug.assert_eq(histogram.data_points[0].max, Some(8.0))
 }
 
 ///|
@@ -575,7 +568,7 @@ test "metrics request json roundtrips" {
   let encoded = encode_json_message(
     build_metrics_request(
       [sample_counter_metric(), sample_histogram_metric()],
-      @sdkmetrics.Temporality::LowMemory,
+      LowMemory,
     ),
   )
   let request : @collectormetrics.ExportMetricsServiceRequest = match
@@ -583,8 +576,8 @@ test "metrics request json roundtrips" {
     Ok(request) => request
     Err(message) => fail("expected valid metrics json payload: \{message}")
   }
-  assert_eq(request.resource_metrics.length(), 2)
-  assert_eq(
+  @debug.assert_eq(request.resource_metrics.length(), 2)
+  @debug.assert_eq(
     request.resource_metrics[0].scope_metrics[0].metrics[0].name,
     "requests",
   )
@@ -595,21 +588,21 @@ test "metrics request json roundtrips" {
 // Test method: Validate empty success payloads for each signal, then feed partial-success payloads and assert the returned messages include rejection counts.
 test "json response validation handles success and partial success" {
   guard validate_trace_response(
-      Protocol::HttpJson,
+      HttpJson,
       encode_json_message(@collectortrace.ExportTraceServiceResponse::default()),
     )
     is Ok(_) else {
     fail("expected empty trace json response to validate")
   }
   guard validate_logs_response(
-      Protocol::HttpJson,
+      HttpJson,
       encode_json_message(@collectorlogs.ExportLogsServiceResponse::default()),
     )
     is Ok(_) else {
     fail("expected empty logs json response to validate")
   }
   guard validate_metrics_response(
-      Protocol::HttpJson,
+      HttpJson,
       encode_json_message(
         @collectormetrics.ExportMetricsServiceResponse::default(),
       ),
@@ -619,7 +612,7 @@ test "json response validation handles success and partial success" {
   }
 
   guard validate_trace_response(
-      Protocol::HttpJson,
+      HttpJson,
       encode_json_message(
         @collectortrace.ExportTraceServiceResponse::new(
           @collectortrace.ExportTracePartialSuccess::new(1L, "trace failed"),
@@ -632,7 +625,7 @@ test "json response validation handles success and partial success" {
   assert_true(trace_message.contains("rejected_spans=1"))
 
   guard validate_logs_response(
-      Protocol::HttpJson,
+      HttpJson,
       encode_json_message(
         @collectorlogs.ExportLogsServiceResponse::new(
           @collectorlogs.ExportLogsPartialSuccess::new(2L, "logs failed"),
@@ -645,7 +638,7 @@ test "json response validation handles success and partial success" {
   assert_true(logs_message.contains("rejected_log_records=2"))
 
   guard validate_metrics_response(
-      Protocol::HttpJson,
+      HttpJson,
       encode_json_message(
         @collectormetrics.ExportMetricsServiceResponse::new(
           @collectormetrics.ExportMetricsPartialSuccess::new(
@@ -664,9 +657,9 @@ test "json response validation handles success and partial success" {
 // Test target: Verify the async span exporter posts protobuf OTLP payloads to the configured collector endpoint.
 // Test method: Run a local HTTP server, export one span batch over protobuf, and assert the request path, content type, and decoded body are correct.
 async test "async span exporter posts protobuf to collector" {
-  let received_path = Ref::new("")
-  let received_content_type = Ref::new("")
-  let received_body = Ref::new(b"")
+  let received_path = Ref("")
+  let received_content_type = Ref("")
+  let received_body = Ref(b"")
 
   @async.with_task_group(group => {
     let server = @http.Server(@socket.Addr::parse("127.0.0.1:0"))
@@ -698,23 +691,23 @@ async test "async span exporter posts protobuf to collector" {
     }
   })
 
-  assert_eq(received_path.val, "/custom/traces")
-  assert_eq(received_content_type.val, "application/x-protobuf")
+  @debug.assert_eq(received_path.val, "/custom/traces")
+  @debug.assert_eq(received_content_type.val, "application/x-protobuf")
   let request : @collectortrace.ExportTraceServiceRequest = match
     decode_trace_request(received_body.val) {
     Ok(request) => request
     Err(message) => fail("expected valid protobuf body: \{message}")
   }
-  assert_eq(request.resource_spans.length(), 1)
+  @debug.assert_eq(request.resource_spans.length(), 1)
 }
 
 ///|
 // Test target: Verify the async span exporter posts JSON OTLP payloads when configured for HTTP/JSON.
 // Test method: Run a local HTTP server, export one span batch over JSON, and assert the request path, content type, and decoded body are correct.
 async test "async span exporter posts json to collector" {
-  let received_path = Ref::new("")
-  let received_content_type = Ref::new("")
-  let received_body = Ref::new(b"")
+  let received_path = Ref("")
+  let received_content_type = Ref("")
+  let received_body = Ref(b"")
 
   @async.with_task_group(group => {
     let server = @http.Server(@socket.Addr::parse("127.0.0.1:0"))
@@ -741,7 +734,7 @@ async test "async span exporter posts json to collector" {
 
     guard SpanExporter::builder()
       .with_endpoint("http://127.0.0.1:\{port}/custom/traces")
-      .with_protocol(Protocol::HttpJson)
+      .with_protocol(HttpJson)
       .build()
       is Ok(exporter) else {
       fail("expected json exporter build to succeed")
@@ -751,14 +744,14 @@ async test "async span exporter posts json to collector" {
     }
   })
 
-  assert_eq(received_path.val, "/custom/traces")
-  assert_eq(received_content_type.val, "application/json")
+  @debug.assert_eq(received_path.val, "/custom/traces")
+  @debug.assert_eq(received_content_type.val, "application/json")
   let request : @collectortrace.ExportTraceServiceRequest = match
     decode_json_message(received_body.val) {
     Ok(request) => request
     Err(message) => fail("expected valid json body: \{message}")
   }
-  assert_eq(request.resource_spans.length(), 1)
+  @debug.assert_eq(request.resource_spans.length(), 1)
 }
 
 ///|
@@ -771,8 +764,7 @@ async test "sdk exporters reject export after shutdown" {
   guard span_exporter.shutdown() is Ok(_) else {
     fail("expected span exporter shutdown to succeed")
   }
-  guard span_exporter.export_batch([sample_span_data()])
-    is Err(@error.OTelSdkError::AlreadyShutdown) else {
+  guard span_exporter.export_batch([sample_span_data()]) is Err(AlreadyShutdown) else {
     fail("expected span exporter to reject export after shutdown")
   }
 
@@ -782,8 +774,7 @@ async test "sdk exporters reject export after shutdown" {
   guard log_exporter.shutdown() is Ok(_) else {
     fail("expected log exporter shutdown to succeed")
   }
-  guard log_exporter.export_batch([sample_log_record()])
-    is Err(@error.OTelSdkError::AlreadyShutdown) else {
+  guard log_exporter.export_batch([sample_log_record()]) is Err(AlreadyShutdown) else {
     fail("expected log exporter to reject export after shutdown")
   }
 
@@ -794,7 +785,7 @@ async test "sdk exporters reject export after shutdown" {
     fail("expected metric exporter shutdown to succeed")
   }
   guard metric_exporter.export_batch([sample_counter_metric()])
-    is Err(@error.OTelSdkError::AlreadyShutdown) else {
+    is Err(AlreadyShutdown) else {
     fail("expected metric exporter to reject export after shutdown")
   }
 }

@@ -23,14 +23,12 @@ test "env resource detector reads process environment" {
   @env.set_env_var("OTEL_RESOURCE_ATTRIBUTES", "deployment.environment=staging")
 
   let resource = env_resource_detector().detect()
-  guard resource.get("service.name")
-    is Some(@common.Value::String(service_name)) else {
+  guard resource.get("service.name") is Some(String(service_name)) else {
     fail("expected service.name from environment")
   }
-  assert_eq(service_name, "native-service")
-  guard resource.get("deployment.environment")
-    is Some(@common.Value::String(environment)) else {
+  @debug.assert_eq(service_name, "native-service")
+  guard resource.get("deployment.environment") is Some(String(environment)) else {
     fail("expected deployment.environment from environment")
   }
-  assert_eq(environment, "staging")
+  @debug.assert_eq(environment, "staging")
 }

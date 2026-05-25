@@ -1,8 +1,9 @@
 import {
+  "moonbitlang/core/debug",
   "moonbitlang/core/env",
   "moonbitlang/core/string",
-  "moonbit-community/opentelemetry/internal/utils" @utils,
-  "moonbit-community/opentelemetry/interface/common" @common,
+  "moonbit-community/opentelemetry/internal/utils",
+  "moonbit-community/opentelemetry/interface/common",
 }
 
 options(

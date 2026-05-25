@@ -6,7 +6,7 @@ pub(all) struct Resource {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for Resource with size_of(self) {
+pub impl @protobuf.Sized for Resource with fn size_of(self) {
   let mut size = 0U
   for s in self.attributes {
     let s = @protobuf.size_of(s)
@@ -21,12 +21,8 @@ pub impl @protobuf.Sized for Resource with size_of(self) {
 }
 
 ///|
-pub impl Default for Resource with default() -> Resource {
-  Resource::{
-    attributes: [],
-    dropped_attributes_count: UInt::default(),
-    entity_refs: [],
-  }
+pub impl Default for Resource with fn default() -> Resource {
+  { attributes: [], dropped_attributes_count: UInt::default(), entity_refs: [] }
 }
 
 ///|
@@ -35,11 +31,11 @@ pub fn Resource::new(
   dropped_attributes_count : UInt,
   entity_refs : Array[@v1_dep.EntityRef],
 ) -> Resource {
-  Resource::{ attributes, dropped_attributes_count, entity_refs }
+  { attributes, dropped_attributes_count, entity_refs }
 }
 
 ///|
-pub impl @protobuf.Read for Resource with read_with_limit(
+pub impl @protobuf.Read for Resource with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Resource raise {
   let msg = Resource::default()
@@ -67,7 +63,7 @@ pub impl @protobuf.Read for Resource with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for Resource with write(
+pub impl @protobuf.Write for Resource with fn write(
   self : Resource,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -86,7 +82,7 @@ pub impl @protobuf.Write for Resource with write(
 }
 
 ///|
-pub impl ToJson for Resource with to_json(self) {
+pub impl ToJson for Resource with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.attributes != Default::default() {
     json["attributes"] = self.attributes.to_json()
@@ -101,12 +97,12 @@ pub impl ToJson for Resource with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for Resource with from_json(
+pub impl @json.FromJson for Resource with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> Resource raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for Resource"))
+    raise JsonDecodeError((path, "Expected an object for Resource"))
   }
   let message = Resource::default()
   for key, value in obj {
@@ -117,14 +113,14 @@ pub impl @json.FromJson for Resource with from_json(
         message.dropped_attributes_count = @json.from_json(value, path~)
       ("entityRefs", Array(value)) =>
         message.entity_refs = value.map(v => @json.from_json(v, path~))
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for Resource with read_with_limit(
+pub impl @protobuf.AsyncRead for Resource with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Resource raise {
   let msg = Resource::default()
@@ -152,7 +148,7 @@ pub impl @protobuf.AsyncRead for Resource with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for Resource with write(
+pub impl @protobuf.AsyncWrite for Resource with fn write(
   self : Resource,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {

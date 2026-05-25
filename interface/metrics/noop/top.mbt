@@ -1,11 +1,11 @@
 ///|
 /// Trivial meter provider that always produces no-op instruments.
-pub struct NoopMeterProvider {}
+pub struct NoopMeterProvider {} derive(Default)
 
 ///|
 /// Creates a no-op meter provider.
 pub fn NoopMeterProvider::new() -> NoopMeterProvider {
-  NoopMeterProvider::{  }
+  Default::default()
 }
 
 ///|

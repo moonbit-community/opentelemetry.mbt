@@ -23,8 +23,8 @@ test "baggage propagator preserves metadata" {
     is Some((value, metadata)) else {
     fail("expected extracted baggage")
   }
-  assert_eq(value, "42")
-  assert_eq(metadata.as_string(), "source=test")
+  @debug.assert_eq(value, "42")
+  @debug.assert_eq(metadata.as_string(), "source=test")
 }
 
 ///|
@@ -38,9 +38,9 @@ test "baggage propagator merges into existing context baggage" {
   carrier["baggage"] = "shared=new,remote=added"
 
   let extracted = BaggagePropagator::new().extract_with_context(base, carrier)
-  assert_eq(extracted.baggage().get("existing"), Some("keep"))
-  assert_eq(extracted.baggage().get("shared"), Some("new"))
-  assert_eq(extracted.baggage().get("remote"), Some("added"))
+  @debug.assert_eq(extracted.baggage().get("existing"), Some("keep"))
+  @debug.assert_eq(extracted.baggage().get("shared"), Some("new"))
+  @debug.assert_eq(extracted.baggage().get("remote"), Some("added"))
 }
 
 ///|
@@ -72,8 +72,14 @@ test "trace context propagator round trips span context" {
   guard extracted.span_context() is Some(round_tripped) else {
     fail("expected round-tripped span context")
   }
-  assert_eq(round_tripped.trace_id().to_hex(), span_context.trace_id().to_hex())
-  assert_eq(round_tripped.span_id().to_hex(), span_context.span_id().to_hex())
+  @debug.assert_eq(
+    round_tripped.trace_id().to_hex(),
+    span_context.trace_id().to_hex(),
+  )
+  @debug.assert_eq(
+    round_tripped.span_id().to_hex(),
+    span_context.span_id().to_hex(),
+  )
 }
 
 ///|
@@ -93,5 +99,5 @@ test "trace context propagator reads mixed-case map keys" {
     fail("expected span context from mixed-case keys")
   }
   assert_true(span_context.is_remote())
-  assert_eq(span_context.trace_state().to_header(), Some("foo=bar"))
+  @debug.assert_eq(span_context.trace_state().to_header(), Some("foo=bar"))
 }

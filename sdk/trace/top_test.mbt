@@ -32,25 +32,25 @@ async test "simple processor exports parent child spans" {
     .build()
   let tracer = provider.tracer("trace-test")
   let root = tracer.start("root")
-  root.set_attribute("http.method", @common.Value::String("GET"))
+  root.set_attribute("http.method", String("GET"))
   root.add_event("connected")
   let child = tracer.start("child", parent_context=root.context())
   child.end()
   root.end()
 
   let spans = exporter.finished_spans()
-  assert_eq(spans.length(), 2)
-  assert_eq(spans[0].name, "child")
-  assert_eq(spans[1].name, "root")
+  @debug.assert_eq(spans.length(), 2)
+  @debug.assert_eq(spans[0].name, "child")
+  @debug.assert_eq(spans[1].name, "root")
   guard spans[0].parent_span_context is Some(parent_span_context) else {
     fail("expected child span parent context")
   }
-  assert_eq(
+  @debug.assert_eq(
     parent_span_context.span_id().to_hex(),
     root.span_context().span_id().to_hex(),
   )
-  assert_eq(spans[1].attributes.length(), 1)
-  assert_eq(spans[1].events.length(), 1)
+  @debug.assert_eq(spans[1].attributes.length(), 1)
+  @debug.assert_eq(spans[1].events.length(), 1)
 }
 
 ///|
@@ -68,11 +68,11 @@ async test "batch processor flushes queued spans" {
   let span = tracer.start("queued")
   span.end()
 
-  assert_eq(exporter.finished_spans().length(), 0)
+  @debug.assert_eq(exporter.finished_spans().length(), 0)
   guard provider.force_flush() is Ok(_) else {
     fail("expected force_flush to succeed")
   }
-  assert_eq(exporter.finished_spans().length(), 1)
+  @debug.assert_eq(exporter.finished_spans().length(), 1)
 }
 
 ///|
@@ -109,16 +109,19 @@ test "default trace config reads environment variables" {
   @env.set_env_var("OTEL_BSP_MAX_EXPORT_BATCH_SIZE", "29")
 
   let config : Config = Default::default()
-  assert_eq(config.sampler.description(), "parent_based(trace_id_ratio(0.25))")
-  assert_eq(config.span_limits.max_attributes_per_span, 7)
-  assert_eq(config.span_limits.max_events_per_span, 9)
-  assert_eq(config.span_limits.max_links_per_span, 11)
+  @debug.assert_eq(
+    config.sampler.description(),
+    "parent_based(trace_id_ratio(0.25))",
+  )
+  @debug.assert_eq(config.span_limits.max_attributes_per_span, 7)
+  @debug.assert_eq(config.span_limits.max_events_per_span, 9)
+  @debug.assert_eq(config.span_limits.max_links_per_span, 11)
 
   let batch : BatchConfig = Default::default()
-  assert_eq(batch.scheduled_delay_millis, 17)
-  assert_eq(batch.export_timeout_millis, 19)
-  assert_eq(batch.max_queue_size, 23)
-  assert_eq(batch.max_export_batch_size, 23)
+  @debug.assert_eq(batch.scheduled_delay_millis, 17)
+  @debug.assert_eq(batch.export_timeout_millis, 19)
+  @debug.assert_eq(batch.max_queue_size, 23)
+  @debug.assert_eq(batch.max_export_batch_size, 23)
 }
 
 ///|
@@ -142,7 +145,7 @@ async test "batch processor flushes on scheduled delay in background" {
     let span = tracer.start("scheduled")
     span.end()
     @async.sleep(40)
-    assert_eq(exporter.finished_spans().length(), 1)
+    @debug.assert_eq(exporter.finished_spans().length(), 1)
     ignore(provider.shutdown())
   })
 }
@@ -158,7 +161,7 @@ async test "provider shutdown with timeout marks provider unavailable" {
   guard provider.shutdown_with_timeout(1) is Ok(_) else {
     fail("expected shutdown_with_timeout to succeed")
   }
-  guard provider.shutdown() is Err(@error.OTelSdkError::AlreadyShutdown) else {
+  guard provider.shutdown() is Err(AlreadyShutdown) else {
     fail("expected provider to stay shut down")
   }
 }
@@ -173,12 +176,12 @@ test "span status follows ok error unset precedence" {
     .start("status")
   span.set_status(Status::error(description=Some("boom")))
   span.set_status(Status::unset())
-  assert_true(span.snapshot().status.code == StatusCode::Error)
+  assert_true(span.snapshot().status.code == Error)
   span.set_status(Status::ok())
   span.set_status(Status::error(description=Some("later")))
   let status = span.snapshot().status
-  assert_true(status.code == StatusCode::Ok)
-  assert_eq(status.description, None)
+  assert_true(status.code == Ok)
+  @debug.assert_eq(status.description, None)
 }
 
 ///|
@@ -197,30 +200,30 @@ test "event and link attributes honor per-item limits" {
         "4bf92f3577b34da6a3ce929d0e0e4736", "00f067aa0ba902b7",
       ),
       attributes=[
-        @common.KeyValue::new("kept", @common.Value::String("one")),
-        @common.KeyValue::new("dropped", @common.Value::String("two")),
+        @common.KeyValue::new("kept", String("one")),
+        @common.KeyValue::new("dropped", String("two")),
       ],
     ),
   ])
   span.add_event("db.query", attributes=[
-    @common.KeyValue::new("db.system", @common.Value::String("postgresql")),
-    @common.KeyValue::new("db.name", @common.Value::String("app")),
+    @common.KeyValue::new("db.system", String("postgresql")),
+    @common.KeyValue::new("db.name", String("app")),
   ])
   span.add_link(
     sample_span_context("4bf92f3577b34da6a3ce929d0e0e4737", "00f067aa0ba902b8"),
     attributes=[
-      @common.KeyValue::new("kept", @common.Value::String("yes")),
-      @common.KeyValue::new("dropped", @common.Value::String("no")),
+      @common.KeyValue::new("kept", String("yes")),
+      @common.KeyValue::new("dropped", String("no")),
     ],
   )
 
   let snapshot = span.snapshot()
-  assert_eq(snapshot.events.length(), 1)
-  assert_eq(snapshot.events[0].attributes.length(), 1)
-  assert_eq(snapshot.events[0].dropped_attributes_count, 1)
-  assert_eq(snapshot.links.length(), 2)
-  assert_eq(snapshot.links[0].attributes.length(), 1)
-  assert_eq(snapshot.links[0].dropped_attributes_count, 1)
-  assert_eq(snapshot.links[1].attributes.length(), 1)
-  assert_eq(snapshot.links[1].dropped_attributes_count, 1)
+  @debug.assert_eq(snapshot.events.length(), 1)
+  @debug.assert_eq(snapshot.events[0].attributes.length(), 1)
+  @debug.assert_eq(snapshot.events[0].dropped_attributes_count, 1)
+  @debug.assert_eq(snapshot.links.length(), 2)
+  @debug.assert_eq(snapshot.links[0].attributes.length(), 1)
+  @debug.assert_eq(snapshot.links[0].dropped_attributes_count, 1)
+  @debug.assert_eq(snapshot.links[1].attributes.length(), 1)
+  @debug.assert_eq(snapshot.links[1].dropped_attributes_count, 1)
 }

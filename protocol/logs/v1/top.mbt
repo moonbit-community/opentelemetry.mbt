@@ -30,168 +30,166 @@ pub(all) enum SeverityNumber {
 ///|
 pub fn SeverityNumber::to_enum(self : SeverityNumber) -> @protobuf.Enum {
   match self {
-    SeverityNumber::SEVERITY_NUMBER_UNSPECIFIED => 0
-    SeverityNumber::SEVERITY_NUMBER_TRACE => 1
-    SeverityNumber::SEVERITY_NUMBER_TRACE2 => 2
-    SeverityNumber::SEVERITY_NUMBER_TRACE3 => 3
-    SeverityNumber::SEVERITY_NUMBER_TRACE4 => 4
-    SeverityNumber::SEVERITY_NUMBER_DEBUG => 5
-    SeverityNumber::SEVERITY_NUMBER_DEBUG2 => 6
-    SeverityNumber::SEVERITY_NUMBER_DEBUG3 => 7
-    SeverityNumber::SEVERITY_NUMBER_DEBUG4 => 8
-    SeverityNumber::SEVERITY_NUMBER_INFO => 9
-    SeverityNumber::SEVERITY_NUMBER_INFO2 => 10
-    SeverityNumber::SEVERITY_NUMBER_INFO3 => 11
-    SeverityNumber::SEVERITY_NUMBER_INFO4 => 12
-    SeverityNumber::SEVERITY_NUMBER_WARN => 13
-    SeverityNumber::SEVERITY_NUMBER_WARN2 => 14
-    SeverityNumber::SEVERITY_NUMBER_WARN3 => 15
-    SeverityNumber::SEVERITY_NUMBER_WARN4 => 16
-    SeverityNumber::SEVERITY_NUMBER_ERROR => 17
-    SeverityNumber::SEVERITY_NUMBER_ERROR2 => 18
-    SeverityNumber::SEVERITY_NUMBER_ERROR3 => 19
-    SeverityNumber::SEVERITY_NUMBER_ERROR4 => 20
-    SeverityNumber::SEVERITY_NUMBER_FATAL => 21
-    SeverityNumber::SEVERITY_NUMBER_FATAL2 => 22
-    SeverityNumber::SEVERITY_NUMBER_FATAL3 => 23
-    SeverityNumber::SEVERITY_NUMBER_FATAL4 => 24
+    SEVERITY_NUMBER_UNSPECIFIED => 0
+    SEVERITY_NUMBER_TRACE => 1
+    SEVERITY_NUMBER_TRACE2 => 2
+    SEVERITY_NUMBER_TRACE3 => 3
+    SEVERITY_NUMBER_TRACE4 => 4
+    SEVERITY_NUMBER_DEBUG => 5
+    SEVERITY_NUMBER_DEBUG2 => 6
+    SEVERITY_NUMBER_DEBUG3 => 7
+    SEVERITY_NUMBER_DEBUG4 => 8
+    SEVERITY_NUMBER_INFO => 9
+    SEVERITY_NUMBER_INFO2 => 10
+    SEVERITY_NUMBER_INFO3 => 11
+    SEVERITY_NUMBER_INFO4 => 12
+    SEVERITY_NUMBER_WARN => 13
+    SEVERITY_NUMBER_WARN2 => 14
+    SEVERITY_NUMBER_WARN3 => 15
+    SEVERITY_NUMBER_WARN4 => 16
+    SEVERITY_NUMBER_ERROR => 17
+    SEVERITY_NUMBER_ERROR2 => 18
+    SEVERITY_NUMBER_ERROR3 => 19
+    SEVERITY_NUMBER_ERROR4 => 20
+    SEVERITY_NUMBER_FATAL => 21
+    SEVERITY_NUMBER_FATAL2 => 22
+    SEVERITY_NUMBER_FATAL3 => 23
+    SEVERITY_NUMBER_FATAL4 => 24
   }
 }
 
 ///|
 pub fn SeverityNumber::from_enum(i : @protobuf.Enum) -> SeverityNumber {
   match i.0 {
-    0 => SeverityNumber::SEVERITY_NUMBER_UNSPECIFIED
-    1 => SeverityNumber::SEVERITY_NUMBER_TRACE
-    2 => SeverityNumber::SEVERITY_NUMBER_TRACE2
-    3 => SeverityNumber::SEVERITY_NUMBER_TRACE3
-    4 => SeverityNumber::SEVERITY_NUMBER_TRACE4
-    5 => SeverityNumber::SEVERITY_NUMBER_DEBUG
-    6 => SeverityNumber::SEVERITY_NUMBER_DEBUG2
-    7 => SeverityNumber::SEVERITY_NUMBER_DEBUG3
-    8 => SeverityNumber::SEVERITY_NUMBER_DEBUG4
-    9 => SeverityNumber::SEVERITY_NUMBER_INFO
-    10 => SeverityNumber::SEVERITY_NUMBER_INFO2
-    11 => SeverityNumber::SEVERITY_NUMBER_INFO3
-    12 => SeverityNumber::SEVERITY_NUMBER_INFO4
-    13 => SeverityNumber::SEVERITY_NUMBER_WARN
-    14 => SeverityNumber::SEVERITY_NUMBER_WARN2
-    15 => SeverityNumber::SEVERITY_NUMBER_WARN3
-    16 => SeverityNumber::SEVERITY_NUMBER_WARN4
-    17 => SeverityNumber::SEVERITY_NUMBER_ERROR
-    18 => SeverityNumber::SEVERITY_NUMBER_ERROR2
-    19 => SeverityNumber::SEVERITY_NUMBER_ERROR3
-    20 => SeverityNumber::SEVERITY_NUMBER_ERROR4
-    21 => SeverityNumber::SEVERITY_NUMBER_FATAL
-    22 => SeverityNumber::SEVERITY_NUMBER_FATAL2
-    23 => SeverityNumber::SEVERITY_NUMBER_FATAL3
-    24 => SeverityNumber::SEVERITY_NUMBER_FATAL4
+    0 => SEVERITY_NUMBER_UNSPECIFIED
+    1 => SEVERITY_NUMBER_TRACE
+    2 => SEVERITY_NUMBER_TRACE2
+    3 => SEVERITY_NUMBER_TRACE3
+    4 => SEVERITY_NUMBER_TRACE4
+    5 => SEVERITY_NUMBER_DEBUG
+    6 => SEVERITY_NUMBER_DEBUG2
+    7 => SEVERITY_NUMBER_DEBUG3
+    8 => SEVERITY_NUMBER_DEBUG4
+    9 => SEVERITY_NUMBER_INFO
+    10 => SEVERITY_NUMBER_INFO2
+    11 => SEVERITY_NUMBER_INFO3
+    12 => SEVERITY_NUMBER_INFO4
+    13 => SEVERITY_NUMBER_WARN
+    14 => SEVERITY_NUMBER_WARN2
+    15 => SEVERITY_NUMBER_WARN3
+    16 => SEVERITY_NUMBER_WARN4
+    17 => SEVERITY_NUMBER_ERROR
+    18 => SEVERITY_NUMBER_ERROR2
+    19 => SEVERITY_NUMBER_ERROR3
+    20 => SEVERITY_NUMBER_ERROR4
+    21 => SEVERITY_NUMBER_FATAL
+    22 => SEVERITY_NUMBER_FATAL2
+    23 => SEVERITY_NUMBER_FATAL3
+    24 => SEVERITY_NUMBER_FATAL4
     _ => Default::default()
   }
 }
 
 ///|
-pub impl Default for SeverityNumber with default() -> SeverityNumber {
-  SeverityNumber::SEVERITY_NUMBER_UNSPECIFIED
+pub impl Default for SeverityNumber with fn default() -> SeverityNumber {
+  SEVERITY_NUMBER_UNSPECIFIED
 }
 
 ///|
-pub impl @protobuf.Sized for SeverityNumber with size_of(self : SeverityNumber) {
+pub impl @protobuf.Sized for SeverityNumber with fn size_of(
+  self : SeverityNumber,
+) {
   @protobuf.Sized::size_of(self.to_enum())
 }
 
 ///|
-pub impl @json.FromJson for SeverityNumber with from_json(
+pub impl @json.FromJson for SeverityNumber with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> SeverityNumber raise {
   match json {
-    String("SEVERITY_NUMBER_UNSPECIFIED") =>
-      SeverityNumber::SEVERITY_NUMBER_UNSPECIFIED
-    String("SEVERITY_NUMBER_TRACE") => SeverityNumber::SEVERITY_NUMBER_TRACE
-    String("SEVERITY_NUMBER_TRACE2") => SeverityNumber::SEVERITY_NUMBER_TRACE2
-    String("SEVERITY_NUMBER_TRACE3") => SeverityNumber::SEVERITY_NUMBER_TRACE3
-    String("SEVERITY_NUMBER_TRACE4") => SeverityNumber::SEVERITY_NUMBER_TRACE4
-    String("SEVERITY_NUMBER_DEBUG") => SeverityNumber::SEVERITY_NUMBER_DEBUG
-    String("SEVERITY_NUMBER_DEBUG2") => SeverityNumber::SEVERITY_NUMBER_DEBUG2
-    String("SEVERITY_NUMBER_DEBUG3") => SeverityNumber::SEVERITY_NUMBER_DEBUG3
-    String("SEVERITY_NUMBER_DEBUG4") => SeverityNumber::SEVERITY_NUMBER_DEBUG4
-    String("SEVERITY_NUMBER_INFO") => SeverityNumber::SEVERITY_NUMBER_INFO
-    String("SEVERITY_NUMBER_INFO2") => SeverityNumber::SEVERITY_NUMBER_INFO2
-    String("SEVERITY_NUMBER_INFO3") => SeverityNumber::SEVERITY_NUMBER_INFO3
-    String("SEVERITY_NUMBER_INFO4") => SeverityNumber::SEVERITY_NUMBER_INFO4
-    String("SEVERITY_NUMBER_WARN") => SeverityNumber::SEVERITY_NUMBER_WARN
-    String("SEVERITY_NUMBER_WARN2") => SeverityNumber::SEVERITY_NUMBER_WARN2
-    String("SEVERITY_NUMBER_WARN3") => SeverityNumber::SEVERITY_NUMBER_WARN3
-    String("SEVERITY_NUMBER_WARN4") => SeverityNumber::SEVERITY_NUMBER_WARN4
-    String("SEVERITY_NUMBER_ERROR") => SeverityNumber::SEVERITY_NUMBER_ERROR
-    String("SEVERITY_NUMBER_ERROR2") => SeverityNumber::SEVERITY_NUMBER_ERROR2
-    String("SEVERITY_NUMBER_ERROR3") => SeverityNumber::SEVERITY_NUMBER_ERROR3
-    String("SEVERITY_NUMBER_ERROR4") => SeverityNumber::SEVERITY_NUMBER_ERROR4
-    String("SEVERITY_NUMBER_FATAL") => SeverityNumber::SEVERITY_NUMBER_FATAL
-    String("SEVERITY_NUMBER_FATAL2") => SeverityNumber::SEVERITY_NUMBER_FATAL2
-    String("SEVERITY_NUMBER_FATAL3") => SeverityNumber::SEVERITY_NUMBER_FATAL3
-    String("SEVERITY_NUMBER_FATAL4") => SeverityNumber::SEVERITY_NUMBER_FATAL4
-    Number(0, ..) => SeverityNumber::SEVERITY_NUMBER_UNSPECIFIED
-    Number(1, ..) => SeverityNumber::SEVERITY_NUMBER_TRACE
-    Number(2, ..) => SeverityNumber::SEVERITY_NUMBER_TRACE2
-    Number(3, ..) => SeverityNumber::SEVERITY_NUMBER_TRACE3
-    Number(4, ..) => SeverityNumber::SEVERITY_NUMBER_TRACE4
-    Number(5, ..) => SeverityNumber::SEVERITY_NUMBER_DEBUG
-    Number(6, ..) => SeverityNumber::SEVERITY_NUMBER_DEBUG2
-    Number(7, ..) => SeverityNumber::SEVERITY_NUMBER_DEBUG3
-    Number(8, ..) => SeverityNumber::SEVERITY_NUMBER_DEBUG4
-    Number(9, ..) => SeverityNumber::SEVERITY_NUMBER_INFO
-    Number(10, ..) => SeverityNumber::SEVERITY_NUMBER_INFO2
-    Number(11, ..) => SeverityNumber::SEVERITY_NUMBER_INFO3
-    Number(12, ..) => SeverityNumber::SEVERITY_NUMBER_INFO4
-    Number(13, ..) => SeverityNumber::SEVERITY_NUMBER_WARN
-    Number(14, ..) => SeverityNumber::SEVERITY_NUMBER_WARN2
-    Number(15, ..) => SeverityNumber::SEVERITY_NUMBER_WARN3
-    Number(16, ..) => SeverityNumber::SEVERITY_NUMBER_WARN4
-    Number(17, ..) => SeverityNumber::SEVERITY_NUMBER_ERROR
-    Number(18, ..) => SeverityNumber::SEVERITY_NUMBER_ERROR2
-    Number(19, ..) => SeverityNumber::SEVERITY_NUMBER_ERROR3
-    Number(20, ..) => SeverityNumber::SEVERITY_NUMBER_ERROR4
-    Number(21, ..) => SeverityNumber::SEVERITY_NUMBER_FATAL
-    Number(22, ..) => SeverityNumber::SEVERITY_NUMBER_FATAL2
-    Number(23, ..) => SeverityNumber::SEVERITY_NUMBER_FATAL3
-    Number(24, ..) => SeverityNumber::SEVERITY_NUMBER_FATAL4
-    _ =>
-      raise @json.JsonDecodeError(
-        (path, "Expected a number or string for enum"),
-      )
+    String("SEVERITY_NUMBER_UNSPECIFIED") => SEVERITY_NUMBER_UNSPECIFIED
+    String("SEVERITY_NUMBER_TRACE") => SEVERITY_NUMBER_TRACE
+    String("SEVERITY_NUMBER_TRACE2") => SEVERITY_NUMBER_TRACE2
+    String("SEVERITY_NUMBER_TRACE3") => SEVERITY_NUMBER_TRACE3
+    String("SEVERITY_NUMBER_TRACE4") => SEVERITY_NUMBER_TRACE4
+    String("SEVERITY_NUMBER_DEBUG") => SEVERITY_NUMBER_DEBUG
+    String("SEVERITY_NUMBER_DEBUG2") => SEVERITY_NUMBER_DEBUG2
+    String("SEVERITY_NUMBER_DEBUG3") => SEVERITY_NUMBER_DEBUG3
+    String("SEVERITY_NUMBER_DEBUG4") => SEVERITY_NUMBER_DEBUG4
+    String("SEVERITY_NUMBER_INFO") => SEVERITY_NUMBER_INFO
+    String("SEVERITY_NUMBER_INFO2") => SEVERITY_NUMBER_INFO2
+    String("SEVERITY_NUMBER_INFO3") => SEVERITY_NUMBER_INFO3
+    String("SEVERITY_NUMBER_INFO4") => SEVERITY_NUMBER_INFO4
+    String("SEVERITY_NUMBER_WARN") => SEVERITY_NUMBER_WARN
+    String("SEVERITY_NUMBER_WARN2") => SEVERITY_NUMBER_WARN2
+    String("SEVERITY_NUMBER_WARN3") => SEVERITY_NUMBER_WARN3
+    String("SEVERITY_NUMBER_WARN4") => SEVERITY_NUMBER_WARN4
+    String("SEVERITY_NUMBER_ERROR") => SEVERITY_NUMBER_ERROR
+    String("SEVERITY_NUMBER_ERROR2") => SEVERITY_NUMBER_ERROR2
+    String("SEVERITY_NUMBER_ERROR3") => SEVERITY_NUMBER_ERROR3
+    String("SEVERITY_NUMBER_ERROR4") => SEVERITY_NUMBER_ERROR4
+    String("SEVERITY_NUMBER_FATAL") => SEVERITY_NUMBER_FATAL
+    String("SEVERITY_NUMBER_FATAL2") => SEVERITY_NUMBER_FATAL2
+    String("SEVERITY_NUMBER_FATAL3") => SEVERITY_NUMBER_FATAL3
+    String("SEVERITY_NUMBER_FATAL4") => SEVERITY_NUMBER_FATAL4
+    Number(0, ..) => SEVERITY_NUMBER_UNSPECIFIED
+    Number(1, ..) => SEVERITY_NUMBER_TRACE
+    Number(2, ..) => SEVERITY_NUMBER_TRACE2
+    Number(3, ..) => SEVERITY_NUMBER_TRACE3
+    Number(4, ..) => SEVERITY_NUMBER_TRACE4
+    Number(5, ..) => SEVERITY_NUMBER_DEBUG
+    Number(6, ..) => SEVERITY_NUMBER_DEBUG2
+    Number(7, ..) => SEVERITY_NUMBER_DEBUG3
+    Number(8, ..) => SEVERITY_NUMBER_DEBUG4
+    Number(9, ..) => SEVERITY_NUMBER_INFO
+    Number(10, ..) => SEVERITY_NUMBER_INFO2
+    Number(11, ..) => SEVERITY_NUMBER_INFO3
+    Number(12, ..) => SEVERITY_NUMBER_INFO4
+    Number(13, ..) => SEVERITY_NUMBER_WARN
+    Number(14, ..) => SEVERITY_NUMBER_WARN2
+    Number(15, ..) => SEVERITY_NUMBER_WARN3
+    Number(16, ..) => SEVERITY_NUMBER_WARN4
+    Number(17, ..) => SEVERITY_NUMBER_ERROR
+    Number(18, ..) => SEVERITY_NUMBER_ERROR2
+    Number(19, ..) => SEVERITY_NUMBER_ERROR3
+    Number(20, ..) => SEVERITY_NUMBER_ERROR4
+    Number(21, ..) => SEVERITY_NUMBER_FATAL
+    Number(22, ..) => SEVERITY_NUMBER_FATAL2
+    Number(23, ..) => SEVERITY_NUMBER_FATAL3
+    Number(24, ..) => SEVERITY_NUMBER_FATAL4
+    _ => raise JsonDecodeError((path, "Expected a number or string for enum"))
   }
 }
 
 ///|
-pub impl ToJson for SeverityNumber with to_json(self : SeverityNumber) -> Json {
+pub impl ToJson for SeverityNumber with fn to_json(self : SeverityNumber) -> Json {
   match self {
-    SeverityNumber::SEVERITY_NUMBER_UNSPECIFIED => "SEVERITY_NUMBER_UNSPECIFIED"
-    SeverityNumber::SEVERITY_NUMBER_TRACE => "SEVERITY_NUMBER_TRACE"
-    SeverityNumber::SEVERITY_NUMBER_TRACE2 => "SEVERITY_NUMBER_TRACE2"
-    SeverityNumber::SEVERITY_NUMBER_TRACE3 => "SEVERITY_NUMBER_TRACE3"
-    SeverityNumber::SEVERITY_NUMBER_TRACE4 => "SEVERITY_NUMBER_TRACE4"
-    SeverityNumber::SEVERITY_NUMBER_DEBUG => "SEVERITY_NUMBER_DEBUG"
-    SeverityNumber::SEVERITY_NUMBER_DEBUG2 => "SEVERITY_NUMBER_DEBUG2"
-    SeverityNumber::SEVERITY_NUMBER_DEBUG3 => "SEVERITY_NUMBER_DEBUG3"
-    SeverityNumber::SEVERITY_NUMBER_DEBUG4 => "SEVERITY_NUMBER_DEBUG4"
-    SeverityNumber::SEVERITY_NUMBER_INFO => "SEVERITY_NUMBER_INFO"
-    SeverityNumber::SEVERITY_NUMBER_INFO2 => "SEVERITY_NUMBER_INFO2"
-    SeverityNumber::SEVERITY_NUMBER_INFO3 => "SEVERITY_NUMBER_INFO3"
-    SeverityNumber::SEVERITY_NUMBER_INFO4 => "SEVERITY_NUMBER_INFO4"
-    SeverityNumber::SEVERITY_NUMBER_WARN => "SEVERITY_NUMBER_WARN"
-    SeverityNumber::SEVERITY_NUMBER_WARN2 => "SEVERITY_NUMBER_WARN2"
-    SeverityNumber::SEVERITY_NUMBER_WARN3 => "SEVERITY_NUMBER_WARN3"
-    SeverityNumber::SEVERITY_NUMBER_WARN4 => "SEVERITY_NUMBER_WARN4"
-    SeverityNumber::SEVERITY_NUMBER_ERROR => "SEVERITY_NUMBER_ERROR"
-    SeverityNumber::SEVERITY_NUMBER_ERROR2 => "SEVERITY_NUMBER_ERROR2"
-    SeverityNumber::SEVERITY_NUMBER_ERROR3 => "SEVERITY_NUMBER_ERROR3"
-    SeverityNumber::SEVERITY_NUMBER_ERROR4 => "SEVERITY_NUMBER_ERROR4"
-    SeverityNumber::SEVERITY_NUMBER_FATAL => "SEVERITY_NUMBER_FATAL"
-    SeverityNumber::SEVERITY_NUMBER_FATAL2 => "SEVERITY_NUMBER_FATAL2"
-    SeverityNumber::SEVERITY_NUMBER_FATAL3 => "SEVERITY_NUMBER_FATAL3"
-    SeverityNumber::SEVERITY_NUMBER_FATAL4 => "SEVERITY_NUMBER_FATAL4"
+    SEVERITY_NUMBER_UNSPECIFIED => "SEVERITY_NUMBER_UNSPECIFIED"
+    SEVERITY_NUMBER_TRACE => "SEVERITY_NUMBER_TRACE"
+    SEVERITY_NUMBER_TRACE2 => "SEVERITY_NUMBER_TRACE2"
+    SEVERITY_NUMBER_TRACE3 => "SEVERITY_NUMBER_TRACE3"
+    SEVERITY_NUMBER_TRACE4 => "SEVERITY_NUMBER_TRACE4"
+    SEVERITY_NUMBER_DEBUG => "SEVERITY_NUMBER_DEBUG"
+    SEVERITY_NUMBER_DEBUG2 => "SEVERITY_NUMBER_DEBUG2"
+    SEVERITY_NUMBER_DEBUG3 => "SEVERITY_NUMBER_DEBUG3"
+    SEVERITY_NUMBER_DEBUG4 => "SEVERITY_NUMBER_DEBUG4"
+    SEVERITY_NUMBER_INFO => "SEVERITY_NUMBER_INFO"
+    SEVERITY_NUMBER_INFO2 => "SEVERITY_NUMBER_INFO2"
+    SEVERITY_NUMBER_INFO3 => "SEVERITY_NUMBER_INFO3"
+    SEVERITY_NUMBER_INFO4 => "SEVERITY_NUMBER_INFO4"
+    SEVERITY_NUMBER_WARN => "SEVERITY_NUMBER_WARN"
+    SEVERITY_NUMBER_WARN2 => "SEVERITY_NUMBER_WARN2"
+    SEVERITY_NUMBER_WARN3 => "SEVERITY_NUMBER_WARN3"
+    SEVERITY_NUMBER_WARN4 => "SEVERITY_NUMBER_WARN4"
+    SEVERITY_NUMBER_ERROR => "SEVERITY_NUMBER_ERROR"
+    SEVERITY_NUMBER_ERROR2 => "SEVERITY_NUMBER_ERROR2"
+    SEVERITY_NUMBER_ERROR3 => "SEVERITY_NUMBER_ERROR3"
+    SEVERITY_NUMBER_ERROR4 => "SEVERITY_NUMBER_ERROR4"
+    SEVERITY_NUMBER_FATAL => "SEVERITY_NUMBER_FATAL"
+    SEVERITY_NUMBER_FATAL2 => "SEVERITY_NUMBER_FATAL2"
+    SEVERITY_NUMBER_FATAL3 => "SEVERITY_NUMBER_FATAL3"
+    SEVERITY_NUMBER_FATAL4 => "SEVERITY_NUMBER_FATAL4"
   }
 }
 
@@ -204,55 +202,52 @@ pub(all) enum LogRecordFlags {
 ///|
 pub fn LogRecordFlags::to_enum(self : LogRecordFlags) -> @protobuf.Enum {
   match self {
-    LogRecordFlags::LOG_RECORD_FLAGS_DO_NOT_USE => 0
-    LogRecordFlags::LOG_RECORD_FLAGS_TRACE_FLAGS_MASK => 255
+    LOG_RECORD_FLAGS_DO_NOT_USE => 0
+    LOG_RECORD_FLAGS_TRACE_FLAGS_MASK => 255
   }
 }
 
 ///|
 pub fn LogRecordFlags::from_enum(i : @protobuf.Enum) -> LogRecordFlags {
   match i.0 {
-    0 => LogRecordFlags::LOG_RECORD_FLAGS_DO_NOT_USE
-    255 => LogRecordFlags::LOG_RECORD_FLAGS_TRACE_FLAGS_MASK
+    0 => LOG_RECORD_FLAGS_DO_NOT_USE
+    255 => LOG_RECORD_FLAGS_TRACE_FLAGS_MASK
     _ => Default::default()
   }
 }
 
 ///|
-pub impl Default for LogRecordFlags with default() -> LogRecordFlags {
-  LogRecordFlags::LOG_RECORD_FLAGS_DO_NOT_USE
+pub impl Default for LogRecordFlags with fn default() -> LogRecordFlags {
+  LOG_RECORD_FLAGS_DO_NOT_USE
 }
 
 ///|
-pub impl @protobuf.Sized for LogRecordFlags with size_of(self : LogRecordFlags) {
+pub impl @protobuf.Sized for LogRecordFlags with fn size_of(
+  self : LogRecordFlags,
+) {
   @protobuf.Sized::size_of(self.to_enum())
 }
 
 ///|
-pub impl @json.FromJson for LogRecordFlags with from_json(
+pub impl @json.FromJson for LogRecordFlags with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> LogRecordFlags raise {
   match json {
-    String("LOG_RECORD_FLAGS_DO_NOT_USE") =>
-      LogRecordFlags::LOG_RECORD_FLAGS_DO_NOT_USE
+    String("LOG_RECORD_FLAGS_DO_NOT_USE") => LOG_RECORD_FLAGS_DO_NOT_USE
     String("LOG_RECORD_FLAGS_TRACE_FLAGS_MASK") =>
-      LogRecordFlags::LOG_RECORD_FLAGS_TRACE_FLAGS_MASK
-    Number(0, ..) => LogRecordFlags::LOG_RECORD_FLAGS_DO_NOT_USE
-    Number(255, ..) => LogRecordFlags::LOG_RECORD_FLAGS_TRACE_FLAGS_MASK
-    _ =>
-      raise @json.JsonDecodeError(
-        (path, "Expected a number or string for enum"),
-      )
+      LOG_RECORD_FLAGS_TRACE_FLAGS_MASK
+    Number(0, ..) => LOG_RECORD_FLAGS_DO_NOT_USE
+    Number(255, ..) => LOG_RECORD_FLAGS_TRACE_FLAGS_MASK
+    _ => raise JsonDecodeError((path, "Expected a number or string for enum"))
   }
 }
 
 ///|
-pub impl ToJson for LogRecordFlags with to_json(self : LogRecordFlags) -> Json {
+pub impl ToJson for LogRecordFlags with fn to_json(self : LogRecordFlags) -> Json {
   match self {
-    LogRecordFlags::LOG_RECORD_FLAGS_DO_NOT_USE => "LOG_RECORD_FLAGS_DO_NOT_USE"
-    LogRecordFlags::LOG_RECORD_FLAGS_TRACE_FLAGS_MASK =>
-      "LOG_RECORD_FLAGS_TRACE_FLAGS_MASK"
+    LOG_RECORD_FLAGS_DO_NOT_USE => "LOG_RECORD_FLAGS_DO_NOT_USE"
+    LOG_RECORD_FLAGS_TRACE_FLAGS_MASK => "LOG_RECORD_FLAGS_TRACE_FLAGS_MASK"
   }
 }
 
@@ -262,7 +257,7 @@ pub(all) struct LogsData {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for LogsData with size_of(self) {
+pub impl @protobuf.Sized for LogsData with fn size_of(self) {
   let mut size = 0U
   for s in self.resource_logs {
     let s = @protobuf.size_of(s)
@@ -272,17 +267,17 @@ pub impl @protobuf.Sized for LogsData with size_of(self) {
 }
 
 ///|
-pub impl Default for LogsData with default() -> LogsData {
-  LogsData::{ resource_logs: [] }
+pub impl Default for LogsData with fn default() -> LogsData {
+  { resource_logs: [] }
 }
 
 ///|
 pub fn LogsData::new(resource_logs : Array[ResourceLogs]) -> LogsData {
-  LogsData::{ resource_logs, }
+  { resource_logs, }
 }
 
 ///|
-pub impl @protobuf.Read for LogsData with read_with_limit(
+pub impl @protobuf.Read for LogsData with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> LogsData raise {
   let msg = LogsData::default()
@@ -304,7 +299,7 @@ pub impl @protobuf.Read for LogsData with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for LogsData with write(
+pub impl @protobuf.Write for LogsData with fn write(
   self : LogsData,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -316,7 +311,7 @@ pub impl @protobuf.Write for LogsData with write(
 }
 
 ///|
-pub impl ToJson for LogsData with to_json(self) {
+pub impl ToJson for LogsData with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.resource_logs != Default::default() {
     json["resourceLogs"] = self.resource_logs.to_json()
@@ -325,26 +320,26 @@ pub impl ToJson for LogsData with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for LogsData with from_json(
+pub impl @json.FromJson for LogsData with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> LogsData raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for LogsData"))
+    raise JsonDecodeError((path, "Expected an object for LogsData"))
   }
   let message = LogsData::default()
   for key, value in obj {
     match (key, value) {
       ("resourceLogs", Array(value)) =>
         message.resource_logs = value.map(v => @json.from_json(v, path~))
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for LogsData with read_with_limit(
+pub impl @protobuf.AsyncRead for LogsData with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> LogsData raise {
   let msg = LogsData::default()
@@ -366,7 +361,7 @@ pub impl @protobuf.AsyncRead for LogsData with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for LogsData with write(
+pub impl @protobuf.AsyncWrite for LogsData with fn write(
   self : LogsData,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -385,7 +380,7 @@ pub(all) struct ResourceLogs {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for ResourceLogs with size_of(self) {
+pub impl @protobuf.Sized for ResourceLogs with fn size_of(self) {
   let mut size = 0U
   size += 1U +
     ({
@@ -405,8 +400,8 @@ pub impl @protobuf.Sized for ResourceLogs with size_of(self) {
 }
 
 ///|
-pub impl Default for ResourceLogs with default() -> ResourceLogs {
-  ResourceLogs::{
+pub impl Default for ResourceLogs with fn default() -> ResourceLogs {
+  {
     resource: @v11.Resource::default(),
     scope_logs: [],
     schema_url: String::default(),
@@ -419,11 +414,11 @@ pub fn ResourceLogs::new(
   scope_logs : Array[ScopeLogs],
   schema_url : String,
 ) -> ResourceLogs {
-  ResourceLogs::{ resource, scope_logs, schema_url }
+  { resource, scope_logs, schema_url }
 }
 
 ///|
-pub impl @protobuf.Read for ResourceLogs with read_with_limit(
+pub impl @protobuf.Read for ResourceLogs with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ResourceLogs raise {
   let msg = ResourceLogs::default()
@@ -446,7 +441,7 @@ pub impl @protobuf.Read for ResourceLogs with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for ResourceLogs with write(
+pub impl @protobuf.Write for ResourceLogs with fn write(
   self : ResourceLogs,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -463,7 +458,7 @@ pub impl @protobuf.Write for ResourceLogs with write(
 }
 
 ///|
-pub impl ToJson for ResourceLogs with to_json(self) {
+pub impl ToJson for ResourceLogs with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.resource != Default::default() {
     json["resource"] = self.resource.to_json()
@@ -478,12 +473,12 @@ pub impl ToJson for ResourceLogs with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for ResourceLogs with from_json(
+pub impl @json.FromJson for ResourceLogs with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> ResourceLogs raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for ResourceLogs"))
+    raise JsonDecodeError((path, "Expected an object for ResourceLogs"))
   }
   let message = ResourceLogs::default()
   for key, value in obj {
@@ -492,14 +487,14 @@ pub impl @json.FromJson for ResourceLogs with from_json(
       ("scopeLogs", Array(value)) =>
         message.scope_logs = value.map(v => @json.from_json(v, path~))
       ("schemaUrl", value) => message.schema_url = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for ResourceLogs with read_with_limit(
+pub impl @protobuf.AsyncRead for ResourceLogs with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ResourceLogs raise {
   let msg = ResourceLogs::default()
@@ -525,7 +520,7 @@ pub impl @protobuf.AsyncRead for ResourceLogs with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for ResourceLogs with write(
+pub impl @protobuf.AsyncWrite for ResourceLogs with fn write(
   self : ResourceLogs,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -549,7 +544,7 @@ pub(all) struct ScopeLogs {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for ScopeLogs with size_of(self) {
+pub impl @protobuf.Sized for ScopeLogs with fn size_of(self) {
   let mut size = 0U
   size += 1U +
     ({
@@ -569,8 +564,8 @@ pub impl @protobuf.Sized for ScopeLogs with size_of(self) {
 }
 
 ///|
-pub impl Default for ScopeLogs with default() -> ScopeLogs {
-  ScopeLogs::{
+pub impl Default for ScopeLogs with fn default() -> ScopeLogs {
+  {
     scope: @v1_dep.InstrumentationScope::default(),
     log_records: [],
     schema_url: String::default(),
@@ -583,11 +578,11 @@ pub fn ScopeLogs::new(
   log_records : Array[LogRecord],
   schema_url : String,
 ) -> ScopeLogs {
-  ScopeLogs::{ scope, log_records, schema_url }
+  { scope, log_records, schema_url }
 }
 
 ///|
-pub impl @protobuf.Read for ScopeLogs with read_with_limit(
+pub impl @protobuf.Read for ScopeLogs with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ScopeLogs raise {
   let msg = ScopeLogs::default()
@@ -611,7 +606,7 @@ pub impl @protobuf.Read for ScopeLogs with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for ScopeLogs with write(
+pub impl @protobuf.Write for ScopeLogs with fn write(
   self : ScopeLogs,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -628,7 +623,7 @@ pub impl @protobuf.Write for ScopeLogs with write(
 }
 
 ///|
-pub impl ToJson for ScopeLogs with to_json(self) {
+pub impl ToJson for ScopeLogs with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.scope != Default::default() {
     json["scope"] = self.scope.to_json()
@@ -643,12 +638,12 @@ pub impl ToJson for ScopeLogs with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for ScopeLogs with from_json(
+pub impl @json.FromJson for ScopeLogs with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> ScopeLogs raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for ScopeLogs"))
+    raise JsonDecodeError((path, "Expected an object for ScopeLogs"))
   }
   let message = ScopeLogs::default()
   for key, value in obj {
@@ -657,14 +652,14 @@ pub impl @json.FromJson for ScopeLogs with from_json(
       ("logRecords", Array(value)) =>
         message.log_records = value.map(v => @json.from_json(v, path~))
       ("schemaUrl", value) => message.schema_url = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for ScopeLogs with read_with_limit(
+pub impl @protobuf.AsyncRead for ScopeLogs with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ScopeLogs raise {
   let msg = ScopeLogs::default()
@@ -691,7 +686,7 @@ pub impl @protobuf.AsyncRead for ScopeLogs with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for ScopeLogs with write(
+pub impl @protobuf.AsyncWrite for ScopeLogs with fn write(
   self : ScopeLogs,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -723,7 +718,7 @@ pub(all) struct LogRecord {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for LogRecord with size_of(self) {
+pub impl @protobuf.Sized for LogRecord with fn size_of(self) {
   let mut size = 0U
   size += 1U + 8U
   size += 1U + 8U
@@ -763,8 +758,8 @@ pub impl @protobuf.Sized for LogRecord with size_of(self) {
 }
 
 ///|
-pub impl Default for LogRecord with default() -> LogRecord {
-  LogRecord::{
+pub impl Default for LogRecord with fn default() -> LogRecord {
+  {
     time_unix_nano: UInt64::default(),
     observed_time_unix_nano: UInt64::default(),
     severity_number: SeverityNumber::default(),
@@ -793,7 +788,7 @@ pub fn LogRecord::new(
   span_id : Bytes,
   event_name : String,
 ) -> LogRecord {
-  LogRecord::{
+  {
     time_unix_nano,
     observed_time_unix_nano,
     severity_number,
@@ -809,7 +804,7 @@ pub fn LogRecord::new(
 }
 
 ///|
-pub impl @protobuf.Read for LogRecord with read_with_limit(
+pub impl @protobuf.Read for LogRecord with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> LogRecord raise {
   let msg = LogRecord::default()
@@ -847,7 +842,7 @@ pub impl @protobuf.Read for LogRecord with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for LogRecord with write(
+pub impl @protobuf.Write for LogRecord with fn write(
   self : LogRecord,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -880,7 +875,7 @@ pub impl @protobuf.Write for LogRecord with write(
 }
 
 ///|
-pub impl ToJson for LogRecord with to_json(self) {
+pub impl ToJson for LogRecord with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.time_unix_nano != Default::default() {
     json["timeUnixNano"] = self.time_unix_nano.to_json()
@@ -919,12 +914,12 @@ pub impl ToJson for LogRecord with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for LogRecord with from_json(
+pub impl @json.FromJson for LogRecord with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> LogRecord raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for LogRecord"))
+    raise JsonDecodeError((path, "Expected an object for LogRecord"))
   }
   let message = LogRecord::default()
   for key, value in obj {
@@ -948,14 +943,14 @@ pub impl @json.FromJson for LogRecord with from_json(
       ("spanId", String(value)) =>
         message.span_id = @protobuf.base64_decode(value)
       ("eventName", value) => message.event_name = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for LogRecord with read_with_limit(
+pub impl @protobuf.AsyncRead for LogRecord with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> LogRecord raise {
   let msg = LogRecord::default()
@@ -994,7 +989,7 @@ pub impl @protobuf.AsyncRead for LogRecord with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for LogRecord with write(
+pub impl @protobuf.AsyncWrite for LogRecord with fn write(
   self : LogRecord,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {

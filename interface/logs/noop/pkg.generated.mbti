@@ -11,7 +11,7 @@ import {
 
 // Types and methods
 pub struct NoopLoggerProvider {
-}
+} derive(Default)
 pub fn NoopLoggerProvider::into_logger_provider(Self) -> @logs.LoggerProvider
 pub fn NoopLoggerProvider::new() -> Self
 

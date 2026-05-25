@@ -4,7 +4,7 @@
 /// Implement this for HTTP header maps or other text carriers that need
 /// outgoing trace context and baggage injection.
 pub(open) trait Injector {
-  set(Self, String, String) -> Unit
+  fn set(Self, String, String) -> Unit
 }
 
 ///|
@@ -14,12 +14,12 @@ pub(open) trait Injector {
 /// incoming trace context and baggage extraction. `keys()` is optional but lets
 /// propagators handle case-insensitive carriers more efficiently.
 pub(open) trait Extractor {
-  get(Self, StringView) -> String?
-  keys(Self) -> Array[String] = _
+  fn get(Self, StringView) -> String?
+  fn keys(Self) -> Array[String] = _
 }
 
 ///|
-impl Extractor with keys(_) {
+impl Extractor with fn keys(_) {
   []
 }
 
@@ -52,12 +52,12 @@ fn get_case_insensitive(
 }
 
 ///|
-pub impl Injector for Map[String, String] with set(self, key, value) {
+pub impl Injector for Map[String, String] with fn set(self, key, value) {
   self[normalize_ascii_lower(key)] = value
 }
 
 ///|
-pub impl Extractor for Map[String, String] with get(self, key) {
+pub impl Extractor for Map[String, String] with fn get(self, key) {
   get_case_insensitive(self, key)
 }
 
@@ -78,7 +78,7 @@ fn merge_baggage(
 }
 
 ///|
-pub impl Extractor for Map[String, String] with keys(self) {
+pub impl Extractor for Map[String, String] with fn keys(self) {
   self.keys().to_array()
 }
 
@@ -223,19 +223,19 @@ fn decode_baggage_component(value : StringView) -> String {
       index + 2 < value.length() &&
       is_hex_digit(value[index + 1:index + 2]) &&
       is_hex_digit(value[index + 2:index + 3]) {
-      let part = value[index + 1:index + 3].to_string()
+      let part = value[index + 1:index + 3].to_owned()
       let decoded = @string.parse_int(part, base=16) catch { _ => -1 }
       if decoded >= 0 && decoded < 128 {
         match decoded.to_char() {
           Some(decoded_char) => builder.write_char(decoded_char)
-          None => builder.write_string(value[index:index + 3].to_string())
+          None => builder.write_string(value[index:index + 3].to_owned())
         }
       } else {
-        builder.write_string(value[index:index + 3].to_string())
+        builder.write_string(value[index:index + 3].to_owned())
       }
       index += 3
     } else {
-      builder.write_string(ch.to_string())
+      builder.write_string(ch.to_owned())
       index += 1
     }
   }
@@ -285,10 +285,10 @@ fn decode_baggage(header : StringView) -> @baggage.Baggage {
     guard baggage_item.0.find("=") is Some(index)
     let key = decode_baggage_component(baggage_item.0[:index].trim())
       .trim()
-      .to_string()
+      .to_owned()
     let value = decode_baggage_component(baggage_item.0[index + 1:].trim())
       .trim()
-      .to_string()
+      .to_owned()
     baggage = baggage.insert_with_metadata(
       key,
       value,
@@ -326,7 +326,7 @@ fn extract_span_context(extractor : &Extractor) -> @common.SpanContext? {
   if version.length() != 2 || !is_lower_hex(version) {
     return None
   }
-  let version = @string.parse_int(version.to_string(), base=16) catch {
+  let version = @string.parse_int(version.to_owned(), base=16) catch {
     _ => return None
   }
   if version > 254 || (version == 0 && parts.length() != 4) {
@@ -494,7 +494,7 @@ pub fn TraceContextPropagator::into_text_map(
 pub fn TextMapCompositePropagator::new(
   propagators : ArrayView[TextMapPropagator],
 ) -> TextMapCompositePropagator {
-  let propagators = propagators.to_array()
+  let propagators = propagators.to_owned()
   {
     inner: TextMapPropagator::from_functions(
       (context, injector) => {

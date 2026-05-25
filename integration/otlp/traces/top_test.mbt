@@ -25,7 +25,7 @@ fn sampled_trace_flags() -> @otel.TraceFlags {
 
 ///|
 fn fixed_id_generator() -> @sdktrace.IdGenerator {
-  let span_ids = Ref::new([
+  let span_ids = Ref([
     parse_span_id("1111111111111111"),
     parse_span_id("2222222222222222"),
     parse_span_id("3333333333333333"),
@@ -48,10 +48,7 @@ fn fixed_id_generator() -> @sdktrace.IdGenerator {
 fn integration_resource(service_name : StringView) -> @resource.Resource {
   @resource.Resource::builder_empty()
   .with_service_name(service_name)
-  .with_attribute(
-    "deployment.environment.name",
-    @otel.Value::String("integration"),
-  )
+  .with_attribute("deployment.environment.name", String("integration"))
   .with_schema_url(schema_url)
   .build()
 }
@@ -71,9 +68,9 @@ fn remote_link_context() -> @sdk.SpanContext {
 fn build_trace_exporter(protocol : @otlp.Protocol) -> @otlp.SpanExporter {
   let builder = @otlp.SpanExporter::builder()
   let builder = match protocol {
-    @otlp.Protocol::HttpBinary => builder.with_http()
-    @otlp.Protocol::HttpJson => builder.with_protocol(protocol)
-    @otlp.Protocol::Grpc => abort("grpc is not part of the integration suite")
+    HttpBinary => builder.with_http()
+    HttpJson => builder.with_protocol(protocol)
+    Grpc => abort("grpc is not part of the integration suite")
   }
   guard builder.build() is Ok(exporter) else {
     abort("expected span exporter to build")
@@ -94,7 +91,7 @@ fn find_scope_spans(
   data : @otlp_trace.TracesData,
   scope_name : StringView,
 ) -> Array[@otlp_trace.ScopeSpans] {
-  let scope_name = scope_name.to_string()
+  let scope_name = scope_name.to_owned()
   let matches : Array[@otlp_trace.ScopeSpans] = []
   for resource_spans in data.resource_spans {
     for scope_spans in resource_spans.scope_spans {
@@ -111,7 +108,7 @@ fn find_span(
   spans : ArrayView[@otlp_trace.Span],
   name : StringView,
 ) -> @otlp_trace.Span? {
-  let name = name.to_string()
+  let name = name.to_owned()
   for span in spans {
     if span.name == name {
       return Some(span)
@@ -126,13 +123,12 @@ fn has_string_attribute(
   key : StringView,
   expected : StringView,
 ) -> Bool {
-  let key = key.to_string()
-  let expected = expected.to_string()
+  let key = key.to_owned()
+  let expected = expected.to_owned()
   for attribute in attributes {
     if attribute.key == key {
       match attribute.value.value {
-        @otlp_common.AnyValue_Value::StringValue(value) =>
-          return value == expected
+        StringValue(value) => return value == expected
         _ => return false
       }
     }
@@ -146,14 +142,13 @@ fn has_int_attribute(
   key : StringView,
   expected : Int64,
 ) -> Bool {
-  let key = key.to_string()
+  let key = key.to_owned()
   let expected_text = expected.to_string()
   for attribute in attributes {
     if attribute.key == key {
       match attribute.value.value {
-        @otlp_common.AnyValue_Value::IntValue(value) => return value == expected
-        @otlp_common.AnyValue_Value::StringValue(value) =>
-          return value == expected_text
+        IntValue(value) => return value == expected
+        StringValue(value) => return value == expected_text
         _ => return false
       }
     }
@@ -167,12 +162,11 @@ fn has_bool_attribute(
   key : StringView,
   expected : Bool,
 ) -> Bool {
-  let key = key.to_string()
+  let key = key.to_owned()
   for attribute in attributes {
     if attribute.key == key {
       match attribute.value.value {
-        @otlp_common.AnyValue_Value::BoolValue(value) =>
-          return value == expected
+        BoolValue(value) => return value == expected
         _ => return false
       }
     }
@@ -185,7 +179,7 @@ fn find_event(
   events : ArrayView[@otlp_trace.Span_Event],
   name : StringView,
 ) -> @otlp_trace.Span_Event? {
-  let name = name.to_string()
+  let name = name.to_owned()
   for event in events {
     if event.name == name {
       return Some(event)
@@ -207,7 +201,7 @@ async test "batch traces export over http protobuf via root API" {
     .with_resource(integration_resource("integration-traces-protobuf"))
     .with_id_generator(fixed_id_generator())
     .with_batch_exporter(
-      build_trace_exporter(@otlp.Protocol::HttpBinary).into_span_exporter(),
+      build_trace_exporter(HttpBinary).into_span_exporter(),
       config=@sdk.BatchConfig::new(
         max_queue_size=8,
         max_export_batch_size=8,
@@ -224,41 +218,35 @@ async test "batch traces export over http protobuf via root API" {
       scope_name,
       version=Some("1.0.0"),
       schema_url=Some(schema_url),
-      attributes=[
-        @otel.KeyValue::new("scope.attr", @otel.Value::String("batch")),
-      ],
+      attributes=[@otel.KeyValue::new("scope.attr", String("batch"))],
     )
     let root = tracer.build(
       tracer
       .span_builder("http.request")
-      .with_kind(@trace.SpanKind::Server)
+      .with_kind(Server)
       .with_start_time(100L)
-      .with_attributes([
-        @otel.KeyValue::new("http.method", @otel.Value::String("GET")),
-      ])
+      .with_attributes([@otel.KeyValue::new("http.method", String("GET"))])
       .with_events([
         @trace.Event::new("connected", timestamp_unix_nano=150L, attributes=[
-          @otel.KeyValue::new("net.transport", @otel.Value::String("tcp")),
+          @otel.KeyValue::new("net.transport", String("tcp")),
         ]),
       ])
       .with_links([
         @trace.Link::new(remote_link_context(), attributes=[
-          @otel.KeyValue::new("linked", @otel.Value::String("true")),
+          @otel.KeyValue::new("linked", String("true")),
         ]),
       ]),
     )
     let child = tracer.build_with_context(
       tracer
       .span_builder("db.query")
-      .with_kind(@trace.SpanKind::Client)
+      .with_kind(Client)
       .with_start_time(170L)
-      .with_attributes([
-        @otel.KeyValue::new("db.system", @otel.Value::String("postgresql")),
-      ]),
+      .with_attributes([@otel.KeyValue::new("db.system", String("postgresql"))]),
       root.context(),
     )
     child.add_event_with_timestamp("db.rows", 180L, attributes=[
-      @otel.KeyValue::new("db.rows", @otel.Value::Int64(3L)),
+      @otel.KeyValue::new("db.rows", Int64(3L)),
     ])
     child.end_with_timestamp(190L)
 
@@ -304,7 +292,7 @@ async test "force flushed traces export over http json via root API" {
     .with_resource(integration_resource("integration-traces-json"))
     .with_id_generator(fixed_id_generator())
     .with_batch_exporter(
-      build_trace_exporter(@otlp.Protocol::HttpJson).into_span_exporter(),
+      build_trace_exporter(HttpJson).into_span_exporter(),
       config=@sdk.BatchConfig::new(
         max_queue_size=8,
         max_export_batch_size=8,
@@ -318,14 +306,14 @@ async test "force flushed traces export over http json via root API" {
     scope_name,
     version=Some("1.0.0"),
     schema_url=Some(schema_url),
-    attributes=[@otel.KeyValue::new("scope.attr", @otel.Value::String("json"))],
+    attributes=[@otel.KeyValue::new("scope.attr", String("json"))],
   )
   let span = tracer.build(
     tracer
     .span_builder("cache.lookup")
-    .with_kind(@trace.SpanKind::Internal)
+    .with_kind(Internal)
     .with_start_time(300L)
-    .with_attributes([@otel.KeyValue::new("cache.hit", @otel.Value::Bool(true))]),
+    .with_attributes([@otel.KeyValue::new("cache.hit", Bool(true))]),
   )
   span.add_event_with_timestamp("lookup.complete", 320L)
   span.end_with_timestamp(330L)
@@ -419,24 +407,22 @@ async test "trace builder overrides env and exports nested spans through root AP
     scope_name,
     version=Some("1.1.0"),
     schema_url=Some(schema_url),
-    attributes=[
-      @otel.KeyValue::new("scope.attr", @otel.Value::String("builder")),
-    ],
+    attributes=[@otel.KeyValue::new("scope.attr", String("builder"))],
   )
   let root = tracer.start("queue.receive")
   assert_true(root.is_recording())
   assert_true(!root.has_ended())
   root.update_name("queue.receive.process")
   root.set_attribute(
-    @otel.KeyValue::new("messaging.system", @otel.Value::String("rabbitmq")),
+    @otel.KeyValue::new("messaging.system", String("rabbitmq")),
   )
   root.set_attributes([
-    @otel.KeyValue::new("messaging.batch.message_count", @otel.Value::Int64(2L)),
-    @otel.KeyValue::new("component", @otel.Value::String("worker")),
+    @otel.KeyValue::new("messaging.batch.message_count", Int64(2L)),
+    @otel.KeyValue::new("component", String("worker")),
   ])
   root.record_error("decode failed")
   root.add_link(remote_link_context(), attributes=[
-    @otel.KeyValue::new("retry", @otel.Value::Bool(false)),
+    @otel.KeyValue::new("retry", Bool(false)),
   ])
 
   let worker = tracer.start_with_context("job.handle", root.context())
@@ -447,17 +433,15 @@ async test "trace builder overrides env and exports nested spans through root AP
     tracer.in_span_with_builder(
       tracer
       .span_builder("job.persist")
-      .with_kind(@trace.SpanKind::Client)
+      .with_kind(Client)
       .with_start_time(831L)
-      .with_attributes([
-        @otel.KeyValue::new("db.system", @otel.Value::String("sqlite")),
-      ]),
+      .with_attributes([@otel.KeyValue::new("db.system", String("sqlite"))]),
       root.context(),
       persist_context => {
         let cache = tracer.build_with_context(
           tracer
           .span_builder("job.cache")
-          .with_kind(@trace.SpanKind::Internal)
+          .with_kind(Internal)
           .with_start_time(832L),
           persist_context,
         )
@@ -498,7 +482,7 @@ async test "trace builder overrides env and exports nested spans through root AP
   if scope_spans.is_empty() {
     fail("expected trace export to contain scope \{scope_name}")
   }
-  assert_eq(scope_spans[0].scope.version, "1.1.0")
+  @debug.assert_eq(scope_spans[0].scope.version, "1.1.0")
   assert_true(
     has_string_attribute(
       scope_spans[0].scope.attributes,
@@ -512,7 +496,7 @@ async test "trace builder overrides env and exports nested spans through root AP
       spans.push(span)
     }
   }
-  assert_eq(spans.length(), 4)
+  @debug.assert_eq(spans.length(), 4)
 
   let root_span : @otlp_trace.Span = match
     find_span(spans, "queue.receive.process") {
@@ -539,12 +523,10 @@ async test "trace builder overrides env and exports nested spans through root AP
     has_int_attribute(root_span.attributes, "messaging.batch.message_count", 2L),
   )
   assert_true(has_string_attribute(root_span.attributes, "component", "worker"))
-  assert_eq(root_span.links.length(), 1)
+  @debug.assert_eq(root_span.links.length(), 1)
   assert_true(has_bool_attribute(root_span.links[0].attributes, "retry", false))
-  assert_true(
-    root_span.status.code == @otlp_trace.Status_StatusCode::STATUS_CODE_ERROR,
-  )
-  assert_eq(root_span.status.message, "root failed")
+  assert_true(root_span.status.code == STATUS_CODE_ERROR)
+  @debug.assert_eq(root_span.status.message, "root failed")
 
   let exception_event : @otlp_trace.Span_Event = match
     find_event(root_span.events, "exception") {
@@ -560,8 +542,8 @@ async test "trace builder overrides env and exports nested spans through root AP
   )
 
   assert_true(worker_span.parent_span_id == root_span.span_id)
-  assert_eq(worker_span.events.length(), 1)
-  assert_eq(worker_span.events[0].name, "job.started")
+  @debug.assert_eq(worker_span.events.length(), 1)
+  @debug.assert_eq(worker_span.events[0].name, "job.started")
   assert_true(persist_span.parent_span_id == root_span.span_id)
   assert_true(cache_span.parent_span_id == persist_span.span_id)
   assert_true(
@@ -612,8 +594,7 @@ async test "trace force_flush times out against a delayed endpoint" {
     let span = tracer.start("checkout.timeout")
     span.end()
 
-    guard provider.force_flush()
-      is Err(@error.OTelSdkError::ExportFailure(_, message)) else {
+    guard provider.force_flush() is Err(ExportFailure(_, message)) else {
       fail("expected trace force_flush to fail with ExportFailure")
     }
     assert_true(message.contains("traces export timed out after 100ms"))
@@ -622,9 +603,9 @@ async test "trace force_flush times out against a delayed endpoint" {
       Ok(request_path) => request_path
       Err(message) => fail(message)
     }
-    assert_eq(request_path, "/v1/traces")
-    assert_eq(server.request_count(), 1)
-    assert_eq(server.request_path(), "/v1/traces")
+    @debug.assert_eq(request_path, "/v1/traces")
+    @debug.assert_eq(server.request_count(), 1)
+    @debug.assert_eq(server.request_path(), "/v1/traces")
 
     match span_processor.shutdown() {
       Ok(_) => ()
@@ -633,7 +614,7 @@ async test "trace force_flush times out against a delayed endpoint" {
           "expected trace span processor shutdown to succeed: \{@debug.to_string(err)}",
         )
     }
-    assert_eq(server.request_count(), 1)
+    @debug.assert_eq(server.request_count(), 1)
   })
 }
 
@@ -692,21 +673,17 @@ async test "signal-specific trace endpoint overrides invalid global endpoint" {
     scope_name,
     version=Some("1.0.1"),
     schema_url=Some(schema_url),
-    attributes=[
-      @otel.KeyValue::new("scope.attr", @otel.Value::String("env-endpoint")),
-    ],
+    attributes=[@otel.KeyValue::new("scope.attr", String("env-endpoint"))],
   )
   let span = tracer.build(
     tracer
     .span_builder("queue.publish")
-    .with_kind(@trace.SpanKind::Producer)
+    .with_kind(Producer)
     .with_start_time(610L)
-    .with_attributes([
-      @otel.KeyValue::new("messaging.system", @otel.Value::String("kafka")),
-    ]),
+    .with_attributes([@otel.KeyValue::new("messaging.system", String("kafka"))]),
   )
   span.add_event_with_timestamp("publish.acked", 620L, attributes=[
-    @otel.KeyValue::new("partition", @otel.Value::Int64(7L)),
+    @otel.KeyValue::new("partition", Int64(7L)),
   ])
   span.end_with_timestamp(630L)
 

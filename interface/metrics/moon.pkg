@@ -1,5 +1,6 @@
 import {
-  "moonbit-community/opentelemetry/interface/common" @common,
+  "moonbitlang/core/debug",
+  "moonbit-community/opentelemetry/interface/common",
 }
 
 import {

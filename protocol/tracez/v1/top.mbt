@@ -7,7 +7,7 @@ pub(all) struct TracezCounts {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for TracezCounts with size_of(self) {
+pub impl @protobuf.Sized for TracezCounts with fn size_of(self) {
   let mut size = 0U
   size += 1U +
     ({
@@ -28,8 +28,8 @@ pub impl @protobuf.Sized for TracezCounts with size_of(self) {
 }
 
 ///|
-pub impl Default for TracezCounts with default() -> TracezCounts {
-  TracezCounts::{
+pub impl Default for TracezCounts with fn default() -> TracezCounts {
+  {
     spanname: String::default(),
     latency: [],
     running: UInt::default(),
@@ -44,11 +44,11 @@ pub fn TracezCounts::new(
   running : UInt,
   error : UInt,
 ) -> TracezCounts {
-  TracezCounts::{ spanname, latency, running, error }
+  { spanname, latency, running, error }
 }
 
 ///|
-pub impl @protobuf.Read for TracezCounts with read_with_limit(
+pub impl @protobuf.Read for TracezCounts with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> TracezCounts raise {
   let msg = TracezCounts::default()
@@ -73,7 +73,7 @@ pub impl @protobuf.Read for TracezCounts with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for TracezCounts with write(
+pub impl @protobuf.Write for TracezCounts with fn write(
   self : TracezCounts,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -92,7 +92,7 @@ pub impl @protobuf.Write for TracezCounts with write(
 }
 
 ///|
-pub impl ToJson for TracezCounts with to_json(self) {
+pub impl ToJson for TracezCounts with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.spanname != Default::default() {
     json["spanname"] = self.spanname.to_json()
@@ -110,12 +110,12 @@ pub impl ToJson for TracezCounts with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for TracezCounts with from_json(
+pub impl @json.FromJson for TracezCounts with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> TracezCounts raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for TracezCounts"))
+    raise JsonDecodeError((path, "Expected an object for TracezCounts"))
   }
   let message = TracezCounts::default()
   for key, value in obj {
@@ -125,14 +125,14 @@ pub impl @json.FromJson for TracezCounts with from_json(
         message.latency = value.map(v => @json.from_json(v, path~))
       ("running", value) => message.running = @json.from_json(value, path~)
       ("error", value) => message.error = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for TracezCounts with read_with_limit(
+pub impl @protobuf.AsyncRead for TracezCounts with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> TracezCounts raise {
   let msg = TracezCounts::default()
@@ -158,7 +158,7 @@ pub impl @protobuf.AsyncRead for TracezCounts with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for TracezCounts with write(
+pub impl @protobuf.AsyncWrite for TracezCounts with fn write(
   self : TracezCounts,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -189,7 +189,7 @@ pub(all) struct LatencyData {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for LatencyData with size_of(self) {
+pub impl @protobuf.Sized for LatencyData with fn size_of(self) {
   let mut size = 0U
   size += 1U +
     ({
@@ -224,8 +224,8 @@ pub impl @protobuf.Sized for LatencyData with size_of(self) {
 }
 
 ///|
-pub impl Default for LatencyData with default() -> LatencyData {
-  LatencyData::{
+pub impl Default for LatencyData with fn default() -> LatencyData {
+  {
     traceid: Bytes::default(),
     spanid: Bytes::default(),
     parentid: Bytes::default(),
@@ -248,20 +248,11 @@ pub fn LatencyData::new(
   events : Array[@v12.Span_Event],
   links : Array[@v12.Span_Link],
 ) -> LatencyData {
-  LatencyData::{
-    traceid,
-    spanid,
-    parentid,
-    starttime,
-    endtime,
-    attributes,
-    events,
-    links,
-  }
+  { traceid, spanid, parentid, starttime, endtime, attributes, events, links }
 }
 
 ///|
-pub impl @protobuf.Read for LatencyData with read_with_limit(
+pub impl @protobuf.Read for LatencyData with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> LatencyData raise {
   let msg = LatencyData::default()
@@ -294,7 +285,7 @@ pub impl @protobuf.Read for LatencyData with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for LatencyData with write(
+pub impl @protobuf.Write for LatencyData with fn write(
   self : LatencyData,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -326,7 +317,7 @@ pub impl @protobuf.Write for LatencyData with write(
 }
 
 ///|
-pub impl ToJson for LatencyData with to_json(self) {
+pub impl ToJson for LatencyData with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.traceid != Default::default() {
     json["traceid"] = @protobuf.base64_encode(self.traceid).to_json()
@@ -356,12 +347,12 @@ pub impl ToJson for LatencyData with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for LatencyData with from_json(
+pub impl @json.FromJson for LatencyData with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> LatencyData raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for LatencyData"))
+    raise JsonDecodeError((path, "Expected an object for LatencyData"))
   }
   let message = LatencyData::default()
   for key, value in obj {
@@ -380,14 +371,14 @@ pub impl @json.FromJson for LatencyData with from_json(
         message.events = value.map(v => @json.from_json(v, path~))
       ("links", Array(value)) =>
         message.links = value.map(v => @json.from_json(v, path~))
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for LatencyData with read_with_limit(
+pub impl @protobuf.AsyncRead for LatencyData with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> LatencyData raise {
   let msg = LatencyData::default()
@@ -422,7 +413,7 @@ pub impl @protobuf.AsyncRead for LatencyData with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for LatencyData with write(
+pub impl @protobuf.AsyncWrite for LatencyData with fn write(
   self : LatencyData,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -465,7 +456,7 @@ pub(all) struct RunningData {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for RunningData with size_of(self) {
+pub impl @protobuf.Sized for RunningData with fn size_of(self) {
   let mut size = 0U
   size += 1U +
     ({
@@ -499,8 +490,8 @@ pub impl @protobuf.Sized for RunningData with size_of(self) {
 }
 
 ///|
-pub impl Default for RunningData with default() -> RunningData {
-  RunningData::{
+pub impl Default for RunningData with fn default() -> RunningData {
+  {
     traceid: Bytes::default(),
     spanid: Bytes::default(),
     parentid: Bytes::default(),
@@ -521,19 +512,11 @@ pub fn RunningData::new(
   events : Array[@v12.Span_Event],
   links : Array[@v12.Span_Link],
 ) -> RunningData {
-  RunningData::{
-    traceid,
-    spanid,
-    parentid,
-    starttime,
-    attributes,
-    events,
-    links,
-  }
+  { traceid, spanid, parentid, starttime, attributes, events, links }
 }
 
 ///|
-pub impl @protobuf.Read for RunningData with read_with_limit(
+pub impl @protobuf.Read for RunningData with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> RunningData raise {
   let msg = RunningData::default()
@@ -565,7 +548,7 @@ pub impl @protobuf.Read for RunningData with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for RunningData with write(
+pub impl @protobuf.Write for RunningData with fn write(
   self : RunningData,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -595,7 +578,7 @@ pub impl @protobuf.Write for RunningData with write(
 }
 
 ///|
-pub impl ToJson for RunningData with to_json(self) {
+pub impl ToJson for RunningData with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.traceid != Default::default() {
     json["traceid"] = @protobuf.base64_encode(self.traceid).to_json()
@@ -622,12 +605,12 @@ pub impl ToJson for RunningData with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for RunningData with from_json(
+pub impl @json.FromJson for RunningData with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> RunningData raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for RunningData"))
+    raise JsonDecodeError((path, "Expected an object for RunningData"))
   }
   let message = RunningData::default()
   for key, value in obj {
@@ -645,14 +628,14 @@ pub impl @json.FromJson for RunningData with from_json(
         message.events = value.map(v => @json.from_json(v, path~))
       ("links", Array(value)) =>
         message.links = value.map(v => @json.from_json(v, path~))
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for RunningData with read_with_limit(
+pub impl @protobuf.AsyncRead for RunningData with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> RunningData raise {
   let msg = RunningData::default()
@@ -686,7 +669,7 @@ pub impl @protobuf.AsyncRead for RunningData with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for RunningData with write(
+pub impl @protobuf.AsyncWrite for RunningData with fn write(
   self : RunningData,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -728,7 +711,7 @@ pub(all) struct ErrorData {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for ErrorData with size_of(self) {
+pub impl @protobuf.Sized for ErrorData with fn size_of(self) {
   let mut size = 0U
   size += 1U +
     ({
@@ -767,8 +750,8 @@ pub impl @protobuf.Sized for ErrorData with size_of(self) {
 }
 
 ///|
-pub impl Default for ErrorData with default() -> ErrorData {
-  ErrorData::{
+pub impl Default for ErrorData with fn default() -> ErrorData {
+  {
     traceid: Bytes::default(),
     spanid: Bytes::default(),
     parentid: Bytes::default(),
@@ -791,20 +774,11 @@ pub fn ErrorData::new(
   links : Array[@v12.Span_Link],
   status : @v12.Status,
 ) -> ErrorData {
-  ErrorData::{
-    traceid,
-    spanid,
-    parentid,
-    starttime,
-    attributes,
-    events,
-    links,
-    status,
-  }
+  { traceid, spanid, parentid, starttime, attributes, events, links, status }
 }
 
 ///|
-pub impl @protobuf.Read for ErrorData with read_with_limit(
+pub impl @protobuf.Read for ErrorData with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ErrorData raise {
   let msg = ErrorData::default()
@@ -838,7 +812,7 @@ pub impl @protobuf.Read for ErrorData with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for ErrorData with write(
+pub impl @protobuf.Write for ErrorData with fn write(
   self : ErrorData,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -871,7 +845,7 @@ pub impl @protobuf.Write for ErrorData with write(
 }
 
 ///|
-pub impl ToJson for ErrorData with to_json(self) {
+pub impl ToJson for ErrorData with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.traceid != Default::default() {
     json["traceid"] = @protobuf.base64_encode(self.traceid).to_json()
@@ -901,12 +875,12 @@ pub impl ToJson for ErrorData with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for ErrorData with from_json(
+pub impl @json.FromJson for ErrorData with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> ErrorData raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for ErrorData"))
+    raise JsonDecodeError((path, "Expected an object for ErrorData"))
   }
   let message = ErrorData::default()
   for key, value in obj {
@@ -925,14 +899,14 @@ pub impl @json.FromJson for ErrorData with from_json(
       ("links", Array(value)) =>
         message.links = value.map(v => @json.from_json(v, path~))
       ("status", value) => message.status = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for ErrorData with read_with_limit(
+pub impl @protobuf.AsyncRead for ErrorData with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ErrorData raise {
   let msg = ErrorData::default()
@@ -968,7 +942,7 @@ pub impl @protobuf.AsyncRead for ErrorData with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for ErrorData with write(
+pub impl @protobuf.AsyncWrite for ErrorData with fn write(
   self : ErrorData,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {

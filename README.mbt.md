@@ -66,7 +66,7 @@ async fn _readme_trace_to_stdout() -> Unit {
 
   let tracer = tracer("checkout-service", version=Some("1.0.0"))
   let span = tracer.start("charge-card")
-  span.set_attribute(KeyValue::new("payment.system", Value::String("test")))
+  span.set_attribute(KeyValue::new("payment.system", String("test")))
   span.set_status(@trace.Status::ok())
   span.end()
 
@@ -92,7 +92,7 @@ pub async fn _library_operation() -> Unit {
     version=Some("0.1.0"),
   )
   let span = tracer.start("example.operation")
-  span.set_attribute(KeyValue::new("example.kind", Value::String("demo")))
+  span.set_attribute(KeyValue::new("example.kind", String("demo")))
   // Library work goes here.
   span.end()
 }
@@ -152,10 +152,10 @@ fn _record_request_metrics() -> Unit {
     .build()
 
   request_count.add(1UL, attributes=[
-    KeyValue::new("http.request.method", Value::String("POST")),
+    KeyValue::new("http.request.method", String("POST")),
   ])
   request_latency.record(32.5, attributes=[
-    KeyValue::new("http.route", Value::String("/checkout")),
+    KeyValue::new("http.route", String("/checkout")),
   ])
 }
 ```
@@ -170,13 +170,13 @@ events into `LogRecord` values.
 ///|
 async fn _emit_structured_log() -> Unit {
   let logger = logger("checkout-service")
-  if logger.event_enabled(@logs.Severity::Info, "checkout") {
+  if logger.event_enabled(Info, "checkout") {
     let record = logger.create_log_record()
     record.set_event_name("checkout.completed")
     record.set_target("checkout")
-    record.set_severity_number(@logs.Severity::Info)
-    record.set_body(@logs.AnyValue::String("checkout completed"))
-    record.add_attribute("cart.items", @logs.AnyValue::Int(3L))
+    record.set_severity_number(Info)
+    record.set_body(String("checkout completed"))
+    record.add_attribute("cart.items", Int(3L))
     logger.emit(record)
   }
 }
@@ -254,7 +254,7 @@ where both are available.
 ```mbt check
 ///|
 fn _semantic_convention_attribute() -> Array[KeyValue] {
-  [KeyValue::new(@semtrace.HTTP_REQUEST_METHOD, Value::String("GET"))]
+  [KeyValue::new(@semtrace.HTTP_REQUEST_METHOD, String("GET"))]
 }
 ```
 
