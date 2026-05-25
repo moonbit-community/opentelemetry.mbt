@@ -1,11 +1,11 @@
 ///|
 /// Trivial logger provider that always produces no-op loggers.
-pub struct NoopLoggerProvider {}
+pub struct NoopLoggerProvider {} derive(Default)
 
 ///|
 /// Creates a no-op logger provider.
 pub fn NoopLoggerProvider::new() -> NoopLoggerProvider {
-  NoopLoggerProvider::{  }
+  Default::default()
 }
 
 ///|

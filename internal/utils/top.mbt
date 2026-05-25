@@ -14,7 +14,7 @@ pub fn basename(path : StringView) -> String {
       start = i + 1
     }
   }
-  let name = path[start:].to_string()
+  let name = path[start:].to_owned()
   if name == "" {
     "moonbit"
   } else {
@@ -25,5 +25,5 @@ pub fn basename(path : StringView) -> String {
 ///|
 /// Reads an environment variable from the host process.
 pub fn getenv(key : StringView) -> String? {
-  @env.get_env_var(key.to_string())
+  @env.get_env_var(key.to_owned())
 }

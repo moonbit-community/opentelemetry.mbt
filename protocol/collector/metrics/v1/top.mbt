@@ -4,7 +4,7 @@ pub(all) struct ExportMetricsServiceRequest {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for ExportMetricsServiceRequest with size_of(self) {
+pub impl @protobuf.Sized for ExportMetricsServiceRequest with fn size_of(self) {
   let mut size = 0U
   for s in self.resource_metrics {
     let s = @protobuf.size_of(s)
@@ -14,19 +14,19 @@ pub impl @protobuf.Sized for ExportMetricsServiceRequest with size_of(self) {
 }
 
 ///|
-pub impl Default for ExportMetricsServiceRequest with default() -> ExportMetricsServiceRequest {
-  ExportMetricsServiceRequest::{ resource_metrics: [] }
+pub impl Default for ExportMetricsServiceRequest with fn default() -> ExportMetricsServiceRequest {
+  { resource_metrics: [] }
 }
 
 ///|
 pub fn ExportMetricsServiceRequest::new(
   resource_metrics : Array[@v13.ResourceMetrics],
 ) -> ExportMetricsServiceRequest {
-  ExportMetricsServiceRequest::{ resource_metrics, }
+  { resource_metrics, }
 }
 
 ///|
-pub impl @protobuf.Read for ExportMetricsServiceRequest with read_with_limit(
+pub impl @protobuf.Read for ExportMetricsServiceRequest with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ExportMetricsServiceRequest raise {
   let msg = ExportMetricsServiceRequest::default()
@@ -48,7 +48,7 @@ pub impl @protobuf.Read for ExportMetricsServiceRequest with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for ExportMetricsServiceRequest with write(
+pub impl @protobuf.Write for ExportMetricsServiceRequest with fn write(
   self : ExportMetricsServiceRequest,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -60,7 +60,7 @@ pub impl @protobuf.Write for ExportMetricsServiceRequest with write(
 }
 
 ///|
-pub impl ToJson for ExportMetricsServiceRequest with to_json(self) {
+pub impl ToJson for ExportMetricsServiceRequest with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.resource_metrics != Default::default() {
     json["resourceMetrics"] = self.resource_metrics.to_json()
@@ -69,12 +69,12 @@ pub impl ToJson for ExportMetricsServiceRequest with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for ExportMetricsServiceRequest with from_json(
+pub impl @json.FromJson for ExportMetricsServiceRequest with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> ExportMetricsServiceRequest raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError(
+    raise JsonDecodeError(
       (path, "Expected an object for ExportMetricsServiceRequest"),
     )
   }
@@ -83,14 +83,14 @@ pub impl @json.FromJson for ExportMetricsServiceRequest with from_json(
     match (key, value) {
       ("resourceMetrics", Array(value)) =>
         message.resource_metrics = value.map(v => @json.from_json(v, path~))
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for ExportMetricsServiceRequest with read_with_limit(
+pub impl @protobuf.AsyncRead for ExportMetricsServiceRequest with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ExportMetricsServiceRequest raise {
   let msg = ExportMetricsServiceRequest::default()
@@ -112,7 +112,7 @@ pub impl @protobuf.AsyncRead for ExportMetricsServiceRequest with read_with_limi
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for ExportMetricsServiceRequest with write(
+pub impl @protobuf.AsyncWrite for ExportMetricsServiceRequest with fn write(
   self : ExportMetricsServiceRequest,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -129,7 +129,7 @@ pub(all) struct ExportMetricsServiceResponse {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for ExportMetricsServiceResponse with size_of(self) {
+pub impl @protobuf.Sized for ExportMetricsServiceResponse with fn size_of(self) {
   let mut size = 0U
   size += 1U +
     ({
@@ -140,21 +140,19 @@ pub impl @protobuf.Sized for ExportMetricsServiceResponse with size_of(self) {
 }
 
 ///|
-pub impl Default for ExportMetricsServiceResponse with default() -> ExportMetricsServiceResponse {
-  ExportMetricsServiceResponse::{
-    partial_success: ExportMetricsPartialSuccess::default(),
-  }
+pub impl Default for ExportMetricsServiceResponse with fn default() -> ExportMetricsServiceResponse {
+  { partial_success: ExportMetricsPartialSuccess::default() }
 }
 
 ///|
 pub fn ExportMetricsServiceResponse::new(
   partial_success : ExportMetricsPartialSuccess,
 ) -> ExportMetricsServiceResponse {
-  ExportMetricsServiceResponse::{ partial_success, }
+  { partial_success, }
 }
 
 ///|
-pub impl @protobuf.Read for ExportMetricsServiceResponse with read_with_limit(
+pub impl @protobuf.Read for ExportMetricsServiceResponse with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ExportMetricsServiceResponse raise {
   let msg = ExportMetricsServiceResponse::default()
@@ -175,7 +173,7 @@ pub impl @protobuf.Read for ExportMetricsServiceResponse with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for ExportMetricsServiceResponse with write(
+pub impl @protobuf.Write for ExportMetricsServiceResponse with fn write(
   self : ExportMetricsServiceResponse,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -185,7 +183,7 @@ pub impl @protobuf.Write for ExportMetricsServiceResponse with write(
 }
 
 ///|
-pub impl ToJson for ExportMetricsServiceResponse with to_json(self) {
+pub impl ToJson for ExportMetricsServiceResponse with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.partial_success != Default::default() {
     json["partialSuccess"] = self.partial_success.to_json()
@@ -194,12 +192,12 @@ pub impl ToJson for ExportMetricsServiceResponse with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for ExportMetricsServiceResponse with from_json(
+pub impl @json.FromJson for ExportMetricsServiceResponse with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> ExportMetricsServiceResponse raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError(
+    raise JsonDecodeError(
       (path, "Expected an object for ExportMetricsServiceResponse"),
     )
   }
@@ -208,14 +206,14 @@ pub impl @json.FromJson for ExportMetricsServiceResponse with from_json(
     match (key, value) {
       ("partialSuccess", value) =>
         message.partial_success = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for ExportMetricsServiceResponse with read_with_limit(
+pub impl @protobuf.AsyncRead for ExportMetricsServiceResponse with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ExportMetricsServiceResponse raise {
   let msg = ExportMetricsServiceResponse::default()
@@ -237,7 +235,7 @@ pub impl @protobuf.AsyncRead for ExportMetricsServiceResponse with read_with_lim
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for ExportMetricsServiceResponse with write(
+pub impl @protobuf.AsyncWrite for ExportMetricsServiceResponse with fn write(
   self : ExportMetricsServiceResponse,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -254,7 +252,7 @@ pub(all) struct ExportMetricsPartialSuccess {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for ExportMetricsPartialSuccess with size_of(self) {
+pub impl @protobuf.Sized for ExportMetricsPartialSuccess with fn size_of(self) {
   let mut size = 0U
   size += 1U + @protobuf.size_of(self.rejected_data_points)
   size += 1U +
@@ -266,11 +264,8 @@ pub impl @protobuf.Sized for ExportMetricsPartialSuccess with size_of(self) {
 }
 
 ///|
-pub impl Default for ExportMetricsPartialSuccess with default() -> ExportMetricsPartialSuccess {
-  ExportMetricsPartialSuccess::{
-    rejected_data_points: Int64::default(),
-    error_message: String::default(),
-  }
+pub impl Default for ExportMetricsPartialSuccess with fn default() -> ExportMetricsPartialSuccess {
+  { rejected_data_points: Int64::default(), error_message: String::default() }
 }
 
 ///|
@@ -278,11 +273,11 @@ pub fn ExportMetricsPartialSuccess::new(
   rejected_data_points : Int64,
   error_message : String,
 ) -> ExportMetricsPartialSuccess {
-  ExportMetricsPartialSuccess::{ rejected_data_points, error_message }
+  { rejected_data_points, error_message }
 }
 
 ///|
-pub impl @protobuf.Read for ExportMetricsPartialSuccess with read_with_limit(
+pub impl @protobuf.Read for ExportMetricsPartialSuccess with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ExportMetricsPartialSuccess raise {
   let msg = ExportMetricsPartialSuccess::default()
@@ -302,7 +297,7 @@ pub impl @protobuf.Read for ExportMetricsPartialSuccess with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for ExportMetricsPartialSuccess with write(
+pub impl @protobuf.Write for ExportMetricsPartialSuccess with fn write(
   self : ExportMetricsPartialSuccess,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -313,7 +308,7 @@ pub impl @protobuf.Write for ExportMetricsPartialSuccess with write(
 }
 
 ///|
-pub impl ToJson for ExportMetricsPartialSuccess with to_json(self) {
+pub impl ToJson for ExportMetricsPartialSuccess with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.rejected_data_points != Default::default() {
     json["rejectedDataPoints"] = self.rejected_data_points.to_json()
@@ -325,12 +320,12 @@ pub impl ToJson for ExportMetricsPartialSuccess with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for ExportMetricsPartialSuccess with from_json(
+pub impl @json.FromJson for ExportMetricsPartialSuccess with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> ExportMetricsPartialSuccess raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError(
+    raise JsonDecodeError(
       (path, "Expected an object for ExportMetricsPartialSuccess"),
     )
   }
@@ -341,14 +336,14 @@ pub impl @json.FromJson for ExportMetricsPartialSuccess with from_json(
         message.rejected_data_points = @json.from_json(value, path~)
       ("errorMessage", value) =>
         message.error_message = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for ExportMetricsPartialSuccess with read_with_limit(
+pub impl @protobuf.AsyncRead for ExportMetricsPartialSuccess with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ExportMetricsPartialSuccess raise {
   let msg = ExportMetricsPartialSuccess::default()
@@ -369,7 +364,7 @@ pub impl @protobuf.AsyncRead for ExportMetricsPartialSuccess with read_with_limi
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for ExportMetricsPartialSuccess with write(
+pub impl @protobuf.AsyncWrite for ExportMetricsPartialSuccess with fn write(
   self : ExportMetricsPartialSuccess,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {

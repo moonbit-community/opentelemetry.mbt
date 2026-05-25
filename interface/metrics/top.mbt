@@ -541,7 +541,7 @@ pub fn[T] CounterBuilder::with_description(
   self : CounterBuilder[T],
   description : StringView,
 ) -> CounterBuilder[T] {
-  self.description = Some(description.to_string())
+  self.description = Some(description.to_owned())
   self
 }
 
@@ -551,7 +551,7 @@ pub fn[T] CounterBuilder::with_unit(
   self : CounterBuilder[T],
   unit : StringView,
 ) -> CounterBuilder[T] {
-  self.unit = Some(unit.to_string())
+  self.unit = Some(unit.to_owned())
   self
 }
 
@@ -567,7 +567,7 @@ pub fn[T] UpDownCounterBuilder::with_description(
   self : UpDownCounterBuilder[T],
   description : StringView,
 ) -> UpDownCounterBuilder[T] {
-  self.description = Some(description.to_string())
+  self.description = Some(description.to_owned())
   self
 }
 
@@ -577,7 +577,7 @@ pub fn[T] UpDownCounterBuilder::with_unit(
   self : UpDownCounterBuilder[T],
   unit : StringView,
 ) -> UpDownCounterBuilder[T] {
-  self.unit = Some(unit.to_string())
+  self.unit = Some(unit.to_owned())
   self
 }
 
@@ -595,7 +595,7 @@ pub fn[T] HistogramBuilder::with_description(
   self : HistogramBuilder[T],
   description : StringView,
 ) -> HistogramBuilder[T] {
-  self.description = Some(description.to_string())
+  self.description = Some(description.to_owned())
   self
 }
 
@@ -605,7 +605,7 @@ pub fn[T] HistogramBuilder::with_unit(
   self : HistogramBuilder[T],
   unit : StringView,
 ) -> HistogramBuilder[T] {
-  self.unit = Some(unit.to_string())
+  self.unit = Some(unit.to_owned())
   self
 }
 
@@ -621,7 +621,7 @@ pub fn[T] GaugeBuilder::with_description(
   self : GaugeBuilder[T],
   description : StringView,
 ) -> GaugeBuilder[T] {
-  self.description = Some(description.to_string())
+  self.description = Some(description.to_owned())
   self
 }
 
@@ -631,7 +631,7 @@ pub fn[T] GaugeBuilder::with_unit(
   self : GaugeBuilder[T],
   unit : StringView,
 ) -> GaugeBuilder[T] {
-  self.unit = Some(unit.to_string())
+  self.unit = Some(unit.to_owned())
   self
 }
 
@@ -647,7 +647,7 @@ pub fn[T] ObservableCounterBuilder::with_description(
   self : ObservableCounterBuilder[T],
   description : StringView,
 ) -> ObservableCounterBuilder[T] {
-  self.description = Some(description.to_string())
+  self.description = Some(description.to_owned())
   self
 }
 
@@ -657,7 +657,7 @@ pub fn[T] ObservableCounterBuilder::with_unit(
   self : ObservableCounterBuilder[T],
   unit : StringView,
 ) -> ObservableCounterBuilder[T] {
-  self.unit = Some(unit.to_string())
+  self.unit = Some(unit.to_owned())
   self
 }
 
@@ -689,7 +689,7 @@ pub fn[T] ObservableUpDownCounterBuilder::with_description(
   self : ObservableUpDownCounterBuilder[T],
   description : StringView,
 ) -> ObservableUpDownCounterBuilder[T] {
-  self.description = Some(description.to_string())
+  self.description = Some(description.to_owned())
   self
 }
 
@@ -699,7 +699,7 @@ pub fn[T] ObservableUpDownCounterBuilder::with_unit(
   self : ObservableUpDownCounterBuilder[T],
   unit : StringView,
 ) -> ObservableUpDownCounterBuilder[T] {
-  self.unit = Some(unit.to_string())
+  self.unit = Some(unit.to_owned())
   self
 }
 
@@ -731,7 +731,7 @@ pub fn[T] ObservableGaugeBuilder::with_description(
   self : ObservableGaugeBuilder[T],
   description : StringView,
 ) -> ObservableGaugeBuilder[T] {
-  self.description = Some(description.to_string())
+  self.description = Some(description.to_owned())
   self
 }
 
@@ -741,7 +741,7 @@ pub fn[T] ObservableGaugeBuilder::with_unit(
   self : ObservableGaugeBuilder[T],
   unit : StringView,
 ) -> ObservableGaugeBuilder[T] {
-  self.unit = Some(unit.to_string())
+  self.unit = Some(unit.to_owned())
   self
 }
 
@@ -775,7 +775,7 @@ pub fn Meter::u64_counter(
   self : Meter,
   name : StringView,
 ) -> CounterBuilder[UInt64] {
-  (self.u64_counter_fn)(name.to_string())
+  (self.u64_counter_fn)(name.to_owned())
 }
 
 ///|
@@ -786,7 +786,7 @@ pub fn Meter::f64_counter(
   self : Meter,
   name : StringView,
 ) -> CounterBuilder[Double] {
-  (self.f64_counter_fn)(name.to_string())
+  (self.f64_counter_fn)(name.to_owned())
 }
 
 ///|
@@ -795,7 +795,7 @@ pub fn Meter::i64_up_down_counter(
   self : Meter,
   name : StringView,
 ) -> UpDownCounterBuilder[Int64] {
-  (self.i64_up_down_counter_fn)(name.to_string())
+  (self.i64_up_down_counter_fn)(name.to_owned())
 }
 
 ///|
@@ -804,7 +804,7 @@ pub fn Meter::f64_up_down_counter(
   self : Meter,
   name : StringView,
 ) -> UpDownCounterBuilder[Double] {
-  (self.f64_up_down_counter_fn)(name.to_string())
+  (self.f64_up_down_counter_fn)(name.to_owned())
 }
 
 ///|
@@ -813,7 +813,7 @@ pub fn Meter::u64_histogram(
   self : Meter,
   name : StringView,
 ) -> HistogramBuilder[UInt64] {
-  (self.u64_histogram_fn)(name.to_string())
+  (self.u64_histogram_fn)(name.to_owned())
 }
 
 ///|
@@ -822,7 +822,7 @@ pub fn Meter::f64_histogram(
   self : Meter,
   name : StringView,
 ) -> HistogramBuilder[Double] {
-  (self.f64_histogram_fn)(name.to_string())
+  (self.f64_histogram_fn)(name.to_owned())
 }
 
 ///|
@@ -831,7 +831,7 @@ pub fn Meter::u64_gauge(
   self : Meter,
   name : StringView,
 ) -> GaugeBuilder[UInt64] {
-  (self.u64_gauge_fn)(name.to_string())
+  (self.u64_gauge_fn)(name.to_owned())
 }
 
 ///|
@@ -839,7 +839,7 @@ pub fn Meter::u64_gauge(
 ///
 /// Values are converted to `Double` before they are forwarded to the SDK.
 pub fn Meter::i64_gauge(self : Meter, name : StringView) -> GaugeBuilder[Int64] {
-  (self.i64_gauge_fn)(name.to_string())
+  (self.i64_gauge_fn)(name.to_owned())
 }
 
 ///|
@@ -848,7 +848,7 @@ pub fn Meter::f64_gauge(
   self : Meter,
   name : StringView,
 ) -> GaugeBuilder[Double] {
-  (self.f64_gauge_fn)(name.to_string())
+  (self.f64_gauge_fn)(name.to_owned())
 }
 
 ///|
@@ -857,7 +857,7 @@ pub fn Meter::u64_observable_counter(
   self : Meter,
   name : StringView,
 ) -> ObservableCounterBuilder[UInt64] {
-  (self.u64_observable_counter_fn)(name.to_string())
+  (self.u64_observable_counter_fn)(name.to_owned())
 }
 
 ///|
@@ -866,7 +866,7 @@ pub fn Meter::f64_observable_counter(
   self : Meter,
   name : StringView,
 ) -> ObservableCounterBuilder[Double] {
-  (self.f64_observable_counter_fn)(name.to_string())
+  (self.f64_observable_counter_fn)(name.to_owned())
 }
 
 ///|
@@ -875,7 +875,7 @@ pub fn Meter::i64_observable_up_down_counter(
   self : Meter,
   name : StringView,
 ) -> ObservableUpDownCounterBuilder[Int64] {
-  (self.i64_observable_up_down_counter_fn)(name.to_string())
+  (self.i64_observable_up_down_counter_fn)(name.to_owned())
 }
 
 ///|
@@ -884,7 +884,7 @@ pub fn Meter::f64_observable_up_down_counter(
   self : Meter,
   name : StringView,
 ) -> ObservableUpDownCounterBuilder[Double] {
-  (self.f64_observable_up_down_counter_fn)(name.to_string())
+  (self.f64_observable_up_down_counter_fn)(name.to_owned())
 }
 
 ///|
@@ -893,7 +893,7 @@ pub fn Meter::u64_observable_gauge(
   self : Meter,
   name : StringView,
 ) -> ObservableGaugeBuilder[UInt64] {
-  (self.u64_observable_gauge_fn)(name.to_string())
+  (self.u64_observable_gauge_fn)(name.to_owned())
 }
 
 ///|
@@ -905,7 +905,7 @@ pub fn Meter::i64_observable_gauge(
   self : Meter,
   name : StringView,
 ) -> ObservableGaugeBuilder[Int64] {
-  (self.i64_observable_gauge_fn)(name.to_string())
+  (self.i64_observable_gauge_fn)(name.to_owned())
 }
 
 ///|
@@ -914,5 +914,5 @@ pub fn Meter::f64_observable_gauge(
   self : Meter,
   name : StringView,
 ) -> ObservableGaugeBuilder[Double] {
-  (self.f64_observable_gauge_fn)(name.to_string())
+  (self.f64_observable_gauge_fn)(name.to_owned())
 }

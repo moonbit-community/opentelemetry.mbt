@@ -7,22 +7,22 @@ fn default_text_map_propagator() -> @propagation.TextMapPropagator {
 }
 
 ///|
-let tracer_provider_ref : Ref[@trace.TracerProvider] = Ref::new(
+let tracer_provider_ref : Ref[@trace.TracerProvider] = Ref(
   @trace.TracerProvider::noop(),
 )
 
 ///|
-let logger_provider_ref : Ref[@logs.LoggerProvider] = Ref::new(
+let logger_provider_ref : Ref[@logs.LoggerProvider] = Ref(
   @logs.LoggerProvider::noop(),
 )
 
 ///|
-let meter_provider_ref : Ref[@metrics.MeterProvider] = Ref::new(
+let meter_provider_ref : Ref[@metrics.MeterProvider] = Ref(
   @metrics.MeterProvider::noop(),
 )
 
 ///|
-let text_map_propagator_ref : Ref[@propagation.TextMapPropagator] = Ref::new(
+let text_map_propagator_ref : Ref[@propagation.TextMapPropagator] = Ref(
   default_text_map_propagator(),
 )
 

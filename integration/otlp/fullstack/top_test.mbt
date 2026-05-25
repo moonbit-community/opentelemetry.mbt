@@ -5,10 +5,7 @@ let schema_url = "https://opentelemetry.io/schemas/1.25.0"
 fn integration_resource(service_name : StringView) -> @resource.Resource {
   @resource.Resource::builder_empty()
   .with_service_name(service_name)
-  .with_attribute(
-    "deployment.environment.name",
-    @otel.Value::String("integration"),
-  )
+  .with_attribute("deployment.environment.name", String("integration"))
   .with_schema_url(schema_url)
   .build()
 }
@@ -23,9 +20,7 @@ fn build_trace_exporter() -> @otlp.SpanExporter {
 
 ///|
 fn build_log_exporter() -> @otlp.LogExporter {
-  guard @otlp.LogExporter::builder()
-    .with_protocol(@otlp.Protocol::HttpJson)
-    .build()
+  guard @otlp.LogExporter::builder().with_protocol(HttpJson).build()
     is Ok(exporter) else {
     abort("expected log exporter to build")
   }
@@ -36,7 +31,7 @@ fn build_log_exporter() -> @otlp.LogExporter {
 fn build_metric_exporter() -> @otlp.MetricExporter {
   guard @otlp.MetricExporter::builder()
     .with_http()
-    .with_temporality(@sdkmetrics.Temporality::Cumulative)
+    .with_temporality(Cumulative)
     .build()
     is Ok(exporter) else {
     abort("expected metric exporter to build")
@@ -50,13 +45,12 @@ fn has_string_attribute(
   key : StringView,
   expected : StringView,
 ) -> Bool {
-  let key = key.to_string()
-  let expected = expected.to_string()
+  let key = key.to_owned()
+  let expected = expected.to_owned()
   for attribute in attributes {
     if attribute.key == key {
       match attribute.value.value {
-        @otlp_common.AnyValue_Value::StringValue(value) =>
-          return value == expected
+        StringValue(value) => return value == expected
         _ => return false
       }
     }
@@ -69,7 +63,7 @@ fn find_trace_resource(
   data : @otlp_trace.TracesData,
   scope_name : StringView,
 ) -> @otlp_trace.ResourceSpans? {
-  let scope_name = scope_name.to_string()
+  let scope_name = scope_name.to_owned()
   for resource_spans in data.resource_spans {
     for scope_spans in resource_spans.scope_spans {
       if scope_spans.scope.name == scope_name {
@@ -85,7 +79,7 @@ fn find_trace_scope(
   data : @otlp_trace.TracesData,
   scope_name : StringView,
 ) -> @otlp_trace.ScopeSpans? {
-  let scope_name = scope_name.to_string()
+  let scope_name = scope_name.to_owned()
   for resource_spans in data.resource_spans {
     for scope_spans in resource_spans.scope_spans {
       if scope_spans.scope.name == scope_name {
@@ -101,7 +95,7 @@ fn find_log_resource(
   data : @otlp_logs.LogsData,
   scope_name : StringView,
 ) -> @otlp_logs.ResourceLogs? {
-  let scope_name = scope_name.to_string()
+  let scope_name = scope_name.to_owned()
   for resource_logs in data.resource_logs {
     for scope_logs in resource_logs.scope_logs {
       if scope_logs.scope.name == scope_name {
@@ -117,7 +111,7 @@ fn find_log_scope(
   data : @otlp_logs.LogsData,
   scope_name : StringView,
 ) -> @otlp_logs.ScopeLogs? {
-  let scope_name = scope_name.to_string()
+  let scope_name = scope_name.to_owned()
   for resource_logs in data.resource_logs {
     for scope_logs in resource_logs.scope_logs {
       if scope_logs.scope.name == scope_name {
@@ -133,7 +127,7 @@ fn find_metric_resource(
   data : @otlp_metrics.MetricsData,
   scope_name : StringView,
 ) -> @otlp_metrics.ResourceMetrics? {
-  let scope_name = scope_name.to_string()
+  let scope_name = scope_name.to_owned()
   for resource_metrics in data.resource_metrics {
     for scope_metrics in resource_metrics.scope_metrics {
       if scope_metrics.scope.name == scope_name {
@@ -149,7 +143,7 @@ fn find_metric_scope(
   data : @otlp_metrics.MetricsData,
   scope_name : StringView,
 ) -> @otlp_metrics.ScopeMetrics? {
-  let scope_name = scope_name.to_string()
+  let scope_name = scope_name.to_owned()
   for resource_metrics in data.resource_metrics {
     for scope_metrics in resource_metrics.scope_metrics {
       if scope_metrics.scope.name == scope_name {
@@ -165,7 +159,7 @@ fn find_metric(
   metrics : ArrayView[@otlp_metrics.Metric],
   name : StringView,
 ) -> @otlp_metrics.Metric? {
-  let name = name.to_string()
+  let name = name.to_owned()
   for metric in metrics {
     if metric.name == name {
       return Some(metric)
@@ -179,7 +173,7 @@ fn metrics_data_has_scope(
   data : @otlp_metrics.MetricsData,
   scope_name : StringView,
 ) -> Bool {
-  let scope_name = scope_name.to_string()
+  let scope_name = scope_name.to_owned()
   for resource_metrics in data.resource_metrics {
     for scope_metrics in resource_metrics.scope_metrics {
       if scope_metrics.scope.name == scope_name {
@@ -237,42 +231,34 @@ async test "global APIs export correlated traces logs and metrics together" {
     trace_scope_name,
     version=Some("1.0.0"),
     schema_url=Some(schema_url),
-    attributes=[
-      @otel.KeyValue::new("scope.attr", @otel.Value::String("fullstack")),
-    ],
+    attributes=[@otel.KeyValue::new("scope.attr", String("fullstack"))],
   )
   let logger = @otel.logger(
     log_scope_name,
     version=Some("1.0.0"),
     schema_url=Some(schema_url),
-    attributes=[
-      @otel.KeyValue::new("scope.attr", @otel.Value::String("fullstack")),
-    ],
+    attributes=[@otel.KeyValue::new("scope.attr", String("fullstack"))],
   )
   let meter = @otel.meter(
     metric_scope_name,
     version=Some("1.0.0"),
     schema_url=Some(schema_url),
-    attributes=[
-      @otel.KeyValue::new("scope.attr", @otel.Value::String("fullstack")),
-    ],
+    attributes=[@otel.KeyValue::new("scope.attr", String("fullstack"))],
   )
   let counter = meter.u64_counter("checkout.attempts").with_unit("1").build()
 
   let span = tracer.start("checkout.process")
-  span.set_attribute(
-    @otel.KeyValue::new("workflow", @otel.Value::String("checkout")),
-  )
+  span.set_attribute(@otel.KeyValue::new("workflow", String("checkout")))
   let span_context = span.span_context()
 
   let record = logger.create_log_record()
   record.set_event_name("checkout.audit")
   record.set_timestamp(200L)
   record.set_observed_timestamp(205L)
-  record.set_severity_number(@ilogs.Severity::Info2)
-  record.set_body(@ilogs.AnyValue::String("accepted"))
-  record.add_attribute("workflow", @ilogs.AnyValue::String("checkout"))
-  record.add_attribute("result", @ilogs.AnyValue::String("ok"))
+  record.set_severity_number(Info2)
+  record.set_body(String("accepted"))
+  record.add_attribute("workflow", String("checkout"))
+  record.add_attribute("result", String("ok"))
   record.set_trace_context(
     span_context.trace_id(),
     span_context.span_id(),
@@ -281,7 +267,7 @@ async test "global APIs export correlated traces logs and metrics together" {
   logger.emit(record)
 
   counter.add(2UL, attributes=[
-    @otel.KeyValue::new("workflow", @otel.Value::String("checkout")),
+    @otel.KeyValue::new("workflow", String("checkout")),
   ])
 
   span.add_event_with_timestamp("checkout.completed", 210L)
@@ -387,9 +373,9 @@ async test "global APIs export correlated traces logs and metrics together" {
     ),
   )
 
-  assert_eq(trace_scope.scope.version, "1.0.0")
-  assert_eq(log_scope.scope.version, "1.0.0")
-  assert_eq(metric_scope.scope.version, "1.0.0")
+  @debug.assert_eq(trace_scope.scope.version, "1.0.0")
+  @debug.assert_eq(log_scope.scope.version, "1.0.0")
+  @debug.assert_eq(metric_scope.scope.version, "1.0.0")
   assert_true(
     has_string_attribute(
       trace_scope.scope.attributes,
@@ -408,19 +394,19 @@ async test "global APIs export correlated traces logs and metrics together" {
     ),
   )
 
-  assert_eq(trace_scope.spans.length(), 1)
+  @debug.assert_eq(trace_scope.spans.length(), 1)
   let exported_span = trace_scope.spans[0]
-  assert_eq(exported_span.name, "checkout.process")
+  @debug.assert_eq(exported_span.name, "checkout.process")
   assert_true(
     has_string_attribute(exported_span.attributes, "workflow", "checkout"),
   )
-  assert_eq(exported_span.events.length(), 1)
-  assert_eq(exported_span.events[0].name, "checkout.completed")
+  @debug.assert_eq(exported_span.events.length(), 1)
+  @debug.assert_eq(exported_span.events[0].name, "checkout.completed")
 
-  assert_eq(log_scope.log_records.length(), 1)
+  @debug.assert_eq(log_scope.log_records.length(), 1)
   let exported_log = log_scope.log_records[0]
-  assert_eq(exported_log.event_name, "checkout.audit")
-  assert_eq(exported_log.severity_text, "INFO2")
+  @debug.assert_eq(exported_log.event_name, "checkout.audit")
+  @debug.assert_eq(exported_log.severity_text, "INFO2")
   assert_true(
     has_string_attribute(exported_log.attributes, "workflow", "checkout"),
   )
@@ -428,17 +414,17 @@ async test "global APIs export correlated traces logs and metrics together" {
   assert_true(exported_log.trace_id == exported_span.trace_id)
   assert_true(exported_log.span_id == exported_span.span_id)
 
-  assert_eq(metric_scope.metrics.length(), 1)
+  @debug.assert_eq(metric_scope.metrics.length(), 1)
   let attempts_metric = match
     find_metric(metric_scope.metrics, "checkout.attempts") {
     Some(metric) => metric
     None => fail("expected checkout.attempts metric")
   }
-  assert_eq(attempts_metric.unit, "1")
+  @debug.assert_eq(attempts_metric.unit, "1")
   match attempts_metric.data {
-    @otlp_metrics.Metric_Data::Sum(sum) => {
+    Sum(sum) => {
       assert_true(sum.is_monotonic)
-      assert_eq(sum.data_points.length(), 1)
+      @debug.assert_eq(sum.data_points.length(), 1)
       assert_true(
         has_string_attribute(
           sum.data_points[0].attributes,
@@ -446,10 +432,7 @@ async test "global APIs export correlated traces logs and metrics together" {
           "checkout",
         ),
       )
-      assert_true(
-        sum.data_points[0].value ==
-        @otlp_metrics.NumberDataPoint_Value::AsInt(2L),
-      )
+      assert_true(sum.data_points[0].value == AsInt(2L))
     }
     _ => fail("expected checkout.attempts to export as a sum")
   }

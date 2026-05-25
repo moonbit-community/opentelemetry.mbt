@@ -4,7 +4,7 @@ pub(all) struct ExportTraceServiceRequest {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for ExportTraceServiceRequest with size_of(self) {
+pub impl @protobuf.Sized for ExportTraceServiceRequest with fn size_of(self) {
   let mut size = 0U
   for s in self.resource_spans {
     let s = @protobuf.size_of(s)
@@ -14,19 +14,19 @@ pub impl @protobuf.Sized for ExportTraceServiceRequest with size_of(self) {
 }
 
 ///|
-pub impl Default for ExportTraceServiceRequest with default() -> ExportTraceServiceRequest {
-  ExportTraceServiceRequest::{ resource_spans: [] }
+pub impl Default for ExportTraceServiceRequest with fn default() -> ExportTraceServiceRequest {
+  { resource_spans: [] }
 }
 
 ///|
 pub fn ExportTraceServiceRequest::new(
   resource_spans : Array[@v12.ResourceSpans],
 ) -> ExportTraceServiceRequest {
-  ExportTraceServiceRequest::{ resource_spans, }
+  { resource_spans, }
 }
 
 ///|
-pub impl @protobuf.Read for ExportTraceServiceRequest with read_with_limit(
+pub impl @protobuf.Read for ExportTraceServiceRequest with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ExportTraceServiceRequest raise {
   let msg = ExportTraceServiceRequest::default()
@@ -48,7 +48,7 @@ pub impl @protobuf.Read for ExportTraceServiceRequest with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for ExportTraceServiceRequest with write(
+pub impl @protobuf.Write for ExportTraceServiceRequest with fn write(
   self : ExportTraceServiceRequest,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -60,7 +60,7 @@ pub impl @protobuf.Write for ExportTraceServiceRequest with write(
 }
 
 ///|
-pub impl ToJson for ExportTraceServiceRequest with to_json(self) {
+pub impl ToJson for ExportTraceServiceRequest with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.resource_spans != Default::default() {
     json["resourceSpans"] = self.resource_spans.to_json()
@@ -69,12 +69,12 @@ pub impl ToJson for ExportTraceServiceRequest with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for ExportTraceServiceRequest with from_json(
+pub impl @json.FromJson for ExportTraceServiceRequest with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> ExportTraceServiceRequest raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError(
+    raise JsonDecodeError(
       (path, "Expected an object for ExportTraceServiceRequest"),
     )
   }
@@ -83,14 +83,14 @@ pub impl @json.FromJson for ExportTraceServiceRequest with from_json(
     match (key, value) {
       ("resourceSpans", Array(value)) =>
         message.resource_spans = value.map(v => @json.from_json(v, path~))
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for ExportTraceServiceRequest with read_with_limit(
+pub impl @protobuf.AsyncRead for ExportTraceServiceRequest with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ExportTraceServiceRequest raise {
   let msg = ExportTraceServiceRequest::default()
@@ -112,7 +112,7 @@ pub impl @protobuf.AsyncRead for ExportTraceServiceRequest with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for ExportTraceServiceRequest with write(
+pub impl @protobuf.AsyncWrite for ExportTraceServiceRequest with fn write(
   self : ExportTraceServiceRequest,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -129,7 +129,7 @@ pub(all) struct ExportTraceServiceResponse {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for ExportTraceServiceResponse with size_of(self) {
+pub impl @protobuf.Sized for ExportTraceServiceResponse with fn size_of(self) {
   let mut size = 0U
   size += 1U +
     ({
@@ -140,21 +140,19 @@ pub impl @protobuf.Sized for ExportTraceServiceResponse with size_of(self) {
 }
 
 ///|
-pub impl Default for ExportTraceServiceResponse with default() -> ExportTraceServiceResponse {
-  ExportTraceServiceResponse::{
-    partial_success: ExportTracePartialSuccess::default(),
-  }
+pub impl Default for ExportTraceServiceResponse with fn default() -> ExportTraceServiceResponse {
+  { partial_success: ExportTracePartialSuccess::default() }
 }
 
 ///|
 pub fn ExportTraceServiceResponse::new(
   partial_success : ExportTracePartialSuccess,
 ) -> ExportTraceServiceResponse {
-  ExportTraceServiceResponse::{ partial_success, }
+  { partial_success, }
 }
 
 ///|
-pub impl @protobuf.Read for ExportTraceServiceResponse with read_with_limit(
+pub impl @protobuf.Read for ExportTraceServiceResponse with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ExportTraceServiceResponse raise {
   let msg = ExportTraceServiceResponse::default()
@@ -175,7 +173,7 @@ pub impl @protobuf.Read for ExportTraceServiceResponse with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for ExportTraceServiceResponse with write(
+pub impl @protobuf.Write for ExportTraceServiceResponse with fn write(
   self : ExportTraceServiceResponse,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -185,7 +183,7 @@ pub impl @protobuf.Write for ExportTraceServiceResponse with write(
 }
 
 ///|
-pub impl ToJson for ExportTraceServiceResponse with to_json(self) {
+pub impl ToJson for ExportTraceServiceResponse with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.partial_success != Default::default() {
     json["partialSuccess"] = self.partial_success.to_json()
@@ -194,12 +192,12 @@ pub impl ToJson for ExportTraceServiceResponse with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for ExportTraceServiceResponse with from_json(
+pub impl @json.FromJson for ExportTraceServiceResponse with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> ExportTraceServiceResponse raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError(
+    raise JsonDecodeError(
       (path, "Expected an object for ExportTraceServiceResponse"),
     )
   }
@@ -208,14 +206,14 @@ pub impl @json.FromJson for ExportTraceServiceResponse with from_json(
     match (key, value) {
       ("partialSuccess", value) =>
         message.partial_success = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for ExportTraceServiceResponse with read_with_limit(
+pub impl @protobuf.AsyncRead for ExportTraceServiceResponse with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ExportTraceServiceResponse raise {
   let msg = ExportTraceServiceResponse::default()
@@ -236,7 +234,7 @@ pub impl @protobuf.AsyncRead for ExportTraceServiceResponse with read_with_limit
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for ExportTraceServiceResponse with write(
+pub impl @protobuf.AsyncWrite for ExportTraceServiceResponse with fn write(
   self : ExportTraceServiceResponse,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -253,7 +251,7 @@ pub(all) struct ExportTracePartialSuccess {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for ExportTracePartialSuccess with size_of(self) {
+pub impl @protobuf.Sized for ExportTracePartialSuccess with fn size_of(self) {
   let mut size = 0U
   size += 1U + @protobuf.size_of(self.rejected_spans)
   size += 1U +
@@ -265,11 +263,8 @@ pub impl @protobuf.Sized for ExportTracePartialSuccess with size_of(self) {
 }
 
 ///|
-pub impl Default for ExportTracePartialSuccess with default() -> ExportTracePartialSuccess {
-  ExportTracePartialSuccess::{
-    rejected_spans: Int64::default(),
-    error_message: String::default(),
-  }
+pub impl Default for ExportTracePartialSuccess with fn default() -> ExportTracePartialSuccess {
+  { rejected_spans: Int64::default(), error_message: String::default() }
 }
 
 ///|
@@ -277,11 +272,11 @@ pub fn ExportTracePartialSuccess::new(
   rejected_spans : Int64,
   error_message : String,
 ) -> ExportTracePartialSuccess {
-  ExportTracePartialSuccess::{ rejected_spans, error_message }
+  { rejected_spans, error_message }
 }
 
 ///|
-pub impl @protobuf.Read for ExportTracePartialSuccess with read_with_limit(
+pub impl @protobuf.Read for ExportTracePartialSuccess with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ExportTracePartialSuccess raise {
   let msg = ExportTracePartialSuccess::default()
@@ -301,7 +296,7 @@ pub impl @protobuf.Read for ExportTracePartialSuccess with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for ExportTracePartialSuccess with write(
+pub impl @protobuf.Write for ExportTracePartialSuccess with fn write(
   self : ExportTracePartialSuccess,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -312,7 +307,7 @@ pub impl @protobuf.Write for ExportTracePartialSuccess with write(
 }
 
 ///|
-pub impl ToJson for ExportTracePartialSuccess with to_json(self) {
+pub impl ToJson for ExportTracePartialSuccess with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.rejected_spans != Default::default() {
     json["rejectedSpans"] = self.rejected_spans.to_json()
@@ -324,12 +319,12 @@ pub impl ToJson for ExportTracePartialSuccess with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for ExportTracePartialSuccess with from_json(
+pub impl @json.FromJson for ExportTracePartialSuccess with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> ExportTracePartialSuccess raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError(
+    raise JsonDecodeError(
       (path, "Expected an object for ExportTracePartialSuccess"),
     )
   }
@@ -340,14 +335,14 @@ pub impl @json.FromJson for ExportTracePartialSuccess with from_json(
         message.rejected_spans = @json.from_json(value, path~)
       ("errorMessage", value) =>
         message.error_message = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for ExportTracePartialSuccess with read_with_limit(
+pub impl @protobuf.AsyncRead for ExportTracePartialSuccess with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ExportTracePartialSuccess raise {
   let msg = ExportTracePartialSuccess::default()
@@ -367,7 +362,7 @@ pub impl @protobuf.AsyncRead for ExportTracePartialSuccess with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for ExportTracePartialSuccess with write(
+pub impl @protobuf.AsyncWrite for ExportTracePartialSuccess with fn write(
   self : ExportTracePartialSuccess,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {

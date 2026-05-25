@@ -10,7 +10,7 @@ pub(all) struct ProfilesDictionary {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for ProfilesDictionary with size_of(self) {
+pub impl @protobuf.Sized for ProfilesDictionary with fn size_of(self) {
   let mut size = 0U
   for s in self.mapping_table {
     let s = @protobuf.size_of(s)
@@ -44,8 +44,8 @@ pub impl @protobuf.Sized for ProfilesDictionary with size_of(self) {
 }
 
 ///|
-pub impl Default for ProfilesDictionary with default() -> ProfilesDictionary {
-  ProfilesDictionary::{
+pub impl Default for ProfilesDictionary with fn default() -> ProfilesDictionary {
+  {
     mapping_table: [],
     location_table: [],
     function_table: [],
@@ -66,7 +66,7 @@ pub fn ProfilesDictionary::new(
   attribute_table : Array[KeyValueAndUnit],
   stack_table : Array[Stack],
 ) -> ProfilesDictionary {
-  ProfilesDictionary::{
+  {
     mapping_table,
     location_table,
     function_table,
@@ -78,7 +78,7 @@ pub fn ProfilesDictionary::new(
 }
 
 ///|
-pub impl @protobuf.Read for ProfilesDictionary with read_with_limit(
+pub impl @protobuf.Read for ProfilesDictionary with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ProfilesDictionary raise {
   let msg = ProfilesDictionary::default()
@@ -115,7 +115,7 @@ pub impl @protobuf.Read for ProfilesDictionary with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for ProfilesDictionary with write(
+pub impl @protobuf.Write for ProfilesDictionary with fn write(
   self : ProfilesDictionary,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -156,7 +156,7 @@ pub impl @protobuf.Write for ProfilesDictionary with write(
 }
 
 ///|
-pub impl ToJson for ProfilesDictionary with to_json(self) {
+pub impl ToJson for ProfilesDictionary with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.mapping_table != Default::default() {
     json["mappingTable"] = self.mapping_table.to_json()
@@ -183,14 +183,12 @@ pub impl ToJson for ProfilesDictionary with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for ProfilesDictionary with from_json(
+pub impl @json.FromJson for ProfilesDictionary with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> ProfilesDictionary raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError(
-      (path, "Expected an object for ProfilesDictionary"),
-    )
+    raise JsonDecodeError((path, "Expected an object for ProfilesDictionary"))
   }
   let message = ProfilesDictionary::default()
   for key, value in obj {
@@ -209,14 +207,14 @@ pub impl @json.FromJson for ProfilesDictionary with from_json(
         message.attribute_table = value.map(v => @json.from_json(v, path~))
       ("stackTable", Array(value)) =>
         message.stack_table = value.map(v => @json.from_json(v, path~))
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for ProfilesDictionary with read_with_limit(
+pub impl @protobuf.AsyncRead for ProfilesDictionary with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ProfilesDictionary raise {
   let msg = ProfilesDictionary::default()
@@ -257,7 +255,7 @@ pub impl @protobuf.AsyncRead for ProfilesDictionary with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for ProfilesDictionary with write(
+pub impl @protobuf.AsyncWrite for ProfilesDictionary with fn write(
   self : ProfilesDictionary,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -304,7 +302,7 @@ pub(all) struct ProfilesData {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for ProfilesData with size_of(self) {
+pub impl @protobuf.Sized for ProfilesData with fn size_of(self) {
   let mut size = 0U
   for s in self.resource_profiles {
     let s = @protobuf.size_of(s)
@@ -319,11 +317,8 @@ pub impl @protobuf.Sized for ProfilesData with size_of(self) {
 }
 
 ///|
-pub impl Default for ProfilesData with default() -> ProfilesData {
-  ProfilesData::{
-    resource_profiles: [],
-    dictionary: ProfilesDictionary::default(),
-  }
+pub impl Default for ProfilesData with fn default() -> ProfilesData {
+  { resource_profiles: [], dictionary: ProfilesDictionary::default() }
 }
 
 ///|
@@ -331,11 +326,11 @@ pub fn ProfilesData::new(
   resource_profiles : Array[ResourceProfiles],
   dictionary : ProfilesDictionary,
 ) -> ProfilesData {
-  ProfilesData::{ resource_profiles, dictionary }
+  { resource_profiles, dictionary }
 }
 
 ///|
-pub impl @protobuf.Read for ProfilesData with read_with_limit(
+pub impl @protobuf.Read for ProfilesData with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ProfilesData raise {
   let msg = ProfilesData::default()
@@ -360,7 +355,7 @@ pub impl @protobuf.Read for ProfilesData with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for ProfilesData with write(
+pub impl @protobuf.Write for ProfilesData with fn write(
   self : ProfilesData,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -375,7 +370,7 @@ pub impl @protobuf.Write for ProfilesData with write(
 }
 
 ///|
-pub impl ToJson for ProfilesData with to_json(self) {
+pub impl ToJson for ProfilesData with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.resource_profiles != Default::default() {
     json["resourceProfiles"] = self.resource_profiles.to_json()
@@ -387,12 +382,12 @@ pub impl ToJson for ProfilesData with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for ProfilesData with from_json(
+pub impl @json.FromJson for ProfilesData with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> ProfilesData raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for ProfilesData"))
+    raise JsonDecodeError((path, "Expected an object for ProfilesData"))
   }
   let message = ProfilesData::default()
   for key, value in obj {
@@ -401,14 +396,14 @@ pub impl @json.FromJson for ProfilesData with from_json(
         message.resource_profiles = value.map(v => @json.from_json(v, path~))
       ("dictionary", value) =>
         message.dictionary = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for ProfilesData with read_with_limit(
+pub impl @protobuf.AsyncRead for ProfilesData with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ProfilesData raise {
   let msg = ProfilesData::default()
@@ -433,7 +428,7 @@ pub impl @protobuf.AsyncRead for ProfilesData with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for ProfilesData with write(
+pub impl @protobuf.AsyncWrite for ProfilesData with fn write(
   self : ProfilesData,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -455,7 +450,7 @@ pub(all) struct ResourceProfiles {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for ResourceProfiles with size_of(self) {
+pub impl @protobuf.Sized for ResourceProfiles with fn size_of(self) {
   let mut size = 0U
   size += 1U +
     ({
@@ -475,8 +470,8 @@ pub impl @protobuf.Sized for ResourceProfiles with size_of(self) {
 }
 
 ///|
-pub impl Default for ResourceProfiles with default() -> ResourceProfiles {
-  ResourceProfiles::{
+pub impl Default for ResourceProfiles with fn default() -> ResourceProfiles {
+  {
     resource: @v11.Resource::default(),
     scope_profiles: [],
     schema_url: String::default(),
@@ -489,11 +484,11 @@ pub fn ResourceProfiles::new(
   scope_profiles : Array[ScopeProfiles],
   schema_url : String,
 ) -> ResourceProfiles {
-  ResourceProfiles::{ resource, scope_profiles, schema_url }
+  { resource, scope_profiles, schema_url }
 }
 
 ///|
-pub impl @protobuf.Read for ResourceProfiles with read_with_limit(
+pub impl @protobuf.Read for ResourceProfiles with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ResourceProfiles raise {
   let msg = ResourceProfiles::default()
@@ -518,7 +513,7 @@ pub impl @protobuf.Read for ResourceProfiles with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for ResourceProfiles with write(
+pub impl @protobuf.Write for ResourceProfiles with fn write(
   self : ResourceProfiles,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -535,7 +530,7 @@ pub impl @protobuf.Write for ResourceProfiles with write(
 }
 
 ///|
-pub impl ToJson for ResourceProfiles with to_json(self) {
+pub impl ToJson for ResourceProfiles with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.resource != Default::default() {
     json["resource"] = self.resource.to_json()
@@ -550,14 +545,12 @@ pub impl ToJson for ResourceProfiles with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for ResourceProfiles with from_json(
+pub impl @json.FromJson for ResourceProfiles with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> ResourceProfiles raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError(
-      (path, "Expected an object for ResourceProfiles"),
-    )
+    raise JsonDecodeError((path, "Expected an object for ResourceProfiles"))
   }
   let message = ResourceProfiles::default()
   for key, value in obj {
@@ -566,14 +559,14 @@ pub impl @json.FromJson for ResourceProfiles with from_json(
       ("scopeProfiles", Array(value)) =>
         message.scope_profiles = value.map(v => @json.from_json(v, path~))
       ("schemaUrl", value) => message.schema_url = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for ResourceProfiles with read_with_limit(
+pub impl @protobuf.AsyncRead for ResourceProfiles with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ResourceProfiles raise {
   let msg = ResourceProfiles::default()
@@ -599,7 +592,7 @@ pub impl @protobuf.AsyncRead for ResourceProfiles with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for ResourceProfiles with write(
+pub impl @protobuf.AsyncWrite for ResourceProfiles with fn write(
   self : ResourceProfiles,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -623,7 +616,7 @@ pub(all) struct ScopeProfiles {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for ScopeProfiles with size_of(self) {
+pub impl @protobuf.Sized for ScopeProfiles with fn size_of(self) {
   let mut size = 0U
   size += 1U +
     ({
@@ -643,8 +636,8 @@ pub impl @protobuf.Sized for ScopeProfiles with size_of(self) {
 }
 
 ///|
-pub impl Default for ScopeProfiles with default() -> ScopeProfiles {
-  ScopeProfiles::{
+pub impl Default for ScopeProfiles with fn default() -> ScopeProfiles {
+  {
     scope: @v1.InstrumentationScope::default(),
     profiles: [],
     schema_url: String::default(),
@@ -657,11 +650,11 @@ pub fn ScopeProfiles::new(
   profiles : Array[Profile],
   schema_url : String,
 ) -> ScopeProfiles {
-  ScopeProfiles::{ scope, profiles, schema_url }
+  { scope, profiles, schema_url }
 }
 
 ///|
-pub impl @protobuf.Read for ScopeProfiles with read_with_limit(
+pub impl @protobuf.Read for ScopeProfiles with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ScopeProfiles raise {
   let msg = ScopeProfiles::default()
@@ -685,7 +678,7 @@ pub impl @protobuf.Read for ScopeProfiles with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for ScopeProfiles with write(
+pub impl @protobuf.Write for ScopeProfiles with fn write(
   self : ScopeProfiles,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -702,7 +695,7 @@ pub impl @protobuf.Write for ScopeProfiles with write(
 }
 
 ///|
-pub impl ToJson for ScopeProfiles with to_json(self) {
+pub impl ToJson for ScopeProfiles with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.scope != Default::default() {
     json["scope"] = self.scope.to_json()
@@ -717,12 +710,12 @@ pub impl ToJson for ScopeProfiles with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for ScopeProfiles with from_json(
+pub impl @json.FromJson for ScopeProfiles with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> ScopeProfiles raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for ScopeProfiles"))
+    raise JsonDecodeError((path, "Expected an object for ScopeProfiles"))
   }
   let message = ScopeProfiles::default()
   for key, value in obj {
@@ -731,14 +724,14 @@ pub impl @json.FromJson for ScopeProfiles with from_json(
       ("profiles", Array(value)) =>
         message.profiles = value.map(v => @json.from_json(v, path~))
       ("schemaUrl", value) => message.schema_url = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for ScopeProfiles with read_with_limit(
+pub impl @protobuf.AsyncRead for ScopeProfiles with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ScopeProfiles raise {
   let msg = ScopeProfiles::default()
@@ -764,7 +757,7 @@ pub impl @protobuf.AsyncRead for ScopeProfiles with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for ScopeProfiles with write(
+pub impl @protobuf.AsyncWrite for ScopeProfiles with fn write(
   self : ScopeProfiles,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -796,7 +789,7 @@ pub(all) struct Profile {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for Profile with size_of(self) {
+pub impl @protobuf.Sized for Profile with fn size_of(self) {
   let mut size = 0U
   size += 1U +
     ({
@@ -843,8 +836,8 @@ pub impl @protobuf.Sized for Profile with size_of(self) {
 }
 
 ///|
-pub impl Default for Profile with default() -> Profile {
-  Profile::{
+pub impl Default for Profile with fn default() -> Profile {
+  {
     sample_type: ValueType::default(),
     samples: [],
     time_unix_nano: UInt64::default(),
@@ -873,7 +866,7 @@ pub fn Profile::new(
   original_payload : Bytes,
   attribute_indices : Array[Int],
 ) -> Profile {
-  Profile::{
+  {
     sample_type,
     samples,
     time_unix_nano,
@@ -889,7 +882,7 @@ pub fn Profile::new(
 }
 
 ///|
-pub impl @protobuf.Read for Profile with read_with_limit(
+pub impl @protobuf.Read for Profile with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Profile raise {
   let msg = Profile::default()
@@ -926,7 +919,7 @@ pub impl @protobuf.Read for Profile with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for Profile with write(
+pub impl @protobuf.Write for Profile with fn write(
   self : Profile,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -967,7 +960,7 @@ pub impl @protobuf.Write for Profile with write(
 }
 
 ///|
-pub impl ToJson for Profile with to_json(self) {
+pub impl ToJson for Profile with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.sample_type != Default::default() {
     json["sampleType"] = self.sample_type.to_json()
@@ -1006,12 +999,12 @@ pub impl ToJson for Profile with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for Profile with from_json(
+pub impl @json.FromJson for Profile with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> Profile raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for Profile"))
+    raise JsonDecodeError((path, "Expected an object for Profile"))
   }
   let message = Profile::default()
   for key, value in obj {
@@ -1037,14 +1030,14 @@ pub impl @json.FromJson for Profile with from_json(
         message.original_payload = @protobuf.base64_decode(value)
       ("attributeIndices", Array(value)) =>
         message.attribute_indices = value.map(v => @json.from_json(v, path~))
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for Profile with read_with_limit(
+pub impl @protobuf.AsyncRead for Profile with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Profile raise {
   let msg = Profile::default()
@@ -1084,7 +1077,7 @@ pub impl @protobuf.AsyncRead for Profile with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for Profile with write(
+pub impl @protobuf.AsyncWrite for Profile with fn write(
   self : Profile,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -1131,7 +1124,7 @@ pub(all) struct Link {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for Link with size_of(self) {
+pub impl @protobuf.Sized for Link with fn size_of(self) {
   let mut size = 0U
   size += 1U +
     ({
@@ -1147,17 +1140,17 @@ pub impl @protobuf.Sized for Link with size_of(self) {
 }
 
 ///|
-pub impl Default for Link with default() -> Link {
-  Link::{ trace_id: Bytes::default(), span_id: Bytes::default() }
+pub impl Default for Link with fn default() -> Link {
+  { trace_id: Bytes::default(), span_id: Bytes::default() }
 }
 
 ///|
 pub fn Link::new(trace_id : Bytes, span_id : Bytes) -> Link {
-  Link::{ trace_id, span_id }
+  { trace_id, span_id }
 }
 
 ///|
-pub impl @protobuf.Read for Link with read_with_limit(
+pub impl @protobuf.Read for Link with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Link raise {
   let msg = Link::default()
@@ -1177,7 +1170,7 @@ pub impl @protobuf.Read for Link with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for Link with write(
+pub impl @protobuf.Write for Link with fn write(
   self : Link,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -1188,7 +1181,7 @@ pub impl @protobuf.Write for Link with write(
 }
 
 ///|
-pub impl ToJson for Link with to_json(self) {
+pub impl ToJson for Link with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.trace_id != Default::default() {
     json["traceId"] = @protobuf.base64_encode(self.trace_id).to_json()
@@ -1200,12 +1193,12 @@ pub impl ToJson for Link with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for Link with from_json(
+pub impl @json.FromJson for Link with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> Link raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for Link"))
+    raise JsonDecodeError((path, "Expected an object for Link"))
   }
   let message = Link::default()
   for key, value in obj {
@@ -1214,14 +1207,14 @@ pub impl @json.FromJson for Link with from_json(
         message.trace_id = @protobuf.base64_decode(value)
       ("spanId", String(value)) =>
         message.span_id = @protobuf.base64_decode(value)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for Link with read_with_limit(
+pub impl @protobuf.AsyncRead for Link with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Link raise {
   let msg = Link::default()
@@ -1241,7 +1234,7 @@ pub impl @protobuf.AsyncRead for Link with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for Link with write(
+pub impl @protobuf.AsyncWrite for Link with fn write(
   self : Link,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -1258,7 +1251,7 @@ pub(all) struct ValueType {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for ValueType with size_of(self) {
+pub impl @protobuf.Sized for ValueType with fn size_of(self) {
   let mut size = 0U
   size += 1U + @protobuf.size_of(self.type_strindex)
   size += 1U + @protobuf.size_of(self.unit_strindex)
@@ -1266,17 +1259,17 @@ pub impl @protobuf.Sized for ValueType with size_of(self) {
 }
 
 ///|
-pub impl Default for ValueType with default() -> ValueType {
-  ValueType::{ type_strindex: Int::default(), unit_strindex: Int::default() }
+pub impl Default for ValueType with fn default() -> ValueType {
+  { type_strindex: Int::default(), unit_strindex: Int::default() }
 }
 
 ///|
 pub fn ValueType::new(type_strindex : Int, unit_strindex : Int) -> ValueType {
-  ValueType::{ type_strindex, unit_strindex }
+  { type_strindex, unit_strindex }
 }
 
 ///|
-pub impl @protobuf.Read for ValueType with read_with_limit(
+pub impl @protobuf.Read for ValueType with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ValueType raise {
   let msg = ValueType::default()
@@ -1296,7 +1289,7 @@ pub impl @protobuf.Read for ValueType with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for ValueType with write(
+pub impl @protobuf.Write for ValueType with fn write(
   self : ValueType,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -1307,7 +1300,7 @@ pub impl @protobuf.Write for ValueType with write(
 }
 
 ///|
-pub impl ToJson for ValueType with to_json(self) {
+pub impl ToJson for ValueType with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.type_strindex != Default::default() {
     json["typeStrindex"] = self.type_strindex.to_json()
@@ -1319,12 +1312,12 @@ pub impl ToJson for ValueType with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for ValueType with from_json(
+pub impl @json.FromJson for ValueType with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> ValueType raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for ValueType"))
+    raise JsonDecodeError((path, "Expected an object for ValueType"))
   }
   let message = ValueType::default()
   for key, value in obj {
@@ -1333,14 +1326,14 @@ pub impl @json.FromJson for ValueType with from_json(
         message.type_strindex = @json.from_json(value, path~)
       ("unitStrindex", value) =>
         message.unit_strindex = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for ValueType with read_with_limit(
+pub impl @protobuf.AsyncRead for ValueType with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ValueType raise {
   let msg = ValueType::default()
@@ -1360,7 +1353,7 @@ pub impl @protobuf.AsyncRead for ValueType with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for ValueType with write(
+pub impl @protobuf.AsyncWrite for ValueType with fn write(
   self : ValueType,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -1380,7 +1373,7 @@ pub(all) struct Sample {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for Sample with size_of(self) {
+pub impl @protobuf.Sized for Sample with fn size_of(self) {
   let mut size = 0U
   size += 1U + @protobuf.size_of(self.stack_index)
   size += 1U +
@@ -1409,8 +1402,8 @@ pub impl @protobuf.Sized for Sample with size_of(self) {
 }
 
 ///|
-pub impl Default for Sample with default() -> Sample {
-  Sample::{
+pub impl Default for Sample with fn default() -> Sample {
+  {
     stack_index: Int::default(),
     attribute_indices: [],
     link_index: Int::default(),
@@ -1427,17 +1420,11 @@ pub fn Sample::new(
   values : Array[Int64],
   timestamps_unix_nano : Array[UInt64],
 ) -> Sample {
-  Sample::{
-    stack_index,
-    attribute_indices,
-    link_index,
-    values,
-    timestamps_unix_nano,
-  }
+  { stack_index, attribute_indices, link_index, values, timestamps_unix_nano }
 }
 
 ///|
-pub impl @protobuf.Read for Sample with read_with_limit(
+pub impl @protobuf.Read for Sample with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Sample raise {
   let msg = Sample::default()
@@ -1469,7 +1456,7 @@ pub impl @protobuf.Read for Sample with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for Sample with write(
+pub impl @protobuf.Write for Sample with fn write(
   self : Sample,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -1501,7 +1488,7 @@ pub impl @protobuf.Write for Sample with write(
 }
 
 ///|
-pub impl ToJson for Sample with to_json(self) {
+pub impl ToJson for Sample with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.stack_index != Default::default() {
     json["stackIndex"] = self.stack_index.to_json()
@@ -1522,12 +1509,12 @@ pub impl ToJson for Sample with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for Sample with from_json(
+pub impl @json.FromJson for Sample with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> Sample raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for Sample"))
+    raise JsonDecodeError((path, "Expected an object for Sample"))
   }
   let message = Sample::default()
   for key, value in obj {
@@ -1541,14 +1528,14 @@ pub impl @json.FromJson for Sample with from_json(
         message.values = value.map(v => @json.from_json(v, path~))
       ("timestampsUnixNano", Array(value)) =>
         message.timestamps_unix_nano = value.map(v => @json.from_json(v, path~))
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for Sample with read_with_limit(
+pub impl @protobuf.AsyncRead for Sample with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Sample raise {
   let msg = Sample::default()
@@ -1586,7 +1573,7 @@ pub impl @protobuf.AsyncRead for Sample with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for Sample with write(
+pub impl @protobuf.AsyncWrite for Sample with fn write(
   self : Sample,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -1627,7 +1614,7 @@ pub(all) struct Mapping {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for Mapping with size_of(self) {
+pub impl @protobuf.Sized for Mapping with fn size_of(self) {
   let mut size = 0U
   size += 1U + @protobuf.size_of(self.memory_start)
   size += 1U + @protobuf.size_of(self.memory_limit)
@@ -1645,8 +1632,8 @@ pub impl @protobuf.Sized for Mapping with size_of(self) {
 }
 
 ///|
-pub impl Default for Mapping with default() -> Mapping {
-  Mapping::{
+pub impl Default for Mapping with fn default() -> Mapping {
+  {
     memory_start: UInt64::default(),
     memory_limit: UInt64::default(),
     file_offset: UInt64::default(),
@@ -1663,7 +1650,7 @@ pub fn Mapping::new(
   filename_strindex : Int,
   attribute_indices : Array[Int],
 ) -> Mapping {
-  Mapping::{
+  {
     memory_start,
     memory_limit,
     file_offset,
@@ -1673,7 +1660,7 @@ pub fn Mapping::new(
 }
 
 ///|
-pub impl @protobuf.Read for Mapping with read_with_limit(
+pub impl @protobuf.Read for Mapping with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Mapping raise {
   let msg = Mapping::default()
@@ -1699,7 +1686,7 @@ pub impl @protobuf.Read for Mapping with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for Mapping with write(
+pub impl @protobuf.Write for Mapping with fn write(
   self : Mapping,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -1723,7 +1710,7 @@ pub impl @protobuf.Write for Mapping with write(
 }
 
 ///|
-pub impl ToJson for Mapping with to_json(self) {
+pub impl ToJson for Mapping with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.memory_start != Default::default() {
     json["memoryStart"] = self.memory_start.to_json()
@@ -1744,12 +1731,12 @@ pub impl ToJson for Mapping with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for Mapping with from_json(
+pub impl @json.FromJson for Mapping with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> Mapping raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for Mapping"))
+    raise JsonDecodeError((path, "Expected an object for Mapping"))
   }
   let message = Mapping::default()
   for key, value in obj {
@@ -1764,14 +1751,14 @@ pub impl @json.FromJson for Mapping with from_json(
         message.filename_strindex = @json.from_json(value, path~)
       ("attributeIndices", Array(value)) =>
         message.attribute_indices = value.map(v => @json.from_json(v, path~))
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for Mapping with read_with_limit(
+pub impl @protobuf.AsyncRead for Mapping with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Mapping raise {
   let msg = Mapping::default()
@@ -1798,7 +1785,7 @@ pub impl @protobuf.AsyncRead for Mapping with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for Mapping with write(
+pub impl @protobuf.AsyncWrite for Mapping with fn write(
   self : Mapping,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -1827,7 +1814,7 @@ pub(all) struct Stack {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for Stack with size_of(self) {
+pub impl @protobuf.Sized for Stack with fn size_of(self) {
   let mut size = 0U
   size += 1U +
     ({
@@ -1841,17 +1828,17 @@ pub impl @protobuf.Sized for Stack with size_of(self) {
 }
 
 ///|
-pub impl Default for Stack with default() -> Stack {
-  Stack::{ location_indices: [] }
+pub impl Default for Stack with fn default() -> Stack {
+  { location_indices: [] }
 }
 
 ///|
 pub fn Stack::new(location_indices : Array[Int]) -> Stack {
-  Stack::{ location_indices, }
+  { location_indices, }
 }
 
 ///|
-pub impl @protobuf.Read for Stack with read_with_limit(
+pub impl @protobuf.Read for Stack with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Stack raise {
   let msg = Stack::default()
@@ -1873,7 +1860,7 @@ pub impl @protobuf.Read for Stack with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for Stack with write(
+pub impl @protobuf.Write for Stack with fn write(
   self : Stack,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -1889,7 +1876,7 @@ pub impl @protobuf.Write for Stack with write(
 }
 
 ///|
-pub impl ToJson for Stack with to_json(self) {
+pub impl ToJson for Stack with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.location_indices != Default::default() {
     json["locationIndices"] = self.location_indices.to_json()
@@ -1898,26 +1885,26 @@ pub impl ToJson for Stack with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for Stack with from_json(
+pub impl @json.FromJson for Stack with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> Stack raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for Stack"))
+    raise JsonDecodeError((path, "Expected an object for Stack"))
   }
   let message = Stack::default()
   for key, value in obj {
     match (key, value) {
       ("locationIndices", Array(value)) =>
         message.location_indices = value.map(v => @json.from_json(v, path~))
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for Stack with read_with_limit(
+pub impl @protobuf.AsyncRead for Stack with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Stack raise {
   let msg = Stack::default()
@@ -1940,7 +1927,7 @@ pub impl @protobuf.AsyncRead for Stack with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for Stack with write(
+pub impl @protobuf.AsyncWrite for Stack with fn write(
   self : Stack,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -1964,7 +1951,7 @@ pub(all) struct Location {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for Location with size_of(self) {
+pub impl @protobuf.Sized for Location with fn size_of(self) {
   let mut size = 0U
   size += 1U + @protobuf.size_of(self.mapping_index)
   size += 1U + @protobuf.size_of(self.address)
@@ -1984,8 +1971,8 @@ pub impl @protobuf.Sized for Location with size_of(self) {
 }
 
 ///|
-pub impl Default for Location with default() -> Location {
-  Location::{
+pub impl Default for Location with fn default() -> Location {
+  {
     mapping_index: Int::default(),
     address: UInt64::default(),
     lines: [],
@@ -2000,11 +1987,11 @@ pub fn Location::new(
   lines : Array[Line],
   attribute_indices : Array[Int],
 ) -> Location {
-  Location::{ mapping_index, address, lines, attribute_indices }
+  { mapping_index, address, lines, attribute_indices }
 }
 
 ///|
-pub impl @protobuf.Read for Location with read_with_limit(
+pub impl @protobuf.Read for Location with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Location raise {
   let msg = Location::default()
@@ -2029,7 +2016,7 @@ pub impl @protobuf.Read for Location with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for Location with write(
+pub impl @protobuf.Write for Location with fn write(
   self : Location,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -2054,7 +2041,7 @@ pub impl @protobuf.Write for Location with write(
 }
 
 ///|
-pub impl ToJson for Location with to_json(self) {
+pub impl ToJson for Location with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.mapping_index != Default::default() {
     json["mappingIndex"] = self.mapping_index.to_json()
@@ -2072,12 +2059,12 @@ pub impl ToJson for Location with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for Location with from_json(
+pub impl @json.FromJson for Location with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> Location raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for Location"))
+    raise JsonDecodeError((path, "Expected an object for Location"))
   }
   let message = Location::default()
   for key, value in obj {
@@ -2089,14 +2076,14 @@ pub impl @json.FromJson for Location with from_json(
         message.lines = value.map(v => @json.from_json(v, path~))
       ("attributeIndices", Array(value)) =>
         message.attribute_indices = value.map(v => @json.from_json(v, path~))
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for Location with read_with_limit(
+pub impl @protobuf.AsyncRead for Location with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Location raise {
   let msg = Location::default()
@@ -2123,7 +2110,7 @@ pub impl @protobuf.AsyncRead for Location with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for Location with write(
+pub impl @protobuf.AsyncWrite for Location with fn write(
   self : Location,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -2155,7 +2142,7 @@ pub(all) struct Line {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for Line with size_of(self) {
+pub impl @protobuf.Sized for Line with fn size_of(self) {
   let mut size = 0U
   size += 1U + @protobuf.size_of(self.function_index)
   size += 1U + @protobuf.size_of(self.line)
@@ -2164,8 +2151,8 @@ pub impl @protobuf.Sized for Line with size_of(self) {
 }
 
 ///|
-pub impl Default for Line with default() -> Line {
-  Line::{
+pub impl Default for Line with fn default() -> Line {
+  {
     function_index: Int::default(),
     line: Int64::default(),
     column: Int64::default(),
@@ -2174,11 +2161,11 @@ pub impl Default for Line with default() -> Line {
 
 ///|
 pub fn Line::new(function_index : Int, line : Int64, column : Int64) -> Line {
-  Line::{ function_index, line, column }
+  { function_index, line, column }
 }
 
 ///|
-pub impl @protobuf.Read for Line with read_with_limit(
+pub impl @protobuf.Read for Line with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Line raise {
   let msg = Line::default()
@@ -2199,7 +2186,7 @@ pub impl @protobuf.Read for Line with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for Line with write(
+pub impl @protobuf.Write for Line with fn write(
   self : Line,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -2212,7 +2199,7 @@ pub impl @protobuf.Write for Line with write(
 }
 
 ///|
-pub impl ToJson for Line with to_json(self) {
+pub impl ToJson for Line with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.function_index != Default::default() {
     json["functionIndex"] = self.function_index.to_json()
@@ -2227,12 +2214,12 @@ pub impl ToJson for Line with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for Line with from_json(
+pub impl @json.FromJson for Line with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> Line raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for Line"))
+    raise JsonDecodeError((path, "Expected an object for Line"))
   }
   let message = Line::default()
   for key, value in obj {
@@ -2241,14 +2228,14 @@ pub impl @json.FromJson for Line with from_json(
         message.function_index = @json.from_json(value, path~)
       ("line", value) => message.line = @json.from_json(value, path~)
       ("column", value) => message.column = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for Line with read_with_limit(
+pub impl @protobuf.AsyncRead for Line with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Line raise {
   let msg = Line::default()
@@ -2269,7 +2256,7 @@ pub impl @protobuf.AsyncRead for Line with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for Line with write(
+pub impl @protobuf.AsyncWrite for Line with fn write(
   self : Line,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -2290,7 +2277,7 @@ pub(all) struct Function {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for Function with size_of(self) {
+pub impl @protobuf.Sized for Function with fn size_of(self) {
   let mut size = 0U
   size += 1U + @protobuf.size_of(self.name_strindex)
   size += 1U + @protobuf.size_of(self.system_name_strindex)
@@ -2300,8 +2287,8 @@ pub impl @protobuf.Sized for Function with size_of(self) {
 }
 
 ///|
-pub impl Default for Function with default() -> Function {
-  Function::{
+pub impl Default for Function with fn default() -> Function {
+  {
     name_strindex: Int::default(),
     system_name_strindex: Int::default(),
     filename_strindex: Int::default(),
@@ -2316,16 +2303,11 @@ pub fn Function::new(
   filename_strindex : Int,
   start_line : Int64,
 ) -> Function {
-  Function::{
-    name_strindex,
-    system_name_strindex,
-    filename_strindex,
-    start_line,
-  }
+  { name_strindex, system_name_strindex, filename_strindex, start_line }
 }
 
 ///|
-pub impl @protobuf.Read for Function with read_with_limit(
+pub impl @protobuf.Read for Function with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Function raise {
   let msg = Function::default()
@@ -2347,7 +2329,7 @@ pub impl @protobuf.Read for Function with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for Function with write(
+pub impl @protobuf.Write for Function with fn write(
   self : Function,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -2362,7 +2344,7 @@ pub impl @protobuf.Write for Function with write(
 }
 
 ///|
-pub impl ToJson for Function with to_json(self) {
+pub impl ToJson for Function with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.name_strindex != Default::default() {
     json["nameStrindex"] = self.name_strindex.to_json()
@@ -2380,12 +2362,12 @@ pub impl ToJson for Function with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for Function with from_json(
+pub impl @json.FromJson for Function with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> Function raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError((path, "Expected an object for Function"))
+    raise JsonDecodeError((path, "Expected an object for Function"))
   }
   let message = Function::default()
   for key, value in obj {
@@ -2397,14 +2379,14 @@ pub impl @json.FromJson for Function with from_json(
       ("filenameStrindex", value) =>
         message.filename_strindex = @json.from_json(value, path~)
       ("startLine", value) => message.start_line = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for Function with read_with_limit(
+pub impl @protobuf.AsyncRead for Function with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Function raise {
   let msg = Function::default()
@@ -2427,7 +2409,7 @@ pub impl @protobuf.AsyncRead for Function with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for Function with write(
+pub impl @protobuf.AsyncWrite for Function with fn write(
   self : Function,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {
@@ -2449,7 +2431,7 @@ pub(all) struct KeyValueAndUnit {
 } derive(Eq)
 
 ///|
-pub impl @protobuf.Sized for KeyValueAndUnit with size_of(self) {
+pub impl @protobuf.Sized for KeyValueAndUnit with fn size_of(self) {
   let mut size = 0U
   size += 1U + @protobuf.size_of(self.key_strindex)
   size += 1U +
@@ -2462,8 +2444,8 @@ pub impl @protobuf.Sized for KeyValueAndUnit with size_of(self) {
 }
 
 ///|
-pub impl Default for KeyValueAndUnit with default() -> KeyValueAndUnit {
-  KeyValueAndUnit::{
+pub impl Default for KeyValueAndUnit with fn default() -> KeyValueAndUnit {
+  {
     key_strindex: Int::default(),
     value: @v1.AnyValue::default(),
     unit_strindex: Int::default(),
@@ -2476,11 +2458,11 @@ pub fn KeyValueAndUnit::new(
   value : @v1.AnyValue,
   unit_strindex : Int,
 ) -> KeyValueAndUnit {
-  KeyValueAndUnit::{ key_strindex, value, unit_strindex }
+  { key_strindex, value, unit_strindex }
 }
 
 ///|
-pub impl @protobuf.Read for KeyValueAndUnit with read_with_limit(
+pub impl @protobuf.Read for KeyValueAndUnit with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> KeyValueAndUnit raise {
   let msg = KeyValueAndUnit::default()
@@ -2502,7 +2484,7 @@ pub impl @protobuf.Read for KeyValueAndUnit with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.Write for KeyValueAndUnit with write(
+pub impl @protobuf.Write for KeyValueAndUnit with fn write(
   self : KeyValueAndUnit,
   writer : &@protobuf.Writer,
 ) -> Unit raise {
@@ -2516,7 +2498,7 @@ pub impl @protobuf.Write for KeyValueAndUnit with write(
 }
 
 ///|
-pub impl ToJson for KeyValueAndUnit with to_json(self) {
+pub impl ToJson for KeyValueAndUnit with fn to_json(self) {
   let json : Map[String, Json] = {}
   if self.key_strindex != Default::default() {
     json["keyStrindex"] = self.key_strindex.to_json()
@@ -2531,14 +2513,12 @@ pub impl ToJson for KeyValueAndUnit with to_json(self) {
 }
 
 ///|
-pub impl @json.FromJson for KeyValueAndUnit with from_json(
+pub impl @json.FromJson for KeyValueAndUnit with fn from_json(
   json : Json,
   path : @json.JsonPath,
 ) -> KeyValueAndUnit raise {
   guard json is Object(obj) else {
-    raise @json.JsonDecodeError(
-      (path, "Expected an object for KeyValueAndUnit"),
-    )
+    raise JsonDecodeError((path, "Expected an object for KeyValueAndUnit"))
   }
   let message = KeyValueAndUnit::default()
   for key, value in obj {
@@ -2548,14 +2528,14 @@ pub impl @json.FromJson for KeyValueAndUnit with from_json(
       ("value", value) => message.value = @json.from_json(value, path~)
       ("unitStrindex", value) =>
         message.unit_strindex = @json.from_json(value, path~)
-      key => raise @json.JsonDecodeError((path, "Unknown field \{key}"))
+      (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }
   message
 }
 
 ///|
-pub impl @protobuf.AsyncRead for KeyValueAndUnit with read_with_limit(
+pub impl @protobuf.AsyncRead for KeyValueAndUnit with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> KeyValueAndUnit raise {
   let msg = KeyValueAndUnit::default()
@@ -2577,7 +2557,7 @@ pub impl @protobuf.AsyncRead for KeyValueAndUnit with read_with_limit(
 }
 
 ///|
-pub impl @protobuf.AsyncWrite for KeyValueAndUnit with write(
+pub impl @protobuf.AsyncWrite for KeyValueAndUnit with fn write(
   self : KeyValueAndUnit,
   writer : &@protobuf.AsyncWriter,
 ) -> Unit raise {

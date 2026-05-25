@@ -23,13 +23,13 @@ instrumentation scope, and trace correlation fields.
 ///|
 async fn _logs_readme_emit() -> Unit {
   let logger = LoggerProvider::noop().logger("example")
-  if logger.event_enabled(Severity::Info, "example") {
+  if logger.event_enabled(Info, "example") {
     let record = logger.create_log_record()
     record.set_event_name("user.created")
     record.set_target("example")
-    record.set_severity_number(Severity::Info)
-    record.set_body(AnyValue::String("created user"))
-    record.add_attribute("user.plan", AnyValue::String("free"))
+    record.set_severity_number(Info)
+    record.set_body(String("created user"))
+    record.add_attribute("user.plan", String("free"))
     logger.emit(record)
   }
 }

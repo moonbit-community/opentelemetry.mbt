@@ -14,6 +14,6 @@ async test "global tracer provider can be replaced from sdk-backed wrapper" {
   let span = tracer("global-root").start("root-span")
   span.end()
 
-  assert_eq(exporter.finished_spans().length(), 1)
+  @debug.assert_eq(exporter.finished_spans().length(), 1)
   reset_for_test()
 }

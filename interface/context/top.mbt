@@ -122,6 +122,6 @@ pub fn Context::with_telemetry_suppressed(
 }
 
 ///|
-pub impl Default for Context with default() -> Context {
+pub impl Default for Context with fn default() -> Context {
   Context::empty()
 }

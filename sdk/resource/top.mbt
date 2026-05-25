@@ -118,7 +118,7 @@ pub fn Resource::merge(self : Resource, other : Resource) -> Resource {
 }
 
 ///|
-pub impl Default for Resource with default() -> Resource {
+pub impl Default for Resource with fn default() -> Resource {
   Resource::empty()
 }
 
@@ -151,10 +151,7 @@ fn default_service_name() -> String {
 pub fn sdk_provided_resource_detector() -> ResourceDetector {
   ResourceDetector::new(() => {
     Resource::new([
-      @common.KeyValue::new(
-        "service.name",
-        @common.Value::String(default_service_name()),
-      ),
+      @common.KeyValue::new("service.name", String(default_service_name())),
     ])
   })
 }
@@ -164,18 +161,9 @@ pub fn sdk_provided_resource_detector() -> ResourceDetector {
 pub fn telemetry_resource_detector() -> ResourceDetector {
   ResourceDetector::new(() => {
     Resource::new([
-      @common.KeyValue::new(
-        "telemetry.sdk.name",
-        @common.Value::String("opentelemetry"),
-      ),
-      @common.KeyValue::new(
-        "telemetry.sdk.language",
-        @common.Value::String("moonbit"),
-      ),
-      @common.KeyValue::new(
-        "telemetry.sdk.version",
-        @common.Value::String("0.1.0"),
-      ),
+      @common.KeyValue::new("telemetry.sdk.name", String("opentelemetry")),
+      @common.KeyValue::new("telemetry.sdk.language", String("moonbit")),
+      @common.KeyValue::new("telemetry.sdk.version", String("0.1.0")),
     ])
   })
 }
@@ -194,9 +182,7 @@ fn parse_resource_attributes(
     let key = item[:index].trim()
     let value = item[index + 1:].trim()
     if key != "" {
-      parsed.push(
-        @common.KeyValue::new(key, @common.Value::String(value.to_string())),
-      )
+      parsed.push(@common.KeyValue::new(key, String(value.to_owned())))
     }
   }
   parsed
@@ -215,10 +201,7 @@ pub fn env_resource_detector() -> ResourceDetector {
     }
     if @utils.getenv("OTEL_SERVICE_NAME") is Some(service_name) {
       let service_resource = Resource::new([
-        @common.KeyValue::new(
-          "service.name",
-          @common.Value::String(service_name),
-        ),
+        @common.KeyValue::new("service.name", String(service_name)),
       ])
       resource = resource.merge(service_resource)
     }
@@ -255,10 +238,7 @@ pub fn ResourceBuilder::with_service_name(
   self : ResourceBuilder,
   service_name : StringView,
 ) -> ResourceBuilder {
-  self.with_attribute(
-    "service.name",
-    @common.Value::String(service_name.to_string()),
-  )
+  self.with_attribute("service.name", String(service_name.to_owned()))
 }
 
 ///|
@@ -269,7 +249,7 @@ pub fn ResourceBuilder::with_schema_url(
 ) -> ResourceBuilder {
   self.resource = {
     attributes: self.resource.attributes,
-    schema_url: Some(schema_url.to_string()),
+    schema_url: Some(schema_url.to_owned()),
   }
   self
 }

@@ -1,16 +1,16 @@
 import {
   "moonbitlang/async",
-  "moonbit-community/opentelemetry/interface/baggage" @baggage,
-  "moonbit-community/opentelemetry/interface/common" @common,
-  "moonbit-community/opentelemetry/interface/context" @context,
+  "moonbit-community/opentelemetry/interface/baggage",
+  "moonbit-community/opentelemetry/interface/common",
+  "moonbit-community/opentelemetry/interface/context",
   "moonbit-community/opentelemetry/interface/global" @api_global,
-  "moonbit-community/opentelemetry/interface/propagation" @propagation,
-  "moonbit-community/opentelemetry/sdk/error" @error,
-  "moonbit-community/opentelemetry/sdk/global" @global,
-  "moonbit-community/opentelemetry/sdk/logs" @logs,
-  "moonbit-community/opentelemetry/sdk/metrics" @metrics,
-  "moonbit-community/opentelemetry/sdk/resource" @resource,
-  "moonbit-community/opentelemetry/sdk/trace" @trace,
+  "moonbit-community/opentelemetry/interface/propagation",
+  "moonbit-community/opentelemetry/sdk/error",
+  "moonbit-community/opentelemetry/sdk/global",
+  "moonbit-community/opentelemetry/sdk/logs",
+  "moonbit-community/opentelemetry/sdk/metrics",
+  "moonbit-community/opentelemetry/sdk/resource",
+  "moonbit-community/opentelemetry/sdk/trace",
 }
 
 options(

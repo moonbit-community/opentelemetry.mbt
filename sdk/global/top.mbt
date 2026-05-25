@@ -8,22 +8,22 @@ fn default_text_map_propagator() -> @propagation.TextMapPropagator {
 }
 
 ///|
-let tracer_provider_ref : Ref[@trace.SdkTracerProvider] = Ref::new(
+let tracer_provider_ref : Ref[@trace.SdkTracerProvider] = Ref(
   @trace.SdkTracerProvider::builder().build(),
 )
 
 ///|
-let logger_provider_ref : Ref[@logs.SdkLoggerProvider] = Ref::new(
+let logger_provider_ref : Ref[@logs.SdkLoggerProvider] = Ref(
   @logs.SdkLoggerProvider::builder().build(),
 )
 
 ///|
-let meter_provider_ref : Ref[@metrics.SdkMeterProvider] = Ref::new(
+let meter_provider_ref : Ref[@metrics.SdkMeterProvider] = Ref(
   @metrics.SdkMeterProvider::builder().build(),
 )
 
 ///|
-let text_map_propagator_ref : Ref[@propagation.TextMapPropagator] = Ref::new(
+let text_map_propagator_ref : Ref[@propagation.TextMapPropagator] = Ref(
   default_text_map_propagator(),
 )
 

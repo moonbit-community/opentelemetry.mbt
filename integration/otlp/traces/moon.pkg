@@ -1,18 +1,17 @@
 import {
-  "moonbitlang/async" @async,
+  "moonbitlang/async",
   "moonbitlang/core/debug",
-  "moonbitlang/core/env" @env,
+  "moonbitlang/core/env",
   "moonbit-community/opentelemetry" @otel,
-  "moonbit-community/opentelemetry/interface/global" @global,
+  "moonbit-community/opentelemetry/interface/global",
   "moonbit-community/opentelemetry/protocol/common/v1" @otlp_common,
-  "moonbit-community/opentelemetry/interface/trace" @trace,
-  "moonbit-community/opentelemetry/otlp" @otlp,
+  "moonbit-community/opentelemetry/interface/trace",
+  "moonbit-community/opentelemetry/otlp",
   "moonbit-community/opentelemetry/protocol/trace/v1" @otlp_trace,
-  "moonbit-community/opentelemetry/sdk" @sdk,
-  "moonbit-community/opentelemetry/sdk/error" @error,
-  "moonbit-community/opentelemetry/sdk/resource" @resource,
+  "moonbit-community/opentelemetry/sdk",
+  "moonbit-community/opentelemetry/sdk/resource",
   "moonbit-community/opentelemetry/sdk/trace" @sdktrace,
-  "moonbit-community/opentelemetry-integration-otlp/support" @support,
+  "moonbit-community/opentelemetry-integration-otlp/support",
 } for "test"
 
 options(

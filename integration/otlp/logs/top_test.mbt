@@ -27,10 +27,7 @@ fn sampled_trace_flags() -> @sdk.TraceFlags {
 fn integration_resource(service_name : StringView) -> @resource.Resource {
   @resource.Resource::builder_empty()
   .with_service_name(service_name)
-  .with_attribute(
-    "deployment.environment.name",
-    @sdk.Value::String("integration"),
-  )
+  .with_attribute("deployment.environment.name", String("integration"))
   .with_schema_url(schema_url)
   .build()
 }
@@ -39,9 +36,9 @@ fn integration_resource(service_name : StringView) -> @resource.Resource {
 fn build_log_exporter(protocol : @otlp.Protocol) -> @otlp.LogExporter {
   let builder = @otlp.LogExporter::builder()
   let builder = match protocol {
-    @otlp.Protocol::HttpBinary => builder.with_http()
-    @otlp.Protocol::HttpJson => builder.with_protocol(protocol)
-    @otlp.Protocol::Grpc => abort("grpc is not part of the integration suite")
+    HttpBinary => builder.with_http()
+    HttpJson => builder.with_protocol(protocol)
+    Grpc => abort("grpc is not part of the integration suite")
   }
   guard builder.build() is Ok(exporter) else {
     abort("expected log exporter to build")
@@ -62,7 +59,7 @@ fn find_scope_logs(
   data : @otlp_logs.LogsData,
   scope_name : StringView,
 ) -> @otlp_logs.ScopeLogs? {
-  let scope_name = scope_name.to_string()
+  let scope_name = scope_name.to_owned()
   for resource_logs in data.resource_logs {
     for scope_logs in resource_logs.scope_logs {
       if scope_logs.scope.name == scope_name {
@@ -78,7 +75,7 @@ fn find_log_record(
   records : ArrayView[@otlp_logs.LogRecord],
   event_name : StringView,
 ) -> @otlp_logs.LogRecord? {
-  let event_name = event_name.to_string()
+  let event_name = event_name.to_owned()
   for record in records {
     if record.event_name == event_name {
       return Some(record)
@@ -93,13 +90,12 @@ fn has_string_attribute(
   key : StringView,
   expected : StringView,
 ) -> Bool {
-  let key = key.to_string()
-  let expected = expected.to_string()
+  let key = key.to_owned()
+  let expected = expected.to_owned()
   for attribute in attributes {
     if attribute.key == key {
       match attribute.value.value {
-        @otlp_common.AnyValue_Value::StringValue(value) =>
-          return value == expected
+        StringValue(value) => return value == expected
         _ => return false
       }
     }
@@ -113,14 +109,13 @@ fn has_int_attribute(
   key : StringView,
   expected : Int64,
 ) -> Bool {
-  let key = key.to_string()
+  let key = key.to_owned()
   let expected_text = expected.to_string()
   for attribute in attributes {
     if attribute.key == key {
       match attribute.value.value {
-        @otlp_common.AnyValue_Value::IntValue(value) => return value == expected
-        @otlp_common.AnyValue_Value::StringValue(value) =>
-          return value == expected_text
+        IntValue(value) => return value == expected
+        StringValue(value) => return value == expected_text
         _ => return false
       }
     }
@@ -131,7 +126,7 @@ fn has_int_attribute(
 ///|
 fn log_body_is_empty_string(record : @otlp_logs.LogRecord) -> Bool {
   match record.body.value {
-    @otlp_common.AnyValue_Value::StringValue(value) => value == ""
+    StringValue(value) => value == ""
     _ => false
   }
 }
@@ -139,8 +134,7 @@ fn log_body_is_empty_string(record : @otlp_logs.LogRecord) -> Bool {
 ///|
 fn log_body_is_array(record : @otlp_logs.LogRecord, expected_len : Int) -> Bool {
   match record.body.value {
-    @otlp_common.AnyValue_Value::ArrayValue(values) =>
-      values.values.length() == expected_len
+    ArrayValue(values) => values.values.length() == expected_len
     _ => false
   }
 }
@@ -154,15 +148,12 @@ fn build_record(target : StringView) -> @ilogs.LogRecord {
   record.set_event_name("checkout.failed")
   record.set_timestamp(400L)
   record.set_observed_timestamp(405L)
-  record.set_severity_number(@ilogs.Severity::Error3)
+  record.set_severity_number(Error3)
   record.set_body(
-    @ilogs.AnyValue::Map({
-      "message": @ilogs.AnyValue::String("request failed"),
-      "retries": @ilogs.AnyValue::Int(2L),
-    }),
+    Map({ "message": String("request failed"), "retries": Int(2L) }),
   )
-  record.add_attribute("http.status_code", @ilogs.AnyValue::Int(500L))
-  record.add_attribute("feature.flag", @ilogs.AnyValue::Boolean(true))
+  record.add_attribute("http.status_code", Int(500L))
+  record.add_attribute("feature.flag", Boolean(true))
   record.set_trace_context(
     parse_trace_id("cccccccccccccccccccccccccccccccc"),
     parse_span_id("dddddddddddddddd"),
@@ -183,7 +174,7 @@ async test "batch logs export over http protobuf via root API" {
   let provider = @sdk.logger_provider_builder()
     .with_resource(integration_resource("integration-logs-protobuf"))
     .with_batch_exporter(
-      build_log_exporter(@otlp.Protocol::HttpBinary).into_log_exporter(),
+      build_log_exporter(HttpBinary).into_log_exporter(),
       config=@sdklogs.BatchConfig::new(
         max_queue_size=8,
         max_export_batch_size=8,
@@ -200,9 +191,7 @@ async test "batch logs export over http protobuf via root API" {
       @sdk.InstrumentationScope::builder("integration.logs.logger")
       .with_version("1.0.0")
       .with_schema_url(schema_url)
-      .with_attributes([
-        @sdk.KeyValue::new("scope.attr", @sdk.Value::String("batch")),
-      ])
+      .with_attributes([@sdk.KeyValue::new("scope.attr", String("batch"))])
       .build(),
     )
     logger.emit(build_record(target_name))
@@ -245,7 +234,7 @@ async test "force flushed logs export over http json via root API" {
   let provider = @sdk.logger_provider_builder()
     .with_resource(integration_resource("integration-logs-json"))
     .with_batch_exporter(
-      build_log_exporter(@otlp.Protocol::HttpJson).into_log_exporter(),
+      build_log_exporter(HttpJson).into_log_exporter(),
       config=@sdklogs.BatchConfig::new(
         max_queue_size=8,
         max_export_batch_size=8,
@@ -259,15 +248,13 @@ async test "force flushed logs export over http json via root API" {
     @sdk.InstrumentationScope::builder("integration.logs.logger")
     .with_version("1.0.0")
     .with_schema_url(schema_url)
-    .with_attributes([
-      @sdk.KeyValue::new("scope.attr", @sdk.Value::String("json")),
-    ])
+    .with_attributes([@sdk.KeyValue::new("scope.attr", String("json"))])
     .build(),
   )
   let record = build_record(target_name)
-  record.set_severity_number(@ilogs.Severity::Warn)
+  record.set_severity_number(Warn)
   record.set_severity_text("WARN")
-  record.set_body(@ilogs.AnyValue::String("cache warning"))
+  record.set_body(String("cache warning"))
   record.set_timestamp(500L)
   record.set_observed_timestamp(505L)
   logger.emit(record)
@@ -362,14 +349,10 @@ async test "root logger API exports explicit and default log record fields" {
     "integration.logs.root",
     version=Some("1.2.0"),
     schema_url=Some(schema_url),
-    attributes=[@sdk.KeyValue::new("scope.attr", @sdk.Value::String("root"))],
+    attributes=[@sdk.KeyValue::new("scope.attr", String("root"))],
   )
   assert_true(
-    logger.event_enabled(
-      @ilogs.Severity::Info2,
-      target_name,
-      name=Some("checkout.audit"),
-    ),
+    logger.event_enabled(Info2, target_name, name=Some("checkout.audit")),
   )
 
   let audit = logger.create_log_record()
@@ -377,17 +360,12 @@ async test "root logger API exports explicit and default log record fields" {
   audit.set_event_name("checkout.audit")
   audit.set_timestamp(880L)
   audit.set_observed_timestamp(885L)
-  audit.set_severity_number(@ilogs.Severity::Info2)
-  audit.set_body(
-    @ilogs.AnyValue::ListAny([
-      @ilogs.AnyValue::String("accepted"),
-      @ilogs.AnyValue::Int(2L),
-    ]),
-  )
-  audit.add_attribute("payment.method", @ilogs.AnyValue::String("card"))
+  audit.set_severity_number(Info2)
+  audit.set_body(ListAny([String("accepted"), Int(2L)]))
+  audit.add_attribute("payment.method", String("card"))
   audit.add_attributes([
-    @sdk.KeyValue::new("tenant", @sdk.Value::String("blue")),
-    @sdk.KeyValue::new("items", @sdk.Value::Int64(3L)),
+    @sdk.KeyValue::new("tenant", String("blue")),
+    @sdk.KeyValue::new("items", Int64(3L)),
   ])
   audit.set_trace_context(
     parse_trace_id("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"),
@@ -401,7 +379,7 @@ async test "root logger API exports explicit and default log record fields" {
   fallback.set_event_name("checkout.empty")
   fallback.set_timestamp(890L)
   fallback.set_observed_timestamp(891L)
-  fallback.set_severity_number(@ilogs.Severity::Error)
+  fallback.set_severity_number(Error)
   logger.emit(fallback)
 
   match provider.force_flush() {
@@ -432,7 +410,7 @@ async test "root logger API exports explicit and default log record fields" {
     Some(scope_logs) => scope_logs
     None => fail("expected log export to contain scope \{target_name}")
   }
-  assert_eq(scope_logs.log_records.length(), 2)
+  @debug.assert_eq(scope_logs.log_records.length(), 2)
 
   let audit_record = match
     find_log_record(scope_logs.log_records, "checkout.audit") {
@@ -445,7 +423,7 @@ async test "root logger API exports explicit and default log record fields" {
     None => fail("expected checkout.empty log record")
   }
 
-  assert_eq(audit_record.severity_text, "INFO2")
+  @debug.assert_eq(audit_record.severity_text, "INFO2")
   assert_true(log_body_is_array(audit_record, 2))
   assert_true(
     has_string_attribute(audit_record.attributes, "payment.method", "card"),
@@ -455,11 +433,11 @@ async test "root logger API exports explicit and default log record fields" {
   assert_true(audit_record.trace_id.length() > 0)
   assert_true(audit_record.span_id.length() > 0)
 
-  assert_eq(fallback_record.severity_text, "ERROR")
+  @debug.assert_eq(fallback_record.severity_text, "ERROR")
   assert_true(log_body_is_empty_string(fallback_record))
-  assert_eq(fallback_record.attributes.length(), 0)
-  assert_eq(fallback_record.trace_id.length(), 0)
-  assert_eq(fallback_record.span_id.length(), 0)
+  @debug.assert_eq(fallback_record.attributes.length(), 0)
+  @debug.assert_eq(fallback_record.trace_id.length(), 0)
+  @debug.assert_eq(fallback_record.span_id.length(), 0)
 }
 
 ///|
@@ -500,8 +478,7 @@ async test "log force_flush times out against a delayed endpoint" {
     let logger = @global.logger_provider().logger("integration.logs.timeout")
     logger.emit(build_record(target_name))
 
-    guard provider.force_flush()
-      is Err(@error.OTelSdkError::ExportFailure(_, message)) else {
+    guard provider.force_flush() is Err(ExportFailure(_, message)) else {
       fail("expected log force_flush to fail with ExportFailure")
     }
     assert_true(message.contains("logs export timed out after 100ms"))
@@ -510,9 +487,9 @@ async test "log force_flush times out against a delayed endpoint" {
       Ok(request_path) => request_path
       Err(message) => fail(message)
     }
-    assert_eq(request_path, "/v1/logs")
-    assert_eq(server.request_count(), 1)
-    assert_eq(server.request_path(), "/v1/logs")
+    @debug.assert_eq(request_path, "/v1/logs")
+    @debug.assert_eq(server.request_count(), 1)
+    @debug.assert_eq(server.request_path(), "/v1/logs")
 
     match log_processor.shutdown() {
       Ok(_) => ()
@@ -521,7 +498,7 @@ async test "log force_flush times out against a delayed endpoint" {
           "expected log processor shutdown to succeed: \{@debug.to_string(err)}",
         )
     }
-    assert_eq(server.request_count(), 1)
+    @debug.assert_eq(server.request_count(), 1)
   })
 }
 
@@ -579,19 +556,14 @@ async test "signal-specific log endpoint overrides invalid global endpoint" {
     @sdk.InstrumentationScope::builder("integration.logs.env")
     .with_version("1.0.1")
     .with_schema_url(schema_url)
-    .with_attributes([
-      @sdk.KeyValue::new("scope.attr", @sdk.Value::String("env-endpoint")),
-    ])
+    .with_attributes([@sdk.KeyValue::new("scope.attr", String("env-endpoint"))])
     .build(),
   )
   let record = build_record(target_name)
-  record.set_severity_number(@ilogs.Severity::Info2)
+  record.set_severity_number(Info2)
   record.set_severity_text("INFO2")
   record.set_body(
-    @ilogs.AnyValue::Map({
-      "message": @ilogs.AnyValue::String("job accepted"),
-      "queue": @ilogs.AnyValue::String("checkout"),
-    }),
+    Map({ "message": String("job accepted"), "queue": String("checkout") }),
   )
   record.set_timestamp(710L)
   record.set_observed_timestamp(715L)

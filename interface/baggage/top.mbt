@@ -35,7 +35,7 @@ pub struct Baggage {
 /// Creates metadata from one text fragment after trimming surrounding
 /// whitespace.
 pub fn BaggageMetadata::new(metadata : StringView) -> BaggageMetadata {
-  { metadata: metadata.trim().to_string() }
+  { metadata: metadata.trim().to_owned() }
 }
 
 ///|
@@ -45,7 +45,7 @@ pub fn BaggageMetadata::as_string(self : BaggageMetadata) -> String {
 }
 
 ///|
-pub impl Default for BaggageMetadata with default() -> BaggageMetadata {
+pub impl Default for BaggageMetadata with fn default() -> BaggageMetadata {
   BaggageMetadata::new("")
 }
 
@@ -59,7 +59,7 @@ pub fn KeyValueMetadata::new(
   value : StringView,
   metadata? : BaggageMetadata = Default::default(),
 ) -> KeyValueMetadata {
-  { key: @common.Key::new(key), value: value.to_string(), metadata }
+  { key: @common.Key::new(key), value: value.to_owned(), metadata }
 }
 
 ///|
@@ -163,8 +163,8 @@ pub fn Baggage::insert_with_metadata(
   value : StringView,
   metadata : BaggageMetadata,
 ) -> Baggage {
-  let key = key.trim().to_string()
-  let value = value.to_string()
+  let key = key.trim().to_owned()
+  let value = value.to_owned()
   let metadata_text = metadata.as_string()
   if !is_key_valid(key) || !is_value_valid(value) {
     return self
@@ -199,14 +199,14 @@ pub fn Baggage::insert_with_metadata(
 /// contents.
 pub fn Baggage::remove(self : Baggage, key : StringView) -> Baggage {
   let entries = self.entries.copy()
-  ignore(entries.remove(key.to_string()))
+  ignore(entries.remove(key.to_owned()))
   baggage_with_entries(entries)
 }
 
 ///|
 /// Looks up the string value for `key`.
 pub fn Baggage::get(self : Baggage, key : StringView) -> String? {
-  self.entries.get(key.to_string()).map(entry => entry.value)
+  self.entries.get(key.to_owned()).map(entry => entry.value)
 }
 
 ///|
@@ -215,7 +215,7 @@ pub fn Baggage::get_with_metadata(
   self : Baggage,
   key : StringView,
 ) -> (String, BaggageMetadata)? {
-  self.entries.get(key.to_string()).map(entry => (entry.value, entry.metadata))
+  self.entries.get(key.to_owned()).map(entry => (entry.value, entry.metadata))
 }
 
 ///|
@@ -243,6 +243,6 @@ pub fn Baggage::is_empty(self : Baggage) -> Bool {
 }
 
 ///|
-pub impl Default for Baggage with default() -> Baggage {
+pub impl Default for Baggage with fn default() -> Baggage {
   Baggage::new()
 }

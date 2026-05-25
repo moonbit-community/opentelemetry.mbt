@@ -1,12 +1,13 @@
 import {
+  "moonbitlang/core/debug",
   "moonbitlang/async",
   "moonbitlang/core/env",
   "moonbitlang/core/string",
-  "moonbit-community/opentelemetry/internal/utils" @utils,
-  "moonbit-community/opentelemetry/interface/common" @common,
+  "moonbit-community/opentelemetry/internal/utils",
+  "moonbit-community/opentelemetry/interface/common",
   "moonbit-community/opentelemetry/interface/metrics" @api,
-  "moonbit-community/opentelemetry/sdk/error" @error,
-  "moonbit-community/opentelemetry/sdk/resource" @resource,
+  "moonbit-community/opentelemetry/sdk/error",
+  "moonbit-community/opentelemetry/sdk/resource",
 }
 
 options(

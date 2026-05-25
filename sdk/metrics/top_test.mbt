@@ -1,7 +1,7 @@
 ///|
 fn has_metric(metrics : Array[MetricData], name : StringView) -> Bool {
   for metric in metrics {
-    if metric.name == name.to_string() {
+    if metric.name == name.to_owned() {
       return true
     }
   }
@@ -19,9 +19,9 @@ fn restore_env_var(key : String, value : String?) -> Unit {
 ///|
 fn counter_sum(metrics : Array[MetricData], name : StringView) -> Int64? {
   for metric in metrics {
-    if metric.name == name.to_string() {
+    if metric.name == name.to_owned() {
       match metric.aggregation {
-        Aggregation::Sum(Number::Int64(value)) => return Some(value)
+        Sum(Int64(value)) => return Some(value)
         _ => return None
       }
     }
@@ -32,9 +32,9 @@ fn counter_sum(metrics : Array[MetricData], name : StringView) -> Int64? {
 ///|
 fn counter_sum_u64(metrics : Array[MetricData], name : StringView) -> UInt64? {
   for metric in metrics {
-    if metric.name == name.to_string() {
+    if metric.name == name.to_owned() {
       match metric.aggregation {
-        Aggregation::Sum(Number::UInt64(value)) => return Some(value)
+        Sum(UInt64(value)) => return Some(value)
         _ => return None
       }
     }
@@ -45,9 +45,9 @@ fn counter_sum_u64(metrics : Array[MetricData], name : StringView) -> UInt64? {
 ///|
 fn gauge_value(metrics : Array[MetricData], name : StringView) -> Double? {
   for metric in metrics {
-    if metric.name == name.to_string() {
+    if metric.name == name.to_owned() {
       match metric.aggregation {
-        Aggregation::Gauge(Number::Double(value)) => return Some(value)
+        Gauge(Double(value)) => return Some(value)
         _ => return None
       }
     }
@@ -58,9 +58,9 @@ fn gauge_value(metrics : Array[MetricData], name : StringView) -> Double? {
 ///|
 fn gauge_value_u64(metrics : Array[MetricData], name : StringView) -> UInt64? {
   for metric in metrics {
-    if metric.name == name.to_string() {
+    if metric.name == name.to_owned() {
       match metric.aggregation {
-        Aggregation::Gauge(Number::UInt64(value)) => return Some(value)
+        Gauge(UInt64(value)) => return Some(value)
         _ => return None
       }
     }
@@ -71,9 +71,9 @@ fn gauge_value_u64(metrics : Array[MetricData], name : StringView) -> UInt64? {
 ///|
 fn sum_double(metrics : Array[MetricData], name : StringView) -> Double? {
   for metric in metrics {
-    if metric.name == name.to_string() {
+    if metric.name == name.to_owned() {
       match metric.aggregation {
-        Aggregation::Sum(Number::Double(value)) => return Some(value)
+        Sum(Double(value)) => return Some(value)
         _ => return None
       }
     }
@@ -84,11 +84,11 @@ fn sum_double(metrics : Array[MetricData], name : StringView) -> Double? {
 ///|
 fn histogram_sum_u64(metrics : Array[MetricData], name : StringView) -> UInt64? {
   for metric in metrics {
-    if metric.name == name.to_string() {
+    if metric.name == name.to_owned() {
       match metric.aggregation {
-        Aggregation::Histogram(summary) =>
+        Histogram(summary) =>
           match summary.sum {
-            Number::UInt64(value) => return Some(value)
+            UInt64(value) => return Some(value)
             _ => return None
           }
         _ => return None
@@ -102,7 +102,7 @@ fn histogram_sum_u64(metrics : Array[MetricData], name : StringView) -> UInt64? 
 fn metric_count(metrics : Array[MetricData], name : StringView) -> Int {
   let mut count = 0
   for metric in metrics {
-    if metric.name == name.to_string() {
+    if metric.name == name.to_owned() {
       count += 1
     }
   }
@@ -127,9 +127,7 @@ async test "manual reader collects metric snapshots" {
   let gauge = meter.gauge("load").build()
 
   counter.add(2)
-  counter.add(3, attributes=[
-    @common.KeyValue::new("route", @common.Value::String("/health")),
-  ])
+  counter.add(3, attributes=[@common.KeyValue::new("route", String("/health"))])
   retries.add(3)
   retries.add(-1)
   histogram.record(10.0)
@@ -139,7 +137,7 @@ async test "manual reader collects metric snapshots" {
   let reader = provider.manual_reader()
   let metrics = reader.collect()
   assert_true(has_metric(metrics, "requests"))
-  assert_eq(counter_sum(metrics, "retries"), Some(3))
+  @debug.assert_eq(counter_sum(metrics, "retries"), Some(3))
   assert_true(has_metric(metrics, "latency"))
   assert_true(has_metric(metrics, "load"))
 
@@ -163,7 +161,7 @@ test "builder-registered manual reader collects metrics" {
   counter.add(7)
 
   let metrics = reader.collect()
-  assert_eq(counter_sum(metrics, "requests"), Some(7))
+  @debug.assert_eq(counter_sum(metrics, "requests"), Some(7))
 }
 
 ///|
@@ -172,11 +170,10 @@ test "builder-registered manual reader collects metrics" {
 test "manual reader collect_result reports detached readers" {
   let reader = ManualReader::builder().build()
 
-  guard reader.collect_result()
-    is Err(@error.OTelSdkError::InternalFailure(message)) else {
+  guard reader.collect_result() is Err(InternalFailure(message)) else {
     fail("expected detached manual reader collect_result to fail")
   }
-  assert_eq(message, "reader is not registered")
+  @debug.assert_eq(message, "reader is not registered")
 }
 
 ///|
@@ -194,7 +191,7 @@ test "manual reader collect_result succeeds before shutdown" {
   guard reader.collect_result() is Ok(metrics) else {
     fail("expected registered manual reader collect_result to succeed")
   }
-  assert_eq(counter_sum(metrics, "requests"), Some(9))
+  @debug.assert_eq(counter_sum(metrics, "requests"), Some(9))
 }
 
 ///|
@@ -212,7 +209,7 @@ async test "manual reader collect_result reports shutdown" {
   guard reader.shutdown() is Ok(_) else {
     fail("expected manual reader shutdown to succeed")
   }
-  guard reader.collect_result() is Err(@error.OTelSdkError::AlreadyShutdown) else {
+  guard reader.collect_result() is Err(AlreadyShutdown) else {
     fail("expected manual reader collect_result to report shutdown")
   }
 }
@@ -232,33 +229,29 @@ async test "manual reader collect stays convenience-oriented after shutdown" {
   guard reader.shutdown() is Ok(_) else {
     fail("expected manual reader shutdown to succeed")
   }
-  assert_eq(reader.collect().length(), 0)
+  @debug.assert_eq(reader.collect().length(), 0)
 }
 
 ///|
 // Test target: Verify delta temporality readers report only the increment since the previous collection.
 // Test method: Add to a counter across multiple collections and assert each snapshot returns the delta for that interval.
 test "manual reader delta temporality reports counter deltas" {
-  let reader = ManualReader::builder()
-    .with_temporality(Temporality::Delta)
-    .build()
+  let reader = ManualReader::builder().with_temporality(Delta).build()
   let provider = SdkMeterProvider::builder().with_reader(reader).build()
   let counter = provider.meter("metrics-delta").counter("requests").build()
 
   counter.add(2)
-  assert_eq(counter_sum(reader.collect(), "requests"), Some(2))
+  @debug.assert_eq(counter_sum(reader.collect(), "requests"), Some(2))
   counter.add(3)
-  assert_eq(counter_sum(reader.collect(), "requests"), Some(3))
-  assert_eq(counter_sum(reader.collect(), "requests"), Some(0))
+  @debug.assert_eq(counter_sum(reader.collect(), "requests"), Some(3))
+  @debug.assert_eq(counter_sum(reader.collect(), "requests"), Some(0))
 }
 
 ///|
 // Test target: Verify low-memory temporality keeps monotonic counters delta-based while up-down counters remain cumulative.
 // Test method: Record both counter types across two collections and assert the counter resets to deltas while the active total stays cumulative.
 test "low memory temporality keeps up-down counters cumulative" {
-  let reader = ManualReader::builder()
-    .with_temporality(Temporality::LowMemory)
-    .build()
+  let reader = ManualReader::builder().with_temporality(LowMemory).build()
   let provider = SdkMeterProvider::builder().with_reader(reader).build()
   let meter = provider.meter("metrics-low-memory")
   let counter = meter.counter("requests").build()
@@ -267,14 +260,14 @@ test "low memory temporality keeps up-down counters cumulative" {
   counter.add(2)
   active.add(5)
   let first = reader.collect()
-  assert_eq(counter_sum(first, "requests"), Some(2))
-  assert_eq(counter_sum(first, "active"), Some(5))
+  @debug.assert_eq(counter_sum(first, "requests"), Some(2))
+  @debug.assert_eq(counter_sum(first, "active"), Some(5))
 
   counter.add(3)
   active.add(-2)
   let second = reader.collect()
-  assert_eq(counter_sum(second, "requests"), Some(3))
-  assert_eq(counter_sum(second, "active"), Some(3))
+  @debug.assert_eq(counter_sum(second, "requests"), Some(3))
+  @debug.assert_eq(counter_sum(second, "active"), Some(3))
 }
 
 ///|
@@ -298,28 +291,28 @@ test "views rename metrics filter attributes and cap cardinality" {
     .build()
   let counter = provider.meter("metrics-view").counter("requests").build()
   counter.add(1, attributes=[
-    @common.KeyValue::new("route", @common.Value::String("/a")),
-    @common.KeyValue::new("status", @common.Value::Int64(200)),
+    @common.KeyValue::new("route", String("/a")),
+    @common.KeyValue::new("status", Int64(200)),
   ])
   counter.add(2, attributes=[
-    @common.KeyValue::new("route", @common.Value::String("/b")),
-    @common.KeyValue::new("status", @common.Value::Int64(500)),
+    @common.KeyValue::new("route", String("/b")),
+    @common.KeyValue::new("status", Int64(500)),
   ])
 
   let metrics = provider.manual_reader().collect()
-  assert_eq(metric_count(metrics, "http.requests"), 1)
-  assert_eq(counter_sum(metrics, "http.requests"), Some(1))
+  @debug.assert_eq(metric_count(metrics, "http.requests"), 1)
+  @debug.assert_eq(counter_sum(metrics, "http.requests"), Some(1))
   guard metrics[0].attributes.length() == 1 else {
     fail("expected attributes to be filtered by view")
   }
-  assert_eq(metrics[0].attributes[0].key.as_string(), "route")
+  @debug.assert_eq(metrics[0].attributes[0].key.as_string(), "route")
 }
 
 ///|
 // Test target: Verify observable gauges re-run their callback and publish a fresh point on every collection.
 // Test method: Change the observed value between two manual collections and assert each snapshot reports the latest reading only once.
 test "observable gauges refresh on each collection" {
-  let current = Ref::new(1.5)
+  let current = Ref(1.5)
   let reader = ManualReader::builder().build()
   let provider = SdkMeterProvider::builder().with_reader(reader).build()
   ignore(
@@ -331,11 +324,11 @@ test "observable gauges refresh on each collection" {
   )
 
   let first = reader.collect()
-  assert_eq(gauge_value(first, "load"), Some(1.5))
+  @debug.assert_eq(gauge_value(first, "load"), Some(1.5))
   current.val = 2.5
   let second = reader.collect()
-  assert_eq(metric_count(second, "load"), 1)
-  assert_eq(gauge_value(second, "load"), Some(2.5))
+  @debug.assert_eq(metric_count(second, "load"), 1)
+  @debug.assert_eq(gauge_value(second, "load"), Some(2.5))
 }
 
 ///|
@@ -345,7 +338,7 @@ test "views can override histogram aggregation to sum" {
   let provider = SdkMeterProvider::builder()
     .with_view(instrument => {
       if instrument.name == "latency" {
-        Some(Stream::builder().with_aggregation(StreamAggregation::Sum).build())
+        Some(Stream::builder().with_aggregation(Sum).build())
       } else {
         None
       }
@@ -359,7 +352,7 @@ test "views can override histogram aggregation to sum" {
   histogram.record(2.0)
 
   let metrics = provider.manual_reader().collect()
-  assert_eq(sum_double(metrics, "latency"), Some(3.5))
+  @debug.assert_eq(sum_double(metrics, "latency"), Some(3.5))
 }
 
 ///|
@@ -369,9 +362,7 @@ test "views can drop matching streams" {
   let provider = SdkMeterProvider::builder()
     .with_view(instrument => {
       if instrument.name == "drop.me" {
-        Some(
-          Stream::builder().with_aggregation(StreamAggregation::Drop).build(),
-        )
+        Some(Stream::builder().with_aggregation(Drop).build())
       } else {
         None
       }
@@ -407,7 +398,7 @@ async test "builder-registered periodic reader force flush honors delta temporal
   let exporter = InMemoryMetricExporter::new()
   let reader = PeriodicMetricReader::builder(exporter.into_metric_exporter())
     .with_interval(10)
-    .with_temporality(Temporality::Delta)
+    .with_temporality(Delta)
     .build()
   let provider = SdkMeterProvider::builder()
     .with_periodic_reader(reader)
@@ -421,14 +412,14 @@ async test "builder-registered periodic reader force flush honors delta temporal
   guard reader.force_flush() is Ok(_) else {
     fail("expected periodic reader force_flush to succeed")
   }
-  assert_eq(counter_sum(exporter.finished_metrics(), "jobs"), Some(4))
+  @debug.assert_eq(counter_sum(exporter.finished_metrics(), "jobs"), Some(4))
 
   exporter.reset()
   counter.add(2)
   guard reader.force_flush() is Ok(_) else {
     fail("expected periodic reader force_flush to succeed")
   }
-  assert_eq(counter_sum(exporter.finished_metrics(), "jobs"), Some(2))
+  @debug.assert_eq(counter_sum(exporter.finished_metrics(), "jobs"), Some(2))
 }
 
 ///|
@@ -483,8 +474,8 @@ test "floating-point counters and observables export double sums" {
   let meter = provider.meter("metrics-double")
   let counter = meter.f64_counter("bytes").build()
   let up_down_counter = meter.f64_up_down_counter("balance").build()
-  let current_rate = Ref::new(1.25)
-  let current_offset = Ref::new(-0.5)
+  let current_rate = Ref(1.25)
+  let current_offset = Ref(-0.5)
   ignore(
     meter
     .f64_observable_counter("rate")
@@ -505,16 +496,16 @@ test "floating-point counters and observables export double sums" {
   up_down_counter.add(-1.0)
 
   let first = reader.collect()
-  assert_eq(sum_double(first, "bytes"), Some(3.5))
-  assert_eq(sum_double(first, "balance"), Some(4.5))
-  assert_eq(sum_double(first, "rate"), Some(1.25))
-  assert_eq(sum_double(first, "offset"), Some(-0.5))
+  @debug.assert_eq(sum_double(first, "bytes"), Some(3.5))
+  @debug.assert_eq(sum_double(first, "balance"), Some(4.5))
+  @debug.assert_eq(sum_double(first, "rate"), Some(1.25))
+  @debug.assert_eq(sum_double(first, "offset"), Some(-0.5))
 
   current_rate.val = 2.75
   current_offset.val = 3.0
   let second = reader.collect()
-  assert_eq(sum_double(second, "rate"), Some(2.75))
-  assert_eq(sum_double(second, "offset"), Some(3.0))
+  @debug.assert_eq(sum_double(second, "rate"), Some(2.75))
+  @debug.assert_eq(sum_double(second, "offset"), Some(3.0))
 }
 
 ///|
@@ -527,7 +518,7 @@ test "u64 instruments preserve full-range values" {
   let counter = meter.u64_counter("bytes").build()
   let histogram = meter.u64_histogram("payload").build()
   let gauge = meter.u64_gauge("load").build()
-  let current = Ref::new(9223372036854775809UL)
+  let current = Ref(9223372036854775809UL)
   ignore(
     meter
     .u64_observable_counter("rate")
@@ -546,9 +537,9 @@ test "u64 instruments preserve full-range values" {
   gauge.record(current.val)
 
   let metrics = reader.collect()
-  assert_eq(counter_sum_u64(metrics, "bytes"), Some(current.val))
-  assert_eq(histogram_sum_u64(metrics, "payload"), Some(current.val))
-  assert_eq(gauge_value_u64(metrics, "load"), Some(current.val))
-  assert_eq(counter_sum_u64(metrics, "rate"), Some(current.val))
-  assert_eq(gauge_value_u64(metrics, "current"), Some(current.val))
+  @debug.assert_eq(counter_sum_u64(metrics, "bytes"), Some(current.val))
+  @debug.assert_eq(histogram_sum_u64(metrics, "payload"), Some(current.val))
+  @debug.assert_eq(gauge_value_u64(metrics, "load"), Some(current.val))
+  @debug.assert_eq(counter_sum_u64(metrics, "rate"), Some(current.val))
+  @debug.assert_eq(gauge_value_u64(metrics, "current"), Some(current.val))
 }

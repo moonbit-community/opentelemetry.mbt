@@ -75,9 +75,9 @@ fn format_log_value(value : @sdklogs.AnyValue) -> String {
 ///|
 fn format_status(status : @sdktrace.Status) -> String {
   let code = match status.code {
-    @sdktrace.StatusCode::Unset => "Unset"
-    @sdktrace.StatusCode::Ok => "Ok"
-    @sdktrace.StatusCode::Error => "Error"
+    Unset => "Unset"
+    Ok => "Ok"
+    Error => "Error"
   }
   match status.description {
     Some(description) => "\{code}(\{description.to_json().stringify()})"
@@ -88,64 +88,63 @@ fn format_status(status : @sdktrace.Status) -> String {
 ///|
 fn format_span_kind(kind : @sdktrace.SpanKind) -> String {
   match kind {
-    @sdktrace.SpanKind::Internal => "Internal"
-    @sdktrace.SpanKind::Client => "Client"
-    @sdktrace.SpanKind::Server => "Server"
-    @sdktrace.SpanKind::Producer => "Producer"
-    @sdktrace.SpanKind::Consumer => "Consumer"
+    Internal => "Internal"
+    Client => "Client"
+    Server => "Server"
+    Producer => "Producer"
+    Consumer => "Consumer"
   }
 }
 
 ///|
 fn format_severity_number(severity : @sdklogs.SeverityNumber) -> String {
   match severity {
-    @sdklogs.SeverityNumber::Trace => "Trace"
-    @sdklogs.SeverityNumber::Trace2 => "Trace2"
-    @sdklogs.SeverityNumber::Trace3 => "Trace3"
-    @sdklogs.SeverityNumber::Trace4 => "Trace4"
-    @sdklogs.SeverityNumber::Debug => "Debug"
-    @sdklogs.SeverityNumber::Debug2 => "Debug2"
-    @sdklogs.SeverityNumber::Debug3 => "Debug3"
-    @sdklogs.SeverityNumber::Debug4 => "Debug4"
-    @sdklogs.SeverityNumber::Info => "Info"
-    @sdklogs.SeverityNumber::Info2 => "Info2"
-    @sdklogs.SeverityNumber::Info3 => "Info3"
-    @sdklogs.SeverityNumber::Info4 => "Info4"
-    @sdklogs.SeverityNumber::Warn => "Warn"
-    @sdklogs.SeverityNumber::Warn2 => "Warn2"
-    @sdklogs.SeverityNumber::Warn3 => "Warn3"
-    @sdklogs.SeverityNumber::Warn4 => "Warn4"
-    @sdklogs.SeverityNumber::Error => "Error"
-    @sdklogs.SeverityNumber::Error2 => "Error2"
-    @sdklogs.SeverityNumber::Error3 => "Error3"
-    @sdklogs.SeverityNumber::Error4 => "Error4"
-    @sdklogs.SeverityNumber::Fatal => "Fatal"
-    @sdklogs.SeverityNumber::Fatal2 => "Fatal2"
-    @sdklogs.SeverityNumber::Fatal3 => "Fatal3"
-    @sdklogs.SeverityNumber::Fatal4 => "Fatal4"
+    Trace => "Trace"
+    Trace2 => "Trace2"
+    Trace3 => "Trace3"
+    Trace4 => "Trace4"
+    Debug => "Debug"
+    Debug2 => "Debug2"
+    Debug3 => "Debug3"
+    Debug4 => "Debug4"
+    Info => "Info"
+    Info2 => "Info2"
+    Info3 => "Info3"
+    Info4 => "Info4"
+    Warn => "Warn"
+    Warn2 => "Warn2"
+    Warn3 => "Warn3"
+    Warn4 => "Warn4"
+    Error => "Error"
+    Error2 => "Error2"
+    Error3 => "Error3"
+    Error4 => "Error4"
+    Fatal => "Fatal"
+    Fatal2 => "Fatal2"
+    Fatal3 => "Fatal3"
+    Fatal4 => "Fatal4"
   }
 }
 
 ///|
 fn format_instrument_kind(kind : @sdkmetrics.InstrumentKind) -> String {
   match kind {
-    @sdkmetrics.InstrumentKind::Counter => "Counter"
-    @sdkmetrics.InstrumentKind::UpDownCounter => "UpDownCounter"
-    @sdkmetrics.InstrumentKind::Histogram => "Histogram"
-    @sdkmetrics.InstrumentKind::Gauge => "Gauge"
-    @sdkmetrics.InstrumentKind::ObservableCounter => "ObservableCounter"
-    @sdkmetrics.InstrumentKind::ObservableUpDownCounter =>
-      "ObservableUpDownCounter"
-    @sdkmetrics.InstrumentKind::ObservableGauge => "ObservableGauge"
+    Counter => "Counter"
+    UpDownCounter => "UpDownCounter"
+    Histogram => "Histogram"
+    Gauge => "Gauge"
+    ObservableCounter => "ObservableCounter"
+    ObservableUpDownCounter => "ObservableUpDownCounter"
+    ObservableGauge => "ObservableGauge"
   }
 }
 
 ///|
 fn format_number(number : @sdkmetrics.Number) -> String {
   match number {
-    @sdkmetrics.Number::Int64(value) => value.to_string()
-    @sdkmetrics.Number::UInt64(value) => value.to_string()
-    @sdkmetrics.Number::Double(value) => value.to_string()
+    Int64(value) => value.to_string()
+    UInt64(value) => value.to_string()
+    Double(value) => value.to_string()
   }
 }
 
@@ -401,15 +400,15 @@ fn write_metric_aggregation(
   aggregation : @sdkmetrics.Aggregation,
 ) -> Unit {
   match aggregation {
-    @sdkmetrics.Aggregation::Sum(number) => {
+    Sum(number) => {
       push_field(builder, 2, "Aggregation", "Sum")
       push_field(builder, 4, "Value", format_number(number))
     }
-    @sdkmetrics.Aggregation::Gauge(number) => {
+    Gauge(number) => {
       push_field(builder, 2, "Aggregation", "Gauge")
       push_field(builder, 4, "Value", format_number(number))
     }
-    @sdkmetrics.Aggregation::Histogram(summary) => {
+    Histogram(summary) => {
       push_field(builder, 2, "Aggregation", "Histogram")
       push_field(builder, 4, "Count", summary.count.to_string())
       push_field(builder, 4, "Sum", format_number(summary.sum))
@@ -455,17 +454,17 @@ fn render_metric_batch(batch : ArrayView[@sdkmetrics.MetricData]) -> String {
 }
 
 ///|
-pub impl Default for SpanExporter with default() -> SpanExporter {
-  { state: Ref::new({ is_shutdown: false, resource_emitted: false }) }
+pub impl Default for SpanExporter with fn default() -> SpanExporter {
+  { state: Ref({ is_shutdown: false, resource_emitted: false }) }
 }
 
 ///|
-pub impl Default for LogExporter with default() -> LogExporter {
-  { state: Ref::new({ is_shutdown: false, resource_emitted: false }) }
+pub impl Default for LogExporter with fn default() -> LogExporter {
+  { state: Ref({ is_shutdown: false, resource_emitted: false }) }
 }
 
 ///|
-pub impl Default for MetricExporter with default() -> MetricExporter {
+pub impl Default for MetricExporter with fn default() -> MetricExporter {
   MetricExporter::builder().build()
 }
 
@@ -484,7 +483,7 @@ pub fn LogExporter::new() -> LogExporter {
 ///|
 /// Starts building a stdout metric exporter.
 pub fn MetricExporter::builder() -> MetricExporterBuilder {
-  { temporality: @sdkmetrics.Temporality::Cumulative }
+  { temporality: Cumulative }
 }
 
 ///|
@@ -502,7 +501,7 @@ pub fn MetricExporterBuilder::with_temporality(
 pub fn MetricExporterBuilder::build(
   self : MetricExporterBuilder,
 ) -> MetricExporter {
-  { state: Ref::new({ is_shutdown: false }), temporality: self.temporality }
+  { state: Ref({ is_shutdown: false }), temporality: self.temporality }
 }
 
 ///|

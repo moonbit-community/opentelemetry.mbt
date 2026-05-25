@@ -1,7 +1,7 @@
 ///|
 fn sample_resource() -> @resource.Resource {
   @resource.Resource::builder_empty()
-  .with_attribute("service.name", @common.Value::String("print-test"))
+  .with_attribute("service.name", String("print-test"))
   .with_schema_url("https://opentelemetry.io/schemas/1.0.0")
   .build()
 }
@@ -11,9 +11,7 @@ fn sample_scope() -> @common.InstrumentationScope {
   @common.InstrumentationScope::builder("print-test")
   .with_version("1.2.3")
   .with_schema_url("https://opentelemetry.io/schemas/1.0.0")
-  .with_attributes([
-    @common.KeyValue::new("scope.attr", @common.Value::String("demo")),
-  ])
+  .with_attributes([@common.KeyValue::new("scope.attr", String("demo"))])
   .build()
 }
 
@@ -49,22 +47,18 @@ async fn sample_span_data() -> @sdktrace.SpanData {
     "print-test",
     version=Some("1.2.3"),
     schema_url=Some("https://opentelemetry.io/schemas/1.0.0"),
-    attributes=[
-      @common.KeyValue::new("scope.attr", @common.Value::String("demo")),
-    ],
+    attributes=[@common.KeyValue::new("scope.attr", String("demo"))],
   )
   let span = tracer.start("request", start_time_unix_nano=100L)
-  span.set_attribute("http.method", @common.Value::String("GET"))
+  span.set_attribute("http.method", String("GET"))
   span.add_event(
     "connected",
-    attributes=[
-      @common.KeyValue::new("net.transport", @common.Value::String("tcp")),
-    ],
+    attributes=[@common.KeyValue::new("net.transport", String("tcp"))],
     timestamp_unix_nano=150L,
   )
   span.add_link(
     sample_span_context("4bf92f3577b34da6a3ce929d0e0e4737", "00f067aa0ba902b8"),
-    attributes=[@common.KeyValue::new("linked", @common.Value::String("yes"))],
+    attributes=[@common.KeyValue::new("linked", String("yes"))],
   )
   span.set_status(@sdktrace.Status::error(description=Some("boom")))
   span.end(end_time_unix_nano=200L)
@@ -74,12 +68,10 @@ async fn sample_span_data() -> @sdktrace.SpanData {
 ///|
 fn sample_log_record() -> @sdklogs.LogRecord {
   @sdklogs.LogRecord::new(
-    @sdklogs.AnyValue::String("request failed"),
-    severity_number=Some(@sdklogs.SeverityNumber::Error3),
+    String("request failed"),
+    severity_number=Some(Error3),
     severity_text=Some("ERROR3"),
-    attributes=[
-      @sdklogs.KeyValue::new("http.status_code", @sdklogs.AnyValue::Int64(500L)),
-    ],
+    attributes=[@sdklogs.KeyValue::new("http.status_code", Int64(500L))],
     trace_context=Some(
       sample_span_context(
         "4bf92f3577b34da6a3ce929d0e0e4736", "00f067aa0ba902b7",
@@ -101,18 +93,14 @@ fn sample_metric_data() -> @sdkmetrics.MetricData {
     "print-test",
     version=Some("1.2.3"),
     schema_url=Some("https://opentelemetry.io/schemas/1.0.0"),
-    attributes=[
-      @common.KeyValue::new("scope.attr", @common.Value::String("demo")),
-    ],
+    attributes=[@common.KeyValue::new("scope.attr", String("demo"))],
   )
   let counter = meter
     .counter("requests")
     .with_description("request count")
     .with_unit("1")
     .build()
-  counter.add(5, attributes=[
-    @common.KeyValue::new("route", @common.Value::String("/health")),
-  ])
+  counter.add(5, attributes=[@common.KeyValue::new("route", String("/health"))])
   provider.manual_reader().collect()[0]
 }
 
@@ -122,10 +110,9 @@ fn counter_sum(
   name : StringView,
 ) -> Int64? {
   for metric in metrics {
-    if metric.name == name.to_string() {
+    if metric.name == name.to_owned() {
       match metric.aggregation {
-        @sdkmetrics.Aggregation::Sum(@sdkmetrics.Number::Int64(value)) =>
-          return Some(value)
+        Sum(Int64(value)) => return Some(value)
         _ => return None
       }
     }
@@ -184,8 +171,7 @@ async test "sdk exporters reject exports after shutdown" {
   guard span_exporter.shutdown() is Ok(_) else {
     fail("expected span exporter shutdown to succeed")
   }
-  guard span_exporter.export_batch([sample_span_data()])
-    is Err(@error.OTelSdkError::AlreadyShutdown) else {
+  guard span_exporter.export_batch([sample_span_data()]) is Err(AlreadyShutdown) else {
     fail("expected span exporter to reject exports after shutdown")
   }
 
@@ -193,8 +179,7 @@ async test "sdk exporters reject exports after shutdown" {
   guard log_exporter.shutdown() is Ok(_) else {
     fail("expected log exporter shutdown to succeed")
   }
-  guard log_exporter.export_batch([sample_log_record()])
-    is Err(@error.OTelSdkError::AlreadyShutdown) else {
+  guard log_exporter.export_batch([sample_log_record()]) is Err(AlreadyShutdown) else {
     fail("expected log exporter to reject exports after shutdown")
   }
 
@@ -203,7 +188,7 @@ async test "sdk exporters reject exports after shutdown" {
     fail("expected metric exporter shutdown to succeed")
   }
   guard metric_exporter.export_batch([sample_metric_data()])
-    is Err(@error.OTelSdkError::AlreadyShutdown) else {
+    is Err(AlreadyShutdown) else {
     fail("expected metric exporter to reject exports after shutdown")
   }
 }
@@ -212,10 +197,8 @@ async test "sdk exporters reject exports after shutdown" {
 // Test target: Verify a metric exporter's configured temporality is preserved when it is converted into a periodic reader.
 // Test method: Build a delta exporter, collect twice through the derived reader, and assert the observed counter values are delta snapshots.
 test "metric exporter builder temporality feeds periodic reader" {
-  let exporter = MetricExporter::builder()
-    .with_temporality(@sdkmetrics.Temporality::Delta)
-    .build()
-  assert_true(exporter.temporality() == @sdkmetrics.Temporality::Delta)
+  let exporter = MetricExporter::builder().with_temporality(Delta).build()
+  assert_true(exporter.temporality() == Delta)
 
   let reader = exporter.into_periodic_reader(interval_millis=1)
   let provider = @sdkmetrics.SdkMeterProvider::builder()
@@ -224,7 +207,7 @@ test "metric exporter builder temporality feeds periodic reader" {
   let counter = provider.meter("print-metrics").counter("requests").build()
 
   counter.add(2)
-  assert_eq(counter_sum(reader.collect(), "requests"), Some(2L))
+  @debug.assert_eq(counter_sum(reader.collect(), "requests"), Some(2L))
   counter.add(3)
-  assert_eq(counter_sum(reader.collect(), "requests"), Some(3L))
+  @debug.assert_eq(counter_sum(reader.collect(), "requests"), Some(3L))
 }

@@ -49,9 +49,9 @@ async fn _trace_readme_span_lifecycle() -> Unit {
   let tracer = TracerProvider::noop().tracer("example")
   let builder = tracer
     .span_builder("http.request")
-    .with_kind(SpanKind::Server)
+    .with_kind(Server)
     .with_attributes([
-      @common.KeyValue::new("http.request.method", @common.Value::String("GET")),
+      @common.KeyValue::new("http.request.method", String("GET")),
     ])
   let span = tracer.build(builder)
 

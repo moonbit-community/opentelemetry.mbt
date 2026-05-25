@@ -7,7 +7,7 @@ pub struct Key {
 ///|
 /// Creates a key from its canonical string representation.
 pub fn Key::new(name : StringView) -> Key {
-  { name: name.to_string() }
+  { name: name.to_owned() }
 }
 
 ///|
@@ -17,7 +17,7 @@ pub fn Key::as_string(self : Key) -> String {
 }
 
 ///|
-pub impl Default for Key with default() -> Key {
+pub impl Default for Key with fn default() -> Key {
   Key::new("")
 }
 
@@ -77,7 +77,7 @@ pub fn TraceState::set(
   value : StringView,
 ) -> TraceState {
   let entries = self.entries.copy()
-  entries[key.to_string()] = value.to_string()
+  entries[key.to_owned()] = value.to_owned()
   { entries, }
 }
 
@@ -117,8 +117,8 @@ pub fn TraceState::from_header(value : StringView) -> TraceState {
       continue
     }
     guard item.find("=") is Some(index)
-    let key = item[:index].trim().to_string()
-    let val = item[index + 1:].trim().to_string()
+    let key = item[:index].trim().to_owned()
+    let val = item[index + 1:].trim().to_owned()
     if key != "" && val != "" {
       entries[key] = val
     }
@@ -127,7 +127,7 @@ pub fn TraceState::from_header(value : StringView) -> TraceState {
 }
 
 ///|
-pub impl Default for TraceState with default() -> TraceState {
+pub impl Default for TraceState with fn default() -> TraceState {
   TraceState::empty()
 }
 
@@ -181,14 +181,14 @@ pub fn TraceFlags::from_hex(value : StringView) -> TraceFlags? {
   if value.length() != 2 {
     return None
   }
-  let parsed = @string.parse_int(value.to_string(), base=16) catch {
+  let parsed = @string.parse_int(value.to_owned(), base=16) catch {
     _ => return None
   }
   Some(TraceFlags::new(parsed.reinterpret_as_uint()))
 }
 
 ///|
-pub impl Default for TraceFlags with default() -> TraceFlags {
+pub impl Default for TraceFlags with fn default() -> TraceFlags {
   TraceFlags::new(0U)
 }
 
@@ -235,7 +235,7 @@ fn decode_hex(hex : StringView, expected_len : Int) -> Bytes? {
   }
   let bytes = []
   for i = 0; i < hex.length(); i = i + 2 {
-    let part = hex[i:i + 2].to_string()
+    let part = hex[i:i + 2].to_owned()
     let value = @string.parse_int(part, base=16) catch { _ => return None }
     bytes.push(value.to_byte())
   }
@@ -283,7 +283,7 @@ pub fn TraceId::is_valid(self : TraceId) -> Bool {
 }
 
 ///|
-pub impl Default for TraceId with default() -> TraceId {
+pub impl Default for TraceId with fn default() -> TraceId {
   TraceId::invalid()
 }
 
@@ -328,7 +328,7 @@ pub fn SpanId::is_valid(self : SpanId) -> Bool {
 }
 
 ///|
-pub impl Default for SpanId with default() -> SpanId {
+pub impl Default for SpanId with fn default() -> SpanId {
   SpanId::invalid()
 }
 
@@ -413,7 +413,7 @@ pub fn SpanContext::with_remote(
 }
 
 ///|
-pub impl Default for SpanContext with default() -> SpanContext {
+pub impl Default for SpanContext with fn default() -> SpanContext {
   SpanContext::empty()
 }
 
@@ -440,7 +440,7 @@ pub struct InstrumentationScopeBuilder {
 pub fn InstrumentationScope::builder(
   name : StringView,
 ) -> InstrumentationScopeBuilder {
-  { name: name.to_string(), version: None, schema_url: None, attributes: [] }
+  { name: name.to_owned(), version: None, schema_url: None, attributes: [] }
 }
 
 ///|
@@ -475,7 +475,7 @@ pub fn InstrumentationScopeBuilder::with_version(
   self : InstrumentationScopeBuilder,
   version : StringView,
 ) -> InstrumentationScopeBuilder {
-  self.version = Some(version.to_string())
+  self.version = Some(version.to_owned())
   self
 }
 
@@ -485,7 +485,7 @@ pub fn InstrumentationScopeBuilder::with_schema_url(
   self : InstrumentationScopeBuilder,
   schema_url : StringView,
 ) -> InstrumentationScopeBuilder {
-  self.schema_url = Some(schema_url.to_string())
+  self.schema_url = Some(schema_url.to_owned())
   self
 }
 
@@ -495,7 +495,7 @@ pub fn InstrumentationScopeBuilder::with_attributes(
   self : InstrumentationScopeBuilder,
   attributes : ArrayView[KeyValue],
 ) -> InstrumentationScopeBuilder {
-  self.attributes = attributes.to_array()
+  self.attributes = attributes.to_owned()
   self
 }
 
@@ -513,6 +513,6 @@ pub fn InstrumentationScopeBuilder::build(
 }
 
 ///|
-pub impl Default for InstrumentationScope with default() -> InstrumentationScope {
+pub impl Default for InstrumentationScope with fn default() -> InstrumentationScope {
   InstrumentationScope::builder("").build()
 }
