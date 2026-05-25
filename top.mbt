@@ -3,11 +3,13 @@
 ///
 /// Keys should be stable, low-cardinality names. Prefer semantic-convention
 /// constants from `semantics/*` when a standard key exists.
+/// Spec: https://opentelemetry.io/docs/specs/otel/common/#attribute
 pub type Key = @common.Key
 
 ///|
 /// Attribute value type accepted by traces, metrics, resources, and baggage
 /// conversion helpers.
+/// Spec: https://opentelemetry.io/docs/specs/otel/common/#anyvalue
 pub type Value = @common.Value
 
 ///|
@@ -16,22 +18,27 @@ pub type Value = @common.Value
 /// Attributes add searchable dimensions to spans, metrics, logs, and resources.
 /// Avoid unbounded values such as user IDs or raw URLs on metrics because they
 /// can create high-cardinality time series.
+/// Spec: https://opentelemetry.io/docs/specs/otel/common/#attribute
 pub type KeyValue = @common.KeyValue
 
 ///|
 /// 16-byte trace identifier propagated across process boundaries.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#spancontext
 pub type TraceId = @common.TraceId
 
 ///|
 /// 8-byte span identifier for one operation inside a trace.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#spancontext
 pub type SpanId = @common.SpanId
 
 ///|
 /// W3C trace flags, including the sampled bit.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#spancontext
 pub type TraceFlags = @common.TraceFlags
 
 ///|
 /// W3C trace state container used by distributed tracing propagators.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#tracestate
 pub type TraceState = @common.TraceState
 
 ///|
@@ -39,11 +46,13 @@ pub type TraceState = @common.TraceState
 ///
 /// Instrumentation scope is attached to exported telemetry. Use a stable name
 /// such as a package or module name, and set version/schema URL when known.
+/// Spec: https://opentelemetry.io/docs/specs/otel/common/instrumentation-scope/
 pub type InstrumentationScope = @common.InstrumentationScope
 
 ///|
 /// Immutable context container carrying active span context, baggage, and
 /// telemetry suppression.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/#overview
 pub type Context = @context.Context
 
 ///|
@@ -51,14 +60,17 @@ pub type Context = @context.Context
 ///
 /// Baggage is propagated to downstream services, so do not store secrets or
 /// high-cardinality values in it.
+/// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#overview
 pub type Baggage = @baggage.Baggage
 
 ///|
 /// Metadata associated with one baggage entry.
+/// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#overview
 pub type BaggageMetadata = @baggage.BaggageMetadata
 
 ///|
 /// One baggage entry plus its metadata.
+/// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#overview
 pub type KeyValueMetadata = @baggage.KeyValueMetadata
 
 ///|
@@ -72,6 +84,7 @@ pub type KeyValueMetadata = @baggage.KeyValueMetadata
 /// `name` should identify the instrumentation library or component. Optional
 /// version, schema URL, and attributes are folded into the instrumentation scope
 /// attached to spans created by the returned tracer.
+/// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#get-a-tracer
 pub fn tracer(
   name : StringView,
   version? : String? = None,
@@ -90,6 +103,7 @@ pub fn tracer(
 ///
 /// Optional version, schema URL, and attributes are folded into the
 /// instrumentation scope attached to instruments created by the returned meter.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#get-a-meter
 pub fn meter(
   name : StringView,
   version? : String? = None,
@@ -108,6 +122,7 @@ pub fn meter(
 ///
 /// Optional version, schema URL, and attributes are folded into the
 /// instrumentation scope attached to emitted log records.
+/// Spec: https://opentelemetry.io/docs/specs/otel/logs/api/#get-a-logger
 pub fn logger(
   name : StringView,
   version? : String? = None,
@@ -126,6 +141,7 @@ pub fn logger(
 ///
 /// The callback shape avoids exposing the mutable global reference directly
 /// while still letting callers use the current propagator.
+/// Spec: https://opentelemetry.io/docs/specs/otel/context/api-propagators/#get-global-propagator
 pub fn[T] get_text_map_propagator(
   f : (@propagation.TextMapPropagator) -> T,
 ) -> T {

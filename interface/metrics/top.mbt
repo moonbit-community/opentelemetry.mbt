@@ -3,6 +3,7 @@
 ///
 /// Use counters for values that only increase, such as requests served, errors
 /// observed, or bytes sent. Negative deltas are ignored by the SDK.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#counter
 pub struct Counter[T] {
   add_fn : (T, ArrayView[@common.KeyValue]) -> Unit
 }
@@ -12,6 +13,7 @@ pub struct Counter[T] {
 ///
 /// Use up-down counters for state that can increase and decrease, such as
 /// active requests, queue depth, or open connections.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#updowncounter
 pub struct UpDownCounter[T] {
   add_fn : (T, ArrayView[@common.KeyValue]) -> Unit
 }
@@ -21,6 +23,7 @@ pub struct UpDownCounter[T] {
 ///
 /// Use histograms for distributions such as request latency, payload size, or
 /// retry count.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#histogram
 pub struct Histogram[T] {
   record_fn : (T, ArrayView[@common.KeyValue]) -> Unit
 }
@@ -30,6 +33,7 @@ pub struct Histogram[T] {
 ///
 /// Use gauges for current-state measurements such as memory usage or
 /// temperature.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#gauge
 pub struct Gauge[T] {
   record_fn : (T, ArrayView[@common.KeyValue]) -> Unit
 }
@@ -39,24 +43,28 @@ pub struct Gauge[T] {
 ///
 /// Observable instruments report values during SDK collection instead of at the
 /// point where application work happens.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#asynchronous-counter
 pub struct ObservableCounter[T] {
   observe_fn : (T, ArrayView[@common.KeyValue]) -> Unit
 }
 
 ///|
 /// Observable additive counter handle used inside callbacks.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#asynchronous-updowncounter
 pub struct ObservableUpDownCounter[T] {
   observe_fn : (T, ArrayView[@common.KeyValue]) -> Unit
 }
 
 ///|
 /// Observable gauge handle used inside callbacks.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#asynchronous-gauge
 pub struct ObservableGauge[T] {
   observe_fn : (T, ArrayView[@common.KeyValue]) -> Unit
 }
 
 ///|
 /// Builder for `Counter`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub struct CounterBuilder[T] {
   mut description : String?
   mut unit : String?
@@ -65,6 +73,7 @@ pub struct CounterBuilder[T] {
 
 ///|
 /// Builder for `UpDownCounter`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub struct UpDownCounterBuilder[T] {
   mut description : String?
   mut unit : String?
@@ -73,6 +82,7 @@ pub struct UpDownCounterBuilder[T] {
 
 ///|
 /// Builder for `Histogram`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub struct HistogramBuilder[T] {
   mut description : String?
   mut unit : String?
@@ -81,6 +91,7 @@ pub struct HistogramBuilder[T] {
 
 ///|
 /// Builder for `Gauge`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub struct GaugeBuilder[T] {
   mut description : String?
   mut unit : String?
@@ -89,6 +100,7 @@ pub struct GaugeBuilder[T] {
 
 ///|
 /// Builder for `ObservableCounter`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub struct ObservableCounterBuilder[T] {
   mut description : String?
   mut unit : String?
@@ -100,6 +112,7 @@ pub struct ObservableCounterBuilder[T] {
 
 ///|
 /// Builder for `ObservableUpDownCounter`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub struct ObservableUpDownCounterBuilder[T] {
   mut description : String?
   mut unit : String?
@@ -111,6 +124,7 @@ pub struct ObservableUpDownCounterBuilder[T] {
 
 ///|
 /// Builder for `ObservableGauge`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub struct ObservableGaugeBuilder[T] {
   mut description : String?
   mut unit : String?
@@ -125,6 +139,7 @@ pub struct ObservableGaugeBuilder[T] {
 ///
 /// A meter creates reusable instruments for one instrumentation scope. Create
 /// instruments once and reuse them on hot paths.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#meter
 pub struct Meter {
   u64_counter_fn : (String) -> CounterBuilder[UInt64]
   f64_counter_fn : (String) -> CounterBuilder[Double]
@@ -153,12 +168,14 @@ pub struct Meter {
 ///
 /// The default provider is no-op. Applications install SDK-backed providers
 /// through the SDK facade while library code depends only on this API type.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#meterprovider
 pub struct MeterProvider {
   meter_with_scope_fn : (@common.InstrumentationScope) -> Meter
 }
 
 ///|
 /// Builds a counter handle from an add callback.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#counter
 pub fn[T] Counter::from_functions(
   add_fn : (T, ArrayView[@common.KeyValue]) -> Unit,
 ) -> Counter[T] {
@@ -167,6 +184,7 @@ pub fn[T] Counter::from_functions(
 
 ///|
 /// Builds an up-down counter handle from an add callback.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#updowncounter
 pub fn[T] UpDownCounter::from_functions(
   add_fn : (T, ArrayView[@common.KeyValue]) -> Unit,
 ) -> UpDownCounter[T] {
@@ -175,6 +193,7 @@ pub fn[T] UpDownCounter::from_functions(
 
 ///|
 /// Builds a histogram handle from a record callback.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#histogram
 pub fn[T] Histogram::from_functions(
   record_fn : (T, ArrayView[@common.KeyValue]) -> Unit,
 ) -> Histogram[T] {
@@ -183,6 +202,7 @@ pub fn[T] Histogram::from_functions(
 
 ///|
 /// Builds a gauge handle from a record callback.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#gauge
 pub fn[T] Gauge::from_functions(
   record_fn : (T, ArrayView[@common.KeyValue]) -> Unit,
 ) -> Gauge[T] {
@@ -191,6 +211,7 @@ pub fn[T] Gauge::from_functions(
 
 ///|
 /// Builds an observable counter handle from an observe callback.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#asynchronous-counter
 pub fn[T] ObservableCounter::from_functions(
   observe_fn : (T, ArrayView[@common.KeyValue]) -> Unit,
 ) -> ObservableCounter[T] {
@@ -199,6 +220,7 @@ pub fn[T] ObservableCounter::from_functions(
 
 ///|
 /// Builds an observable up-down counter handle from an observe callback.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#asynchronous-updowncounter
 pub fn[T] ObservableUpDownCounter::from_functions(
   observe_fn : (T, ArrayView[@common.KeyValue]) -> Unit,
 ) -> ObservableUpDownCounter[T] {
@@ -207,6 +229,7 @@ pub fn[T] ObservableUpDownCounter::from_functions(
 
 ///|
 /// Builds an observable gauge handle from an observe callback.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#asynchronous-gauge
 pub fn[T] ObservableGauge::from_functions(
   observe_fn : (T, ArrayView[@common.KeyValue]) -> Unit,
 ) -> ObservableGauge[T] {
@@ -215,6 +238,7 @@ pub fn[T] ObservableGauge::from_functions(
 
 ///|
 /// Builds a counter builder from a creation callback.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub fn[T] CounterBuilder::from_functions(
   create_fn : (String?, String?) -> Counter[T],
 ) -> CounterBuilder[T] {
@@ -223,6 +247,7 @@ pub fn[T] CounterBuilder::from_functions(
 
 ///|
 /// Builds an up-down counter builder from a creation callback.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub fn[T] UpDownCounterBuilder::from_functions(
   create_fn : (String?, String?) -> UpDownCounter[T],
 ) -> UpDownCounterBuilder[T] {
@@ -231,6 +256,7 @@ pub fn[T] UpDownCounterBuilder::from_functions(
 
 ///|
 /// Builds a histogram builder from a creation callback.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub fn[T] HistogramBuilder::from_functions(
   create_fn : (String?, String?) -> Histogram[T],
 ) -> HistogramBuilder[T] {
@@ -239,6 +265,7 @@ pub fn[T] HistogramBuilder::from_functions(
 
 ///|
 /// Builds a gauge builder from a creation callback.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub fn[T] GaugeBuilder::from_functions(
   create_fn : (String?, String?) -> Gauge[T],
 ) -> GaugeBuilder[T] {
@@ -247,6 +274,7 @@ pub fn[T] GaugeBuilder::from_functions(
 
 ///|
 /// Builds an observable counter builder from a creation callback.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub fn[T] ObservableCounterBuilder::from_functions(
   create_fn : (String?, String?, Array[(ObservableCounter[T]) -> Unit]) -> ObservableCounter[
     T,
@@ -257,6 +285,7 @@ pub fn[T] ObservableCounterBuilder::from_functions(
 
 ///|
 /// Builds an observable up-down counter builder from a creation callback.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub fn[T] ObservableUpDownCounterBuilder::from_functions(
   create_fn : (String?, String?, Array[(ObservableUpDownCounter[T]) -> Unit]) -> ObservableUpDownCounter[
     T,
@@ -267,6 +296,7 @@ pub fn[T] ObservableUpDownCounterBuilder::from_functions(
 
 ///|
 /// Builds an observable gauge builder from a creation callback.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub fn[T] ObservableGaugeBuilder::from_functions(
   create_fn : (String?, String?, Array[(ObservableGauge[T]) -> Unit]) -> ObservableGauge[
     T,
@@ -378,6 +408,7 @@ fn noop_meter() -> Meter {
 ///
 /// SDK implementations use this to erase concrete meter types into the public
 /// API without making the API package depend on the SDK.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#meter
 pub fn Meter::from_functions(
   u64_counter_fn : (String) -> CounterBuilder[UInt64],
   f64_counter_fn : (String) -> CounterBuilder[Double],
@@ -422,6 +453,7 @@ pub fn Meter::from_functions(
 
 ///|
 /// Builds a meter provider from a scope-to-meter callback.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#meterprovider
 pub fn MeterProvider::from_functions(
   meter_with_scope_fn : (@common.InstrumentationScope) -> Meter,
 ) -> MeterProvider {
@@ -433,6 +465,7 @@ pub fn MeterProvider::from_functions(
 ///
 /// Meters from this provider create instruments that silently discard all
 /// measurements and never run observable callbacks.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#meterprovider
 pub fn MeterProvider::noop() -> MeterProvider {
   MeterProvider::from_functions(_ => noop_meter())
 }
@@ -441,12 +474,14 @@ pub fn MeterProvider::noop() -> MeterProvider {
 /// Returns a meter for one instrumentation name.
 ///
 /// If the provider is no-op, the returned meter creates no-op instruments.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#get-a-meter
 pub fn MeterProvider::meter(self : MeterProvider, name : StringView) -> Meter {
   self.meter_with_scope(@common.InstrumentationScope::builder(name).build())
 }
 
 ///|
 /// Returns a meter for a fully constructed instrumentation scope.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#get-a-meter
 pub fn MeterProvider::meter_with_scope(
   self : MeterProvider,
   scope : @common.InstrumentationScope,
@@ -459,6 +494,7 @@ pub fn MeterProvider::meter_with_scope(
 ///
 /// The underlying SDK ignores negative deltas. Attributes should be
 /// low-cardinality because they form metric series identity.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#counter
 pub fn[T] Counter::add(
   self : Counter[T],
   value : T,
@@ -472,6 +508,7 @@ pub fn[T] Counter::add(
 ///
 /// Use this for state that can go up and down. For monotonically increasing
 /// totals, prefer `Counter`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#updowncounter
 pub fn[T] UpDownCounter::add(
   self : UpDownCounter[T],
   value : T,
@@ -485,6 +522,7 @@ pub fn[T] UpDownCounter::add(
 ///
 /// Histograms aggregate distributions and are usually the right choice for
 /// latency and size measurements.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#histogram
 pub fn[T] Histogram::record(
   self : Histogram[T],
   value : T,
@@ -497,6 +535,7 @@ pub fn[T] Histogram::record(
 /// Records the latest gauge value for one attribute set.
 ///
 /// The latest value replaces the previous value for the same attribute set.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#gauge
 pub fn[T] Gauge::record(
   self : Gauge[T],
   value : T,
@@ -507,6 +546,7 @@ pub fn[T] Gauge::record(
 
 ///|
 /// Reports one observable counter value from a callback.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#asynchronous-counter
 pub fn[T] ObservableCounter::observe(
   self : ObservableCounter[T],
   value : T,
@@ -517,6 +557,7 @@ pub fn[T] ObservableCounter::observe(
 
 ///|
 /// Reports one observable up-down counter value from a callback.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#asynchronous-updowncounter
 pub fn[T] ObservableUpDownCounter::observe(
   self : ObservableUpDownCounter[T],
   value : T,
@@ -527,6 +568,7 @@ pub fn[T] ObservableUpDownCounter::observe(
 
 ///|
 /// Reports one observable gauge value from a callback.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#asynchronous-gauge
 pub fn[T] ObservableGauge::observe(
   self : ObservableGauge[T],
   value : T,
@@ -537,6 +579,7 @@ pub fn[T] ObservableGauge::observe(
 
 ///|
 /// Sets the instrument description on the counter builder.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument-description
 pub fn[T] CounterBuilder::with_description(
   self : CounterBuilder[T],
   description : StringView,
@@ -547,6 +590,7 @@ pub fn[T] CounterBuilder::with_description(
 
 ///|
 /// Sets the instrument unit on the counter builder.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument-unit
 pub fn[T] CounterBuilder::with_unit(
   self : CounterBuilder[T],
   unit : StringView,
@@ -557,12 +601,14 @@ pub fn[T] CounterBuilder::with_unit(
 
 ///|
 /// Builds the counter with the current builder options.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub fn[T] CounterBuilder::build(self : CounterBuilder[T]) -> Counter[T] {
   (self.create_fn)(self.description, self.unit)
 }
 
 ///|
 /// Sets the instrument description on the up-down counter builder.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument-description
 pub fn[T] UpDownCounterBuilder::with_description(
   self : UpDownCounterBuilder[T],
   description : StringView,
@@ -573,6 +619,7 @@ pub fn[T] UpDownCounterBuilder::with_description(
 
 ///|
 /// Sets the instrument unit on the up-down counter builder.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument-unit
 pub fn[T] UpDownCounterBuilder::with_unit(
   self : UpDownCounterBuilder[T],
   unit : StringView,
@@ -583,6 +630,7 @@ pub fn[T] UpDownCounterBuilder::with_unit(
 
 ///|
 /// Builds the up-down counter with the current builder options.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub fn[T] UpDownCounterBuilder::build(
   self : UpDownCounterBuilder[T],
 ) -> UpDownCounter[T] {
@@ -591,6 +639,7 @@ pub fn[T] UpDownCounterBuilder::build(
 
 ///|
 /// Sets the instrument description on the histogram builder.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument-description
 pub fn[T] HistogramBuilder::with_description(
   self : HistogramBuilder[T],
   description : StringView,
@@ -601,6 +650,7 @@ pub fn[T] HistogramBuilder::with_description(
 
 ///|
 /// Sets the instrument unit on the histogram builder.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument-unit
 pub fn[T] HistogramBuilder::with_unit(
   self : HistogramBuilder[T],
   unit : StringView,
@@ -611,12 +661,14 @@ pub fn[T] HistogramBuilder::with_unit(
 
 ///|
 /// Builds the histogram with the current builder options.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub fn[T] HistogramBuilder::build(self : HistogramBuilder[T]) -> Histogram[T] {
   (self.create_fn)(self.description, self.unit)
 }
 
 ///|
 /// Sets the instrument description on the gauge builder.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument-description
 pub fn[T] GaugeBuilder::with_description(
   self : GaugeBuilder[T],
   description : StringView,
@@ -627,6 +679,7 @@ pub fn[T] GaugeBuilder::with_description(
 
 ///|
 /// Sets the instrument unit on the gauge builder.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument-unit
 pub fn[T] GaugeBuilder::with_unit(
   self : GaugeBuilder[T],
   unit : StringView,
@@ -637,12 +690,14 @@ pub fn[T] GaugeBuilder::with_unit(
 
 ///|
 /// Builds the gauge with the current builder options.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub fn[T] GaugeBuilder::build(self : GaugeBuilder[T]) -> Gauge[T] {
   (self.create_fn)(self.description, self.unit)
 }
 
 ///|
 /// Sets the instrument description on the observable counter builder.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument-description
 pub fn[T] ObservableCounterBuilder::with_description(
   self : ObservableCounterBuilder[T],
   description : StringView,
@@ -653,6 +708,7 @@ pub fn[T] ObservableCounterBuilder::with_description(
 
 ///|
 /// Sets the instrument unit on the observable counter builder.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument-unit
 pub fn[T] ObservableCounterBuilder::with_unit(
   self : ObservableCounterBuilder[T],
   unit : StringView,
@@ -666,6 +722,7 @@ pub fn[T] ObservableCounterBuilder::with_unit(
 ///
 /// Keep callbacks fast and side-effect-light. They run on collection/export
 /// paths, not when the observable instrument is created.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub fn[T] ObservableCounterBuilder::with_callback(
   self : ObservableCounterBuilder[T],
   callback : (ObservableCounter[T]) -> Unit,
@@ -677,6 +734,7 @@ pub fn[T] ObservableCounterBuilder::with_callback(
 ///|
 /// Builds the observable counter and freezes the currently registered
 /// callbacks.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub fn[T] ObservableCounterBuilder::build(
   self : ObservableCounterBuilder[T],
 ) -> ObservableCounter[T] {
@@ -685,6 +743,7 @@ pub fn[T] ObservableCounterBuilder::build(
 
 ///|
 /// Sets the instrument description on the observable up-down counter builder.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument-description
 pub fn[T] ObservableUpDownCounterBuilder::with_description(
   self : ObservableUpDownCounterBuilder[T],
   description : StringView,
@@ -695,6 +754,7 @@ pub fn[T] ObservableUpDownCounterBuilder::with_description(
 
 ///|
 /// Sets the instrument unit on the observable up-down counter builder.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument-unit
 pub fn[T] ObservableUpDownCounterBuilder::with_unit(
   self : ObservableUpDownCounterBuilder[T],
   unit : StringView,
@@ -708,6 +768,7 @@ pub fn[T] ObservableUpDownCounterBuilder::with_unit(
 ///
 /// Keep callbacks fast and side-effect-light. They run on collection/export
 /// paths, not when the observable instrument is created.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub fn[T] ObservableUpDownCounterBuilder::with_callback(
   self : ObservableUpDownCounterBuilder[T],
   callback : (ObservableUpDownCounter[T]) -> Unit,
@@ -719,6 +780,7 @@ pub fn[T] ObservableUpDownCounterBuilder::with_callback(
 ///|
 /// Builds the observable up-down counter and freezes the currently registered
 /// callbacks.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub fn[T] ObservableUpDownCounterBuilder::build(
   self : ObservableUpDownCounterBuilder[T],
 ) -> ObservableUpDownCounter[T] {
@@ -727,6 +789,7 @@ pub fn[T] ObservableUpDownCounterBuilder::build(
 
 ///|
 /// Sets the instrument description on the observable gauge builder.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument-description
 pub fn[T] ObservableGaugeBuilder::with_description(
   self : ObservableGaugeBuilder[T],
   description : StringView,
@@ -737,6 +800,7 @@ pub fn[T] ObservableGaugeBuilder::with_description(
 
 ///|
 /// Sets the instrument unit on the observable gauge builder.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument-unit
 pub fn[T] ObservableGaugeBuilder::with_unit(
   self : ObservableGaugeBuilder[T],
   unit : StringView,
@@ -750,6 +814,7 @@ pub fn[T] ObservableGaugeBuilder::with_unit(
 ///
 /// Keep callbacks fast and side-effect-light. They run on collection/export
 /// paths, not when the observable instrument is created.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub fn[T] ObservableGaugeBuilder::with_callback(
   self : ObservableGaugeBuilder[T],
   callback : (ObservableGauge[T]) -> Unit,
@@ -760,6 +825,7 @@ pub fn[T] ObservableGaugeBuilder::with_callback(
 
 ///|
 /// Builds the observable gauge and freezes the currently registered callbacks.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#instrument
 pub fn[T] ObservableGaugeBuilder::build(
   self : ObservableGaugeBuilder[T],
 ) -> ObservableGauge[T] {
@@ -771,6 +837,7 @@ pub fn[T] ObservableGaugeBuilder::build(
 ///
 /// Instrument names should be stable and low-cardinality. The same named
 /// instrument should be built once and reused.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#counter-creation
 pub fn Meter::u64_counter(
   self : Meter,
   name : StringView,
@@ -782,6 +849,7 @@ pub fn Meter::u64_counter(
 /// Starts building a `Double` monotonic counter.
 ///
 /// The underlying SDK ignores negative deltas.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#counter-creation
 pub fn Meter::f64_counter(
   self : Meter,
   name : StringView,
@@ -791,6 +859,7 @@ pub fn Meter::f64_counter(
 
 ///|
 /// Starts building an `Int64` up-down counter.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#updowncounter-creation
 pub fn Meter::i64_up_down_counter(
   self : Meter,
   name : StringView,
@@ -800,6 +869,7 @@ pub fn Meter::i64_up_down_counter(
 
 ///|
 /// Starts building a `Double` up-down counter.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#updowncounter-creation
 pub fn Meter::f64_up_down_counter(
   self : Meter,
   name : StringView,
@@ -809,6 +879,7 @@ pub fn Meter::f64_up_down_counter(
 
 ///|
 /// Starts building a `UInt64` histogram.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#histogram-creation
 pub fn Meter::u64_histogram(
   self : Meter,
   name : StringView,
@@ -818,6 +889,7 @@ pub fn Meter::u64_histogram(
 
 ///|
 /// Starts building a `Double` histogram.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#histogram-creation
 pub fn Meter::f64_histogram(
   self : Meter,
   name : StringView,
@@ -827,6 +899,7 @@ pub fn Meter::f64_histogram(
 
 ///|
 /// Starts building a `UInt64` gauge.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#gauge-creation
 pub fn Meter::u64_gauge(
   self : Meter,
   name : StringView,
@@ -838,12 +911,14 @@ pub fn Meter::u64_gauge(
 /// Starts building an `Int64` gauge.
 ///
 /// Values are converted to `Double` before they are forwarded to the SDK.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#gauge-creation
 pub fn Meter::i64_gauge(self : Meter, name : StringView) -> GaugeBuilder[Int64] {
   (self.i64_gauge_fn)(name.to_owned())
 }
 
 ///|
 /// Starts building a `Double` gauge.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#gauge-creation
 pub fn Meter::f64_gauge(
   self : Meter,
   name : StringView,
@@ -853,6 +928,7 @@ pub fn Meter::f64_gauge(
 
 ///|
 /// Starts building a `UInt64` observable counter.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#asynchronous-counter-creation
 pub fn Meter::u64_observable_counter(
   self : Meter,
   name : StringView,
@@ -862,6 +938,7 @@ pub fn Meter::u64_observable_counter(
 
 ///|
 /// Starts building a `Double` observable counter.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#asynchronous-counter-creation
 pub fn Meter::f64_observable_counter(
   self : Meter,
   name : StringView,
@@ -871,6 +948,7 @@ pub fn Meter::f64_observable_counter(
 
 ///|
 /// Starts building an `Int64` observable up-down counter.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#asynchronous-updowncounter-creation
 pub fn Meter::i64_observable_up_down_counter(
   self : Meter,
   name : StringView,
@@ -880,6 +958,7 @@ pub fn Meter::i64_observable_up_down_counter(
 
 ///|
 /// Starts building a `Double` observable up-down counter.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#asynchronous-updowncounter-creation
 pub fn Meter::f64_observable_up_down_counter(
   self : Meter,
   name : StringView,
@@ -889,6 +968,7 @@ pub fn Meter::f64_observable_up_down_counter(
 
 ///|
 /// Starts building a `UInt64` observable gauge.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#asynchronous-gauge-creation
 pub fn Meter::u64_observable_gauge(
   self : Meter,
   name : StringView,
@@ -901,6 +981,7 @@ pub fn Meter::u64_observable_gauge(
 ///
 /// Callback observations are converted to `Double` before they are forwarded to
 /// the SDK.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#asynchronous-gauge-creation
 pub fn Meter::i64_observable_gauge(
   self : Meter,
   name : StringView,
@@ -910,6 +991,7 @@ pub fn Meter::i64_observable_gauge(
 
 ///|
 /// Starts building a `Double` observable gauge.
+/// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#asynchronous-gauge-creation
 pub fn Meter::f64_observable_gauge(
   self : Meter,
   name : StringView,

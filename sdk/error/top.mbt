@@ -1,5 +1,6 @@
 ///|
 /// Error type shared by SDK providers, processors, and exporters.
+/// Spec: https://opentelemetry.io/docs/specs/otel/error-handling/#basic-error-handling-principles
 pub(all) enum OTelSdkError {
   AlreadyShutdown
   Timeout(Int)
@@ -10,40 +11,47 @@ pub(all) enum OTelSdkError {
 
 ///|
 /// Common result type for operations that succeed with `Unit`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/error-handling/#basic-error-handling-principles
 pub type OTelSdkResult = Result[Unit, OTelSdkError]
 
 ///|
 /// Convenience helper returning `Ok(())`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/error-handling/#basic-error-handling-principles
 pub fn ok() -> OTelSdkResult {
   Ok(())
 }
 
 ///|
 /// Convenience helper returning `AlreadyShutdown`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/error-handling/#basic-error-handling-principles
 pub fn already_shutdown() -> OTelSdkResult {
   Err(AlreadyShutdown)
 }
 
 ///|
 /// Convenience helper returning `Timeout`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/error-handling/#basic-error-handling-principles
 pub fn timeout(timeout_millis : Int) -> OTelSdkResult {
   Err(Timeout(timeout_millis))
 }
 
 ///|
 /// Convenience helper returning `InvalidArgument`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/error-handling/#basic-error-handling-principles
 pub fn invalid_argument(message : String) -> OTelSdkResult {
   Err(InvalidArgument(message))
 }
 
 ///|
 /// Convenience helper returning `InternalFailure`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/error-handling/#basic-error-handling-principles
 pub fn internal_failure(message : String) -> OTelSdkResult {
   Err(InternalFailure(message))
 }
 
 ///|
 /// Convenience helper returning `ExportFailure`.
+/// Spec: https://opentelemetry.io/docs/specs/otel/error-handling/#basic-error-handling-principles
 pub fn export_failure(
   exporter_name : String,
   message : String,
