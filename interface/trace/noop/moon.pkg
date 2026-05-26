@@ -1,5 +1,5 @@
 import {
-  "moonbit-community/opentelemetry/interface/trace" @trace,
+  "moonbit-community/opentelemetry/interface/trace",
 }
 
 options(

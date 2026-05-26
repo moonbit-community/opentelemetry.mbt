@@ -1,5 +1,5 @@
 import {
-  "moonbit-community/opentelemetry/interface/logs" @logs,
+  "moonbit-community/opentelemetry/interface/logs",
 }
 
 options(
