@@ -6,16 +6,9 @@ const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 
 const rootDir = path.resolve(__dirname, "..");
-const rootMoonModPath = path.join(rootDir, "moon.mod.json");
-const rustRepoDir = path.resolve(rootDir, "..", "opentelemetry-rust");
-const protoCrateDir = path.join(rustRepoDir, "opentelemetry-proto");
-const protoSubmoduleDir = path.join(
-  protoCrateDir,
-  "src",
-  "proto",
-  "opentelemetry-proto",
-);
-const grpcBuildRsPath = path.join(protoCrateDir, "tests", "grpc_build.rs");
+const rootMoonModPath = path.join(rootDir, "moon.mod");
+const protoManifestPath = path.join(__dirname, "otel_protocol_manifest.json");
+const protoSubmoduleDir = path.join(rootDir, "third_party", "opentelemetry-proto");
 const protocGenMbtExePath = path.join(rootDir, "protoc-gen-mbt.exe");
 const protocolDir = path.join(rootDir, "protocol");
 const generatedTopLevelDirs = [
@@ -26,21 +19,21 @@ const generatedTopLevelDirs = [
   "profiles",
   "resource",
   "trace",
-  "tracez",
   "opentelemetry",
 ];
 
-main();
+if (require.main === module) {
+  main();
+}
 
 function main() {
-  const rootMoonMod = readJson(rootMoonModPath);
-  const { username, projectName, moduleName } = parseModuleName(rootMoonMod);
+  const moduleName = readModuleName(rootMoonModPath);
+  const { username, projectName } = parseModuleName(moduleName);
 
-  ensureRootModuleDependency(rootMoonMod, "moonbitlang/protobuf", "0.1.0");
   ensureProtoSources();
 
   const pluginExePath = ensurePluginExecutable();
-  const { protoFiles, includeDirs } = parseGrpcBuildInputs();
+  const { protoFiles, includeDirs } = loadProtoManifest();
 
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "opentelemetry-protocol-"));
   try {
@@ -77,39 +70,22 @@ function main() {
   }
 }
 
-function parseModuleName(rootMoonMod) {
-  const moduleName = rootMoonMod.name;
-  if (typeof moduleName !== "string") {
-    throw new Error(`Expected "name" in ${rootMoonModPath}`);
+function readModuleName(filePath) {
+  const source = fs.readFileSync(filePath, "utf8");
+  const match = source.match(/^\s*name\s*=\s*"([^"]+)"\s*$/m);
+  if (!match) {
+    throw new Error(`Expected "name" in ${filePath}`);
   }
+  return match[1];
+}
 
+function parseModuleName(moduleName) {
   const [username, projectName, ...rest] = moduleName.split("/");
   if (!username || !projectName || rest.length > 0) {
     throw new Error(`Expected module name in username/project form, got ${moduleName}`);
   }
 
   return { username, projectName, moduleName };
-}
-
-function ensureRootModuleDependency(rootMoonMod, dependencyName, version) {
-  let changed = false;
-
-  if (!rootMoonMod.deps || typeof rootMoonMod.deps !== "object" || Array.isArray(rootMoonMod.deps)) {
-    rootMoonMod.deps = {};
-    changed = true;
-  }
-
-  if (rootMoonMod.deps[dependencyName] !== version) {
-    rootMoonMod.deps[dependencyName] = version;
-    changed = true;
-  }
-
-  if (changed) {
-    writeJson(rootMoonModPath, rootMoonMod);
-    console.log(
-      `Updated ${path.relative(rootDir, rootMoonModPath)} with ${dependencyName}@${version}`,
-    );
-  }
 }
 
 function ensureProtoSources() {
@@ -119,13 +95,11 @@ function ensureProtoSources() {
 
   console.log("Initializing the OpenTelemetry proto submodule...");
   runCommand("git", [
-    "-C",
-    rustRepoDir,
     "submodule",
     "update",
     "--init",
     "--recursive",
-    "opentelemetry-proto/src/proto/opentelemetry-proto",
+    "third_party/opentelemetry-proto",
   ]);
 
   if (!containsProtoFiles(protoSubmoduleDir)) {
@@ -146,27 +120,30 @@ function ensurePluginExecutable() {
   return protocGenMbtExePath;
 }
 
-function parseGrpcBuildInputs() {
-  const source = fs.readFileSync(grpcBuildRsPath, "utf8");
+function loadProtoManifest(filePath = protoManifestPath) {
+  const manifest = readJson(filePath);
   return {
-    protoFiles: parseRustStringArray(source, "TONIC_PROTO_FILES"),
-    includeDirs: parseRustStringArray(source, "TONIC_INCLUDES"),
+    includeDirs: readManifestStringArray(manifest, "includeDirs", filePath),
+    protoFiles: readManifestStringArray(manifest, "protoFiles", filePath),
   };
 }
 
-function parseRustStringArray(source, constName) {
-  const pattern = new RegExp(
-    `const\\s+${constName}:\\s*&\\[&str\\]\\s*=\\s*&\\[(.*?)\\];`,
-    "s",
-  );
-  const match = source.match(pattern);
-  if (!match) {
-    throw new Error(`Could not find ${constName} in ${grpcBuildRsPath}`);
+function readManifestStringArray(manifest, fieldName, filePath) {
+  const value = manifest[fieldName];
+  if (!Array.isArray(value) || value.length === 0) {
+    throw new Error(`Expected non-empty "${fieldName}" array in ${filePath}`);
   }
 
-  return [...match[1].matchAll(/"((?:[^"\\]|\\.)*)"/g)].map((item) =>
-    unescapeRustString(item[1]),
-  );
+  for (const item of value) {
+    if (typeof item !== "string" || item.length === 0) {
+      throw new Error(`Expected "${fieldName}" in ${filePath} to contain only non-empty strings`);
+    }
+    if (path.isAbsolute(item) || item.split(/[\\/]+/).includes("..")) {
+      throw new Error(`Expected "${fieldName}" entry to be relative and stay inside repository: ${item}`);
+    }
+  }
+
+  return [...value];
 }
 
 function runProtoc({
@@ -177,8 +154,8 @@ function runProtoc({
   protoFiles,
   includeDirs,
 }) {
-  const protoPaths = includeDirs.map((dirPath) => path.join(protoCrateDir, dirPath));
-  const absoluteProtoFiles = protoFiles.map((filePath) => path.join(protoCrateDir, filePath));
+  const protoPaths = includeDirs.map((dirPath) => path.join(rootDir, dirPath));
+  const absoluteProtoFiles = protoFiles.map((filePath) => path.join(rootDir, filePath));
 
   for (const filePath of [...protoPaths, ...absoluteProtoFiles]) {
     if (!fs.existsSync(filePath)) {
@@ -348,15 +325,8 @@ function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
 }
 
-function writeJson(filePath, value) {
-  fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`);
-}
-
-function unescapeRustString(value) {
-  return value
-    .replaceAll("\\\\", "\\")
-    .replaceAll('\\"', '"')
-    .replaceAll("\\n", "\n")
-    .replaceAll("\\r", "\r")
-    .replaceAll("\\t", "\t");
-}
+module.exports = {
+  loadProtoManifest,
+  parseModuleName,
+  readModuleName,
+};

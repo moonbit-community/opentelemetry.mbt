@@ -1,7 +1,6 @@
 # OpenTelemetry Semantic Conventions
 
-This package family exposes generated semantic-convention constants imported
-from upstream OpenTelemetry semantic-convention data.
+This package family exposes generated semantic-convention constants.
 
 ## Packages
 
@@ -27,8 +26,3 @@ fn _trace_attr_example() -> @sdk.KeyValue {
   @sdk.KeyValue::new(@trace.HTTP_REQUEST_METHOD, String("GET"))
 }
 ```
-
-## Generation model
-
-These files are generated. Comments such as "Experimental semantic convention"
-and upstream deprecation notices are preserved from the source data.

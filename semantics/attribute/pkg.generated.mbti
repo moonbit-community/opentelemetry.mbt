@@ -6,8 +6,6 @@ pub const ANDROID_APP_STATE : String = "android.app.state"
 
 pub const ANDROID_OS_API_LEVEL : String = "android.os.api_level"
 
-pub const ANDROID_STATE : String = "android.state"
-
 pub const APP_INSTALLATION_ID : String = "app.installation.id"
 
 pub const APP_SCREEN_COORDINATE_X : String = "app.screen.coordinate.x"
@@ -168,10 +166,6 @@ pub const AZURE_RESOURCE_PROVIDER_NAMESPACE : String = "azure.resource_provider.
 
 pub const AZURE_SERVICE_REQUEST_ID : String = "azure.service.request.id"
 
-pub const AZ_NAMESPACE : String = "az.namespace"
-
-pub const AZ_SERVICE_REQUEST_ID : String = "az.service_request_id"
-
 pub const BROWSER_BRANDS : String = "browser.brands"
 
 pub const BROWSER_LANGUAGE : String = "browser.language"
@@ -272,23 +266,13 @@ pub const CLOUD_REGION : String = "cloud.region"
 
 pub const CLOUD_RESOURCE_ID : String = "cloud.resource_id"
 
-pub const CODE_COLUMN : String = "code.column"
-
 pub const CODE_COLUMN_NUMBER : String = "code.column.number"
-
-pub const CODE_FILEPATH : String = "code.filepath"
 
 pub const CODE_FILE_PATH : String = "code.file.path"
 
-pub const CODE_FUNCTION : String = "code.function"
-
 pub const CODE_FUNCTION_NAME : String = "code.function.name"
 
-pub const CODE_LINENO : String = "code.lineno"
-
 pub const CODE_LINE_NUMBER : String = "code.line.number"
-
-pub const CODE_NAMESPACE : String = "code.namespace"
 
 pub const CODE_STACKTRACE : String = "code.stacktrace"
 
@@ -297,8 +281,6 @@ pub const CONTAINER_COMMAND : String = "container.command"
 pub const CONTAINER_COMMAND_ARGS : String = "container.command_args"
 
 pub const CONTAINER_COMMAND_LINE : String = "container.command_line"
-
-pub const CONTAINER_CPU_STATE : String = "container.cpu.state"
 
 pub const CONTAINER_CSI_PLUGIN_NAME : String = "container.csi.plugin.name"
 
@@ -316,8 +298,6 @@ pub const CONTAINER_IMAGE_TAGS : String = "container.image.tags"
 
 pub const CONTAINER_LABEL : String = "container.label"
 
-pub const CONTAINER_LABELS : String = "container.labels"
-
 pub const CONTAINER_NAME : String = "container.name"
 
 pub const CONTAINER_RUNTIME : String = "container.runtime"
@@ -328,71 +308,13 @@ pub const CPU_MODE : String = "cpu.mode"
 
 pub const CPYTHON_GC_GENERATION : String = "cpython.gc.generation"
 
-pub const DB_CASSANDRA_CONSISTENCY_LEVEL : String = "db.cassandra.consistency_level"
-
-pub const DB_CASSANDRA_COORDINATOR_DC : String = "db.cassandra.coordinator.dc"
-
-pub const DB_CASSANDRA_COORDINATOR_ID : String = "db.cassandra.coordinator.id"
-
-pub const DB_CASSANDRA_IDEMPOTENCE : String = "db.cassandra.idempotence"
-
-pub const DB_CASSANDRA_PAGE_SIZE : String = "db.cassandra.page_size"
-
-pub const DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT : String = "db.cassandra.speculative_execution_count"
-
-pub const DB_CASSANDRA_TABLE : String = "db.cassandra.table"
-
-pub const DB_CLIENT_CONNECTIONS_POOL_NAME : String = "db.client.connections.pool.name"
-
-pub const DB_CLIENT_CONNECTIONS_STATE : String = "db.client.connections.state"
-
 pub const DB_CLIENT_CONNECTION_POOL_NAME : String = "db.client.connection.pool.name"
 
 pub const DB_CLIENT_CONNECTION_STATE : String = "db.client.connection.state"
 
 pub const DB_COLLECTION_NAME : String = "db.collection.name"
 
-pub const DB_CONNECTION_STRING : String = "db.connection_string"
-
-pub const DB_COSMOSDB_CLIENT_ID : String = "db.cosmosdb.client_id"
-
-pub const DB_COSMOSDB_CONNECTION_MODE : String = "db.cosmosdb.connection_mode"
-
-pub const DB_COSMOSDB_CONSISTENCY_LEVEL : String = "db.cosmosdb.consistency_level"
-
-pub const DB_COSMOSDB_CONTAINER : String = "db.cosmosdb.container"
-
-pub const DB_COSMOSDB_OPERATION_TYPE : String = "db.cosmosdb.operation_type"
-
-pub const DB_COSMOSDB_REGIONS_CONTACTED : String = "db.cosmosdb.regions_contacted"
-
-pub const DB_COSMOSDB_REQUEST_CHARGE : String = "db.cosmosdb.request_charge"
-
-pub const DB_COSMOSDB_REQUEST_CONTENT_LENGTH : String = "db.cosmosdb.request_content_length"
-
-pub const DB_COSMOSDB_STATUS_CODE : String = "db.cosmosdb.status_code"
-
-pub const DB_COSMOSDB_SUB_STATUS_CODE : String = "db.cosmosdb.sub_status_code"
-
-pub const DB_ELASTICSEARCH_CLUSTER_NAME : String = "db.elasticsearch.cluster.name"
-
-pub const DB_ELASTICSEARCH_NODE_NAME : String = "db.elasticsearch.node.name"
-
-pub const DB_ELASTICSEARCH_PATH_PARTS : String = "db.elasticsearch.path_parts"
-
-pub const DB_INSTANCE_ID : String = "db.instance.id"
-
-pub const DB_JDBC_DRIVER_CLASSNAME : String = "db.jdbc.driver_classname"
-
-pub const DB_MONGODB_COLLECTION : String = "db.mongodb.collection"
-
-pub const DB_MSSQL_INSTANCE_NAME : String = "db.mssql.instance_name"
-
-pub const DB_NAME : String = "db.name"
-
 pub const DB_NAMESPACE : String = "db.namespace"
-
-pub const DB_OPERATION : String = "db.operation"
 
 pub const DB_OPERATION_BATCH_SIZE : String = "db.operation.batch.size"
 
@@ -406,25 +328,13 @@ pub const DB_QUERY_SUMMARY : String = "db.query.summary"
 
 pub const DB_QUERY_TEXT : String = "db.query.text"
 
-pub const DB_REDIS_DATABASE_INDEX : String = "db.redis.database_index"
-
 pub const DB_RESPONSE_RETURNED_ROWS : String = "db.response.returned_rows"
 
 pub const DB_RESPONSE_STATUS_CODE : String = "db.response.status_code"
 
-pub const DB_SQL_TABLE : String = "db.sql.table"
-
-pub const DB_STATEMENT : String = "db.statement"
-
 pub const DB_STORED_PROCEDURE_NAME : String = "db.stored_procedure.name"
 
-pub const DB_SYSTEM : String = "db.system"
-
 pub const DB_SYSTEM_NAME : String = "db.system.name"
-
-pub const DB_USER : String = "db.user"
-
-pub const DEPLOYMENT_ENVIRONMENT : String = "deployment.environment"
 
 pub const DEPLOYMENT_ENVIRONMENT_NAME : String = "deployment.environment.name"
 
@@ -460,17 +370,9 @@ pub const ENDUSER_ID : String = "enduser.id"
 
 pub const ENDUSER_PSEUDO_ID : String = "enduser.pseudo.id"
 
-pub const ENDUSER_ROLE : String = "enduser.role"
-
-pub const ENDUSER_SCOPE : String = "enduser.scope"
-
 pub const ERROR_MESSAGE : String = "error.message"
 
 pub const ERROR_TYPE : String = "error.type"
-
-pub const EVENT_NAME : String = "event.name"
-
-pub const EXCEPTION_ESCAPED : String = "exception.escaped"
 
 pub const EXCEPTION_MESSAGE : String = "exception.message"
 
@@ -512,10 +414,6 @@ pub const FAAS_VERSION : String = "faas.version"
 
 pub const FEATURE_FLAG_CONTEXT_ID : String = "feature_flag.context.id"
 
-pub const FEATURE_FLAG_EVALUATION_ERROR_MESSAGE : String = "feature_flag.evaluation.error.message"
-
-pub const FEATURE_FLAG_EVALUATION_REASON : String = "feature_flag.evaluation.reason"
-
 pub const FEATURE_FLAG_KEY : String = "feature_flag.key"
 
 pub const FEATURE_FLAG_PROVIDER_NAME : String = "feature_flag.provider.name"
@@ -527,8 +425,6 @@ pub const FEATURE_FLAG_RESULT_VALUE : String = "feature_flag.result.value"
 pub const FEATURE_FLAG_RESULT_VARIANT : String = "feature_flag.result.variant"
 
 pub const FEATURE_FLAG_SET_ID : String = "feature_flag.set.id"
-
-pub const FEATURE_FLAG_VARIANT : String = "feature_flag.variant"
 
 pub const FEATURE_FLAG_VERSION : String = "feature_flag.version"
 
@@ -602,15 +498,9 @@ pub const GEN_AI_AGENT_ID : String = "gen_ai.agent.id"
 
 pub const GEN_AI_AGENT_NAME : String = "gen_ai.agent.name"
 
-pub const GEN_AI_COMPLETION : String = "gen_ai.completion"
-
 pub const GEN_AI_CONVERSATION_ID : String = "gen_ai.conversation.id"
 
 pub const GEN_AI_DATA_SOURCE_ID : String = "gen_ai.data_source.id"
-
-pub const GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT : String = "gen_ai.openai.request.response_format"
-
-pub const GEN_AI_OPENAI_REQUEST_SEED : String = "gen_ai.openai.request.seed"
 
 pub const GEN_AI_OPENAI_REQUEST_SERVICE_TIER : String = "gen_ai.openai.request.service_tier"
 
@@ -621,8 +511,6 @@ pub const GEN_AI_OPENAI_RESPONSE_SYSTEM_FINGERPRINT : String = "gen_ai.openai.re
 pub const GEN_AI_OPERATION_NAME : String = "gen_ai.operation.name"
 
 pub const GEN_AI_OUTPUT_TYPE : String = "gen_ai.output.type"
-
-pub const GEN_AI_PROMPT : String = "gen_ai.prompt"
 
 pub const GEN_AI_REQUEST_CHOICE_COUNT : String = "gen_ai.request.choice.count"
 
@@ -664,13 +552,9 @@ pub const GEN_AI_TOOL_NAME : String = "gen_ai.tool.name"
 
 pub const GEN_AI_TOOL_TYPE : String = "gen_ai.tool.type"
 
-pub const GEN_AI_USAGE_COMPLETION_TOKENS : String = "gen_ai.usage.completion_tokens"
-
 pub const GEN_AI_USAGE_INPUT_TOKENS : String = "gen_ai.usage.input_tokens"
 
 pub const GEN_AI_USAGE_OUTPUT_TOKENS : String = "gen_ai.usage.output_tokens"
-
-pub const GEN_AI_USAGE_PROMPT_TOKENS : String = "gen_ai.usage.prompt_tokens"
 
 pub const GEO_CONTINENT_CODE : String = "geo.continent.code"
 
@@ -730,21 +614,9 @@ pub const HOST_NAME : String = "host.name"
 
 pub const HOST_TYPE : String = "host.type"
 
-pub const HTTP_CLIENT_IP : String = "http.client_ip"
-
 pub const HTTP_CONNECTION_STATE : String = "http.connection.state"
 
-pub const HTTP_FLAVOR : String = "http.flavor"
-
-pub const HTTP_HOST : String = "http.host"
-
-pub const HTTP_METHOD : String = "http.method"
-
 pub const HTTP_REQUEST_BODY_SIZE : String = "http.request.body.size"
-
-pub const HTTP_REQUEST_CONTENT_LENGTH : String = "http.request_content_length"
-
-pub const HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED : String = "http.request_content_length_uncompressed"
 
 pub const HTTP_REQUEST_HEADER : String = "http.request.header"
 
@@ -758,10 +630,6 @@ pub const HTTP_REQUEST_SIZE : String = "http.request.size"
 
 pub const HTTP_RESPONSE_BODY_SIZE : String = "http.response.body.size"
 
-pub const HTTP_RESPONSE_CONTENT_LENGTH : String = "http.response_content_length"
-
-pub const HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED : String = "http.response_content_length_uncompressed"
-
 pub const HTTP_RESPONSE_HEADER : String = "http.response.header"
 
 pub const HTTP_RESPONSE_SIZE : String = "http.response.size"
@@ -769,18 +637,6 @@ pub const HTTP_RESPONSE_SIZE : String = "http.response.size"
 pub const HTTP_RESPONSE_STATUS_CODE : String = "http.response.status_code"
 
 pub const HTTP_ROUTE : String = "http.route"
-
-pub const HTTP_SCHEME : String = "http.scheme"
-
-pub const HTTP_SERVER_NAME : String = "http.server_name"
-
-pub const HTTP_STATUS_CODE : String = "http.status_code"
-
-pub const HTTP_TARGET : String = "http.target"
-
-pub const HTTP_URL : String = "http.url"
-
-pub const HTTP_USER_AGENT : String = "http.user_agent"
 
 pub const HW_ID : String = "hw.id"
 
@@ -793,8 +649,6 @@ pub const HW_STATE : String = "hw.state"
 pub const HW_TYPE : String = "hw.type"
 
 pub const IOS_APP_STATE : String = "ios.app.state"
-
-pub const IOS_STATE : String = "ios.state"
 
 pub const JVM_BUFFER_POOL_NAME : String = "jvm.buffer.pool.name"
 
@@ -896,8 +750,6 @@ pub const K8S_POD_ANNOTATION : String = "k8s.pod.annotation"
 
 pub const K8S_POD_LABEL : String = "k8s.pod.label"
 
-pub const K8S_POD_LABELS : String = "k8s.pod.labels"
-
 pub const K8S_POD_NAME : String = "k8s.pod.name"
 
 pub const K8S_POD_UID : String = "k8s.pod.uid"
@@ -952,14 +804,6 @@ pub const LOG_RECORD_UID : String = "log.record.uid"
 
 pub const MAINFRAME_LPAR_NAME : String = "mainframe.lpar.name"
 
-pub const MESSAGE_COMPRESSED_SIZE : String = "message.compressed_size"
-
-pub const MESSAGE_ID : String = "message.id"
-
-pub const MESSAGE_TYPE : String = "message.type"
-
-pub const MESSAGE_UNCOMPRESSED_SIZE : String = "message.uncompressed_size"
-
 pub const MESSAGING_BATCH_MESSAGE_COUNT : String = "messaging.batch.message_count"
 
 pub const MESSAGING_CLIENT_ID : String = "messaging.client.id"
@@ -972,17 +816,11 @@ pub const MESSAGING_DESTINATION_NAME : String = "messaging.destination.name"
 
 pub const MESSAGING_DESTINATION_PARTITION_ID : String = "messaging.destination.partition.id"
 
-pub const MESSAGING_DESTINATION_PUBLISH_ANONYMOUS : String = "messaging.destination_publish.anonymous"
-
-pub const MESSAGING_DESTINATION_PUBLISH_NAME : String = "messaging.destination_publish.name"
-
 pub const MESSAGING_DESTINATION_SUBSCRIPTION_NAME : String = "messaging.destination.subscription.name"
 
 pub const MESSAGING_DESTINATION_TEMPLATE : String = "messaging.destination.template"
 
 pub const MESSAGING_DESTINATION_TEMPORARY : String = "messaging.destination.temporary"
-
-pub const MESSAGING_EVENTHUBS_CONSUMER_GROUP : String = "messaging.eventhubs.consumer.group"
 
 pub const MESSAGING_EVENTHUBS_MESSAGE_ENQUEUED_TIME : String = "messaging.eventhubs.message.enqueued_time"
 
@@ -994,13 +832,7 @@ pub const MESSAGING_GCP_PUBSUB_MESSAGE_DELIVERY_ATTEMPT : String = "messaging.gc
 
 pub const MESSAGING_GCP_PUBSUB_MESSAGE_ORDERING_KEY : String = "messaging.gcp_pubsub.message.ordering_key"
 
-pub const MESSAGING_KAFKA_CONSUMER_GROUP : String = "messaging.kafka.consumer.group"
-
-pub const MESSAGING_KAFKA_DESTINATION_PARTITION : String = "messaging.kafka.destination.partition"
-
 pub const MESSAGING_KAFKA_MESSAGE_KEY : String = "messaging.kafka.message.key"
-
-pub const MESSAGING_KAFKA_MESSAGE_OFFSET : String = "messaging.kafka.message.offset"
 
 pub const MESSAGING_KAFKA_MESSAGE_TOMBSTONE : String = "messaging.kafka.message.tombstone"
 
@@ -1014,8 +846,6 @@ pub const MESSAGING_MESSAGE_ENVELOPE_SIZE : String = "messaging.message.envelope
 
 pub const MESSAGING_MESSAGE_ID : String = "messaging.message.id"
 
-pub const MESSAGING_OPERATION : String = "messaging.operation"
-
 pub const MESSAGING_OPERATION_NAME : String = "messaging.operation.name"
 
 pub const MESSAGING_OPERATION_TYPE : String = "messaging.operation.type"
@@ -1023,8 +853,6 @@ pub const MESSAGING_OPERATION_TYPE : String = "messaging.operation.type"
 pub const MESSAGING_RABBITMQ_DESTINATION_ROUTING_KEY : String = "messaging.rabbitmq.destination.routing_key"
 
 pub const MESSAGING_RABBITMQ_MESSAGE_DELIVERY_TAG : String = "messaging.rabbitmq.message.delivery_tag"
-
-pub const MESSAGING_ROCKETMQ_CLIENT_GROUP : String = "messaging.rocketmq.client_group"
 
 pub const MESSAGING_ROCKETMQ_CONSUMPTION_MODEL : String = "messaging.rocketmq.consumption_model"
 
@@ -1041,8 +869,6 @@ pub const MESSAGING_ROCKETMQ_MESSAGE_TAG : String = "messaging.rocketmq.message.
 pub const MESSAGING_ROCKETMQ_MESSAGE_TYPE : String = "messaging.rocketmq.message.type"
 
 pub const MESSAGING_ROCKETMQ_NAMESPACE : String = "messaging.rocketmq.namespace"
-
-pub const MESSAGING_SERVICEBUS_DESTINATION_SUBSCRIPTION_NAME : String = "messaging.servicebus.destination.subscription_name"
 
 pub const MESSAGING_SERVICEBUS_DISPOSITION_STATUS : String = "messaging.servicebus.disposition_status"
 
@@ -1086,36 +912,6 @@ pub const NETWORK_TRANSPORT : String = "network.transport"
 
 pub const NETWORK_TYPE : String = "network.type"
 
-pub const NET_HOST_IP : String = "net.host.ip"
-
-pub const NET_HOST_NAME : String = "net.host.name"
-
-pub const NET_HOST_PORT : String = "net.host.port"
-
-pub const NET_PEER_IP : String = "net.peer.ip"
-
-pub const NET_PEER_NAME : String = "net.peer.name"
-
-pub const NET_PEER_PORT : String = "net.peer.port"
-
-pub const NET_PROTOCOL_NAME : String = "net.protocol.name"
-
-pub const NET_PROTOCOL_VERSION : String = "net.protocol.version"
-
-pub const NET_SOCK_FAMILY : String = "net.sock.family"
-
-pub const NET_SOCK_HOST_ADDR : String = "net.sock.host.addr"
-
-pub const NET_SOCK_HOST_PORT : String = "net.sock.host.port"
-
-pub const NET_SOCK_PEER_ADDR : String = "net.sock.peer.addr"
-
-pub const NET_SOCK_PEER_NAME : String = "net.sock.peer.name"
-
-pub const NET_SOCK_PEER_PORT : String = "net.sock.peer.port"
-
-pub const NET_TRANSPORT : String = "net.transport"
-
 pub const NODEJS_EVENTLOOP_STATE : String = "nodejs.eventloop.state"
 
 pub const OCI_MANIFEST_DIGEST : String = "oci.manifest.digest"
@@ -1136,10 +932,6 @@ pub const OTEL_COMPONENT_NAME : String = "otel.component.name"
 
 pub const OTEL_COMPONENT_TYPE : String = "otel.component.type"
 
-pub const OTEL_LIBRARY_NAME : String = "otel.library.name"
-
-pub const OTEL_LIBRARY_VERSION : String = "otel.library.version"
-
 pub const OTEL_SCOPE_NAME : String = "otel.scope.name"
 
 pub const OTEL_SCOPE_VERSION : String = "otel.scope.version"
@@ -1154,8 +946,6 @@ pub const OTEL_STATUS_DESCRIPTION : String = "otel.status_description"
 
 pub const PEER_SERVICE : String = "peer.service"
 
-pub const POOL_NAME : String = "pool.name"
-
 pub const PROCESS_ARGS_COUNT : String = "process.args_count"
 
 pub const PROCESS_COMMAND : String = "process.command"
@@ -1166,8 +956,6 @@ pub const PROCESS_COMMAND_LINE : String = "process.command_line"
 
 pub const PROCESS_CONTEXT_SWITCH_TYPE : String = "process.context_switch_type"
 
-pub const PROCESS_CPU_STATE : String = "process.cpu.state"
-
 pub const PROCESS_CREATION_TIME : String = "process.creation.time"
 
 pub const PROCESS_ENVIRONMENT_VARIABLE : String = "process.environment_variable"
@@ -1177,8 +965,6 @@ pub const PROCESS_EXECUTABLE_BUILD_ID_GNU : String = "process.executable.build_i
 pub const PROCESS_EXECUTABLE_BUILD_ID_GO : String = "process.executable.build_id.go"
 
 pub const PROCESS_EXECUTABLE_BUILD_ID_HTLHASH : String = "process.executable.build_id.htlhash"
-
-pub const PROCESS_EXECUTABLE_BUILD_ID_PROFILING : String = "process.executable.build_id.profiling"
 
 pub const PROCESS_EXECUTABLE_NAME : String = "process.executable.name"
 
@@ -1304,11 +1090,7 @@ pub const SOURCE_ADDRESS : String = "source.address"
 
 pub const SOURCE_PORT : String = "source.port"
 
-pub const STATE : String = "state"
-
 pub const SYSTEM_CPU_LOGICAL_NUMBER : String = "system.cpu.logical_number"
-
-pub const SYSTEM_CPU_STATE : String = "system.cpu.state"
 
 pub const SYSTEM_DEVICE : String = "system.device"
 
@@ -1322,15 +1104,11 @@ pub const SYSTEM_FILESYSTEM_TYPE : String = "system.filesystem.type"
 
 pub const SYSTEM_MEMORY_STATE : String = "system.memory.state"
 
-pub const SYSTEM_NETWORK_STATE : String = "system.network.state"
-
 pub const SYSTEM_PAGING_DIRECTION : String = "system.paging.direction"
 
 pub const SYSTEM_PAGING_STATE : String = "system.paging.state"
 
 pub const SYSTEM_PAGING_TYPE : String = "system.paging.type"
-
-pub const SYSTEM_PROCESSES_STATUS : String = "system.processes.status"
 
 pub const SYSTEM_PROCESS_STATUS : String = "system.process.status"
 
@@ -1375,8 +1153,6 @@ pub const TLS_CLIENT_JA3 : String = "tls.client.ja3"
 pub const TLS_CLIENT_NOT_AFTER : String = "tls.client.not_after"
 
 pub const TLS_CLIENT_NOT_BEFORE : String = "tls.client.not_before"
-
-pub const TLS_CLIENT_SERVER_NAME : String = "tls.client.server_name"
 
 pub const TLS_CLIENT_SUBJECT : String = "tls.client.subject"
 
@@ -1494,17 +1270,7 @@ pub const VCS_REF_HEAD_TYPE : String = "vcs.ref.head.type"
 
 pub const VCS_REF_TYPE : String = "vcs.ref.type"
 
-pub const VCS_REPOSITORY_CHANGE_ID : String = "vcs.repository.change.id"
-
-pub const VCS_REPOSITORY_CHANGE_TITLE : String = "vcs.repository.change.title"
-
 pub const VCS_REPOSITORY_NAME : String = "vcs.repository.name"
-
-pub const VCS_REPOSITORY_REF_NAME : String = "vcs.repository.ref.name"
-
-pub const VCS_REPOSITORY_REF_REVISION : String = "vcs.repository.ref.revision"
-
-pub const VCS_REPOSITORY_REF_TYPE : String = "vcs.repository.ref.type"
 
 pub const VCS_REPOSITORY_URL_FULL : String = "vcs.repository.url.full"
 

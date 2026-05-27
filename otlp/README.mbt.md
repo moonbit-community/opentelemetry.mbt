@@ -1,8 +1,6 @@
 # OpenTelemetry OTLP Exporters
 
-This package exports traces, logs, and metrics to OTLP over HTTP. It keeps the
-same general builder shape as upstream OpenTelemetry SDKs while matching the
-current MoonBit implementation.
+This package exports traces, logs, and metrics to OTLP over HTTP.
 
 Use `print` exporters when learning or writing local tests. Use OTLP exporters
 when telemetry should leave the process and go to the OpenTelemetry Collector or

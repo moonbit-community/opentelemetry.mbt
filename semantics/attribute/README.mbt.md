@@ -1,7 +1,6 @@
 # Semantic Convention Attributes
 
-This package contains the raw generated attribute-key constants from upstream
-OpenTelemetry semantic conventions.
+This package contains the raw generated attribute-key constants.
 
 Import this package when you want the widest constant set, regardless of signal.
 

@@ -5,8 +5,7 @@ discover that information.
 
 ## Default detectors
 
-`Resource::builder()` starts with three detectors, following the same broad
-shape as the Rust SDK:
+`Resource::builder()` starts with three detectors:
 
 - `sdk_provided_resource_detector()`
 - `telemetry_resource_detector()`

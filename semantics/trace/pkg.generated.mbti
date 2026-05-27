@@ -98,8 +98,6 @@ pub const AZURE_RESOURCE_PROVIDER_NAMESPACE : String = "azure.resource_provider.
 
 pub const AZURE_SERVICE_REQUEST_ID : String = "azure.service.request.id"
 
-pub const AZ_SERVICE_REQUEST_ID : String = "az.service_request_id"
-
 pub const CASSANDRA_CONSISTENCY_LEVEL : String = "cassandra.consistency.level"
 
 pub const CASSANDRA_COORDINATOR_DC : String = "cassandra.coordinator.dc"
@@ -165,8 +163,6 @@ pub const ELASTICSEARCH_NODE_NAME : String = "elasticsearch.node.name"
 pub const ERROR_MESSAGE : String = "error.message"
 
 pub const ERROR_TYPE : String = "error.type"
-
-pub const EXCEPTION_ESCAPED : String = "exception.escaped"
 
 pub const EXCEPTION_MESSAGE : String = "exception.message"
 

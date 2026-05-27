@@ -42,35 +42,11 @@ pub const CONTAINER_NETWORK_IO : String = "container.network.io"
 
 pub const CONTAINER_UPTIME : String = "container.uptime"
 
-pub const CPU_FREQUENCY : String = "cpu.frequency"
-
-pub const CPU_TIME : String = "cpu.time"
-
-pub const CPU_UTILIZATION : String = "cpu.utilization"
-
 pub const CPYTHON_GC_COLLECTED_OBJECTS : String = "cpython.gc.collected_objects"
 
 pub const CPYTHON_GC_COLLECTIONS : String = "cpython.gc.collections"
 
 pub const CPYTHON_GC_UNCOLLECTABLE_OBJECTS : String = "cpython.gc.uncollectable_objects"
-
-pub const DB_CLIENT_CONNECTIONS_CREATE_TIME : String = "db.client.connections.create_time"
-
-pub const DB_CLIENT_CONNECTIONS_IDLE_MAX : String = "db.client.connections.idle.max"
-
-pub const DB_CLIENT_CONNECTIONS_IDLE_MIN : String = "db.client.connections.idle.min"
-
-pub const DB_CLIENT_CONNECTIONS_MAX : String = "db.client.connections.max"
-
-pub const DB_CLIENT_CONNECTIONS_PENDING_REQUESTS : String = "db.client.connections.pending_requests"
-
-pub const DB_CLIENT_CONNECTIONS_TIMEOUTS : String = "db.client.connections.timeouts"
-
-pub const DB_CLIENT_CONNECTIONS_USAGE : String = "db.client.connections.usage"
-
-pub const DB_CLIENT_CONNECTIONS_USE_TIME : String = "db.client.connections.use_time"
-
-pub const DB_CLIENT_CONNECTIONS_WAIT_TIME : String = "db.client.connections.wait_time"
 
 pub const DB_CLIENT_CONNECTION_COUNT : String = "db.client.connection.count"
 
@@ -89,10 +65,6 @@ pub const DB_CLIENT_CONNECTION_TIMEOUTS : String = "db.client.connection.timeout
 pub const DB_CLIENT_CONNECTION_USE_TIME : String = "db.client.connection.use_time"
 
 pub const DB_CLIENT_CONNECTION_WAIT_TIME : String = "db.client.connection.wait_time"
-
-pub const DB_CLIENT_COSMOSDB_ACTIVE_INSTANCE_COUNT : String = "db.client.cosmosdb.active_instance.count"
-
-pub const DB_CLIENT_COSMOSDB_OPERATION_REQUEST_CHARGE : String = "db.client.cosmosdb.operation.request_charge"
 
 pub const DB_CLIENT_OPERATION_DURATION : String = "db.client.operation.duration"
 
@@ -223,8 +195,6 @@ pub const HW_STATUS : String = "hw.status"
 pub const JVM_BUFFER_COUNT : String = "jvm.buffer.count"
 
 pub const JVM_BUFFER_MEMORY_LIMIT : String = "jvm.buffer.memory.limit"
-
-pub const JVM_BUFFER_MEMORY_USAGE : String = "jvm.buffer.memory.usage"
 
 pub const JVM_BUFFER_MEMORY_USED : String = "jvm.buffer.memory.used"
 
@@ -366,10 +336,6 @@ pub const K8S_REPLICATIONCONTROLLER_AVAILABLE_PODS : String = "k8s.replicationco
 
 pub const K8S_REPLICATIONCONTROLLER_DESIRED_PODS : String = "k8s.replicationcontroller.desired_pods"
 
-pub const K8S_REPLICATION_CONTROLLER_AVAILABLE_PODS : String = "k8s.replication_controller.available_pods"
-
-pub const K8S_REPLICATION_CONTROLLER_DESIRED_PODS : String = "k8s.replication_controller.desired_pods"
-
 pub const K8S_RESOURCEQUOTA_CPU_LIMIT_HARD : String = "k8s.resourcequota.cpu.limit.hard"
 
 pub const K8S_RESOURCEQUOTA_CPU_LIMIT_USED : String = "k8s.resourcequota.cpu.limit.used"
@@ -438,21 +404,9 @@ pub const MESSAGING_CLIENT_CONSUMED_MESSAGES : String = "messaging.client.consum
 
 pub const MESSAGING_CLIENT_OPERATION_DURATION : String = "messaging.client.operation.duration"
 
-pub const MESSAGING_CLIENT_PUBLISHED_MESSAGES : String = "messaging.client.published.messages"
-
 pub const MESSAGING_CLIENT_SENT_MESSAGES : String = "messaging.client.sent.messages"
 
 pub const MESSAGING_PROCESS_DURATION : String = "messaging.process.duration"
-
-pub const MESSAGING_PROCESS_MESSAGES : String = "messaging.process.messages"
-
-pub const MESSAGING_PUBLISH_DURATION : String = "messaging.publish.duration"
-
-pub const MESSAGING_PUBLISH_MESSAGES : String = "messaging.publish.messages"
-
-pub const MESSAGING_RECEIVE_DURATION : String = "messaging.receive.duration"
-
-pub const MESSAGING_RECEIVE_MESSAGES : String = "messaging.receive.messages"
 
 pub const NODEJS_EVENTLOOP_DELAY_MAX : String = "nodejs.eventloop.delay.max"
 
@@ -484,11 +438,7 @@ pub const OTEL_SDK_EXPORTER_OPERATION_DURATION : String = "otel.sdk.exporter.ope
 
 pub const OTEL_SDK_EXPORTER_SPAN_EXPORTED : String = "otel.sdk.exporter.span.exported"
 
-pub const OTEL_SDK_EXPORTER_SPAN_EXPORTED_COUNT : String = "otel.sdk.exporter.span.exported.count"
-
 pub const OTEL_SDK_EXPORTER_SPAN_INFLIGHT : String = "otel.sdk.exporter.span.inflight"
-
-pub const OTEL_SDK_EXPORTER_SPAN_INFLIGHT_COUNT : String = "otel.sdk.exporter.span.inflight.count"
 
 pub const OTEL_SDK_LOG_CREATED : String = "otel.sdk.log.created"
 
@@ -502,19 +452,11 @@ pub const OTEL_SDK_PROCESSOR_LOG_QUEUE_SIZE : String = "otel.sdk.processor.log.q
 
 pub const OTEL_SDK_PROCESSOR_SPAN_PROCESSED : String = "otel.sdk.processor.span.processed"
 
-pub const OTEL_SDK_PROCESSOR_SPAN_PROCESSED_COUNT : String = "otel.sdk.processor.span.processed.count"
-
 pub const OTEL_SDK_PROCESSOR_SPAN_QUEUE_CAPACITY : String = "otel.sdk.processor.span.queue.capacity"
 
 pub const OTEL_SDK_PROCESSOR_SPAN_QUEUE_SIZE : String = "otel.sdk.processor.span.queue.size"
 
-pub const OTEL_SDK_SPAN_ENDED : String = "otel.sdk.span.ended"
-
-pub const OTEL_SDK_SPAN_ENDED_COUNT : String = "otel.sdk.span.ended.count"
-
 pub const OTEL_SDK_SPAN_LIVE : String = "otel.sdk.span.live"
-
-pub const OTEL_SDK_SPAN_LIVE_COUNT : String = "otel.sdk.span.live.count"
 
 pub const OTEL_SDK_SPAN_STARTED : String = "otel.sdk.span.started"
 
@@ -603,8 +545,6 @@ pub const SYSTEM_MEMORY_SHARED : String = "system.memory.shared"
 pub const SYSTEM_MEMORY_USAGE : String = "system.memory.usage"
 
 pub const SYSTEM_MEMORY_UTILIZATION : String = "system.memory.utilization"
-
-pub const SYSTEM_NETWORK_CONNECTIONS : String = "system.network.connections"
 
 pub const SYSTEM_NETWORK_CONNECTION_COUNT : String = "system.network.connection.count"
 

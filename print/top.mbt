@@ -10,21 +10,21 @@ struct MetricExporterState {
 }
 
 ///|
-/// Stdout span exporter mirroring the debugging-oriented Rust stdout exporter.
+/// Stdout span exporter
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk_exporters/stdout/#span-exporter---standard-output
 pub struct SpanExporter {
   state : Ref[SignalExporterState]
 }
 
 ///|
-/// Stdout log exporter mirroring the debugging-oriented Rust stdout exporter.
+/// Stdout log exporter
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk_exporters/stdout/#logs-exporter---standard-output
 pub struct LogExporter {
   state : Ref[SignalExporterState]
 }
 
 ///|
-/// Stdout metric exporter mirroring the debugging-oriented Rust stdout
+/// Stdout metric exporter
 /// exporter.
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/stdout/#metrics-exporter---standard-output
 pub struct MetricExporter {
