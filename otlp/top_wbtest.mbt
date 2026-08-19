@@ -669,7 +669,7 @@ async test "async span exporter posts protobuf to collector" {
         (request, body, conn) => {
           received_path.val = request.path
           for key, value in request.headers {
-            if normalize_ascii_lower(key) == "content-type" {
+            if key == "content-type" {
               received_content_type.val = value
             }
           }
@@ -717,7 +717,7 @@ async test "async span exporter posts json to collector" {
         (request, body, conn) => {
           received_path.val = request.path
           for key, value in request.headers {
-            if normalize_ascii_lower(key) == "content-type" {
+            if key == "content-type" {
               received_content_type.val = value
             }
           }
