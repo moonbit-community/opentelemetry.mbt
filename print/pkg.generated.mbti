@@ -66,4 +66,3 @@ pub impl Default for SpanExporter
 // Type aliases
 
 // Traits
-

@@ -11,4 +11,3 @@ pub const SCHEMA_URL : String = "https://opentelemetry.io/schemas/1.36.0"
 // Type aliases
 
 // Traits
-

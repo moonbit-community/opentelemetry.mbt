@@ -15,4 +15,3 @@ pub fn now_unix_nano() -> Int64
 // Type aliases
 
 // Traits
-

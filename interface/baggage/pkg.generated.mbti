@@ -43,4 +43,3 @@ pub fn KeyValueMetadata::new(StringView, StringView, metadata? : BaggageMetadata
 // Type aliases
 
 // Traits
-

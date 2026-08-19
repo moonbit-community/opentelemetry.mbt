@@ -478,4 +478,3 @@ pub fn UpDownCounterBuilder::with_unit(Self, StringView) -> Self
 pub type View = (Instrument) -> Stream?
 
 // Traits
-

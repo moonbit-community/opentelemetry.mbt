@@ -52,4 +52,3 @@ pub fn ResourceDetector::new(() -> Resource) -> Self
 // Type aliases
 
 // Traits
-

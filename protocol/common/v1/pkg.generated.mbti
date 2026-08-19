@@ -115,4 +115,3 @@ pub impl @protobuf.Write for KeyValueList
 // Type aliases
 
 // Traits
-

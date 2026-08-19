@@ -327,4 +327,3 @@ pub impl @protobuf.Write for SummaryDataPoint_ValueAtQuantile
 // Type aliases
 
 // Traits
-

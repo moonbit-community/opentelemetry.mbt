@@ -33,4 +33,3 @@ pub(all) enum OTelSdkError {
 pub type OTelSdkResult = Result[Unit, OTelSdkError]
 
 // Traits
-

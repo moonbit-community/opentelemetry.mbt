@@ -371,4 +371,3 @@ pub const USER_AGENT_SYNTHETIC_TYPE : String = "user_agent.synthetic.type"
 // Type aliases
 
 // Traits
-
