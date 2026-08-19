@@ -17,8 +17,6 @@ keywords = [ ]
 
 description = "The MoonBit implementation of OpenTelemetry."
 
-preferred_target = "native"
-
 options(
   exclude: [ "integration" ],
 )
