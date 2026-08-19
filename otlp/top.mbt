@@ -1400,7 +1400,10 @@ async fn post_payload(
   payload : Bytes,
   content_type : String,
 ) -> Result[Bytes, String] {
-  let headers = config.headers.copy()
+  let headers : @http.Headers = Map([])
+  for key, value in config.headers {
+    headers[key] = value
+  }
   headers["content-type"] = content_type
   guard @async.with_timeout_opt(config.timeout_millis, () => {
       @http.post(config.endpoint, payload, headers~)
