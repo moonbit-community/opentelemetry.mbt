@@ -56,6 +56,9 @@ integration/otlp/scripts/test_with_binary.mjs traces
 integration/otlp/scripts/test_with_binary.mjs logs metrics fullstack
 ```
 
+Both runners execute every selected package with the `wasm` and `native`
+backends.
+
 The Docker runner starts one collector container with random host port mapping,
 exports `OTEL_EXPORTER_OTLP_ENDPOINT`, runs the selected packages
 sequentially, and then cleans the container up. If `OTEL_COLLECTOR_IMAGE` is

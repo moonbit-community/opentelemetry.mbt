@@ -14,7 +14,8 @@ import { once } from "node:events";
  *
  * The script generates a temporary collector config that points file exporters
  * at `integration/otlp/actual`, waits for the local collector to start, runs
- * the selected MoonBit packages sequentially, and then shuts everything down.
+ * the selected MoonBit packages for wasm and native sequentially, and then
+ * shuts everything down.
  */
 
 /**
@@ -30,6 +31,7 @@ const scriptDir = path.dirname(__filename);
 const moduleRoot = path.resolve(scriptDir, "..");
 
 const validPackages = new Set(["traces", "logs", "metrics", "fullstack"]);
+const targets = ["wasm", "native"];
 const packages = process.argv.slice(2);
 const selectedPackages =
   packages.length === 0 ? ["traces", "logs", "metrics", "fullstack"] : packages;
@@ -300,22 +302,24 @@ try {
     OTEL_EXPORTER_OTLP_ENDPOINT: `http://${collectorHost}:${collectorPort}`,
   };
 
-  for (const pkg of selectedPackages) {
-    if (collectorExited !== null) {
-      throw new Error(
-        `collector exited before running ${pkg}: code=${collectorExited.code} signal=${collectorExited.signal}`,
+  for (const target of targets) {
+    for (const pkg of selectedPackages) {
+      if (collectorExited !== null) {
+        throw new Error(
+          `collector exited before running ${target}/${pkg}: code=${collectorExited.code} signal=${collectorExited.signal}`,
+        );
+      }
+      resetOutputForPackage(pkg);
+      console.log(`==> moon test --target ${target} ${pkg}`);
+      runChecked(
+        moonBin,
+        ["test", "--target", target, "--no-parallelize", pkg],
+        { cwd: moduleRoot, env: testEnv },
       );
     }
-    resetOutputForPackage(pkg);
-    console.log(`==> moon test ${pkg}`);
-    runChecked(
-      moonBin,
-      ["test", "--no-parallelize", pkg],
-      { cwd: moduleRoot, env: testEnv },
-    );
   }
 
-  console.log("OTLP integration tests passed.");
+  console.log("OTLP integration tests passed for wasm and native.");
 } catch (error) {
   if (error.stdout) {
     process.stdout.write(error.stdout);
