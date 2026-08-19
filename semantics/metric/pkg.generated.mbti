@@ -607,4 +607,3 @@ pub const VCS_REPOSITORY_COUNT : String = "vcs.repository.count"
 // Type aliases
 
 // Traits
-

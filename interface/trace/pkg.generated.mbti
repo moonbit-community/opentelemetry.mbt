@@ -118,4 +118,3 @@ pub fn TracerProvider::tracer_with_scope(Self, @common.InstrumentationScope) -> 
 // Type aliases
 
 // Traits
-

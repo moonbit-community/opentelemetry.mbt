@@ -47,4 +47,3 @@ pub fn tracer_with_scope(@common.InstrumentationScope) -> @trace.Tracer
 // Type aliases
 
 // Traits
-

@@ -173,4 +173,3 @@ pub impl @protobuf.Write for TracesData
 // Type aliases
 
 // Traits
-

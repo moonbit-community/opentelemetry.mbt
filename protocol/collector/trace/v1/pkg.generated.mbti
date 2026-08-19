@@ -54,4 +54,3 @@ pub impl @protobuf.Write for ExportTraceServiceResponse
 // Type aliases
 
 // Traits
-

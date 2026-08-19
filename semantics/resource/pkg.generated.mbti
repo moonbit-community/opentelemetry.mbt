@@ -371,4 +371,3 @@ pub const ZOS_SYSPLEX_NAME : String = "zos.sysplex.name"
 // Type aliases
 
 // Traits
-

@@ -169,4 +169,3 @@ pub fn SimpleLogProcessor::new(LogExporter) -> Self
 // Type aliases
 
 // Traits
-

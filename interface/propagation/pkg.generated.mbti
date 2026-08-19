@@ -57,4 +57,3 @@ pub(open) trait Injector {
   fn set(Self, String, String) -> Unit
 }
 pub impl Injector for Map[String, String]
-

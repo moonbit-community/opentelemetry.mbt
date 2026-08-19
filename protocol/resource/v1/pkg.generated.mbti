@@ -29,4 +29,3 @@ pub impl @protobuf.Write for Resource
 // Type aliases
 
 // Traits
-

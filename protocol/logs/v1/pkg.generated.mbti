@@ -125,4 +125,3 @@ pub impl @protobuf.Sized for SeverityNumber
 // Type aliases
 
 // Traits
-

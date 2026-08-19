@@ -174,4 +174,3 @@ pub fn SpanExporterBuilder::with_timeout(Self, Int) -> Self
 // Type aliases
 
 // Traits
-
