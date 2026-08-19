@@ -51,7 +51,7 @@ jobs:
       
       - name: moon test
         run: |
-          moon test
+          node scripts/test_without_integration.mjs
 
       - name: opentelemetry integration test
         run: |

@@ -12,7 +12,8 @@ import { spawnSync } from "node:child_process";
  *
  * The script starts a container with the repository's collector config, rewires
  * the exported OTLP endpoint to the mapped host port, runs the selected MoonBit
- * test packages sequentially, and always tears the container down on exit.
+ * test packages for wasm and native sequentially, and always tears the
+ * container down on exit.
  */
 
 /**
@@ -28,6 +29,7 @@ const scriptDir = path.dirname(__filename);
 const moduleRoot = path.resolve(scriptDir, "..");
 
 const validPackages = new Set(["traces", "logs", "metrics", "fullstack"]);
+const targets = ["wasm", "native"];
 const packages = process.argv.slice(2);
 const selectedPackages = packages.length === 0 ? ["traces", "logs", "metrics", "fullstack"] : packages;
 
@@ -230,17 +232,19 @@ try {
     OTEL_EXPORTER_OTLP_ENDPOINT: `http://127.0.0.1:${httpPort}`,
   };
 
-  for (const pkg of selectedPackages) {
-    resetOutputForPackage(pkg);
-    console.log(`==> moon test ${pkg}`);
-    runChecked(
-      moonBin,
-      ["test", "--no-parallelize", pkg],
-      { cwd: moduleRoot, env: testEnv },
-    );
+  for (const target of targets) {
+    for (const pkg of selectedPackages) {
+      resetOutputForPackage(pkg);
+      console.log(`==> moon test --target ${target} ${pkg}`);
+      runChecked(
+        moonBin,
+        ["test", "--target", target, "--no-parallelize", pkg],
+        { cwd: moduleRoot, env: testEnv },
+      );
+    }
   }
 
-  console.log("OTLP integration tests passed.");
+  console.log("OTLP integration tests passed for wasm and native.");
 } catch (error) {
   if (error.stdout) {
     process.stdout.write(error.stdout);
