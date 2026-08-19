@@ -124,13 +124,13 @@ pub fn TraceState::to_header(self : TraceState) -> String? {
 /// Parses a `tracestate` header value, ignoring malformed members.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#tracestate
 pub fn TraceState::from_header(value : StringView) -> TraceState {
-  let entries : Map[String, String] = {}
+  let entries : Map[String, String] = Map([])
   for item in value.split(",") {
     let item = item.trim()
     if item.is_empty() {
       continue
     }
-    guard item.find("=") is Some(index)
+    guard item.find("=") is Some(index) else { continue }
     let key = item[:index].trim().to_owned()
     let val = item[index + 1:].trim().to_owned()
     if key != "" && val != "" {

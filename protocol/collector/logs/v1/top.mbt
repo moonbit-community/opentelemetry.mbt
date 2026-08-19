@@ -29,7 +29,7 @@ pub fn ExportLogsServiceRequest::new(
 pub impl @protobuf.Read for ExportLogsServiceRequest with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ExportLogsServiceRequest raise {
-  let msg = ExportLogsServiceRequest::default()
+  let msg : ExportLogsServiceRequest = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -61,7 +61,7 @@ pub impl @protobuf.Write for ExportLogsServiceRequest with fn write(
 
 ///|
 pub impl ToJson for ExportLogsServiceRequest with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.resource_logs != Default::default() {
     json["resourceLogs"] = self.resource_logs.to_json()
   }
@@ -78,7 +78,7 @@ pub impl @json.FromJson for ExportLogsServiceRequest with fn from_json(
       (path, "Expected an object for ExportLogsServiceRequest"),
     )
   }
-  let message = ExportLogsServiceRequest::default()
+  let message : ExportLogsServiceRequest = Default::default()
   for key, value in obj {
     match (key, value) {
       ("resourceLogs", Array(value)) =>
@@ -93,7 +93,7 @@ pub impl @json.FromJson for ExportLogsServiceRequest with fn from_json(
 pub impl @protobuf.AsyncRead for ExportLogsServiceRequest with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ExportLogsServiceRequest raise {
-  let msg = ExportLogsServiceRequest::default()
+  let msg : ExportLogsServiceRequest = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -141,7 +141,7 @@ pub impl @protobuf.Sized for ExportLogsServiceResponse with fn size_of(self) {
 
 ///|
 pub impl Default for ExportLogsServiceResponse with fn default() -> ExportLogsServiceResponse {
-  { partial_success: ExportLogsPartialSuccess::default() }
+  { partial_success: Default::default() }
 }
 
 ///|
@@ -155,7 +155,7 @@ pub fn ExportLogsServiceResponse::new(
 pub impl @protobuf.Read for ExportLogsServiceResponse with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ExportLogsServiceResponse raise {
-  let msg = ExportLogsServiceResponse::default()
+  let msg : ExportLogsServiceResponse = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -184,9 +184,9 @@ pub impl @protobuf.Write for ExportLogsServiceResponse with fn write(
 
 ///|
 pub impl ToJson for ExportLogsServiceResponse with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.partial_success != Default::default() {
-    json["partialSuccess"] = self.partial_success.to_json()
+    json["partialSuccess"] = ToJson::to_json(self.partial_success)
   }
   Json::object(json)
 }
@@ -201,7 +201,7 @@ pub impl @json.FromJson for ExportLogsServiceResponse with fn from_json(
       (path, "Expected an object for ExportLogsServiceResponse"),
     )
   }
-  let message = ExportLogsServiceResponse::default()
+  let message : ExportLogsServiceResponse = Default::default()
   for key, value in obj {
     match (key, value) {
       ("partialSuccess", value) =>
@@ -216,7 +216,7 @@ pub impl @json.FromJson for ExportLogsServiceResponse with fn from_json(
 pub impl @protobuf.AsyncRead for ExportLogsServiceResponse with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ExportLogsServiceResponse raise {
-  let msg = ExportLogsServiceResponse::default()
+  let msg : ExportLogsServiceResponse = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -264,7 +264,10 @@ pub impl @protobuf.Sized for ExportLogsPartialSuccess with fn size_of(self) {
 
 ///|
 pub impl Default for ExportLogsPartialSuccess with fn default() -> ExportLogsPartialSuccess {
-  { rejected_log_records: Int64::default(), error_message: String::default() }
+  {
+    rejected_log_records: Default::default(),
+    error_message: Default::default(),
+  }
 }
 
 ///|
@@ -279,7 +282,7 @@ pub fn ExportLogsPartialSuccess::new(
 pub impl @protobuf.Read for ExportLogsPartialSuccess with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ExportLogsPartialSuccess raise {
-  let msg = ExportLogsPartialSuccess::default()
+  let msg : ExportLogsPartialSuccess = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -308,7 +311,7 @@ pub impl @protobuf.Write for ExportLogsPartialSuccess with fn write(
 
 ///|
 pub impl ToJson for ExportLogsPartialSuccess with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.rejected_log_records != Default::default() {
     json["rejectedLogRecords"] = self.rejected_log_records.to_json()
   }
@@ -328,7 +331,7 @@ pub impl @json.FromJson for ExportLogsPartialSuccess with fn from_json(
       (path, "Expected an object for ExportLogsPartialSuccess"),
     )
   }
-  let message = ExportLogsPartialSuccess::default()
+  let message : ExportLogsPartialSuccess = Default::default()
   for key, value in obj {
     match (key, value) {
       ("rejectedLogRecords", value) =>
@@ -345,7 +348,7 @@ pub impl @json.FromJson for ExportLogsPartialSuccess with fn from_json(
 pub impl @protobuf.AsyncRead for ExportLogsPartialSuccess with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ExportLogsPartialSuccess raise {
-  let msg = ExportLogsPartialSuccess::default()
+  let msg : ExportLogsPartialSuccess = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {

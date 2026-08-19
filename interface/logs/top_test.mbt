@@ -9,7 +9,7 @@ async test "logger record preserves full severity and structured fields" {
     .into_logger_provider()
   let logger = provider.logger("root-logs")
   let record = logger.create_log_record()
-  let body_map : Map[String, AnyValue] = {}
+  let body_map : Map[String, AnyValue] = Map([])
   body_map["message"] = String("boom")
   body_map["retryable"] = Boolean(false)
   record.set_severity_number(Error3)

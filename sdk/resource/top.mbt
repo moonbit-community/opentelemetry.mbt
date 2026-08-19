@@ -27,7 +27,7 @@ fn resource_from_attributes(
   attributes : ArrayView[@common.KeyValue],
   schema_url? : String? = None,
 ) -> Resource {
-  let map : Map[String, @common.Value] = {}
+  let map : Map[String, @common.Value] = Map([])
   for attribute in attributes {
     map[attribute.key.as_string()] = attribute.value
   }
@@ -195,7 +195,7 @@ fn parse_resource_attributes(
     if item.is_empty() {
       continue
     }
-    guard item.find("=") is Some(index)
+    guard item.find("=") is Some(index) else { return [] }
     let key = item[:index].trim()
     let value = item[index + 1:].trim()
     if key != "" {

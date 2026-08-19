@@ -939,7 +939,7 @@ fn metric_identity(metric : MetricData) -> String {
   let builder = StringBuilder::new()
   builder.write_string(metric.name)
   builder.write_char('|')
-  builder.write_string(metric.kind.to_json().stringify())
+  builder.write_string(ToJson::to_json(metric.kind).stringify())
   builder.write_char('|')
   builder.write_string(metric.instrumentation_scope.to_json().stringify())
   builder.write_char('|')
@@ -1066,14 +1066,14 @@ fn apply_temporality(
   metrics : Array[MetricData],
 ) -> TemporalityResult {
   if temporality == Cumulative {
-    let last_metrics = {}
+    let last_metrics = Map([])
     for metric in metrics {
       last_metrics[metric_identity(metric)] = metric.aggregation
     }
     return { last_metrics, metrics }
   }
 
-  let last_metrics = {}
+  let last_metrics = Map([])
   let transformed = []
   for metric in metrics {
     let identity = metric_identity(metric)

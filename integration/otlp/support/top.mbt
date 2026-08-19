@@ -332,7 +332,7 @@ pub fn metrics_json_has_scope(json : Json, scope_name : StringView) -> Bool {
 pub fn zero_metric_timestamps(json : Json) -> Json {
   match json {
     Object(obj) => {
-      let normalized : Map[String, Json] = {}
+      let normalized : Map[String, Json] = Map([])
       for key, value in obj {
         if key == "startTimeUnixNano" || key == "timeUnixNano" {
           normalized[key] = Json::string("0")

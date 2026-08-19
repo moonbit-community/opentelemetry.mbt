@@ -184,9 +184,9 @@ pub fn KeyValue::from_common(attribute : @common.KeyValue) -> KeyValue {
 /// Returns a map value with deterministic key insertion order.
 /// Spec: https://opentelemetry.io/docs/specs/otel/common/#anyvalue
 pub fn AnyValue::map(values : Map[String, AnyValue]) -> AnyValue {
-  let sorted : Map[String, AnyValue] = {}
+  let sorted : Map[String, AnyValue] = Map([])
   for key in sorted_keys(values) {
-    guard values.get(key) is Some(value)
+    guard! values.get(key) is Some(value)
     sorted[key] = value
   }
   Map(sorted)

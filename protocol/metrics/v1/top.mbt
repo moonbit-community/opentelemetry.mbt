@@ -159,7 +159,7 @@ pub fn MetricsData::new(
 pub impl @protobuf.Read for MetricsData with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> MetricsData raise {
-  let msg = MetricsData::default()
+  let msg : MetricsData = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -191,7 +191,7 @@ pub impl @protobuf.Write for MetricsData with fn write(
 
 ///|
 pub impl ToJson for MetricsData with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.resource_metrics != Default::default() {
     json["resourceMetrics"] = self.resource_metrics.to_json()
   }
@@ -206,7 +206,7 @@ pub impl @json.FromJson for MetricsData with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for MetricsData"))
   }
-  let message = MetricsData::default()
+  let message : MetricsData = Default::default()
   for key, value in obj {
     match (key, value) {
       ("resourceMetrics", Array(value)) =>
@@ -221,7 +221,7 @@ pub impl @json.FromJson for MetricsData with fn from_json(
 pub impl @protobuf.AsyncRead for MetricsData with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> MetricsData raise {
-  let msg = MetricsData::default()
+  let msg : MetricsData = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -283,7 +283,7 @@ pub impl Default for ResourceMetrics with fn default() -> ResourceMetrics {
   {
     resource: @v11.Resource::default(),
     scope_metrics: [],
-    schema_url: String::default(),
+    schema_url: Default::default(),
   }
 }
 
@@ -300,7 +300,7 @@ pub fn ResourceMetrics::new(
 pub impl @protobuf.Read for ResourceMetrics with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ResourceMetrics raise {
-  let msg = ResourceMetrics::default()
+  let msg : ResourceMetrics = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -340,7 +340,7 @@ pub impl @protobuf.Write for ResourceMetrics with fn write(
 
 ///|
 pub impl ToJson for ResourceMetrics with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.resource != Default::default() {
     json["resource"] = self.resource.to_json()
   }
@@ -361,7 +361,7 @@ pub impl @json.FromJson for ResourceMetrics with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for ResourceMetrics"))
   }
-  let message = ResourceMetrics::default()
+  let message : ResourceMetrics = Default::default()
   for key, value in obj {
     match (key, value) {
       ("resource", value) => message.resource = @json.from_json(value, path~)
@@ -378,7 +378,7 @@ pub impl @json.FromJson for ResourceMetrics with fn from_json(
 pub impl @protobuf.AsyncRead for ResourceMetrics with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ResourceMetrics raise {
-  let msg = ResourceMetrics::default()
+  let msg : ResourceMetrics = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -449,7 +449,7 @@ pub impl Default for ScopeMetrics with fn default() -> ScopeMetrics {
   {
     scope: @v1_dep.InstrumentationScope::default(),
     metrics: [],
-    schema_url: String::default(),
+    schema_url: Default::default(),
   }
 }
 
@@ -466,7 +466,7 @@ pub fn ScopeMetrics::new(
 pub impl @protobuf.Read for ScopeMetrics with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ScopeMetrics raise {
-  let msg = ScopeMetrics::default()
+  let msg : ScopeMetrics = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -505,7 +505,7 @@ pub impl @protobuf.Write for ScopeMetrics with fn write(
 
 ///|
 pub impl ToJson for ScopeMetrics with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.scope != Default::default() {
     json["scope"] = self.scope.to_json()
   }
@@ -526,7 +526,7 @@ pub impl @json.FromJson for ScopeMetrics with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for ScopeMetrics"))
   }
-  let message = ScopeMetrics::default()
+  let message : ScopeMetrics = Default::default()
   for key, value in obj {
     match (key, value) {
       ("scope", value) => message.scope = @json.from_json(value, path~)
@@ -543,7 +543,7 @@ pub impl @json.FromJson for ScopeMetrics with fn from_json(
 pub impl @protobuf.AsyncRead for ScopeMetrics with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ScopeMetrics raise {
-  let msg = ScopeMetrics::default()
+  let msg : ScopeMetrics = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -641,11 +641,11 @@ pub impl @json.FromJson for Metric_Data with fn from_json(
 ///|
 pub impl ToJson for Metric_Data with fn to_json(self : Metric_Data) -> Json {
   match self {
-    Gauge(v) => v.to_json()
-    Sum(v) => v.to_json()
-    Histogram(v) => v.to_json()
-    ExponentialHistogram(v) => v.to_json()
-    Summary(v) => v.to_json()
+    Gauge(v) => ToJson::to_json(v)
+    Sum(v) => ToJson::to_json(v)
+    Histogram(v) => ToJson::to_json(v)
+    ExponentialHistogram(v) => ToJson::to_json(v)
+    Summary(v) => ToJson::to_json(v)
     NotSet => Json::null()
   }
 }
@@ -711,9 +711,9 @@ pub impl @protobuf.Sized for Metric with fn size_of(self) {
 ///|
 pub impl Default for Metric with fn default() -> Metric {
   {
-    name: String::default(),
-    description: String::default(),
-    unit: String::default(),
+    name: Default::default(),
+    description: Default::default(),
+    unit: Default::default(),
     metadata: [],
     data: NotSet,
   }
@@ -734,7 +734,7 @@ pub fn Metric::new(
 pub impl @protobuf.Read for Metric with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Metric raise {
-  let msg = Metric::default()
+  let msg : Metric = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -814,7 +814,7 @@ pub impl @protobuf.Write for Metric with fn write(
 
 ///|
 pub impl ToJson for Metric with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.name != Default::default() {
     json["name"] = self.name.to_json()
   }
@@ -829,11 +829,11 @@ pub impl ToJson for Metric with fn to_json(self) {
   }
   match self.data {
     NotSet => ()
-    Gauge(v) => json["gauge"] = v.to_json()
-    Sum(v) => json["sum"] = v.to_json()
-    Histogram(v) => json["histogram"] = v.to_json()
-    ExponentialHistogram(v) => json["exponentialHistogram"] = v.to_json()
-    Summary(v) => json["summary"] = v.to_json()
+    Gauge(v) => json["gauge"] = ToJson::to_json(v)
+    Sum(v) => json["sum"] = ToJson::to_json(v)
+    Histogram(v) => json["histogram"] = ToJson::to_json(v)
+    ExponentialHistogram(v) => json["exponentialHistogram"] = ToJson::to_json(v)
+    Summary(v) => json["summary"] = ToJson::to_json(v)
   }
   Json::object(json)
 }
@@ -846,7 +846,7 @@ pub impl @json.FromJson for Metric with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for Metric"))
   }
-  let message = Metric::default()
+  let message : Metric = Default::default()
   for key, value in obj {
     match (key, value) {
       ("name", value) => message.name = @json.from_json(value, path~)
@@ -871,7 +871,7 @@ pub impl @json.FromJson for Metric with fn from_json(
 pub impl @protobuf.AsyncRead for Metric with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Metric raise {
-  let msg = Metric::default()
+  let msg : Metric = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -981,7 +981,7 @@ pub fn Gauge::new(data_points : Array[NumberDataPoint]) -> Gauge {
 pub impl @protobuf.Read for Gauge with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Gauge raise {
-  let msg = Gauge::default()
+  let msg : Gauge = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -1013,7 +1013,7 @@ pub impl @protobuf.Write for Gauge with fn write(
 
 ///|
 pub impl ToJson for Gauge with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.data_points != Default::default() {
     json["dataPoints"] = self.data_points.to_json()
   }
@@ -1028,7 +1028,7 @@ pub impl @json.FromJson for Gauge with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for Gauge"))
   }
-  let message = Gauge::default()
+  let message : Gauge = Default::default()
   for key, value in obj {
     match (key, value) {
       ("dataPoints", Array(value)) =>
@@ -1043,7 +1043,7 @@ pub impl @json.FromJson for Gauge with fn from_json(
 pub impl @protobuf.AsyncRead for Gauge with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Gauge raise {
-  let msg = Gauge::default()
+  let msg : Gauge = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -1096,8 +1096,8 @@ pub impl @protobuf.Sized for Sum with fn size_of(self) {
 pub impl Default for Sum with fn default() -> Sum {
   {
     data_points: [],
-    aggregation_temporality: AggregationTemporality::default(),
-    is_monotonic: Bool::default(),
+    aggregation_temporality: Default::default(),
+    is_monotonic: Default::default(),
   }
 }
 
@@ -1114,7 +1114,7 @@ pub fn Sum::new(
 pub impl @protobuf.Read for Sum with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Sum raise {
-  let msg = Sum::default()
+  let msg : Sum = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -1155,12 +1155,14 @@ pub impl @protobuf.Write for Sum with fn write(
 
 ///|
 pub impl ToJson for Sum with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.data_points != Default::default() {
     json["dataPoints"] = self.data_points.to_json()
   }
   if self.aggregation_temporality != Default::default() {
-    json["aggregationTemporality"] = self.aggregation_temporality.to_json()
+    json["aggregationTemporality"] = ToJson::to_json(
+      self.aggregation_temporality,
+    )
   }
   if self.is_monotonic != Default::default() {
     json["isMonotonic"] = self.is_monotonic.to_json()
@@ -1176,7 +1178,7 @@ pub impl @json.FromJson for Sum with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for Sum"))
   }
-  let message = Sum::default()
+  let message : Sum = Default::default()
   for key, value in obj {
     match (key, value) {
       ("dataPoints", Array(value)) =>
@@ -1195,7 +1197,7 @@ pub impl @json.FromJson for Sum with fn from_json(
 pub impl @protobuf.AsyncRead for Sum with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Sum raise {
-  let msg = Sum::default()
+  let msg : Sum = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -1253,10 +1255,7 @@ pub impl @protobuf.Sized for Histogram with fn size_of(self) {
 
 ///|
 pub impl Default for Histogram with fn default() -> Histogram {
-  {
-    data_points: [],
-    aggregation_temporality: AggregationTemporality::default(),
-  }
+  { data_points: [], aggregation_temporality: Default::default() }
 }
 
 ///|
@@ -1271,7 +1270,7 @@ pub fn Histogram::new(
 pub impl @protobuf.Read for Histogram with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Histogram raise {
-  let msg = Histogram::default()
+  let msg : Histogram = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -1309,12 +1308,14 @@ pub impl @protobuf.Write for Histogram with fn write(
 
 ///|
 pub impl ToJson for Histogram with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.data_points != Default::default() {
     json["dataPoints"] = self.data_points.to_json()
   }
   if self.aggregation_temporality != Default::default() {
-    json["aggregationTemporality"] = self.aggregation_temporality.to_json()
+    json["aggregationTemporality"] = ToJson::to_json(
+      self.aggregation_temporality,
+    )
   }
   Json::object(json)
 }
@@ -1327,7 +1328,7 @@ pub impl @json.FromJson for Histogram with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for Histogram"))
   }
-  let message = Histogram::default()
+  let message : Histogram = Default::default()
   for key, value in obj {
     match (key, value) {
       ("dataPoints", Array(value)) =>
@@ -1344,7 +1345,7 @@ pub impl @json.FromJson for Histogram with fn from_json(
 pub impl @protobuf.AsyncRead for Histogram with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Histogram raise {
-  let msg = Histogram::default()
+  let msg : Histogram = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -1399,10 +1400,7 @@ pub impl @protobuf.Sized for ExponentialHistogram with fn size_of(self) {
 
 ///|
 pub impl Default for ExponentialHistogram with fn default() -> ExponentialHistogram {
-  {
-    data_points: [],
-    aggregation_temporality: AggregationTemporality::default(),
-  }
+  { data_points: [], aggregation_temporality: Default::default() }
 }
 
 ///|
@@ -1417,7 +1415,7 @@ pub fn ExponentialHistogram::new(
 pub impl @protobuf.Read for ExponentialHistogram with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ExponentialHistogram raise {
-  let msg = ExponentialHistogram::default()
+  let msg : ExponentialHistogram = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -1455,12 +1453,14 @@ pub impl @protobuf.Write for ExponentialHistogram with fn write(
 
 ///|
 pub impl ToJson for ExponentialHistogram with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.data_points != Default::default() {
     json["dataPoints"] = self.data_points.to_json()
   }
   if self.aggregation_temporality != Default::default() {
-    json["aggregationTemporality"] = self.aggregation_temporality.to_json()
+    json["aggregationTemporality"] = ToJson::to_json(
+      self.aggregation_temporality,
+    )
   }
   Json::object(json)
 }
@@ -1473,7 +1473,7 @@ pub impl @json.FromJson for ExponentialHistogram with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for ExponentialHistogram"))
   }
-  let message = ExponentialHistogram::default()
+  let message : ExponentialHistogram = Default::default()
   for key, value in obj {
     match (key, value) {
       ("dataPoints", Array(value)) =>
@@ -1490,7 +1490,7 @@ pub impl @json.FromJson for ExponentialHistogram with fn from_json(
 pub impl @protobuf.AsyncRead for ExponentialHistogram with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ExponentialHistogram raise {
-  let msg = ExponentialHistogram::default()
+  let msg : ExponentialHistogram = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -1557,7 +1557,7 @@ pub fn Summary::new(data_points : Array[SummaryDataPoint]) -> Summary {
 pub impl @protobuf.Read for Summary with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Summary raise {
-  let msg = Summary::default()
+  let msg : Summary = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -1589,7 +1589,7 @@ pub impl @protobuf.Write for Summary with fn write(
 
 ///|
 pub impl ToJson for Summary with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.data_points != Default::default() {
     json["dataPoints"] = self.data_points.to_json()
   }
@@ -1604,7 +1604,7 @@ pub impl @json.FromJson for Summary with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for Summary"))
   }
-  let message = Summary::default()
+  let message : Summary = Default::default()
   for key, value in obj {
     match (key, value) {
       ("dataPoints", Array(value)) =>
@@ -1619,7 +1619,7 @@ pub impl @json.FromJson for Summary with fn from_json(
 pub impl @protobuf.AsyncRead for Summary with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Summary raise {
-  let msg = Summary::default()
+  let msg : Summary = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -1726,10 +1726,10 @@ pub impl @protobuf.Sized for NumberDataPoint with fn size_of(self) {
 pub impl Default for NumberDataPoint with fn default() -> NumberDataPoint {
   {
     attributes: [],
-    start_time_unix_nano: UInt64::default(),
-    time_unix_nano: UInt64::default(),
+    start_time_unix_nano: Default::default(),
+    time_unix_nano: Default::default(),
     exemplars: [],
-    flags: UInt::default(),
+    flags: Default::default(),
     value: NotSet,
   }
 }
@@ -1750,7 +1750,7 @@ pub fn NumberDataPoint::new(
 pub impl @protobuf.Read for NumberDataPoint with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> NumberDataPoint raise {
-  let msg = NumberDataPoint::default()
+  let msg : NumberDataPoint = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -1811,7 +1811,7 @@ pub impl @protobuf.Write for NumberDataPoint with fn write(
 
 ///|
 pub impl ToJson for NumberDataPoint with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.attributes != Default::default() {
     json["attributes"] = self.attributes.to_json()
   }
@@ -1843,7 +1843,7 @@ pub impl @json.FromJson for NumberDataPoint with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for NumberDataPoint"))
   }
-  let message = NumberDataPoint::default()
+  let message : NumberDataPoint = Default::default()
   for key, value in obj {
     match (key, value) {
       ("attributes", Array(value)) =>
@@ -1867,7 +1867,7 @@ pub impl @json.FromJson for NumberDataPoint with fn from_json(
 pub impl @protobuf.AsyncRead for NumberDataPoint with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> NumberDataPoint raise {
-  let msg = NumberDataPoint::default()
+  let msg : NumberDataPoint = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -1986,14 +1986,14 @@ pub impl @protobuf.Sized for HistogramDataPoint with fn size_of(self) {
 pub impl Default for HistogramDataPoint with fn default() -> HistogramDataPoint {
   {
     attributes: [],
-    start_time_unix_nano: UInt64::default(),
-    time_unix_nano: UInt64::default(),
-    count: UInt64::default(),
+    start_time_unix_nano: Default::default(),
+    time_unix_nano: Default::default(),
+    count: Default::default(),
     sum: None,
     bucket_counts: [],
     explicit_bounds: [],
     exemplars: [],
-    flags: UInt::default(),
+    flags: Default::default(),
     min: None,
     max: None,
   }
@@ -2032,7 +2032,7 @@ pub fn HistogramDataPoint::new(
 pub impl @protobuf.Read for HistogramDataPoint with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> HistogramDataPoint raise {
-  let msg = HistogramDataPoint::default()
+  let msg : HistogramDataPoint = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -2118,7 +2118,7 @@ pub impl @protobuf.Write for HistogramDataPoint with fn write(
 
 ///|
 pub impl ToJson for HistogramDataPoint with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.attributes != Default::default() {
     json["attributes"] = self.attributes.to_json()
   }
@@ -2166,7 +2166,7 @@ pub impl @json.FromJson for HistogramDataPoint with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for HistogramDataPoint"))
   }
-  let message = HistogramDataPoint::default()
+  let message : HistogramDataPoint = Default::default()
   for key, value in obj {
     match (key, value) {
       ("attributes", Array(value)) =>
@@ -2196,7 +2196,7 @@ pub impl @json.FromJson for HistogramDataPoint with fn from_json(
 pub impl @protobuf.AsyncRead for HistogramDataPoint with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> HistogramDataPoint raise {
-  let msg = HistogramDataPoint::default()
+  let msg : HistogramDataPoint = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -2313,7 +2313,7 @@ pub impl @protobuf.Sized for ExponentialHistogramDataPoint_Buckets with fn size_
 
 ///|
 pub impl Default for ExponentialHistogramDataPoint_Buckets with fn default() -> ExponentialHistogramDataPoint_Buckets {
-  { offset: Int::default(), bucket_counts: [] }
+  { offset: Default::default(), bucket_counts: [] }
 }
 
 ///|
@@ -2328,7 +2328,7 @@ pub fn ExponentialHistogramDataPoint_Buckets::new(
 pub impl @protobuf.Read for ExponentialHistogramDataPoint_Buckets with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ExponentialHistogramDataPoint_Buckets raise {
-  let msg = ExponentialHistogramDataPoint_Buckets::default()
+  let msg : ExponentialHistogramDataPoint_Buckets = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -2367,7 +2367,7 @@ pub impl @protobuf.Write for ExponentialHistogramDataPoint_Buckets with fn write
 
 ///|
 pub impl ToJson for ExponentialHistogramDataPoint_Buckets with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.offset != Default::default() {
     json["offset"] = self.offset.to_json()
   }
@@ -2387,7 +2387,7 @@ pub impl @json.FromJson for ExponentialHistogramDataPoint_Buckets with fn from_j
       (path, "Expected an object for ExponentialHistogramDataPoint_Buckets"),
     )
   }
-  let message = ExponentialHistogramDataPoint_Buckets::default()
+  let message : ExponentialHistogramDataPoint_Buckets = Default::default()
   for key, value in obj {
     match (key, value) {
       ("offset", value) => message.offset = @json.from_json(value, path~)
@@ -2403,7 +2403,7 @@ pub impl @json.FromJson for ExponentialHistogramDataPoint_Buckets with fn from_j
 pub impl @protobuf.AsyncRead for ExponentialHistogramDataPoint_Buckets with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ExponentialHistogramDataPoint_Buckets raise {
-  let msg = ExponentialHistogramDataPoint_Buckets::default()
+  let msg : ExponentialHistogramDataPoint_Buckets = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -2503,19 +2503,19 @@ pub impl @protobuf.Sized for ExponentialHistogramDataPoint with fn size_of(self)
 pub impl Default for ExponentialHistogramDataPoint with fn default() -> ExponentialHistogramDataPoint {
   {
     attributes: [],
-    start_time_unix_nano: UInt64::default(),
-    time_unix_nano: UInt64::default(),
-    count: UInt64::default(),
+    start_time_unix_nano: Default::default(),
+    time_unix_nano: Default::default(),
+    count: Default::default(),
     sum: None,
-    scale: Int::default(),
-    zero_count: UInt64::default(),
-    positive: ExponentialHistogramDataPoint_Buckets::default(),
-    negative: ExponentialHistogramDataPoint_Buckets::default(),
-    flags: UInt::default(),
+    scale: Default::default(),
+    zero_count: Default::default(),
+    positive: Default::default(),
+    negative: Default::default(),
+    flags: Default::default(),
     exemplars: [],
     min: None,
     max: None,
-    zero_threshold: Double::default(),
+    zero_threshold: Default::default(),
   }
 }
 
@@ -2558,7 +2558,7 @@ pub fn ExponentialHistogramDataPoint::new(
 pub impl @protobuf.Read for ExponentialHistogramDataPoint with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ExponentialHistogramDataPoint raise {
-  let msg = ExponentialHistogramDataPoint::default()
+  let msg : ExponentialHistogramDataPoint = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -2647,7 +2647,7 @@ pub impl @protobuf.Write for ExponentialHistogramDataPoint with fn write(
 
 ///|
 pub impl ToJson for ExponentialHistogramDataPoint with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.attributes != Default::default() {
     json["attributes"] = self.attributes.to_json()
   }
@@ -2671,10 +2671,10 @@ pub impl ToJson for ExponentialHistogramDataPoint with fn to_json(self) {
     json["zeroCount"] = self.zero_count.to_json()
   }
   if self.positive != Default::default() {
-    json["positive"] = self.positive.to_json()
+    json["positive"] = ToJson::to_json(self.positive)
   }
   if self.negative != Default::default() {
-    json["negative"] = self.negative.to_json()
+    json["negative"] = ToJson::to_json(self.negative)
   }
   if self.flags != Default::default() {
     json["flags"] = self.flags.to_json()
@@ -2706,7 +2706,7 @@ pub impl @json.FromJson for ExponentialHistogramDataPoint with fn from_json(
       (path, "Expected an object for ExponentialHistogramDataPoint"),
     )
   }
-  let message = ExponentialHistogramDataPoint::default()
+  let message : ExponentialHistogramDataPoint = Default::default()
   for key, value in obj {
     match (key, value) {
       ("attributes", Array(value)) =>
@@ -2738,7 +2738,7 @@ pub impl @json.FromJson for ExponentialHistogramDataPoint with fn from_json(
 pub impl @protobuf.AsyncRead for ExponentialHistogramDataPoint with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ExponentialHistogramDataPoint raise {
-  let msg = ExponentialHistogramDataPoint::default()
+  let msg : ExponentialHistogramDataPoint = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -2846,7 +2846,7 @@ pub impl @protobuf.Sized for SummaryDataPoint_ValueAtQuantile with fn size_of(
 
 ///|
 pub impl Default for SummaryDataPoint_ValueAtQuantile with fn default() -> SummaryDataPoint_ValueAtQuantile {
-  { quantile: Double::default(), value: Double::default() }
+  { quantile: Default::default(), value: Default::default() }
 }
 
 ///|
@@ -2861,7 +2861,7 @@ pub fn SummaryDataPoint_ValueAtQuantile::new(
 pub impl @protobuf.Read for SummaryDataPoint_ValueAtQuantile with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> SummaryDataPoint_ValueAtQuantile raise {
-  let msg = SummaryDataPoint_ValueAtQuantile::default()
+  let msg : SummaryDataPoint_ValueAtQuantile = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -2890,7 +2890,7 @@ pub impl @protobuf.Write for SummaryDataPoint_ValueAtQuantile with fn write(
 
 ///|
 pub impl ToJson for SummaryDataPoint_ValueAtQuantile with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.quantile != Default::default() {
     json["quantile"] = self.quantile.to_json()
   }
@@ -2910,7 +2910,7 @@ pub impl @json.FromJson for SummaryDataPoint_ValueAtQuantile with fn from_json(
       (path, "Expected an object for SummaryDataPoint_ValueAtQuantile"),
     )
   }
-  let message = SummaryDataPoint_ValueAtQuantile::default()
+  let message : SummaryDataPoint_ValueAtQuantile = Default::default()
   for key, value in obj {
     match (key, value) {
       ("quantile", value) => message.quantile = @json.from_json(value, path~)
@@ -2925,7 +2925,7 @@ pub impl @json.FromJson for SummaryDataPoint_ValueAtQuantile with fn from_json(
 pub impl @protobuf.AsyncRead for SummaryDataPoint_ValueAtQuantile with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> SummaryDataPoint_ValueAtQuantile raise {
-  let msg = SummaryDataPoint_ValueAtQuantile::default()
+  let msg : SummaryDataPoint_ValueAtQuantile = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -2986,12 +2986,12 @@ pub impl @protobuf.Sized for SummaryDataPoint with fn size_of(self) {
 pub impl Default for SummaryDataPoint with fn default() -> SummaryDataPoint {
   {
     attributes: [],
-    start_time_unix_nano: UInt64::default(),
-    time_unix_nano: UInt64::default(),
-    count: UInt64::default(),
-    sum: Double::default(),
+    start_time_unix_nano: Default::default(),
+    time_unix_nano: Default::default(),
+    count: Default::default(),
+    sum: Default::default(),
     quantile_values: [],
-    flags: UInt::default(),
+    flags: Default::default(),
   }
 }
 
@@ -3020,7 +3020,7 @@ pub fn SummaryDataPoint::new(
 pub impl @protobuf.Read for SummaryDataPoint with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> SummaryDataPoint raise {
-  let msg = SummaryDataPoint::default()
+  let msg : SummaryDataPoint = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -3078,7 +3078,7 @@ pub impl @protobuf.Write for SummaryDataPoint with fn write(
 
 ///|
 pub impl ToJson for SummaryDataPoint with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.attributes != Default::default() {
     json["attributes"] = self.attributes.to_json()
   }
@@ -3111,7 +3111,7 @@ pub impl @json.FromJson for SummaryDataPoint with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for SummaryDataPoint"))
   }
-  let message = SummaryDataPoint::default()
+  let message : SummaryDataPoint = Default::default()
   for key, value in obj {
     match (key, value) {
       ("attributes", Array(value)) =>
@@ -3135,7 +3135,7 @@ pub impl @json.FromJson for SummaryDataPoint with fn from_json(
 pub impl @protobuf.AsyncRead for SummaryDataPoint with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> SummaryDataPoint raise {
-  let msg = SummaryDataPoint::default()
+  let msg : SummaryDataPoint = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -3270,9 +3270,9 @@ pub impl @protobuf.Sized for Exemplar with fn size_of(self) {
 pub impl Default for Exemplar with fn default() -> Exemplar {
   {
     filtered_attributes: [],
-    time_unix_nano: UInt64::default(),
-    span_id: Bytes::default(),
-    trace_id: Bytes::default(),
+    time_unix_nano: Default::default(),
+    span_id: Default::default(),
+    trace_id: Default::default(),
     value: NotSet,
   }
 }
@@ -3292,7 +3292,7 @@ pub fn Exemplar::new(
 pub impl @protobuf.Read for Exemplar with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Exemplar raise {
-  let msg = Exemplar::default()
+  let msg : Exemplar = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -3346,7 +3346,7 @@ pub impl @protobuf.Write for Exemplar with fn write(
 
 ///|
 pub impl ToJson for Exemplar with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.filtered_attributes != Default::default() {
     json["filteredAttributes"] = self.filtered_attributes.to_json()
   }
@@ -3375,7 +3375,7 @@ pub impl @json.FromJson for Exemplar with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for Exemplar"))
   }
-  let message = Exemplar::default()
+  let message : Exemplar = Default::default()
   for key, value in obj {
     match (key, value) {
       ("filteredAttributes", Array(value)) =>
@@ -3398,7 +3398,7 @@ pub impl @json.FromJson for Exemplar with fn from_json(
 pub impl @protobuf.AsyncRead for Exemplar with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Exemplar raise {
-  let msg = Exemplar::default()
+  let msg : Exemplar = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
