@@ -22,7 +22,11 @@ pub impl @protobuf.Sized for Resource with fn size_of(self) {
 
 ///|
 pub impl Default for Resource with fn default() -> Resource {
-  { attributes: [], dropped_attributes_count: UInt::default(), entity_refs: [] }
+  {
+    attributes: [],
+    dropped_attributes_count: Default::default(),
+    entity_refs: [],
+  }
 }
 
 ///|
@@ -38,7 +42,7 @@ pub fn Resource::new(
 pub impl @protobuf.Read for Resource with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Resource raise {
-  let msg = Resource::default()
+  let msg : Resource = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -83,7 +87,7 @@ pub impl @protobuf.Write for Resource with fn write(
 
 ///|
 pub impl ToJson for Resource with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.attributes != Default::default() {
     json["attributes"] = self.attributes.to_json()
   }
@@ -104,7 +108,7 @@ pub impl @json.FromJson for Resource with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for Resource"))
   }
-  let message = Resource::default()
+  let message : Resource = Default::default()
   for key, value in obj {
     match (key, value) {
       ("attributes", Array(value)) =>
@@ -123,7 +127,7 @@ pub impl @json.FromJson for Resource with fn from_json(
 pub impl @protobuf.AsyncRead for Resource with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Resource raise {
-  let msg = Resource::default()
+  let msg : Resource = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {

@@ -97,7 +97,7 @@ pub fn TracesData::new(resource_spans : Array[ResourceSpans]) -> TracesData {
 pub impl @protobuf.Read for TracesData with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> TracesData raise {
-  let msg = TracesData::default()
+  let msg : TracesData = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -129,7 +129,7 @@ pub impl @protobuf.Write for TracesData with fn write(
 
 ///|
 pub impl ToJson for TracesData with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.resource_spans != Default::default() {
     json["resourceSpans"] = self.resource_spans.to_json()
   }
@@ -144,7 +144,7 @@ pub impl @json.FromJson for TracesData with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for TracesData"))
   }
-  let message = TracesData::default()
+  let message : TracesData = Default::default()
   for key, value in obj {
     match (key, value) {
       ("resourceSpans", Array(value)) =>
@@ -159,7 +159,7 @@ pub impl @json.FromJson for TracesData with fn from_json(
 pub impl @protobuf.AsyncRead for TracesData with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> TracesData raise {
-  let msg = TracesData::default()
+  let msg : TracesData = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -221,7 +221,7 @@ pub impl Default for ResourceSpans with fn default() -> ResourceSpans {
   {
     resource: @v11.Resource::default(),
     scope_spans: [],
-    schema_url: String::default(),
+    schema_url: Default::default(),
   }
 }
 
@@ -238,7 +238,7 @@ pub fn ResourceSpans::new(
 pub impl @protobuf.Read for ResourceSpans with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ResourceSpans raise {
-  let msg = ResourceSpans::default()
+  let msg : ResourceSpans = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -278,7 +278,7 @@ pub impl @protobuf.Write for ResourceSpans with fn write(
 
 ///|
 pub impl ToJson for ResourceSpans with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.resource != Default::default() {
     json["resource"] = self.resource.to_json()
   }
@@ -299,7 +299,7 @@ pub impl @json.FromJson for ResourceSpans with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for ResourceSpans"))
   }
-  let message = ResourceSpans::default()
+  let message : ResourceSpans = Default::default()
   for key, value in obj {
     match (key, value) {
       ("resource", value) => message.resource = @json.from_json(value, path~)
@@ -316,7 +316,7 @@ pub impl @json.FromJson for ResourceSpans with fn from_json(
 pub impl @protobuf.AsyncRead for ResourceSpans with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ResourceSpans raise {
-  let msg = ResourceSpans::default()
+  let msg : ResourceSpans = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -387,7 +387,7 @@ pub impl Default for ScopeSpans with fn default() -> ScopeSpans {
   {
     scope: @v1_dep.InstrumentationScope::default(),
     spans: [],
-    schema_url: String::default(),
+    schema_url: Default::default(),
   }
 }
 
@@ -404,7 +404,7 @@ pub fn ScopeSpans::new(
 pub impl @protobuf.Read for ScopeSpans with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ScopeSpans raise {
-  let msg = ScopeSpans::default()
+  let msg : ScopeSpans = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -442,7 +442,7 @@ pub impl @protobuf.Write for ScopeSpans with fn write(
 
 ///|
 pub impl ToJson for ScopeSpans with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.scope != Default::default() {
     json["scope"] = self.scope.to_json()
   }
@@ -463,7 +463,7 @@ pub impl @json.FromJson for ScopeSpans with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for ScopeSpans"))
   }
-  let message = ScopeSpans::default()
+  let message : ScopeSpans = Default::default()
   for key, value in obj {
     match (key, value) {
       ("scope", value) => message.scope = @json.from_json(value, path~)
@@ -480,7 +480,7 @@ pub impl @json.FromJson for ScopeSpans with fn from_json(
 pub impl @protobuf.AsyncRead for ScopeSpans with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ScopeSpans raise {
-  let msg = ScopeSpans::default()
+  let msg : ScopeSpans = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -625,10 +625,10 @@ pub impl @protobuf.Sized for Span_Event with fn size_of(self) {
 ///|
 pub impl Default for Span_Event with fn default() -> Span_Event {
   {
-    time_unix_nano: UInt64::default(),
-    name: String::default(),
+    time_unix_nano: Default::default(),
+    name: Default::default(),
     attributes: [],
-    dropped_attributes_count: UInt::default(),
+    dropped_attributes_count: Default::default(),
   }
 }
 
@@ -646,7 +646,7 @@ pub fn Span_Event::new(
 pub impl @protobuf.Read for Span_Event with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Span_Event raise {
-  let msg = Span_Event::default()
+  let msg : Span_Event = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -688,7 +688,7 @@ pub impl @protobuf.Write for Span_Event with fn write(
 
 ///|
 pub impl ToJson for Span_Event with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.time_unix_nano != Default::default() {
     json["timeUnixNano"] = self.time_unix_nano.to_json()
   }
@@ -712,7 +712,7 @@ pub impl @json.FromJson for Span_Event with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for Span_Event"))
   }
-  let message = Span_Event::default()
+  let message : Span_Event = Default::default()
   for key, value in obj {
     match (key, value) {
       ("timeUnixNano", value) =>
@@ -732,7 +732,7 @@ pub impl @json.FromJson for Span_Event with fn from_json(
 pub impl @protobuf.AsyncRead for Span_Event with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Span_Event raise {
-  let msg = Span_Event::default()
+  let msg : Span_Event = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -812,12 +812,12 @@ pub impl @protobuf.Sized for Span_Link with fn size_of(self) {
 ///|
 pub impl Default for Span_Link with fn default() -> Span_Link {
   {
-    trace_id: Bytes::default(),
-    span_id: Bytes::default(),
-    trace_state: String::default(),
+    trace_id: Default::default(),
+    span_id: Default::default(),
+    trace_state: Default::default(),
     attributes: [],
-    dropped_attributes_count: UInt::default(),
-    flags: UInt::default(),
+    dropped_attributes_count: Default::default(),
+    flags: Default::default(),
   }
 }
 
@@ -844,7 +844,7 @@ pub fn Span_Link::new(
 pub impl @protobuf.Read for Span_Link with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Span_Link raise {
-  let msg = Span_Link::default()
+  let msg : Span_Link = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -892,7 +892,7 @@ pub impl @protobuf.Write for Span_Link with fn write(
 
 ///|
 pub impl ToJson for Span_Link with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.trace_id != Default::default() {
     json["traceId"] = @protobuf.base64_encode(self.trace_id).to_json()
   }
@@ -922,7 +922,7 @@ pub impl @json.FromJson for Span_Link with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for Span_Link"))
   }
-  let message = Span_Link::default()
+  let message : Span_Link = Default::default()
   for key, value in obj {
     match (key, value) {
       ("traceId", String(value)) =>
@@ -946,7 +946,7 @@ pub impl @json.FromJson for Span_Link with fn from_json(
 pub impl @protobuf.AsyncRead for Span_Link with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Span_Link raise {
-  let msg = Span_Link::default()
+  let msg : Span_Link = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -1070,22 +1070,22 @@ pub impl @protobuf.Sized for Span with fn size_of(self) {
 ///|
 pub impl Default for Span with fn default() -> Span {
   {
-    trace_id: Bytes::default(),
-    span_id: Bytes::default(),
-    trace_state: String::default(),
-    parent_span_id: Bytes::default(),
-    flags: UInt::default(),
-    name: String::default(),
-    kind: Span_SpanKind::default(),
-    start_time_unix_nano: UInt64::default(),
-    end_time_unix_nano: UInt64::default(),
+    trace_id: Default::default(),
+    span_id: Default::default(),
+    trace_state: Default::default(),
+    parent_span_id: Default::default(),
+    flags: Default::default(),
+    name: Default::default(),
+    kind: Default::default(),
+    start_time_unix_nano: Default::default(),
+    end_time_unix_nano: Default::default(),
     attributes: [],
-    dropped_attributes_count: UInt::default(),
+    dropped_attributes_count: Default::default(),
     events: [],
-    dropped_events_count: UInt::default(),
+    dropped_events_count: Default::default(),
     links: [],
-    dropped_links_count: UInt::default(),
-    status: Status::default(),
+    dropped_links_count: Default::default(),
+    status: Default::default(),
   }
 }
 
@@ -1132,7 +1132,7 @@ pub fn Span::new(
 pub impl @protobuf.Read for Span with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Span raise {
-  let msg = Span::default()
+  let msg : Span = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -1220,7 +1220,7 @@ pub impl @protobuf.Write for Span with fn write(
 
 ///|
 pub impl ToJson for Span with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.trace_id != Default::default() {
     json["traceId"] = @protobuf.base64_encode(self.trace_id).to_json()
   }
@@ -1240,7 +1240,7 @@ pub impl ToJson for Span with fn to_json(self) {
     json["name"] = self.name.to_json()
   }
   if self.kind != Default::default() {
-    json["kind"] = self.kind.to_json()
+    json["kind"] = ToJson::to_json(self.kind)
   }
   if self.start_time_unix_nano != Default::default() {
     json["startTimeUnixNano"] = self.start_time_unix_nano.to_json()
@@ -1267,7 +1267,7 @@ pub impl ToJson for Span with fn to_json(self) {
     json["droppedLinksCount"] = self.dropped_links_count.to_json()
   }
   if self.status != Default::default() {
-    json["status"] = self.status.to_json()
+    json["status"] = ToJson::to_json(self.status)
   }
   Json::object(json)
 }
@@ -1280,7 +1280,7 @@ pub impl @json.FromJson for Span with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for Span"))
   }
-  let message = Span::default()
+  let message : Span = Default::default()
   for key, value in obj {
     match (key, value) {
       ("traceId", String(value)) =>
@@ -1321,7 +1321,7 @@ pub impl @json.FromJson for Span with fn from_json(
 pub impl @protobuf.AsyncRead for Span with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Span raise {
-  let msg = Span::default()
+  let msg : Span = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -1499,7 +1499,7 @@ pub impl @protobuf.Sized for Status with fn size_of(self) {
 
 ///|
 pub impl Default for Status with fn default() -> Status {
-  { message: String::default(), code: Status_StatusCode::default() }
+  { message: Default::default(), code: Default::default() }
 }
 
 ///|
@@ -1511,7 +1511,7 @@ pub fn Status::new(message : String, code : Status_StatusCode) -> Status {
 pub impl @protobuf.Read for Status with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> Status raise {
-  let msg = Status::default()
+  let msg : Status = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -1543,12 +1543,12 @@ pub impl @protobuf.Write for Status with fn write(
 
 ///|
 pub impl ToJson for Status with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.message != Default::default() {
     json["message"] = self.message.to_json()
   }
   if self.code != Default::default() {
-    json["code"] = self.code.to_json()
+    json["code"] = ToJson::to_json(self.code)
   }
   Json::object(json)
 }
@@ -1561,7 +1561,7 @@ pub impl @json.FromJson for Status with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for Status"))
   }
-  let message = Status::default()
+  let message : Status = Default::default()
   for key, value in obj {
     match (key, value) {
       ("message", value) => message.message = @json.from_json(value, path~)
@@ -1576,7 +1576,7 @@ pub impl @json.FromJson for Status with fn from_json(
 pub impl @protobuf.AsyncRead for Status with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> Status raise {
-  let msg = Status::default()
+  let msg : Status = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {

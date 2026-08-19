@@ -195,7 +195,7 @@ extract it from incoming headers.
 ```mbt check
 ///|
 fn _inject_headers(context : Context) -> Map[String, String] {
-  let headers = {}
+  let headers = Map([])
   get_text_map_propagator(propagator => {
     propagator.inject_context(context, headers)
   })

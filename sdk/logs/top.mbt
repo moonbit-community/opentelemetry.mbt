@@ -813,7 +813,7 @@ fn any_value_from_api(value : @api.AnyValue) -> AnyValue {
     Map(values) => {
       let converted = []
       for key in api_sorted_keys(values) {
-        guard values.get(key) is Some(value)
+        guard! values.get(key) is Some(value)
         converted.push(KeyValue::new(key, any_value_from_api(value)))
       }
       Map(converted)

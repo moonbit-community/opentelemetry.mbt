@@ -7,7 +7,7 @@ test "baggage propagator preserves metadata" {
     "42",
     metadata=@baggage.BaggageMetadata::new("source=test"),
   )
-  let carrier : Map[String, String] = {}
+  let carrier : Map[String, String] = Map([])
   BaggagePropagator::new().inject_context(context, carrier)
 
   guard carrier.get("baggage") is Some(header) else {
@@ -34,7 +34,7 @@ test "baggage propagator merges into existing context baggage" {
   let base = @context.Context::empty()
     .with_baggage_item("existing", "keep")
     .with_baggage_item("shared", "old")
-  let carrier : Map[String, String] = {}
+  let carrier : Map[String, String] = Map([])
   carrier["baggage"] = "shared=new,remote=added"
 
   let extracted = BaggagePropagator::new().extract_with_context(base, carrier)
@@ -61,7 +61,7 @@ test "trace context propagator round trips span context" {
     trace_flags=trace_flags.with_sampled(true),
   )
   let context = @context.Context::empty().with_span_context(span_context)
-  let carrier : Map[String, String] = {}
+  let carrier : Map[String, String] = Map([])
 
   TraceContextPropagator::new().inject_context(context, carrier)
   let extracted = TraceContextPropagator::new().extract_with_context(

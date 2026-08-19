@@ -292,7 +292,7 @@ fn decode_baggage(header : StringView) -> @baggage.Baggage {
       Some(index) => (item[:index], item[index + 1:])
       None => (item, "")
     }
-    guard baggage_item.0.find("=") is Some(index)
+    guard baggage_item.0.find("=") is Some(index) else { continue }
     let key = decode_baggage_component(baggage_item.0[:index].trim())
       .trim()
       .to_owned()
@@ -529,7 +529,7 @@ pub fn TextMapCompositePropagator::new(
         current
       },
       () => {
-        let fields : Map[String, Unit] = {}
+        let fields : Map[String, Unit] = Map([])
         for propagator in propagators {
           for field in propagator.fields() {
             fields[field] = ()

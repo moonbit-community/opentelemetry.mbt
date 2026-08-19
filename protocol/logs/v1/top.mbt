@@ -280,7 +280,7 @@ pub fn LogsData::new(resource_logs : Array[ResourceLogs]) -> LogsData {
 pub impl @protobuf.Read for LogsData with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> LogsData raise {
-  let msg = LogsData::default()
+  let msg : LogsData = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -312,7 +312,7 @@ pub impl @protobuf.Write for LogsData with fn write(
 
 ///|
 pub impl ToJson for LogsData with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.resource_logs != Default::default() {
     json["resourceLogs"] = self.resource_logs.to_json()
   }
@@ -327,7 +327,7 @@ pub impl @json.FromJson for LogsData with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for LogsData"))
   }
-  let message = LogsData::default()
+  let message : LogsData = Default::default()
   for key, value in obj {
     match (key, value) {
       ("resourceLogs", Array(value)) =>
@@ -342,7 +342,7 @@ pub impl @json.FromJson for LogsData with fn from_json(
 pub impl @protobuf.AsyncRead for LogsData with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> LogsData raise {
-  let msg = LogsData::default()
+  let msg : LogsData = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -404,7 +404,7 @@ pub impl Default for ResourceLogs with fn default() -> ResourceLogs {
   {
     resource: @v11.Resource::default(),
     scope_logs: [],
-    schema_url: String::default(),
+    schema_url: Default::default(),
   }
 }
 
@@ -421,7 +421,7 @@ pub fn ResourceLogs::new(
 pub impl @protobuf.Read for ResourceLogs with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ResourceLogs raise {
-  let msg = ResourceLogs::default()
+  let msg : ResourceLogs = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -459,7 +459,7 @@ pub impl @protobuf.Write for ResourceLogs with fn write(
 
 ///|
 pub impl ToJson for ResourceLogs with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.resource != Default::default() {
     json["resource"] = self.resource.to_json()
   }
@@ -480,7 +480,7 @@ pub impl @json.FromJson for ResourceLogs with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for ResourceLogs"))
   }
-  let message = ResourceLogs::default()
+  let message : ResourceLogs = Default::default()
   for key, value in obj {
     match (key, value) {
       ("resource", value) => message.resource = @json.from_json(value, path~)
@@ -497,7 +497,7 @@ pub impl @json.FromJson for ResourceLogs with fn from_json(
 pub impl @protobuf.AsyncRead for ResourceLogs with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ResourceLogs raise {
-  let msg = ResourceLogs::default()
+  let msg : ResourceLogs = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -568,7 +568,7 @@ pub impl Default for ScopeLogs with fn default() -> ScopeLogs {
   {
     scope: @v1_dep.InstrumentationScope::default(),
     log_records: [],
-    schema_url: String::default(),
+    schema_url: Default::default(),
   }
 }
 
@@ -585,7 +585,7 @@ pub fn ScopeLogs::new(
 pub impl @protobuf.Read for ScopeLogs with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ScopeLogs raise {
-  let msg = ScopeLogs::default()
+  let msg : ScopeLogs = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -624,7 +624,7 @@ pub impl @protobuf.Write for ScopeLogs with fn write(
 
 ///|
 pub impl ToJson for ScopeLogs with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.scope != Default::default() {
     json["scope"] = self.scope.to_json()
   }
@@ -645,7 +645,7 @@ pub impl @json.FromJson for ScopeLogs with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for ScopeLogs"))
   }
-  let message = ScopeLogs::default()
+  let message : ScopeLogs = Default::default()
   for key, value in obj {
     match (key, value) {
       ("scope", value) => message.scope = @json.from_json(value, path~)
@@ -662,7 +662,7 @@ pub impl @json.FromJson for ScopeLogs with fn from_json(
 pub impl @protobuf.AsyncRead for ScopeLogs with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ScopeLogs raise {
-  let msg = ScopeLogs::default()
+  let msg : ScopeLogs = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -760,17 +760,17 @@ pub impl @protobuf.Sized for LogRecord with fn size_of(self) {
 ///|
 pub impl Default for LogRecord with fn default() -> LogRecord {
   {
-    time_unix_nano: UInt64::default(),
-    observed_time_unix_nano: UInt64::default(),
-    severity_number: SeverityNumber::default(),
-    severity_text: String::default(),
+    time_unix_nano: Default::default(),
+    observed_time_unix_nano: Default::default(),
+    severity_number: Default::default(),
+    severity_text: Default::default(),
     body: @v1_dep.AnyValue::default(),
     attributes: [],
-    dropped_attributes_count: UInt::default(),
-    flags: UInt::default(),
-    trace_id: Bytes::default(),
-    span_id: Bytes::default(),
-    event_name: String::default(),
+    dropped_attributes_count: Default::default(),
+    flags: Default::default(),
+    trace_id: Default::default(),
+    span_id: Default::default(),
+    event_name: Default::default(),
   }
 }
 
@@ -807,7 +807,7 @@ pub fn LogRecord::new(
 pub impl @protobuf.Read for LogRecord with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> LogRecord raise {
-  let msg = LogRecord::default()
+  let msg : LogRecord = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -876,7 +876,7 @@ pub impl @protobuf.Write for LogRecord with fn write(
 
 ///|
 pub impl ToJson for LogRecord with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.time_unix_nano != Default::default() {
     json["timeUnixNano"] = self.time_unix_nano.to_json()
   }
@@ -884,7 +884,7 @@ pub impl ToJson for LogRecord with fn to_json(self) {
     json["observedTimeUnixNano"] = self.observed_time_unix_nano.to_json()
   }
   if self.severity_number != Default::default() {
-    json["severityNumber"] = self.severity_number.to_json()
+    json["severityNumber"] = ToJson::to_json(self.severity_number)
   }
   if self.severity_text != Default::default() {
     json["severityText"] = self.severity_text.to_json()
@@ -921,7 +921,7 @@ pub impl @json.FromJson for LogRecord with fn from_json(
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected an object for LogRecord"))
   }
-  let message = LogRecord::default()
+  let message : LogRecord = Default::default()
   for key, value in obj {
     match (key, value) {
       ("timeUnixNano", value) =>
@@ -953,7 +953,7 @@ pub impl @json.FromJson for LogRecord with fn from_json(
 pub impl @protobuf.AsyncRead for LogRecord with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> LogRecord raise {
-  let msg = LogRecord::default()
+  let msg : LogRecord = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {

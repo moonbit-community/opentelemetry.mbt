@@ -249,13 +249,13 @@ fn percent_decode(value : StringView) -> String {
 
 ///|
 fn parse_header_string(value : StringView) -> Map[String, String] {
-  let headers : Map[String, String] = {}
+  let headers : Map[String, String] = Map([])
   for item in value.split(",") {
     let item = item.trim()
     if item.is_empty() {
       continue
     }
-    guard item.find("=") is Some(index)
+    guard item.find("=") is Some(index) else { continue }
     let key = normalize_ascii_lower(item[:index].trim())
     let header_value = percent_decode(item[index + 1:].trim())
     if key != "" {
@@ -267,7 +267,7 @@ fn parse_header_string(value : StringView) -> Map[String, String] {
 
 ///|
 fn normalize_headers(headers : Map[String, String]) -> Map[String, String] {
-  let normalized : Map[String, String] = {}
+  let normalized : Map[String, String] = Map([])
   for key, value in headers {
     normalized[normalize_ascii_lower(key)] = value
   }
@@ -763,7 +763,7 @@ fn resource_attributes(
   let result = []
   let keys = sorted_strings(attributes.keys().to_array())
   for key in keys {
-    guard attributes.get(key) is Some(value)
+    guard! attributes.get(key) is Some(value)
     result.push(@otlpcommon.KeyValue::new(key, any_value_from_sdk(value), 0))
   }
   result
@@ -1101,7 +1101,7 @@ fn decode_span_id_json(value : String, allow_empty : Bool) -> Json {
 fn normalize_otlp_http_json_request(json : Json) -> Json {
   match json {
     Object(obj) => {
-      let normalized : Map[String, Json] = {}
+      let normalized : Map[String, Json] = Map([])
       for key, value in obj {
         normalized[key] = match value {
           String(value) =>
@@ -1126,7 +1126,7 @@ fn normalize_otlp_http_json_request(json : Json) -> Json {
 fn normalize_otlp_http_json_response(json : Json) -> Json {
   match json {
     Object(obj) => {
-      let normalized : Map[String, Json] = {}
+      let normalized : Map[String, Json] = Map([])
       for key, value in obj {
         normalized[key] = match value {
           String(value) =>
@@ -1254,7 +1254,7 @@ fn resource_identity(resource : @resource.Resource) -> String {
   let attributes = resource.attributes()
   let keys = sorted_strings(attributes.keys().to_array())
   for key in keys {
-    guard attributes.get(key) is Some(value)
+    guard! attributes.get(key) is Some(value)
     builder.write_char('|')
     builder.write_string(key)
     builder.write_char('=')

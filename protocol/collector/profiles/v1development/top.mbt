@@ -39,7 +39,7 @@ pub fn ExportProfilesServiceRequest::new(
 pub impl @protobuf.Read for ExportProfilesServiceRequest with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ExportProfilesServiceRequest raise {
-  let msg = ExportProfilesServiceRequest::default()
+  let msg : ExportProfilesServiceRequest = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -80,7 +80,7 @@ pub impl @protobuf.Write for ExportProfilesServiceRequest with fn write(
 
 ///|
 pub impl ToJson for ExportProfilesServiceRequest with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.resource_profiles != Default::default() {
     json["resourceProfiles"] = self.resource_profiles.to_json()
   }
@@ -100,7 +100,7 @@ pub impl @json.FromJson for ExportProfilesServiceRequest with fn from_json(
       (path, "Expected an object for ExportProfilesServiceRequest"),
     )
   }
-  let message = ExportProfilesServiceRequest::default()
+  let message : ExportProfilesServiceRequest = Default::default()
   for key, value in obj {
     match (key, value) {
       ("resourceProfiles", Array(value)) =>
@@ -117,7 +117,7 @@ pub impl @json.FromJson for ExportProfilesServiceRequest with fn from_json(
 pub impl @protobuf.AsyncRead for ExportProfilesServiceRequest with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ExportProfilesServiceRequest raise {
-  let msg = ExportProfilesServiceRequest::default()
+  let msg : ExportProfilesServiceRequest = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -174,7 +174,7 @@ pub impl @protobuf.Sized for ExportProfilesServiceResponse with fn size_of(self)
 
 ///|
 pub impl Default for ExportProfilesServiceResponse with fn default() -> ExportProfilesServiceResponse {
-  { partial_success: ExportProfilesPartialSuccess::default() }
+  { partial_success: Default::default() }
 }
 
 ///|
@@ -188,7 +188,7 @@ pub fn ExportProfilesServiceResponse::new(
 pub impl @protobuf.Read for ExportProfilesServiceResponse with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ExportProfilesServiceResponse raise {
-  let msg = ExportProfilesServiceResponse::default()
+  let msg : ExportProfilesServiceResponse = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -217,9 +217,9 @@ pub impl @protobuf.Write for ExportProfilesServiceResponse with fn write(
 
 ///|
 pub impl ToJson for ExportProfilesServiceResponse with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.partial_success != Default::default() {
-    json["partialSuccess"] = self.partial_success.to_json()
+    json["partialSuccess"] = ToJson::to_json(self.partial_success)
   }
   Json::object(json)
 }
@@ -234,7 +234,7 @@ pub impl @json.FromJson for ExportProfilesServiceResponse with fn from_json(
       (path, "Expected an object for ExportProfilesServiceResponse"),
     )
   }
-  let message = ExportProfilesServiceResponse::default()
+  let message : ExportProfilesServiceResponse = Default::default()
   for key, value in obj {
     match (key, value) {
       ("partialSuccess", value) =>
@@ -249,7 +249,7 @@ pub impl @json.FromJson for ExportProfilesServiceResponse with fn from_json(
 pub impl @protobuf.AsyncRead for ExportProfilesServiceResponse with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ExportProfilesServiceResponse raise {
-  let msg = ExportProfilesServiceResponse::default()
+  let msg : ExportProfilesServiceResponse = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
@@ -298,7 +298,7 @@ pub impl @protobuf.Sized for ExportProfilesPartialSuccess with fn size_of(self) 
 
 ///|
 pub impl Default for ExportProfilesPartialSuccess with fn default() -> ExportProfilesPartialSuccess {
-  { rejected_profiles: Int64::default(), error_message: String::default() }
+  { rejected_profiles: Default::default(), error_message: Default::default() }
 }
 
 ///|
@@ -313,7 +313,7 @@ pub fn ExportProfilesPartialSuccess::new(
 pub impl @protobuf.Read for ExportProfilesPartialSuccess with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.Reader],
 ) -> ExportProfilesPartialSuccess raise {
-  let msg = ExportProfilesPartialSuccess::default()
+  let msg : ExportProfilesPartialSuccess = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.read_tag()) {
@@ -342,7 +342,7 @@ pub impl @protobuf.Write for ExportProfilesPartialSuccess with fn write(
 
 ///|
 pub impl ToJson for ExportProfilesPartialSuccess with fn to_json(self) {
-  let json : Map[String, Json] = {}
+  let json : Map[String, Json] = Map([])
   if self.rejected_profiles != Default::default() {
     json["rejectedProfiles"] = self.rejected_profiles.to_json()
   }
@@ -362,7 +362,7 @@ pub impl @json.FromJson for ExportProfilesPartialSuccess with fn from_json(
       (path, "Expected an object for ExportProfilesPartialSuccess"),
     )
   }
-  let message = ExportProfilesPartialSuccess::default()
+  let message : ExportProfilesPartialSuccess = Default::default()
   for key, value in obj {
     match (key, value) {
       ("rejectedProfiles", value) =>
@@ -379,7 +379,7 @@ pub impl @json.FromJson for ExportProfilesPartialSuccess with fn from_json(
 pub impl @protobuf.AsyncRead for ExportProfilesPartialSuccess with fn read_with_limit(
   reader : @protobuf.LimitedReader[&@protobuf.AsyncReader],
 ) -> ExportProfilesPartialSuccess raise {
-  let msg = ExportProfilesPartialSuccess::default()
+  let msg : ExportProfilesPartialSuccess = Default::default()
   try {
     for ;; {
       match (reader |> @protobuf.async_read_tag()) {
