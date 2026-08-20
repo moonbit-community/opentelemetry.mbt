@@ -1,6 +1,6 @@
 name = "moonbit-community/opentelemetry"
 
-version = "0.1.4"
+version = "0.1.5"
 
 import {
   "moonbitlang/async@0.21.0",
