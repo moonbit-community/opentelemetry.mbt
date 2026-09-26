@@ -15,7 +15,7 @@ pub impl @protobuf.Sized for ExportTraceServiceRequest with fn size_of(self) {
 
 ///|
 pub impl Default for ExportTraceServiceRequest with fn default() -> ExportTraceServiceRequest {
-  { resource_spans: [] }
+  { resource_spans: [], }
 }
 
 ///|
@@ -141,7 +141,7 @@ pub impl @protobuf.Sized for ExportTraceServiceResponse with fn size_of(self) {
 
 ///|
 pub impl Default for ExportTraceServiceResponse with fn default() -> ExportTraceServiceResponse {
-  { partial_success: Default::default() }
+  { partial_success: Default::default(), }
 }
 
 ///|
@@ -264,7 +264,7 @@ pub impl @protobuf.Sized for ExportTracePartialSuccess with fn size_of(self) {
 
 ///|
 pub impl Default for ExportTracePartialSuccess with fn default() -> ExportTracePartialSuccess {
-  { rejected_spans: Default::default(), error_message: Default::default() }
+  { rejected_spans: Default::default(), error_message: Default::default(), }
 }
 
 ///|
@@ -272,7 +272,7 @@ pub fn ExportTracePartialSuccess::new(
   rejected_spans : Int64,
   error_message : String,
 ) -> ExportTracePartialSuccess {
-  { rejected_spans, error_message }
+  { rejected_spans, error_message, }
 }
 
 ///|

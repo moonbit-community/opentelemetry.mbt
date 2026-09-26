@@ -242,7 +242,7 @@ pub fn[T] ObservableGauge::from_functions(
 pub fn[T] CounterBuilder::from_functions(
   create_fn : (String?, String?) -> Counter[T],
 ) -> CounterBuilder[T] {
-  { description: None, unit: None, create_fn }
+  { description: None, unit: None, create_fn, }
 }
 
 ///|
@@ -251,7 +251,7 @@ pub fn[T] CounterBuilder::from_functions(
 pub fn[T] UpDownCounterBuilder::from_functions(
   create_fn : (String?, String?) -> UpDownCounter[T],
 ) -> UpDownCounterBuilder[T] {
-  { description: None, unit: None, create_fn }
+  { description: None, unit: None, create_fn, }
 }
 
 ///|
@@ -260,7 +260,7 @@ pub fn[T] UpDownCounterBuilder::from_functions(
 pub fn[T] HistogramBuilder::from_functions(
   create_fn : (String?, String?) -> Histogram[T],
 ) -> HistogramBuilder[T] {
-  { description: None, unit: None, create_fn }
+  { description: None, unit: None, create_fn, }
 }
 
 ///|
@@ -269,7 +269,7 @@ pub fn[T] HistogramBuilder::from_functions(
 pub fn[T] GaugeBuilder::from_functions(
   create_fn : (String?, String?) -> Gauge[T],
 ) -> GaugeBuilder[T] {
-  { description: None, unit: None, create_fn }
+  { description: None, unit: None, create_fn, }
 }
 
 ///|
@@ -280,7 +280,7 @@ pub fn[T] ObservableCounterBuilder::from_functions(
     T,
   ],
 ) -> ObservableCounterBuilder[T] {
-  { description: None, unit: None, callbacks: [], create_fn }
+  { description: None, unit: None, callbacks: [], create_fn, }
 }
 
 ///|
@@ -291,7 +291,7 @@ pub fn[T] ObservableUpDownCounterBuilder::from_functions(
     T,
   ],
 ) -> ObservableUpDownCounterBuilder[T] {
-  { description: None, unit: None, callbacks: [], create_fn }
+  { description: None, unit: None, callbacks: [], create_fn, }
 }
 
 ///|
@@ -302,7 +302,7 @@ pub fn[T] ObservableGaugeBuilder::from_functions(
     T,
   ],
 ) -> ObservableGaugeBuilder[T] {
-  { description: None, unit: None, callbacks: [], create_fn }
+  { description: None, unit: None, callbacks: [], create_fn, }
 }
 
 ///|

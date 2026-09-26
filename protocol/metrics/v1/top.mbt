@@ -145,7 +145,7 @@ pub impl @protobuf.Sized for MetricsData with fn size_of(self) {
 
 ///|
 pub impl Default for MetricsData with fn default() -> MetricsData {
-  { resource_metrics: [] }
+  { resource_metrics: [], }
 }
 
 ///|
@@ -293,7 +293,7 @@ pub fn ResourceMetrics::new(
   scope_metrics : Array[ScopeMetrics],
   schema_url : String,
 ) -> ResourceMetrics {
-  { resource, scope_metrics, schema_url }
+  { resource, scope_metrics, schema_url, }
 }
 
 ///|
@@ -459,7 +459,7 @@ pub fn ScopeMetrics::new(
   metrics : Array[Metric],
   schema_url : String,
 ) -> ScopeMetrics {
-  { scope, metrics, schema_url }
+  { scope, metrics, schema_url, }
 }
 
 ///|
@@ -727,7 +727,7 @@ pub fn Metric::new(
   metadata : Array[@v1_dep.KeyValue],
   data? : Metric_Data = NotSet,
 ) -> Metric {
-  { name, description, unit, metadata, data }
+  { name, description, unit, metadata, data, }
 }
 
 ///|
@@ -969,7 +969,7 @@ pub impl @protobuf.Sized for Gauge with fn size_of(self) {
 
 ///|
 pub impl Default for Gauge with fn default() -> Gauge {
-  { data_points: [] }
+  { data_points: [], }
 }
 
 ///|
@@ -1107,7 +1107,7 @@ pub fn Sum::new(
   aggregation_temporality : AggregationTemporality,
   is_monotonic : Bool,
 ) -> Sum {
-  { data_points, aggregation_temporality, is_monotonic }
+  { data_points, aggregation_temporality, is_monotonic, }
 }
 
 ///|
@@ -1255,7 +1255,7 @@ pub impl @protobuf.Sized for Histogram with fn size_of(self) {
 
 ///|
 pub impl Default for Histogram with fn default() -> Histogram {
-  { data_points: [], aggregation_temporality: Default::default() }
+  { data_points: [], aggregation_temporality: Default::default(), }
 }
 
 ///|
@@ -1263,7 +1263,7 @@ pub fn Histogram::new(
   data_points : Array[HistogramDataPoint],
   aggregation_temporality : AggregationTemporality,
 ) -> Histogram {
-  { data_points, aggregation_temporality }
+  { data_points, aggregation_temporality, }
 }
 
 ///|
@@ -1400,7 +1400,7 @@ pub impl @protobuf.Sized for ExponentialHistogram with fn size_of(self) {
 
 ///|
 pub impl Default for ExponentialHistogram with fn default() -> ExponentialHistogram {
-  { data_points: [], aggregation_temporality: Default::default() }
+  { data_points: [], aggregation_temporality: Default::default(), }
 }
 
 ///|
@@ -1408,7 +1408,7 @@ pub fn ExponentialHistogram::new(
   data_points : Array[ExponentialHistogramDataPoint],
   aggregation_temporality : AggregationTemporality,
 ) -> ExponentialHistogram {
-  { data_points, aggregation_temporality }
+  { data_points, aggregation_temporality, }
 }
 
 ///|
@@ -1545,7 +1545,7 @@ pub impl @protobuf.Sized for Summary with fn size_of(self) {
 
 ///|
 pub impl Default for Summary with fn default() -> Summary {
-  { data_points: [] }
+  { data_points: [], }
 }
 
 ///|
@@ -1743,7 +1743,7 @@ pub fn NumberDataPoint::new(
   flags : UInt,
   value? : NumberDataPoint_Value = NotSet,
 ) -> NumberDataPoint {
-  { attributes, start_time_unix_nano, time_unix_nano, exemplars, flags, value }
+  { attributes, start_time_unix_nano, time_unix_nano, exemplars, flags, value, }
 }
 
 ///|
@@ -2313,7 +2313,7 @@ pub impl @protobuf.Sized for ExponentialHistogramDataPoint_Buckets with fn size_
 
 ///|
 pub impl Default for ExponentialHistogramDataPoint_Buckets with fn default() -> ExponentialHistogramDataPoint_Buckets {
-  { offset: Default::default(), bucket_counts: [] }
+  { offset: Default::default(), bucket_counts: [], }
 }
 
 ///|
@@ -2321,7 +2321,7 @@ pub fn ExponentialHistogramDataPoint_Buckets::new(
   offset : Int,
   bucket_counts : Array[UInt64],
 ) -> ExponentialHistogramDataPoint_Buckets {
-  { offset, bucket_counts }
+  { offset, bucket_counts, }
 }
 
 ///|
@@ -2846,7 +2846,7 @@ pub impl @protobuf.Sized for SummaryDataPoint_ValueAtQuantile with fn size_of(
 
 ///|
 pub impl Default for SummaryDataPoint_ValueAtQuantile with fn default() -> SummaryDataPoint_ValueAtQuantile {
-  { quantile: Default::default(), value: Default::default() }
+  { quantile: Default::default(), value: Default::default(), }
 }
 
 ///|
@@ -2854,7 +2854,7 @@ pub fn SummaryDataPoint_ValueAtQuantile::new(
   quantile : Double,
   value : Double,
 ) -> SummaryDataPoint_ValueAtQuantile {
-  { quantile, value }
+  { quantile, value, }
 }
 
 ///|
@@ -3285,7 +3285,7 @@ pub fn Exemplar::new(
   trace_id : Bytes,
   value? : Exemplar_Value = NotSet,
 ) -> Exemplar {
-  { filtered_attributes, time_unix_nano, span_id, trace_id, value }
+  { filtered_attributes, time_unix_nano, span_id, trace_id, value, }
 }
 
 ///|

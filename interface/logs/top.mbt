@@ -170,14 +170,14 @@ pub fn AnyValue::from_common(value : @common.Value) -> AnyValue {
 /// Creates a structured log attribute.
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-attributes
 pub fn KeyValue::new(key : StringView, value : AnyValue) -> KeyValue {
-  { key: @common.Key::new(key), value }
+  { key: @common.Key::new(key), value, }
 }
 
 ///|
 /// Converts a shared attribute into a public log attribute.
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-attributes
 pub fn KeyValue::from_common(attribute : @common.KeyValue) -> KeyValue {
-  { key: attribute.key, value: AnyValue::from_common(attribute.value) }
+  { key: attribute.key, value: AnyValue::from_common(attribute.value), }
 }
 
 ///|
@@ -346,7 +346,7 @@ pub fn Logger::from_functions(
     true
   },
 ) -> Logger {
-  { emit_fn, event_enabled_fn }
+  { emit_fn, event_enabled_fn, }
 }
 
 ///|

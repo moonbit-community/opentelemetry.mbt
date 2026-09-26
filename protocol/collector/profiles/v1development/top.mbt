@@ -32,7 +32,7 @@ pub fn ExportProfilesServiceRequest::new(
   resource_profiles : Array[@v1development_dep.ResourceProfiles],
   dictionary : @v1development_dep.ProfilesDictionary,
 ) -> ExportProfilesServiceRequest {
-  { resource_profiles, dictionary }
+  { resource_profiles, dictionary, }
 }
 
 ///|
@@ -174,7 +174,7 @@ pub impl @protobuf.Sized for ExportProfilesServiceResponse with fn size_of(self)
 
 ///|
 pub impl Default for ExportProfilesServiceResponse with fn default() -> ExportProfilesServiceResponse {
-  { partial_success: Default::default() }
+  { partial_success: Default::default(), }
 }
 
 ///|
@@ -298,7 +298,7 @@ pub impl @protobuf.Sized for ExportProfilesPartialSuccess with fn size_of(self) 
 
 ///|
 pub impl Default for ExportProfilesPartialSuccess with fn default() -> ExportProfilesPartialSuccess {
-  { rejected_profiles: Default::default(), error_message: Default::default() }
+  { rejected_profiles: Default::default(), error_message: Default::default(), }
 }
 
 ///|
@@ -306,7 +306,7 @@ pub fn ExportProfilesPartialSuccess::new(
   rejected_profiles : Int64,
   error_message : String,
 ) -> ExportProfilesPartialSuccess {
-  { rejected_profiles, error_message }
+  { rejected_profiles, error_message, }
 }
 
 ///|

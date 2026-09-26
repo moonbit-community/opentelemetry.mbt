@@ -9,7 +9,7 @@ pub struct Key {
 /// Creates a key from its canonical string representation.
 /// Spec: https://opentelemetry.io/docs/specs/otel/common/#attribute
 pub fn Key::new(name : StringView) -> Key {
-  { name: name.to_owned() }
+  { name: name.to_owned(), }
 }
 
 ///|
@@ -48,7 +48,7 @@ pub struct KeyValue {
 /// Creates a key/value pair using a string key.
 /// Spec: https://opentelemetry.io/docs/specs/otel/common/#attribute
 pub fn KeyValue::new(key : StringView, value : Value) -> KeyValue {
-  { key: Key::new(key), value }
+  { key: Key::new(key), value, }
 }
 
 ///|
@@ -69,7 +69,7 @@ pub fn TraceState::new(entries : Map[String, String]) -> TraceState {
 /// Returns an empty trace state.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#tracestate
 pub fn TraceState::empty() -> TraceState {
-  { entries: {} }
+  { entries: {}, }
 }
 
 ///|
@@ -156,7 +156,7 @@ pub struct TraceFlags {
 /// Creates trace flags while masking away bits outside the W3C byte.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#spancontext
 pub fn TraceFlags::new(flags : UInt) -> TraceFlags {
-  { flags: flags & 0xffU }
+  { flags: flags & 0xffU, }
 }
 
 ///|
@@ -268,7 +268,7 @@ fn decode_hex(hex : StringView, expected_len : Int) -> Bytes? {
 /// Returns the invalid all-zero trace ID.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#spancontext
 pub fn TraceId::invalid() -> TraceId {
-  { bytes: Bytes::make(16, b'\x00') }
+  { bytes: Bytes::make(16, b'\x00'), }
 }
 
 ///|
@@ -319,7 +319,7 @@ pub impl Default for TraceId with fn default() -> TraceId {
 /// Returns the invalid all-zero span ID.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#spancontext
 pub fn SpanId::invalid() -> SpanId {
-  { bytes: Bytes::make(8, b'\x00') }
+  { bytes: Bytes::make(8, b'\x00'), }
 }
 
 ///|
@@ -388,7 +388,7 @@ pub fn SpanContext::new(
   is_remote? : Bool = false,
   trace_state? : TraceState = Default::default(),
 ) -> SpanContext {
-  { trace_id, span_id, trace_flags, is_remote, trace_state }
+  { trace_id, span_id, trace_flags, is_remote, trace_state, }
 }
 
 ///|
@@ -488,7 +488,7 @@ pub struct InstrumentationScopeBuilder {
 pub fn InstrumentationScope::builder(
   name : StringView,
 ) -> InstrumentationScopeBuilder {
-  { name: name.to_owned(), version: None, schema_url: None, attributes: [] }
+  { name: name.to_owned(), version: None, schema_url: None, attributes: [], }
 }
 
 ///|

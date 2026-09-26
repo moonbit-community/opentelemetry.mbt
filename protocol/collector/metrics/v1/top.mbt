@@ -15,7 +15,7 @@ pub impl @protobuf.Sized for ExportMetricsServiceRequest with fn size_of(self) {
 
 ///|
 pub impl Default for ExportMetricsServiceRequest with fn default() -> ExportMetricsServiceRequest {
-  { resource_metrics: [] }
+  { resource_metrics: [], }
 }
 
 ///|
@@ -141,7 +141,7 @@ pub impl @protobuf.Sized for ExportMetricsServiceResponse with fn size_of(self) 
 
 ///|
 pub impl Default for ExportMetricsServiceResponse with fn default() -> ExportMetricsServiceResponse {
-  { partial_success: Default::default() }
+  { partial_success: Default::default(), }
 }
 
 ///|
@@ -276,7 +276,7 @@ pub fn ExportMetricsPartialSuccess::new(
   rejected_data_points : Int64,
   error_message : String,
 ) -> ExportMetricsPartialSuccess {
-  { rejected_data_points, error_message }
+  { rejected_data_points, error_message, }
 }
 
 ///|

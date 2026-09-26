@@ -459,12 +459,12 @@ fn render_metric_batch(batch : ArrayView[@sdkmetrics.MetricData]) -> String {
 
 ///|
 pub impl Default for SpanExporter with fn default() -> SpanExporter {
-  { state: Ref({ is_shutdown: false, resource_emitted: false }) }
+  { state: Ref({ is_shutdown: false, resource_emitted: false, }), }
 }
 
 ///|
 pub impl Default for LogExporter with fn default() -> LogExporter {
-  { state: Ref({ is_shutdown: false, resource_emitted: false }) }
+  { state: Ref({ is_shutdown: false, resource_emitted: false, }), }
 }
 
 ///|
@@ -490,7 +490,7 @@ pub fn LogExporter::new() -> LogExporter {
 /// Starts building a stdout metric exporter.
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/stdout/#metrics-exporter---standard-output
 pub fn MetricExporter::builder() -> MetricExporterBuilder {
-  { temporality: Cumulative }
+  { temporality: Cumulative, }
 }
 
 ///|
@@ -510,7 +510,7 @@ pub fn MetricExporterBuilder::with_temporality(
 pub fn MetricExporterBuilder::build(
   self : MetricExporterBuilder,
 ) -> MetricExporter {
-  { state: Ref({ is_shutdown: false }), temporality: self.temporality }
+  { state: Ref({ is_shutdown: false, }), temporality: self.temporality, }
 }
 
 ///|
@@ -534,7 +534,7 @@ pub fn SpanExporter::export_batch(
   }
   println(render_span_batch(batch, !self.state.val.resource_emitted))
   if !self.state.val.resource_emitted && batch.length() > 0 {
-    self.state.val = { ..self.state.val, resource_emitted: true }
+    self.state.val = { ..self.state.val, resource_emitted: true, }
   }
   @error.ok()
 }
@@ -551,7 +551,7 @@ pub fn LogExporter::export_batch(
   }
   println(render_log_batch(batch, !self.state.val.resource_emitted))
   if !self.state.val.resource_emitted && batch.length() > 0 {
-    self.state.val = { ..self.state.val, resource_emitted: true }
+    self.state.val = { ..self.state.val, resource_emitted: true, }
   }
   @error.ok()
 }
@@ -617,7 +617,7 @@ pub fn SpanExporter::shutdown_with_timeout(
   if self.state.val.is_shutdown {
     return @error.already_shutdown()
   }
-  self.state.val = { ..self.state.val, is_shutdown: true }
+  self.state.val = { ..self.state.val, is_shutdown: true, }
   @error.ok()
 }
 
@@ -633,7 +633,7 @@ pub fn LogExporter::shutdown_with_timeout(
   if self.state.val.is_shutdown {
     return @error.already_shutdown()
   }
-  self.state.val = { ..self.state.val, is_shutdown: true }
+  self.state.val = { ..self.state.val, is_shutdown: true, }
   @error.ok()
 }
 
@@ -649,7 +649,7 @@ pub fn MetricExporter::shutdown_with_timeout(
   if self.state.val.is_shutdown {
     return @error.already_shutdown()
   }
-  self.state.val = { is_shutdown: true }
+  self.state.val = { is_shutdown: true, }
   @error.ok()
 }
 

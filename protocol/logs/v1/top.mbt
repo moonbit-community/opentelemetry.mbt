@@ -268,7 +268,7 @@ pub impl @protobuf.Sized for LogsData with fn size_of(self) {
 
 ///|
 pub impl Default for LogsData with fn default() -> LogsData {
-  { resource_logs: [] }
+  { resource_logs: [], }
 }
 
 ///|
@@ -414,7 +414,7 @@ pub fn ResourceLogs::new(
   scope_logs : Array[ScopeLogs],
   schema_url : String,
 ) -> ResourceLogs {
-  { resource, scope_logs, schema_url }
+  { resource, scope_logs, schema_url, }
 }
 
 ///|
@@ -578,7 +578,7 @@ pub fn ScopeLogs::new(
   log_records : Array[LogRecord],
   schema_url : String,
 ) -> ScopeLogs {
-  { scope, log_records, schema_url }
+  { scope, log_records, schema_url, }
 }
 
 ///|

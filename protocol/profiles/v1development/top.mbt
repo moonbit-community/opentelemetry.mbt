@@ -318,7 +318,7 @@ pub impl @protobuf.Sized for ProfilesData with fn size_of(self) {
 
 ///|
 pub impl Default for ProfilesData with fn default() -> ProfilesData {
-  { resource_profiles: [], dictionary: Default::default() }
+  { resource_profiles: [], dictionary: Default::default(), }
 }
 
 ///|
@@ -326,7 +326,7 @@ pub fn ProfilesData::new(
   resource_profiles : Array[ResourceProfiles],
   dictionary : ProfilesDictionary,
 ) -> ProfilesData {
-  { resource_profiles, dictionary }
+  { resource_profiles, dictionary, }
 }
 
 ///|
@@ -484,7 +484,7 @@ pub fn ResourceProfiles::new(
   scope_profiles : Array[ScopeProfiles],
   schema_url : String,
 ) -> ResourceProfiles {
-  { resource, scope_profiles, schema_url }
+  { resource, scope_profiles, schema_url, }
 }
 
 ///|
@@ -650,7 +650,7 @@ pub fn ScopeProfiles::new(
   profiles : Array[Profile],
   schema_url : String,
 ) -> ScopeProfiles {
-  { scope, profiles, schema_url }
+  { scope, profiles, schema_url, }
 }
 
 ///|
@@ -1141,12 +1141,12 @@ pub impl @protobuf.Sized for Link with fn size_of(self) {
 
 ///|
 pub impl Default for Link with fn default() -> Link {
-  { trace_id: Default::default(), span_id: Default::default() }
+  { trace_id: Default::default(), span_id: Default::default(), }
 }
 
 ///|
 pub fn Link::new(trace_id : Bytes, span_id : Bytes) -> Link {
-  { trace_id, span_id }
+  { trace_id, span_id, }
 }
 
 ///|
@@ -1260,12 +1260,12 @@ pub impl @protobuf.Sized for ValueType with fn size_of(self) {
 
 ///|
 pub impl Default for ValueType with fn default() -> ValueType {
-  { type_strindex: Default::default(), unit_strindex: Default::default() }
+  { type_strindex: Default::default(), unit_strindex: Default::default(), }
 }
 
 ///|
 pub fn ValueType::new(type_strindex : Int, unit_strindex : Int) -> ValueType {
-  { type_strindex, unit_strindex }
+  { type_strindex, unit_strindex, }
 }
 
 ///|
@@ -1420,7 +1420,7 @@ pub fn Sample::new(
   values : Array[Int64],
   timestamps_unix_nano : Array[UInt64],
 ) -> Sample {
-  { stack_index, attribute_indices, link_index, values, timestamps_unix_nano }
+  { stack_index, attribute_indices, link_index, values, timestamps_unix_nano, }
 }
 
 ///|
@@ -1829,7 +1829,7 @@ pub impl @protobuf.Sized for Stack with fn size_of(self) {
 
 ///|
 pub impl Default for Stack with fn default() -> Stack {
-  { location_indices: [] }
+  { location_indices: [], }
 }
 
 ///|
@@ -1987,7 +1987,7 @@ pub fn Location::new(
   lines : Array[Line],
   attribute_indices : Array[Int],
 ) -> Location {
-  { mapping_index, address, lines, attribute_indices }
+  { mapping_index, address, lines, attribute_indices, }
 }
 
 ///|
@@ -2161,7 +2161,7 @@ pub impl Default for Line with fn default() -> Line {
 
 ///|
 pub fn Line::new(function_index : Int, line : Int64, column : Int64) -> Line {
-  { function_index, line, column }
+  { function_index, line, column, }
 }
 
 ///|
@@ -2303,7 +2303,7 @@ pub fn Function::new(
   filename_strindex : Int,
   start_line : Int64,
 ) -> Function {
-  { name_strindex, system_name_strindex, filename_strindex, start_line }
+  { name_strindex, system_name_strindex, filename_strindex, start_line, }
 }
 
 ///|
@@ -2458,7 +2458,7 @@ pub fn KeyValueAndUnit::new(
   value : @v1.AnyValue,
   unit_strindex : Int,
 ) -> KeyValueAndUnit {
-  { key_strindex, value, unit_strindex }
+  { key_strindex, value, unit_strindex, }
 }
 
 ///|

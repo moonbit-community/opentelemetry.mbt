@@ -29,7 +29,11 @@ pub fn Context::new() -> Context {
 /// disabled.
 /// Spec: https://opentelemetry.io/docs/specs/otel/context/#overview
 pub fn Context::empty() -> Context {
-  { span_context: None, baggage: Default::default(), suppress_telemetry: false }
+  {
+    span_context: None,
+    baggage: Default::default(),
+    suppress_telemetry: false,
+  }
 }
 
 ///|
@@ -61,7 +65,7 @@ pub fn Context::with_span_context(
   self : Context,
   span_context : @common.SpanContext,
 ) -> Context {
-  { ..self, span_context: Some(span_context.with_remote(false)) }
+  { ..self, span_context: Some(span_context.with_remote(false)), }
 }
 
 ///|
@@ -73,7 +77,7 @@ pub fn Context::with_remote_span_context(
   self : Context,
   span_context : @common.SpanContext,
 ) -> Context {
-  { ..self, span_context: Some(span_context.with_remote(true)) }
+  { ..self, span_context: Some(span_context.with_remote(true)), }
 }
 
 ///|
@@ -108,7 +112,7 @@ pub fn Context::with_baggage_item(
   value : StringView,
   metadata? : @baggage.BaggageMetadata = Default::default(),
 ) -> Context {
-  { ..self, baggage: self.baggage.insert_with_metadata(key, value, metadata) }
+  { ..self, baggage: self.baggage.insert_with_metadata(key, value, metadata), }
 }
 
 ///|
@@ -130,7 +134,7 @@ pub fn Context::with_telemetry_suppressed(
   self : Context,
   suppressed? : Bool = true,
 ) -> Context {
-  { ..self, suppress_telemetry: suppressed }
+  { ..self, suppress_telemetry: suppressed, }
 }
 
 ///|

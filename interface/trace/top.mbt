@@ -118,7 +118,7 @@ pub struct TracerProvider {
 /// Creates a span status.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#set-status
 pub fn Status::new(code : StatusCode, description? : String? = None) -> Status {
-  { code, description }
+  { code, description, }
 }
 
 ///|
@@ -178,7 +178,7 @@ pub fn Link::new(
   attributes? : ArrayView[@common.KeyValue] = [],
   dropped_attributes_count? : Int = 0,
 ) -> Link {
-  { span_context, attributes: attributes.to_owned(), dropped_attributes_count }
+  { span_context, attributes: attributes.to_owned(), dropped_attributes_count, }
 }
 
 ///|
@@ -205,7 +205,7 @@ pub fn SpanBuilder::with_kind(
   self : SpanBuilder,
   span_kind : SpanKind,
 ) -> SpanBuilder {
-  { ..self, span_kind: Some(span_kind) }
+  { ..self, span_kind: Some(span_kind), }
 }
 
 ///|
@@ -215,7 +215,7 @@ pub fn SpanBuilder::with_start_time(
   self : SpanBuilder,
   start_time_unix_nano : Int64,
 ) -> SpanBuilder {
-  { ..self, start_time_unix_nano: Some(start_time_unix_nano) }
+  { ..self, start_time_unix_nano: Some(start_time_unix_nano), }
 }
 
 ///|
@@ -227,7 +227,7 @@ pub fn SpanBuilder::with_attributes(
   self : SpanBuilder,
   attributes : ArrayView[@common.KeyValue],
 ) -> SpanBuilder {
-  { ..self, attributes: attributes.to_owned() }
+  { ..self, attributes: attributes.to_owned(), }
 }
 
 ///|
@@ -239,7 +239,7 @@ pub fn SpanBuilder::with_events(
   self : SpanBuilder,
   events : ArrayView[Event],
 ) -> SpanBuilder {
-  { ..self, events: events.to_owned() }
+  { ..self, events: events.to_owned(), }
 }
 
 ///|
@@ -251,7 +251,7 @@ pub fn SpanBuilder::with_links(
   self : SpanBuilder,
   links : ArrayView[Link],
 ) -> SpanBuilder {
-  { ..self, links: links.to_owned() }
+  { ..self, links: links.to_owned(), }
 }
 
 ///|

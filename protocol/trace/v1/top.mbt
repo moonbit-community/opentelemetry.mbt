@@ -85,7 +85,7 @@ pub impl @protobuf.Sized for TracesData with fn size_of(self) {
 
 ///|
 pub impl Default for TracesData with fn default() -> TracesData {
-  { resource_spans: [] }
+  { resource_spans: [], }
 }
 
 ///|
@@ -231,7 +231,7 @@ pub fn ResourceSpans::new(
   scope_spans : Array[ScopeSpans],
   schema_url : String,
 ) -> ResourceSpans {
-  { resource, scope_spans, schema_url }
+  { resource, scope_spans, schema_url, }
 }
 
 ///|
@@ -397,7 +397,7 @@ pub fn ScopeSpans::new(
   spans : Array[Span],
   schema_url : String,
 ) -> ScopeSpans {
-  { scope, spans, schema_url }
+  { scope, spans, schema_url, }
 }
 
 ///|
@@ -639,7 +639,7 @@ pub fn Span_Event::new(
   attributes : Array[@v1_dep.KeyValue],
   dropped_attributes_count : UInt,
 ) -> Span_Event {
-  { time_unix_nano, name, attributes, dropped_attributes_count }
+  { time_unix_nano, name, attributes, dropped_attributes_count, }
 }
 
 ///|
@@ -1499,12 +1499,12 @@ pub impl @protobuf.Sized for Status with fn size_of(self) {
 
 ///|
 pub impl Default for Status with fn default() -> Status {
-  { message: Default::default(), code: Default::default() }
+  { message: Default::default(), code: Default::default(), }
 }
 
 ///|
 pub fn Status::new(message : String, code : Status_StatusCode) -> Status {
-  { message, code }
+  { message, code, }
 }
 
 ///|
