@@ -31,14 +31,14 @@ fn resource_from_attributes(
   for attribute in attributes {
     map[attribute.key.as_string()] = attribute.value
   }
-  { attributes: map, schema_url }
+  { attributes: map, schema_url, }
 }
 
 ///|
 /// Returns an empty resource.
 /// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#the-empty-resource
 pub fn Resource::empty() -> Resource {
-  { attributes: {}, schema_url: None }
+  { attributes: {}, schema_url: None, }
 }
 
 ///|
@@ -60,7 +60,7 @@ pub fn Resource::builder() -> ResourceBuilder {
 /// Starts building a resource without any default detectors.
 /// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#create
 pub fn Resource::builder_empty() -> ResourceBuilder {
-  { resource: Resource::empty(), detectors: [] }
+  { resource: Resource::empty(), detectors: [], }
 }
 
 ///|
@@ -127,7 +127,7 @@ pub fn Resource::merge(self : Resource, other : Resource) -> Resource {
     (None, Some(right)) => Some(right)
     (None, None) => None
   }
-  { attributes, schema_url }
+  { attributes, schema_url, }
 }
 
 ///|

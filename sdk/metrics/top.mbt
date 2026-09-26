@@ -561,7 +561,7 @@ pub fn MetricExporter::new(
   shutdown_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
   name_fn? : () -> String = () => "custom",
 ) -> MetricExporter {
-  { export_fn, force_flush_fn, shutdown_fn, name_fn }
+  { export_fn, force_flush_fn, shutdown_fn, name_fn, }
 }
 
 ///|
@@ -614,7 +614,7 @@ pub fn MetricExporter::name(self : MetricExporter) -> String {
 /// Creates an empty in-memory metric exporter.
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/in-memory/#metrics-exporter---in-memory
 pub fn InMemoryMetricExporter::new() -> InMemoryMetricExporter {
-  { state: Ref({ finished_metrics: [], is_shutdown: false }) }
+  { state: Ref({ finished_metrics: [], is_shutdown: false, }), }
 }
 
 ///|
@@ -630,7 +630,7 @@ pub fn InMemoryMetricExporter::finished_metrics(
 /// Clears the in-memory metric buffer.
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/in-memory/#metrics-exporter---in-memory
 pub fn InMemoryMetricExporter::reset(self : InMemoryMetricExporter) -> Unit {
-  self.state.val = { ..self.state.val, finished_metrics: [] }
+  self.state.val = { ..self.state.val, finished_metrics: [], }
 }
 
 ///|
@@ -756,7 +756,7 @@ pub fn StreamBuilder::build(self : StreamBuilder) -> Stream {
 /// provider using `SdkMeterProviderBuilder::with_reader()`.
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#metricreader
 pub fn ManualReader::builder() -> ManualReaderBuilder {
-  { temporality: Cumulative }
+  { temporality: Cumulative, }
 }
 
 ///|
@@ -853,7 +853,7 @@ pub fn InMemoryMetricExporter::into_metric_exporter(
       if state.val.is_shutdown {
         @error.already_shutdown()
       } else {
-        state.val = { ..state.val, is_shutdown: true }
+        state.val = { ..state.val, is_shutdown: true, }
         @error.ok()
       }
     },
@@ -1007,9 +1007,9 @@ fn delta_histogram(
       let count = current.count - previous.count
       let sum = subtract_numbers(current.sum, previous.sum)
       if count <= 0 {
-        { count: 0, sum: zero_number(current.sum), min: None, max: None }
+        { count: 0, sum: zero_number(current.sum), min: None, max: None, }
       } else {
-        { count, sum, min: current.min, max: current.max }
+        { count, sum, min: current.min, max: current.max, }
       }
     }
     None => current
@@ -1070,7 +1070,7 @@ fn apply_temporality(
     for metric in metrics {
       last_metrics[metric_identity(metric)] = metric.aggregation
     }
-    return { last_metrics, metrics }
+    return { last_metrics, metrics, }
   }
 
   let last_metrics = Map([])
@@ -1085,7 +1085,7 @@ fn apply_temporality(
     transformed.push({ ..metric, aggregation, })
     last_metrics[identity] = metric.aggregation
   }
-  { last_metrics, metrics: transformed }
+  { last_metrics, metrics: transformed, }
 }
 
 ///|
@@ -1242,7 +1242,7 @@ fn resolve_stream_state(
 ///|
 fn clear_metrics(state : Ref[SyncInstrumentState]) -> Unit {
   for stream in state.val.streams {
-    stream.val = { ..stream.val, points: {} }
+    stream.val = { ..stream.val, points: {}, }
   }
 }
 
@@ -1256,7 +1256,7 @@ fn register_manual_reader(
   }
   match reader.state.val.provider {
     Some(_) => ()
-    None => reader.state.val = { ..reader.state.val, provider: Some(provider) }
+    None => reader.state.val = { ..reader.state.val, provider: Some(provider), }
   }
 }
 
@@ -1270,7 +1270,7 @@ fn register_periodic_reader(
   }
   match reader.state.val.provider {
     Some(_) => ()
-    None => reader.state.val = { ..reader.state.val, provider: Some(provider) }
+    None => reader.state.val = { ..reader.state.val, provider: Some(provider), }
   }
 }
 
@@ -1309,7 +1309,7 @@ fn register_observable_instrument(
   state : Ref[SyncInstrumentState],
   callbacks : Array[() -> Unit],
 ) -> Unit {
-  state.val = { streams: resolve_stream_state(meter, descriptor) }
+  state.val = { streams: resolve_stream_state(meter, descriptor), }
   if !meter.provider.state.val.is_shutdown {
     meter.provider.state.val.collectors.push({
       prepare_fn: () => {
@@ -1350,7 +1350,8 @@ fn histogram_aggregation(current : Aggregation?, value : Number) -> Aggregation 
         max,
       })
     }
-    _ => Histogram({ count: 1, sum: value, min: Some(value), max: Some(value) })
+    _ =>
+      Histogram({ count: 1, sum: value, min: Some(value), max: Some(value), })
   }
 }
 
@@ -1380,7 +1381,7 @@ fn update_sum_stream(
     Histogram => histogram_aggregation(current, Int64(delta))
     _ => Sum(Int64(delta))
   }
-  points[key] = { attributes, aggregation }
+  points[key] = { attributes, aggregation, }
   state.val = { ..state.val, points, }
 }
 
@@ -1410,7 +1411,7 @@ fn update_double_stream(
     Histogram => histogram_aggregation(current, Double(value))
     _ => Gauge(Double(value))
   }
-  points[key] = { attributes, aggregation }
+  points[key] = { attributes, aggregation, }
   state.val = { ..state.val, points, }
 }
 
@@ -1440,7 +1441,7 @@ fn update_u64_stream(
     Histogram => histogram_aggregation(current, UInt64(value))
     _ => Gauge(UInt64(value))
   }
-  points[key] = { attributes, aggregation }
+  points[key] = { attributes, aggregation, }
   state.val = { ..state.val, points, }
 }
 
@@ -1695,7 +1696,7 @@ pub fn SdkMeterProvider::meter(
     None => ()
   }
   scope = scope.with_attributes(attributes)
-  { provider: self, instrumentation_scope: scope.build() }
+  { provider: self, instrumentation_scope: scope.build(), }
 }
 
 ///|
@@ -1796,7 +1797,7 @@ pub async fn SdkMeterProvider::shutdown_with_timeout(
       Err(err) => return Err(err)
     }
   }
-  self.state.val = { ..self.state.val, is_shutdown: true }
+  self.state.val = { ..self.state.val, is_shutdown: true, }
   for exporter in exporters {
     match exporter.shutdown_with_timeout(timeout_millis) {
       Ok(_) => ()
@@ -2444,7 +2445,7 @@ pub fn PeriodicMetricReader::collect(
         self.state.val.temporality,
         self.state.val.last_metrics,
       )
-      self.state.val = { ..self.state.val, last_metrics: result.last_metrics }
+      self.state.val = { ..self.state.val, last_metrics: result.last_metrics, }
       result.metrics
     }
     None => []
@@ -2519,7 +2520,7 @@ pub async fn PeriodicMetricReader::run(self : PeriodicMetricReader) -> Unit {
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#counter-creation
 pub fn SdkMeter::counter(self : SdkMeter, name : StringView) -> CounterBuilder {
   let (meter, name, description, unit) = create_builder(self, name)
-  { meter, name, description, unit }
+  { meter, name, description, unit, }
 }
 
 ///|
@@ -2530,7 +2531,7 @@ pub fn SdkMeter::f64_counter(
   name : StringView,
 ) -> DoubleCounterBuilder {
   let (meter, name, description, unit) = create_builder(self, name)
-  { meter, name, description, unit }
+  { meter, name, description, unit, }
 }
 
 ///|
@@ -2541,7 +2542,7 @@ pub fn SdkMeter::u64_counter(
   name : StringView,
 ) -> UInt64CounterBuilder {
   let (meter, name, description, unit) = create_builder(self, name)
-  { meter, name, description, unit }
+  { meter, name, description, unit, }
 }
 
 ///|
@@ -2552,7 +2553,7 @@ pub fn SdkMeter::up_down_counter(
   name : StringView,
 ) -> UpDownCounterBuilder {
   let (meter, name, description, unit) = create_builder(self, name)
-  { meter, name, description, unit }
+  { meter, name, description, unit, }
 }
 
 ///|
@@ -2563,7 +2564,7 @@ pub fn SdkMeter::f64_up_down_counter(
   name : StringView,
 ) -> DoubleUpDownCounterBuilder {
   let (meter, name, description, unit) = create_builder(self, name)
-  { meter, name, description, unit }
+  { meter, name, description, unit, }
 }
 
 ///|
@@ -2574,7 +2575,7 @@ pub fn SdkMeter::histogram(
   name : StringView,
 ) -> HistogramBuilder {
   let (meter, name, description, unit) = create_builder(self, name)
-  { meter, name, description, unit }
+  { meter, name, description, unit, }
 }
 
 ///|
@@ -2585,7 +2586,7 @@ pub fn SdkMeter::u64_histogram(
   name : StringView,
 ) -> UInt64HistogramBuilder {
   let (meter, name, description, unit) = create_builder(self, name)
-  { meter, name, description, unit }
+  { meter, name, description, unit, }
 }
 
 ///|
@@ -2593,7 +2594,7 @@ pub fn SdkMeter::u64_histogram(
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#gauge-creation
 pub fn SdkMeter::gauge(self : SdkMeter, name : StringView) -> GaugeBuilder {
   let (meter, name, description, unit) = create_builder(self, name)
-  { meter, name, description, unit }
+  { meter, name, description, unit, }
 }
 
 ///|
@@ -2604,7 +2605,7 @@ pub fn SdkMeter::u64_gauge(
   name : StringView,
 ) -> UInt64GaugeBuilder {
   let (meter, name, description, unit) = create_builder(self, name)
-  { meter, name, description, unit }
+  { meter, name, description, unit, }
 }
 
 ///|
@@ -2615,7 +2616,7 @@ pub fn SdkMeter::observable_counter(
   name : StringView,
 ) -> ObservableCounterBuilder {
   let (meter, name, description, unit) = create_builder(self, name)
-  { meter, name, description, unit, callbacks: [] }
+  { meter, name, description, unit, callbacks: [], }
 }
 
 ///|
@@ -2626,7 +2627,7 @@ pub fn SdkMeter::f64_observable_counter(
   name : StringView,
 ) -> ObservableDoubleCounterBuilder {
   let (meter, name, description, unit) = create_builder(self, name)
-  { meter, name, description, unit, callbacks: [] }
+  { meter, name, description, unit, callbacks: [], }
 }
 
 ///|
@@ -2637,7 +2638,7 @@ pub fn SdkMeter::u64_observable_counter(
   name : StringView,
 ) -> ObservableUInt64CounterBuilder {
   let (meter, name, description, unit) = create_builder(self, name)
-  { meter, name, description, unit, callbacks: [] }
+  { meter, name, description, unit, callbacks: [], }
 }
 
 ///|
@@ -2648,7 +2649,7 @@ pub fn SdkMeter::observable_up_down_counter(
   name : StringView,
 ) -> ObservableUpDownCounterBuilder {
   let (meter, name, description, unit) = create_builder(self, name)
-  { meter, name, description, unit, callbacks: [] }
+  { meter, name, description, unit, callbacks: [], }
 }
 
 ///|
@@ -2659,7 +2660,7 @@ pub fn SdkMeter::f64_observable_up_down_counter(
   name : StringView,
 ) -> ObservableDoubleUpDownCounterBuilder {
   let (meter, name, description, unit) = create_builder(self, name)
-  { meter, name, description, unit, callbacks: [] }
+  { meter, name, description, unit, callbacks: [], }
 }
 
 ///|
@@ -2670,7 +2671,7 @@ pub fn SdkMeter::observable_gauge(
   name : StringView,
 ) -> ObservableGaugeBuilder {
   let (meter, name, description, unit) = create_builder(self, name)
-  { meter, name, description, unit, callbacks: [] }
+  { meter, name, description, unit, callbacks: [], }
 }
 
 ///|
@@ -2681,7 +2682,7 @@ pub fn SdkMeter::u64_observable_gauge(
   name : StringView,
 ) -> ObservableUInt64GaugeBuilder {
   let (meter, name, description, unit) = create_builder(self, name)
-  { meter, name, description, unit, callbacks: [] }
+  { meter, name, description, unit, callbacks: [], }
 }
 
 ///|
@@ -2691,7 +2692,7 @@ fn descriptor(
   unit : String?,
   kind : InstrumentKind,
 ) -> InstrumentDescriptor {
-  { name, description, unit, kind }
+  { name, description, unit, kind, }
 }
 
 ///|
@@ -3105,7 +3106,7 @@ pub fn ObservableUInt64CounterBuilder::with_callback(
 pub fn ObservableCounterBuilder::build(
   self : ObservableCounterBuilder,
 ) -> ObservableCounter {
-  let state : Ref[SyncInstrumentState] = Ref({ streams: [] })
+  let state : Ref[SyncInstrumentState] = Ref({ streams: [], })
   let instrument : ObservableCounter = { state, }
   let callbacks = []
   for callback in self.callbacks {
@@ -3125,7 +3126,7 @@ pub fn ObservableCounterBuilder::build(
 pub fn ObservableDoubleCounterBuilder::build(
   self : ObservableDoubleCounterBuilder,
 ) -> ObservableDoubleCounter {
-  let state : Ref[SyncInstrumentState] = Ref({ streams: [] })
+  let state : Ref[SyncInstrumentState] = Ref({ streams: [], })
   let instrument : ObservableDoubleCounter = { state, }
   let callbacks = []
   for callback in self.callbacks {
@@ -3145,7 +3146,7 @@ pub fn ObservableDoubleCounterBuilder::build(
 pub fn ObservableUInt64CounterBuilder::build(
   self : ObservableUInt64CounterBuilder,
 ) -> ObservableUInt64Counter {
-  let state : Ref[SyncInstrumentState] = Ref({ streams: [] })
+  let state : Ref[SyncInstrumentState] = Ref({ streams: [], })
   let instrument : ObservableUInt64Counter = { state, }
   let callbacks = []
   for callback in self.callbacks {
@@ -3225,7 +3226,7 @@ pub fn ObservableDoubleUpDownCounterBuilder::with_callback(
 pub fn ObservableUpDownCounterBuilder::build(
   self : ObservableUpDownCounterBuilder,
 ) -> ObservableUpDownCounter {
-  let state : Ref[SyncInstrumentState] = Ref({ streams: [] })
+  let state : Ref[SyncInstrumentState] = Ref({ streams: [], })
   let instrument : ObservableUpDownCounter = { state, }
   let callbacks = []
   for callback in self.callbacks {
@@ -3245,7 +3246,7 @@ pub fn ObservableUpDownCounterBuilder::build(
 pub fn ObservableDoubleUpDownCounterBuilder::build(
   self : ObservableDoubleUpDownCounterBuilder,
 ) -> ObservableDoubleUpDownCounter {
-  let state : Ref[SyncInstrumentState] = Ref({ streams: [] })
+  let state : Ref[SyncInstrumentState] = Ref({ streams: [], })
   let instrument : ObservableDoubleUpDownCounter = { state, }
   let callbacks = []
   for callback in self.callbacks {
@@ -3325,7 +3326,7 @@ pub fn ObservableUInt64GaugeBuilder::with_callback(
 pub fn ObservableGaugeBuilder::build(
   self : ObservableGaugeBuilder,
 ) -> ObservableGauge {
-  let state : Ref[SyncInstrumentState] = Ref({ streams: [] })
+  let state : Ref[SyncInstrumentState] = Ref({ streams: [], })
   let instrument : ObservableGauge = { state, }
   let callbacks = []
   for callback in self.callbacks {
@@ -3345,7 +3346,7 @@ pub fn ObservableGaugeBuilder::build(
 pub fn ObservableUInt64GaugeBuilder::build(
   self : ObservableUInt64GaugeBuilder,
 ) -> ObservableUInt64Gauge {
-  let state : Ref[SyncInstrumentState] = Ref({ streams: [] })
+  let state : Ref[SyncInstrumentState] = Ref({ streams: [], })
   let instrument : ObservableUInt64Gauge = { state, }
   let callbacks = []
   for callback in self.callbacks {

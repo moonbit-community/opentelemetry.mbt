@@ -125,7 +125,7 @@ pub impl @protobuf.Sized for AnyValue with fn size_of(self) {
 
 ///|
 pub impl Default for AnyValue with fn default() -> AnyValue {
-  { value: NotSet }
+  { value: NotSet, }
 }
 
 ///|
@@ -348,7 +348,7 @@ pub impl @protobuf.Sized for ArrayValue with fn size_of(self) {
 
 ///|
 pub impl Default for ArrayValue with fn default() -> ArrayValue {
-  { values: [] }
+  { values: [], }
 }
 
 ///|
@@ -465,7 +465,7 @@ pub impl @protobuf.Sized for KeyValueList with fn size_of(self) {
 
 ///|
 pub impl Default for KeyValueList with fn default() -> KeyValueList {
-  { values: [] }
+  { values: [], }
 }
 
 ///|
@@ -604,7 +604,7 @@ pub fn KeyValue::new(
   value : AnyValue,
   key_strindex : Int,
 ) -> KeyValue {
-  { key, value, key_strindex }
+  { key, value, key_strindex, }
 }
 
 ///|
@@ -760,7 +760,7 @@ pub fn InstrumentationScope::new(
   attributes : Array[KeyValue],
   dropped_attributes_count : UInt,
 ) -> InstrumentationScope {
-  { name, version, attributes, dropped_attributes_count }
+  { name, version, attributes, dropped_attributes_count, }
 }
 
 ///|
@@ -939,7 +939,7 @@ pub fn EntityRef::new(
   id_keys : Array[String],
   description_keys : Array[String],
 ) -> EntityRef {
-  { schema_url, type_, id_keys, description_keys }
+  { schema_url, type_, id_keys, description_keys, }
 }
 
 ///|

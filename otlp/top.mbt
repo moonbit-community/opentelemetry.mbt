@@ -1837,7 +1837,7 @@ pub fn SpanExporterBuilder::build(
     self.compression,
   )
   match config {
-    Ok(config) => Ok({ state: Ref({ is_shutdown: false }), config })
+    Ok(config) => Ok({ state: Ref({ is_shutdown: false, }), config, })
     Err(err) => Err(err)
   }
 }
@@ -1864,7 +1864,7 @@ pub fn LogExporterBuilder::build(
     self.compression,
   )
   match config {
-    Ok(config) => Ok({ state: Ref({ is_shutdown: false }), config })
+    Ok(config) => Ok({ state: Ref({ is_shutdown: false, }), config, })
     Err(err) => Err(err)
   }
 }
@@ -1893,7 +1893,7 @@ pub fn MetricExporterBuilder::build(
   let temporality = resolve_temporality(self.temporality)
   match (config, temporality) {
     (Ok(config), Ok(temporality)) =>
-      Ok({ state: Ref({ is_shutdown: false }), config, temporality })
+      Ok({ state: Ref({ is_shutdown: false, }), config, temporality, })
     (Err(err), _) => Err(err)
     (_, Err(err)) => Err(err)
   }
@@ -2133,7 +2133,7 @@ pub async fn SpanExporter::shutdown_with_timeout(
   if self.state.val.is_shutdown {
     return @error.already_shutdown()
   }
-  self.state.val = { is_shutdown: true }
+  self.state.val = { is_shutdown: true, }
   @error.ok()
 }
 
@@ -2152,7 +2152,7 @@ pub async fn LogExporter::shutdown_with_timeout(
   if self.state.val.is_shutdown {
     return @error.already_shutdown()
   }
-  self.state.val = { is_shutdown: true }
+  self.state.val = { is_shutdown: true, }
   @error.ok()
 }
 
@@ -2171,7 +2171,7 @@ pub async fn MetricExporter::shutdown_with_timeout(
   if self.state.val.is_shutdown {
     return @error.already_shutdown()
   }
-  self.state.val = { is_shutdown: true }
+  self.state.val = { is_shutdown: true, }
   @error.ok()
 }
 

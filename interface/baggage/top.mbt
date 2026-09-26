@@ -39,7 +39,7 @@ pub struct Baggage {
 /// whitespace.
 /// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#set-value
 pub fn BaggageMetadata::new(metadata : StringView) -> BaggageMetadata {
-  { metadata: metadata.trim().to_owned() }
+  { metadata: metadata.trim().to_owned(), }
 }
 
 ///|
@@ -65,14 +65,14 @@ pub fn KeyValueMetadata::new(
   value : StringView,
   metadata? : BaggageMetadata = Default::default(),
 ) -> KeyValueMetadata {
-  { key: @common.Key::new(key), value: value.to_owned(), metadata }
+  { key: @common.Key::new(key), value: value.to_owned(), metadata, }
 }
 
 ///|
 /// Returns an empty baggage value.
 /// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#overview
 pub fn Baggage::new() -> Baggage {
-  { entries: {}, kv_content_len: 0 }
+  { entries: {}, kv_content_len: 0, }
 }
 
 ///|
@@ -143,7 +143,7 @@ fn baggage_with_entries(entries : Map[String, KeyValueMetadata]) -> Baggage {
       entry.metadata.as_string(),
     )
   }
-  { entries, kv_content_len }
+  { entries, kv_content_len, }
 }
 
 ///|

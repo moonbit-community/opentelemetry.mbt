@@ -132,7 +132,7 @@ pub fn TextMapPropagator::from_functions(
   extract_fn : (@context.Context, &Extractor) -> @context.Context,
   fields_fn : () -> Array[String],
 ) -> TextMapPropagator {
-  { inject_fn, extract_fn, fields_fn }
+  { inject_fn, extract_fn, fields_fn, }
 }
 
 ///|

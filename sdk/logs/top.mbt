@@ -187,7 +187,7 @@ pub struct SdkLogger {
 /// Creates a structured log attribute.
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-attributes
 pub fn KeyValue::new(key : StringView, value : AnyValue) -> KeyValue {
-  { key: @common.Key::new(key), value }
+  { key: @common.Key::new(key), value, }
 }
 
 ///|
@@ -214,7 +214,7 @@ pub fn AnyValue::from_common(value : @common.Value) -> AnyValue {
 /// Converts a shared SDK attribute into a log-specific structured attribute.
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-attributes
 pub fn KeyValue::from_common(attribute : @common.KeyValue) -> KeyValue {
-  { key: attribute.key, value: AnyValue::from_common(attribute.value) }
+  { key: attribute.key, value: AnyValue::from_common(attribute.value), }
 }
 
 ///|
@@ -329,7 +329,7 @@ pub fn LogExporter::new(
   shutdown_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
   name_fn? : () -> String = () => "custom",
 ) -> LogExporter {
-  { export_fn, force_flush_fn, shutdown_fn, name_fn }
+  { export_fn, force_flush_fn, shutdown_fn, name_fn, }
 }
 
 ///|
@@ -384,7 +384,7 @@ pub fn LogProcessor::new(
   force_flush_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
   shutdown_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
 ) -> LogProcessor {
-  { emit_fn, force_flush_fn, shutdown_fn }
+  { emit_fn, force_flush_fn, shutdown_fn, }
 }
 
 ///|
@@ -430,7 +430,7 @@ pub async fn LogProcessor::shutdown(
 /// Creates an empty in-memory log exporter.
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#logrecordexporter
 pub fn InMemoryLogExporter::new() -> InMemoryLogExporter {
-  { state: Ref({ finished_logs: [], is_shutdown: false }) }
+  { state: Ref({ finished_logs: [], is_shutdown: false, }), }
 }
 
 ///|
@@ -446,7 +446,7 @@ pub fn InMemoryLogExporter::finished_logs(
 /// Clears the in-memory log buffer.
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#logrecordexporter
 pub fn InMemoryLogExporter::reset(self : InMemoryLogExporter) -> Unit {
-  self.state.val = { ..self.state.val, finished_logs: [] }
+  self.state.val = { ..self.state.val, finished_logs: [], }
 }
 
 ///|
@@ -470,7 +470,7 @@ pub fn InMemoryLogExporter::into_log_exporter(
       if state.val.is_shutdown {
         @error.already_shutdown()
       } else {
-        state.val = { ..state.val, is_shutdown: true }
+        state.val = { ..state.val, is_shutdown: true, }
         @error.ok()
       }
     },
@@ -567,7 +567,7 @@ pub fn BatchLogProcessor::new(
           return @error.already_shutdown()
         }
         let result = flush_log_queue(state)
-        state.val = { ..state.val, is_shutdown: true }
+        state.val = { ..state.val, is_shutdown: true, }
         match result {
           Ok(_) =>
             state.val.exporter.shutdown_with_timeout(
@@ -730,7 +730,7 @@ pub fn SdkLoggerProvider::logger(
     None => ()
   }
   scope = scope.with_attributes(attributes)
-  { provider: self, instrumentation_scope: scope.build() }
+  { provider: self, instrumentation_scope: scope.build(), }
 }
 
 ///|
@@ -762,7 +762,7 @@ pub async fn SdkLoggerProvider::shutdown_with_timeout(
     return @error.already_shutdown()
   }
   let processors = self.state.val.processors.copy()
-  self.state.val = { ..self.state.val, is_shutdown: true }
+  self.state.val = { ..self.state.val, is_shutdown: true, }
   for processor in processors {
     match processor.shutdown_with_timeout(timeout_millis) {
       Ok(_) => ()
@@ -823,7 +823,7 @@ fn any_value_from_api(value : @api.AnyValue) -> AnyValue {
 
 ///|
 fn key_value_from_api(attribute : @api.KeyValue) -> KeyValue {
-  { key: attribute.key, value: any_value_from_api(attribute.value) }
+  { key: attribute.key, value: any_value_from_api(attribute.value), }
 }
 
 ///|

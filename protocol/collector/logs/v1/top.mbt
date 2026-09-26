@@ -15,7 +15,7 @@ pub impl @protobuf.Sized for ExportLogsServiceRequest with fn size_of(self) {
 
 ///|
 pub impl Default for ExportLogsServiceRequest with fn default() -> ExportLogsServiceRequest {
-  { resource_logs: [] }
+  { resource_logs: [], }
 }
 
 ///|
@@ -141,7 +141,7 @@ pub impl @protobuf.Sized for ExportLogsServiceResponse with fn size_of(self) {
 
 ///|
 pub impl Default for ExportLogsServiceResponse with fn default() -> ExportLogsServiceResponse {
-  { partial_success: Default::default() }
+  { partial_success: Default::default(), }
 }
 
 ///|
@@ -275,7 +275,7 @@ pub fn ExportLogsPartialSuccess::new(
   rejected_log_records : Int64,
   error_message : String,
 ) -> ExportLogsPartialSuccess {
-  { rejected_log_records, error_message }
+  { rejected_log_records, error_message, }
 }
 
 ///|

@@ -291,7 +291,7 @@ pub struct SdkTracer {
 /// Creates a span status.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#set-status
 pub fn Status::new(code : StatusCode, description? : String? = None) -> Status {
-  { code, description }
+  { code, description, }
 }
 
 ///|
@@ -345,7 +345,7 @@ pub fn SpanLink::new(
   attributes? : ArrayView[@common.KeyValue] = [],
   dropped_attributes_count? : Int = 0,
 ) -> SpanLink {
-  { span_context, attributes: attributes.to_owned(), dropped_attributes_count }
+  { span_context, attributes: attributes.to_owned(), dropped_attributes_count, }
 }
 
 ///|
@@ -380,7 +380,7 @@ pub fn SamplingResult::new(
   attributes? : ArrayView[@common.KeyValue] = [],
   trace_state? : @common.TraceState = Default::default(),
 ) -> SamplingResult {
-  { decision, attributes: attributes.to_owned(), trace_state }
+  { decision, attributes: attributes.to_owned(), trace_state, }
 }
 
 ///|
@@ -402,7 +402,7 @@ pub fn Sampler::new(
   should_sample_fn : (SamplingParameters) -> SamplingResult,
   description_fn : () -> String,
 ) -> Sampler {
-  { should_sample_fn, description_fn }
+  { should_sample_fn, description_fn, }
 }
 
 ///|
@@ -644,7 +644,7 @@ pub fn IdGenerator::new(
   new_trace_id_fn : () -> @common.TraceId,
   new_span_id_fn : () -> @common.SpanId,
 ) -> IdGenerator {
-  { new_trace_id_fn, new_span_id_fn }
+  { new_trace_id_fn, new_span_id_fn, }
 }
 
 ///|
@@ -757,7 +757,7 @@ pub fn Config::new(
   span_limits? : SpanLimits = Default::default(),
   resource? : @resource.Resource = @resource.Resource::builder().build(),
 ) -> Config {
-  { sampler, id_generator, span_limits, resource }
+  { sampler, id_generator, span_limits, resource, }
 }
 
 ///|
@@ -774,7 +774,7 @@ pub fn SpanExporter::new(
   shutdown_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
   name_fn? : () -> String = () => "custom",
 ) -> SpanExporter {
-  { export_fn, force_flush_fn, shutdown_fn, name_fn }
+  { export_fn, force_flush_fn, shutdown_fn, name_fn, }
 }
 
 ///|
@@ -832,7 +832,7 @@ pub fn SpanProcessor::new(
   force_flush_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
   shutdown_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
 ) -> SpanProcessor {
-  { on_start_fn, on_end_fn, force_flush_fn, shutdown_fn }
+  { on_start_fn, on_end_fn, force_flush_fn, shutdown_fn, }
 }
 
 ///|
@@ -889,7 +889,7 @@ pub async fn SpanProcessor::shutdown(
 /// Creates an empty in-memory span exporter.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-exporter
 pub fn InMemorySpanExporter::new() -> InMemorySpanExporter {
-  { state: Ref({ finished_spans: [], is_shutdown: false }) }
+  { state: Ref({ finished_spans: [], is_shutdown: false, }), }
 }
 
 ///|
@@ -905,7 +905,7 @@ pub fn InMemorySpanExporter::finished_spans(
 /// Clears the in-memory span buffer.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-exporter
 pub fn InMemorySpanExporter::reset(self : InMemorySpanExporter) -> Unit {
-  self.state.val = { ..self.state.val, finished_spans: [] }
+  self.state.val = { ..self.state.val, finished_spans: [], }
 }
 
 ///|
@@ -936,7 +936,7 @@ pub fn InMemorySpanExporter::into_span_exporter(
       if state.val.is_shutdown {
         @error.already_shutdown()
       } else {
-        state.val = { ..state.val, is_shutdown: true }
+        state.val = { ..state.val, is_shutdown: true, }
         @error.ok()
       }
     },
@@ -1043,7 +1043,7 @@ pub fn BatchSpanProcessor::new(
           return @error.already_shutdown()
         }
         let result = flush_span_queue(state)
-        state.val = { ..state.val, is_shutdown: true }
+        state.val = { ..state.val, is_shutdown: true, }
         match result {
           Ok(_) =>
             state.val.exporter.shutdown_with_timeout(
@@ -1289,7 +1289,7 @@ pub fn Span::set_status(self : Span, status : Status) -> Unit {
 /// Updates the span name.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#updatename
 pub fn Span::update_name(self : Span, name : StringView) -> Unit {
-  self.state.val = { ..self.state.val, name: name.to_owned() }
+  self.state.val = { ..self.state.val, name: name.to_owned(), }
 }
 
 ///|
@@ -1332,7 +1332,7 @@ pub async fn Span::end(
 /// no telemetry is exported.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-provider
 pub fn SdkTracerProvider::builder() -> SdkTracerProviderBuilder {
-  { config: Default::default(), processors: [], batch_processors: [] }
+  { config: Default::default(), processors: [], batch_processors: [], }
 }
 
 ///|
@@ -1491,7 +1491,7 @@ pub fn SdkTracerProvider::tracer(
     None => ()
   }
   scope = scope.with_attributes(attributes)
-  { provider: self, instrumentation_scope: scope.build() }
+  { provider: self, instrumentation_scope: scope.build(), }
 }
 
 ///|
@@ -1523,7 +1523,7 @@ pub async fn SdkTracerProvider::shutdown_with_timeout(
     return @error.already_shutdown()
   }
   let processors = self.state.val.processors.copy()
-  self.state.val = { ..self.state.val, is_shutdown: true }
+  self.state.val = { ..self.state.val, is_shutdown: true, }
   for processor in processors {
     match processor.shutdown_with_timeout(timeout_millis) {
       Ok(_) => ()

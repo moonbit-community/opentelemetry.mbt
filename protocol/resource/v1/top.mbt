@@ -35,7 +35,7 @@ pub fn Resource::new(
   dropped_attributes_count : UInt,
   entity_refs : Array[@v1_dep.EntityRef],
 ) -> Resource {
-  { attributes, dropped_attributes_count, entity_refs }
+  { attributes, dropped_attributes_count, entity_refs, }
 }
 
 ///|
