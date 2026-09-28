@@ -4,7 +4,7 @@ version = "0.1.0"
 
 import {
   "moonbit-community/opentelemetry@0.1.4",
-  "moonbitlang/async@0.21.0",
+  "moonbitlang/async@0.22.4",
   "moonbitlang/protobuf@0.1.0",
 }
 
