@@ -3,7 +3,7 @@ name = "moonbit-community/opentelemetry"
 version = "0.1.6"
 
 import {
-  "moonbitlang/async@0.21.0",
+  "moonbitlang/async@0.22.4",
   "moonbitlang/protobuf@0.1.2",
 }
 
