@@ -46,8 +46,8 @@ The SDK does not automatically start background export loops. Call
 ```mbt check
 ///|
 async fn _sdk_readme_trace_setup() -> Unit {
-  let exporter = InMemorySpanExporter::new()
-  let provider = tracer_provider_builder()
+  let exporter = @sdk.InMemorySpanExporter::new()
+  let provider = @sdk.tracer_provider_builder()
     .with_simple_exporter(exporter.into_span_exporter())
     .build()
 

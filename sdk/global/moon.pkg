@@ -1,5 +1,4 @@
 import {
-  "moonbitlang/core/debug",
   "moonbitlang/async",
   "moonbit-community/opentelemetry/interface/common",
   "moonbit-community/opentelemetry/sdk/logs",
@@ -7,6 +6,10 @@ import {
   "moonbit-community/opentelemetry/interface/propagation",
   "moonbit-community/opentelemetry/sdk/trace",
 }
+
+import {
+  "moonbitlang/core/debug",
+} for "test"
 
 options(
   backend: [ "native" ],

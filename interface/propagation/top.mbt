@@ -27,7 +27,7 @@ impl Extractor with fn keys(_) {
 
 ///|
 fn normalize_ascii_lower(value : StringView) -> String {
-  let builder = StringBuilder::new()
+  let builder = StringBuilder()
   for _, ch in value {
     builder.write_char(ch.to_ascii_lowercase())
   }
@@ -200,7 +200,7 @@ fn is_unreserved_baggage_char(ch : Char) -> Bool {
 
 ///|
 fn encode_baggage_component(value : StringView) -> String {
-  let builder = StringBuilder::new()
+  let builder = StringBuilder()
   for _, ch in value {
     if is_unreserved_baggage_char(ch) {
       builder.write_char(ch)
@@ -225,7 +225,7 @@ fn is_hex_digit(value : StringView) -> Bool {
 
 ///|
 fn decode_baggage_component(value : StringView) -> String {
-  let builder = StringBuilder::new()
+  let builder = StringBuilder()
   let mut index = 0
   while index < value.length() {
     let ch = value[index:index + 1]
@@ -257,7 +257,7 @@ fn encode_baggage(baggage : @baggage.Baggage) -> String? {
   if baggage.is_empty() {
     return None
   }
-  let builder = StringBuilder::new()
+  let builder = StringBuilder()
   let mut is_first = true
   for entry in baggage.entries() {
     let key = entry.key.as_string().trim()

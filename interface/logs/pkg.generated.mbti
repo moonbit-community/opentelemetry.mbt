@@ -20,15 +20,23 @@ pub(all) enum AnyValue {
   ListAny(Array[AnyValue])
   Map(Map[String, AnyValue])
 } derive(Eq, ToJson, @debug.Debug)
+pub fn AnyValue::equal(Self, Self) -> Bool
 pub fn AnyValue::from_common(@common.Value) -> Self
 pub fn AnyValue::map(Map[String, Self]) -> Self
+pub fn AnyValue::not_equal(Self, Self) -> Bool
+pub fn AnyValue::to_json(Self) -> Json
+pub fn AnyValue::to_repr(Self) -> @debug.Repr
 
 pub struct KeyValue {
   key : @common.Key
   value : AnyValue
 } derive(Eq, ToJson, @debug.Debug)
+pub fn KeyValue::equal(Self, Self) -> Bool
 pub fn KeyValue::from_common(@common.KeyValue) -> Self
 pub fn KeyValue::new(StringView, AnyValue) -> Self
+pub fn KeyValue::not_equal(Self, Self) -> Bool
+pub fn KeyValue::to_json(Self) -> Json
+pub fn KeyValue::to_repr(Self) -> @debug.Repr
 
 pub struct LogRecord {
   mut event_name : String?
@@ -43,7 +51,10 @@ pub struct LogRecord {
 } derive(Eq, ToJson, @debug.Debug)
 pub fn LogRecord::add_attribute(Self, StringView, AnyValue) -> Unit
 pub fn LogRecord::add_attributes(Self, ArrayView[@common.KeyValue]) -> Unit
+pub fn LogRecord::default() -> Self
+pub fn LogRecord::equal(Self, Self) -> Bool
 pub fn LogRecord::new() -> Self
+pub fn LogRecord::not_equal(Self, Self) -> Bool
 pub fn LogRecord::set_body(Self, AnyValue) -> Unit
 pub fn LogRecord::set_event_name(Self, StringView) -> Unit
 pub fn LogRecord::set_observed_timestamp(Self, Int64) -> Unit
@@ -52,6 +63,8 @@ pub fn LogRecord::set_severity_text(Self, StringView) -> Unit
 pub fn LogRecord::set_target(Self, StringView) -> Unit
 pub fn LogRecord::set_timestamp(Self, Int64) -> Unit
 pub fn LogRecord::set_trace_context(Self, @common.TraceId, @common.SpanId, trace_flags? : @common.TraceFlags?) -> Unit
+pub fn LogRecord::to_json(Self) -> Json
+pub fn LogRecord::to_repr(Self) -> @debug.Repr
 pub impl Default for LogRecord
 
 pub struct Logger {
@@ -97,7 +110,18 @@ pub(all) enum Severity {
   Fatal3
   Fatal4
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn Severity::compare(Self, Self) -> Int
+pub fn Severity::equal(Self, Self) -> Bool
+pub fn Severity::hash(Self) -> Int
+pub fn Severity::hash_combine(Self, Hasher) -> Unit
 pub fn Severity::name(Self) -> String
+pub fn Severity::not_equal(Self, Self) -> Bool
+pub fn Severity::op_ge(Self, Self) -> Bool
+pub fn Severity::op_gt(Self, Self) -> Bool
+pub fn Severity::op_le(Self, Self) -> Bool
+pub fn Severity::op_lt(Self, Self) -> Bool
+pub fn Severity::to_json(Self) -> Json
+pub fn Severity::to_repr(Self) -> @debug.Repr
 
 // Type aliases
 

@@ -14,6 +14,21 @@ pub(all) enum SpanKind {
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
+pub extend SpanKind with Eq::{not_equal, equal}
+
+///|
+pub extend SpanKind with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+pub extend SpanKind with Hash::{hash, hash_combine}
+
+///|
+pub extend SpanKind with ToJson::{to_json}
+
+///|
+pub extend SpanKind with Debug::{to_repr}
+
+///|
 /// OpenTelemetry status code attached to a completed span.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#set-status
 pub(all) enum StatusCode {
@@ -23,12 +38,36 @@ pub(all) enum StatusCode {
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
+pub extend StatusCode with Eq::{not_equal, equal}
+
+///|
+pub extend StatusCode with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+pub extend StatusCode with Hash::{hash, hash_combine}
+
+///|
+pub extend StatusCode with ToJson::{to_json}
+
+///|
+pub extend StatusCode with Debug::{to_repr}
+
+///|
 /// Span status consisting of a code and optional description.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#set-status
 pub struct Status {
   code : StatusCode
   description : String?
 } derive(Eq, ToJson, Debug)
+
+///|
+pub extend Status with Eq::{not_equal, equal}
+
+///|
+pub extend Status with ToJson::{to_json}
+
+///|
+pub extend Status with Debug::{to_repr}
 
 ///|
 /// Event recorded on a span timeline.
@@ -41,6 +80,15 @@ pub struct SpanEvent {
 } derive(Eq, ToJson, Debug)
 
 ///|
+pub extend SpanEvent with Eq::{not_equal, equal}
+
+///|
+pub extend SpanEvent with ToJson::{to_json}
+
+///|
+pub extend SpanEvent with Debug::{to_repr}
+
+///|
 /// Link from one span to another span context.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#link
 pub struct SpanLink {
@@ -48,6 +96,15 @@ pub struct SpanLink {
   attributes : Array[@common.KeyValue]
   dropped_attributes_count : Int
 } derive(Eq, ToJson, Debug)
+
+///|
+pub extend SpanLink with Eq::{not_equal, equal}
+
+///|
+pub extend SpanLink with ToJson::{to_json}
+
+///|
+pub extend SpanLink with Debug::{to_repr}
 
 ///|
 /// Per-span limits for attributes, events, and links.
@@ -59,6 +116,21 @@ pub struct SpanLimits {
   max_attributes_per_event : Int
   max_attributes_per_link : Int
 } derive(Eq, Compare, Hash, ToJson, Debug)
+
+///|
+pub extend SpanLimits with Eq::{not_equal, equal}
+
+///|
+pub extend SpanLimits with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+pub extend SpanLimits with Hash::{hash, hash_combine}
+
+///|
+pub extend SpanLimits with ToJson::{to_json}
+
+///|
+pub extend SpanLimits with Debug::{to_repr}
 
 ///|
 /// Result of a sampler decision.
@@ -74,6 +146,21 @@ pub(all) enum SamplingDecision {
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
+pub extend SamplingDecision with Eq::{not_equal, equal}
+
+///|
+pub extend SamplingDecision with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+pub extend SamplingDecision with Hash::{hash, hash_combine}
+
+///|
+pub extend SamplingDecision with ToJson::{to_json}
+
+///|
+pub extend SamplingDecision with Debug::{to_repr}
+
+///|
 /// Full sampler output, including attributes and trace state to apply to the
 /// started span.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#sampling
@@ -82,6 +169,15 @@ pub struct SamplingResult {
   attributes : Array[@common.KeyValue]
   trace_state : @common.TraceState
 } derive(Eq, ToJson, Debug)
+
+///|
+pub extend SamplingResult with Eq::{not_equal, equal}
+
+///|
+pub extend SamplingResult with ToJson::{to_json}
+
+///|
+pub extend SamplingResult with Debug::{to_repr}
 
 ///|
 /// Inputs provided to a sampler when a span is started.
@@ -94,6 +190,15 @@ pub struct SamplingParameters {
   attributes : Array[@common.KeyValue]
   links : Array[SpanLink]
 } derive(Eq, ToJson, Debug)
+
+///|
+pub extend SamplingParameters with Eq::{not_equal, equal}
+
+///|
+pub extend SamplingParameters with ToJson::{to_json}
+
+///|
+pub extend SamplingParameters with Debug::{to_repr}
 
 ///|
 /// Sampling policy wrapper.
@@ -129,6 +234,21 @@ pub struct BatchConfig {
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
+pub extend BatchConfig with Eq::{not_equal, equal}
+
+///|
+pub extend BatchConfig with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+pub extend BatchConfig with Hash::{hash, hash_combine}
+
+///|
+pub extend BatchConfig with ToJson::{to_json}
+
+///|
+pub extend BatchConfig with Debug::{to_repr}
+
+///|
 /// Provider-wide trace configuration.
 ///
 /// Configuration is read when a span starts. Builder methods override defaults
@@ -161,6 +281,15 @@ pub struct SpanData {
   resource : @resource.Resource
   instrumentation_scope : @common.InstrumentationScope
 } derive(Eq, ToJson, Debug)
+
+///|
+pub extend SpanData with Eq::{not_equal, equal}
+
+///|
+pub extend SpanData with ToJson::{to_json}
+
+///|
+pub extend SpanData with Debug::{to_repr}
 
 ///|
 /// Exporter callback wrapper for finished span batches.
@@ -321,6 +450,9 @@ pub impl Default for Status with fn default() -> Status {
 }
 
 ///|
+pub extend Status with Default::{default}
+
+///|
 /// Creates a span event.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#add-events
 pub fn SpanEvent::new(
@@ -371,6 +503,9 @@ pub fn SpanLimits::new(
 pub impl Default for SpanLimits with fn default() -> SpanLimits {
   SpanLimits::new()
 }
+
+///|
+pub extend SpanLimits with Default::{default}
 
 ///|
 /// Creates a sampling result.
@@ -638,6 +773,9 @@ pub impl Default for Sampler with fn default() -> Sampler {
 }
 
 ///|
+pub extend Sampler with Default::{default}
+
+///|
 /// Builds an ID generator from callbacks.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#id-generators
 pub fn IdGenerator::new(
@@ -746,6 +884,9 @@ pub impl Default for BatchConfig with fn default() -> BatchConfig {
 }
 
 ///|
+pub extend BatchConfig with Default::{default}
+
+///|
 /// Creates trace provider configuration.
 ///
 /// Omitted arguments use default sampler, ID generator, span limits, and
@@ -764,6 +905,9 @@ pub fn Config::new(
 pub impl Default for Config with fn default() -> Config {
   Config::new(sampler=sampler_from_env(), span_limits=span_limits_from_env())
 }
+
+///|
+pub extend Config with Default::{default}
 
 ///|
 /// Builds a span exporter from callbacks.

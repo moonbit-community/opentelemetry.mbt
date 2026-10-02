@@ -18,14 +18,22 @@ pub struct Event {
   attributes : Array[@common.KeyValue]
   dropped_attributes_count : Int
 } derive(Eq, ToJson, @debug.Debug)
+pub fn Event::equal(Self, Self) -> Bool
 pub fn Event::new(StringView, timestamp_unix_nano? : Int64, attributes? : ArrayView[@common.KeyValue], dropped_attributes_count? : Int) -> Self
+pub fn Event::not_equal(Self, Self) -> Bool
+pub fn Event::to_json(Self) -> Json
+pub fn Event::to_repr(Self) -> @debug.Repr
 
 pub struct Link {
   span_context : @common.SpanContext
   attributes : Array[@common.KeyValue]
   dropped_attributes_count : Int
 } derive(Eq, ToJson, @debug.Debug)
+pub fn Link::equal(Self, Self) -> Bool
 pub fn Link::new(@common.SpanContext, attributes? : ArrayView[@common.KeyValue], dropped_attributes_count? : Int) -> Self
+pub fn Link::not_equal(Self, Self) -> Bool
+pub fn Link::to_json(Self) -> Json
+pub fn Link::to_repr(Self) -> @debug.Repr
 
 pub struct Span {
   span_context_fn : () -> @common.SpanContext
@@ -63,7 +71,11 @@ pub struct SpanBuilder {
   events : Array[Event]
   links : Array[Link]
 } derive(Eq, ToJson, @debug.Debug)
+pub fn SpanBuilder::equal(Self, Self) -> Bool
 pub fn SpanBuilder::from_name(StringView) -> Self
+pub fn SpanBuilder::not_equal(Self, Self) -> Bool
+pub fn SpanBuilder::to_json(Self) -> Json
+pub fn SpanBuilder::to_repr(Self) -> @debug.Repr
 pub fn SpanBuilder::with_attributes(Self, ArrayView[@common.KeyValue]) -> Self
 pub fn SpanBuilder::with_events(Self, ArrayView[Event]) -> Self
 pub fn SpanBuilder::with_kind(Self, SpanKind) -> Self
@@ -77,14 +89,30 @@ pub(all) enum SpanKind {
   Producer
   Consumer
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn SpanKind::compare(Self, Self) -> Int
+pub fn SpanKind::equal(Self, Self) -> Bool
+pub fn SpanKind::hash(Self) -> Int
+pub fn SpanKind::hash_combine(Self, Hasher) -> Unit
+pub fn SpanKind::not_equal(Self, Self) -> Bool
+pub fn SpanKind::op_ge(Self, Self) -> Bool
+pub fn SpanKind::op_gt(Self, Self) -> Bool
+pub fn SpanKind::op_le(Self, Self) -> Bool
+pub fn SpanKind::op_lt(Self, Self) -> Bool
+pub fn SpanKind::to_json(Self) -> Json
+pub fn SpanKind::to_repr(Self) -> @debug.Repr
 
 pub struct Status {
   code : StatusCode
   description : String?
 } derive(Eq, ToJson, @debug.Debug)
+pub fn Status::default() -> Self
+pub fn Status::equal(Self, Self) -> Bool
 pub fn Status::error(description? : String?) -> Self
 pub fn Status::new(StatusCode, description? : String?) -> Self
+pub fn Status::not_equal(Self, Self) -> Bool
 pub fn Status::ok() -> Self
+pub fn Status::to_json(Self) -> Json
+pub fn Status::to_repr(Self) -> @debug.Repr
 pub fn Status::unset() -> Self
 pub impl Default for Status
 
@@ -93,6 +121,17 @@ pub(all) enum StatusCode {
   Ok
   Error
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn StatusCode::compare(Self, Self) -> Int
+pub fn StatusCode::equal(Self, Self) -> Bool
+pub fn StatusCode::hash(Self) -> Int
+pub fn StatusCode::hash_combine(Self, Hasher) -> Unit
+pub fn StatusCode::not_equal(Self, Self) -> Bool
+pub fn StatusCode::op_ge(Self, Self) -> Bool
+pub fn StatusCode::op_gt(Self, Self) -> Bool
+pub fn StatusCode::op_le(Self, Self) -> Bool
+pub fn StatusCode::op_lt(Self, Self) -> Bool
+pub fn StatusCode::to_json(Self) -> Json
+pub fn StatusCode::to_repr(Self) -> @debug.Repr
 
 pub struct Tracer {
   build_with_context_fn : (SpanBuilder, @context.Context) -> Span

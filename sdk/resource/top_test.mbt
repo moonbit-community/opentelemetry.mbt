@@ -22,7 +22,7 @@ test "env resource detector reads process environment" {
   @env.set_env_var("OTEL_SERVICE_NAME", "native-service")
   @env.set_env_var("OTEL_RESOURCE_ATTRIBUTES", "deployment.environment=staging")
 
-  let resource = env_resource_detector().detect()
+  let resource = @resource.env_resource_detector().detect()
   guard resource.get("service.name") is Some(String(service_name)) else {
     fail("expected service.name from environment")
   }
@@ -35,7 +35,7 @@ test "env resource detector reads process environment" {
   @env.set_env_var(
     "OTEL_RESOURCE_ATTRIBUTES", "valid.attribute=kept,malformed-attribute",
   )
-  let malformed_resource = env_resource_detector().detect()
+  let malformed_resource = @resource.env_resource_detector().detect()
   @debug.assert_eq(malformed_resource.get("valid.attribute"), None)
   guard malformed_resource.get("service.name") is Some(String(service_name)) else {
     fail("expected OTEL_SERVICE_NAME to remain effective")

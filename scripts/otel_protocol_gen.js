@@ -22,11 +22,48 @@ const generatedTopLevelDirs = [
   "opentelemetry",
 ];
 
+// Methods that each trait used by the generated code contributes to a type.
+// MoonBit no longer promotes trait methods to regular methods implicitly
+// (warning `implicit_impl_as_method`), so the generated code declares the
+// promotion explicitly with `pub extend T with Trait::{...}` to keep the
+// public API unchanged.
+const extendedTraitMethods = new Map([
+  ["Eq", ["equal", "not_equal"]],
+  ["Default", ["default"]],
+  ["ToJson", ["to_json"]],
+  ["@json.FromJson", ["from_json"]],
+  ["@protobuf.Sized", ["size_of"]],
+  ["@protobuf.Read", ["read", "read_with_limit"]],
+  ["@protobuf.Write", ["write"]],
+  ["@protobuf.AsyncRead", ["read", "read_with_limit"]],
+  ["@protobuf.AsyncWrite", ["write"]],
+]);
+
+// The async codec traits define methods with the same names as the sync
+// ones; a type can only have one regular method per name, so when both are
+// implemented only the sync trait is promoted.
+const shadowedBy = new Map([
+  ["@protobuf.AsyncRead", "@protobuf.Read"],
+  ["@protobuf.AsyncWrite", "@protobuf.Write"],
+]);
+
 if (require.main === module) {
   main();
 }
 
 function main() {
+  if (process.argv.includes("--postprocess-only")) {
+    // Re-apply the post-processing to the checked-in generated code without
+    // re-running protoc (useful when only the post-processing changed).
+    for (const packageDir of walkPackageDirs(protocolDir)) {
+      const topMbtPath = path.join(packageDir, "top.mbt");
+      fs.writeFileSync(topMbtPath, postprocessTopMbt(fs.readFileSync(topMbtPath, "utf8")));
+    }
+    runCommand("moon", ["info"]);
+    runCommand("moon", ["fmt"]);
+    return;
+  }
+
   const moduleName = readModuleName(rootMoonModPath);
   const { username, projectName } = parseModuleName(moduleName);
 
@@ -204,7 +241,7 @@ function syncGeneratedTree({ outDir, projectName, moduleName }) {
     moonPkgContent = ensureJsonImport(moonPkgContent, moonPkgPath);
 
     let topMbtContent = fs.readFileSync(topMbtPath, "utf8");
-    topMbtContent = rewriteTopMbt(topMbtContent);
+    topMbtContent = postprocessTopMbt(topMbtContent);
 
     const aliasRewrites = findAliasRewrites(packageDir, moonPkgContent);
     for (const [oldAlias, newAlias] of aliasRewrites) {
@@ -279,6 +316,64 @@ function findAliasRewrites(packageDir, moonPkgContent) {
   return aliasRewrites;
 }
 
+function postprocessTopMbt(content) {
+  return addExplicitExtends(rewriteTopMbt(content));
+}
+
+function addExplicitExtends(content) {
+  const traitsByType = new Map();
+  const addTrait = (typeName, traitName) => {
+    if (!extendedTraitMethods.has(traitName)) {
+      throw new Error(`Unexpected trait ${traitName} for ${typeName} in generated code`);
+    }
+    if (!traitsByType.has(typeName)) {
+      traitsByType.set(typeName, []);
+    }
+    const traits = traitsByType.get(typeName);
+    if (!traits.includes(traitName)) {
+      traits.push(traitName);
+    }
+  };
+
+  let currentType = null;
+  for (const line of content.split("\n")) {
+    const typeDecl = line.match(/^(?:pub(?:\([a-z]+\))?\s+)?(?:struct|enum)\s+([A-Za-z_][A-Za-z0-9_]*)/);
+    if (typeDecl) {
+      currentType = typeDecl[1];
+    }
+    const derive = line.match(/^\s*\}?\s*derive\(([^)]*)\)/);
+    if (derive && currentType) {
+      for (const traitName of derive[1].split(",").map((s) => s.trim()).filter(Boolean)) {
+        addTrait(currentType, traitName);
+      }
+    }
+    const impl = line.match(/^pub\s+impl\s+(\S+)\s+for\s+([A-Za-z_][A-Za-z0-9_]*)\s+with\b/);
+    if (impl) {
+      addTrait(impl[2], impl[1]);
+    }
+  }
+
+  const extensions = [];
+  for (const [typeName, traits] of traitsByType) {
+    for (const traitName of traits) {
+      const shadowing = shadowedBy.get(traitName);
+      if (shadowing && traits.includes(shadowing)) {
+        continue;
+      }
+      if (content.includes(`extend ${typeName} with ${traitName}::`)) {
+        continue;
+      }
+      const methods = extendedTraitMethods.get(traitName).join(", ");
+      extensions.push(`///|\npub extend ${typeName} with ${traitName}::{${methods}}\n`);
+    }
+  }
+
+  if (extensions.length === 0) {
+    return content;
+  }
+  return `${content.replace(/\n*$/, "\n")}\n${extensions.join("\n")}`;
+}
+
 function rewriteTopMbt(content) {
   return content
     .replaceAll("for {", "for ;; {")
@@ -326,6 +421,7 @@ function readJson(filePath) {
 }
 
 module.exports = {
+  addExplicitExtends,
   loadProtoManifest,
   parseModuleName,
   readModuleName,

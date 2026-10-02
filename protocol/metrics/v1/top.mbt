@@ -3450,3 +3450,416 @@ pub impl @protobuf.AsyncWrite for Exemplar with fn write(
     NotSet => ()
   }
 }
+
+///|
+pub extend AggregationTemporality with Eq::{equal, not_equal}
+
+///|
+pub extend AggregationTemporality with Default::{default}
+
+///|
+pub extend AggregationTemporality with @protobuf.Sized::{size_of}
+
+///|
+pub extend AggregationTemporality with @json.FromJson::{from_json}
+
+///|
+pub extend AggregationTemporality with ToJson::{to_json}
+
+///|
+pub extend DataPointFlags with Eq::{equal, not_equal}
+
+///|
+pub extend DataPointFlags with Default::{default}
+
+///|
+pub extend DataPointFlags with @protobuf.Sized::{size_of}
+
+///|
+pub extend DataPointFlags with @json.FromJson::{from_json}
+
+///|
+pub extend DataPointFlags with ToJson::{to_json}
+
+///|
+pub extend MetricsData with Eq::{equal, not_equal}
+
+///|
+pub extend MetricsData with @protobuf.Sized::{size_of}
+
+///|
+pub extend MetricsData with Default::{default}
+
+///|
+pub extend MetricsData with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend MetricsData with @protobuf.Write::{write}
+
+///|
+pub extend MetricsData with ToJson::{to_json}
+
+///|
+pub extend MetricsData with @json.FromJson::{from_json}
+
+///|
+pub extend ResourceMetrics with Eq::{equal, not_equal}
+
+///|
+pub extend ResourceMetrics with @protobuf.Sized::{size_of}
+
+///|
+pub extend ResourceMetrics with Default::{default}
+
+///|
+pub extend ResourceMetrics with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend ResourceMetrics with @protobuf.Write::{write}
+
+///|
+pub extend ResourceMetrics with ToJson::{to_json}
+
+///|
+pub extend ResourceMetrics with @json.FromJson::{from_json}
+
+///|
+pub extend ScopeMetrics with Eq::{equal, not_equal}
+
+///|
+pub extend ScopeMetrics with @protobuf.Sized::{size_of}
+
+///|
+pub extend ScopeMetrics with Default::{default}
+
+///|
+pub extend ScopeMetrics with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend ScopeMetrics with @protobuf.Write::{write}
+
+///|
+pub extend ScopeMetrics with ToJson::{to_json}
+
+///|
+pub extend ScopeMetrics with @json.FromJson::{from_json}
+
+///|
+pub extend Metric with Eq::{equal, not_equal}
+
+///|
+pub extend Metric with @protobuf.Sized::{size_of}
+
+///|
+pub extend Metric with Default::{default}
+
+///|
+pub extend Metric with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend Metric with @protobuf.Write::{write}
+
+///|
+pub extend Metric with ToJson::{to_json}
+
+///|
+pub extend Metric with @json.FromJson::{from_json}
+
+///|
+pub extend Metric_Data with Eq::{equal, not_equal}
+
+///|
+pub extend Metric_Data with Default::{default}
+
+///|
+pub extend Metric_Data with @json.FromJson::{from_json}
+
+///|
+pub extend Metric_Data with ToJson::{to_json}
+
+///|
+pub extend Gauge with Eq::{equal, not_equal}
+
+///|
+pub extend Gauge with @protobuf.Sized::{size_of}
+
+///|
+pub extend Gauge with Default::{default}
+
+///|
+pub extend Gauge with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend Gauge with @protobuf.Write::{write}
+
+///|
+pub extend Gauge with ToJson::{to_json}
+
+///|
+pub extend Gauge with @json.FromJson::{from_json}
+
+///|
+pub extend Sum with Eq::{equal, not_equal}
+
+///|
+pub extend Sum with @protobuf.Sized::{size_of}
+
+///|
+pub extend Sum with Default::{default}
+
+///|
+pub extend Sum with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend Sum with @protobuf.Write::{write}
+
+///|
+pub extend Sum with ToJson::{to_json}
+
+///|
+pub extend Sum with @json.FromJson::{from_json}
+
+///|
+pub extend Histogram with Eq::{equal, not_equal}
+
+///|
+pub extend Histogram with @protobuf.Sized::{size_of}
+
+///|
+pub extend Histogram with Default::{default}
+
+///|
+pub extend Histogram with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend Histogram with @protobuf.Write::{write}
+
+///|
+pub extend Histogram with ToJson::{to_json}
+
+///|
+pub extend Histogram with @json.FromJson::{from_json}
+
+///|
+pub extend ExponentialHistogram with Eq::{equal, not_equal}
+
+///|
+pub extend ExponentialHistogram with @protobuf.Sized::{size_of}
+
+///|
+pub extend ExponentialHistogram with Default::{default}
+
+///|
+pub extend ExponentialHistogram with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend ExponentialHistogram with @protobuf.Write::{write}
+
+///|
+pub extend ExponentialHistogram with ToJson::{to_json}
+
+///|
+pub extend ExponentialHistogram with @json.FromJson::{from_json}
+
+///|
+pub extend Summary with Eq::{equal, not_equal}
+
+///|
+pub extend Summary with @protobuf.Sized::{size_of}
+
+///|
+pub extend Summary with Default::{default}
+
+///|
+pub extend Summary with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend Summary with @protobuf.Write::{write}
+
+///|
+pub extend Summary with ToJson::{to_json}
+
+///|
+pub extend Summary with @json.FromJson::{from_json}
+
+///|
+pub extend NumberDataPoint with Eq::{equal, not_equal}
+
+///|
+pub extend NumberDataPoint with @protobuf.Sized::{size_of}
+
+///|
+pub extend NumberDataPoint with Default::{default}
+
+///|
+pub extend NumberDataPoint with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend NumberDataPoint with @protobuf.Write::{write}
+
+///|
+pub extend NumberDataPoint with ToJson::{to_json}
+
+///|
+pub extend NumberDataPoint with @json.FromJson::{from_json}
+
+///|
+pub extend NumberDataPoint_Value with Eq::{equal, not_equal}
+
+///|
+pub extend NumberDataPoint_Value with Default::{default}
+
+///|
+pub extend NumberDataPoint_Value with @json.FromJson::{from_json}
+
+///|
+pub extend NumberDataPoint_Value with ToJson::{to_json}
+
+///|
+pub extend HistogramDataPoint with Eq::{equal, not_equal}
+
+///|
+pub extend HistogramDataPoint with @protobuf.Sized::{size_of}
+
+///|
+pub extend HistogramDataPoint with Default::{default}
+
+///|
+pub extend HistogramDataPoint with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend HistogramDataPoint with @protobuf.Write::{write}
+
+///|
+pub extend HistogramDataPoint with ToJson::{to_json}
+
+///|
+pub extend HistogramDataPoint with @json.FromJson::{from_json}
+
+///|
+pub extend ExponentialHistogramDataPoint_Buckets with Eq::{equal, not_equal}
+
+///|
+pub extend ExponentialHistogramDataPoint_Buckets with @protobuf.Sized::{size_of}
+
+///|
+pub extend ExponentialHistogramDataPoint_Buckets with Default::{default}
+
+///|
+pub extend ExponentialHistogramDataPoint_Buckets with @protobuf.Read::{
+  read,
+  read_with_limit,
+}
+
+///|
+pub extend ExponentialHistogramDataPoint_Buckets with @protobuf.Write::{write}
+
+///|
+pub extend ExponentialHistogramDataPoint_Buckets with ToJson::{to_json}
+
+///|
+pub extend ExponentialHistogramDataPoint_Buckets with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub extend ExponentialHistogramDataPoint with Eq::{equal, not_equal}
+
+///|
+pub extend ExponentialHistogramDataPoint with @protobuf.Sized::{size_of}
+
+///|
+pub extend ExponentialHistogramDataPoint with Default::{default}
+
+///|
+pub extend ExponentialHistogramDataPoint with @protobuf.Read::{
+  read,
+  read_with_limit,
+}
+
+///|
+pub extend ExponentialHistogramDataPoint with @protobuf.Write::{write}
+
+///|
+pub extend ExponentialHistogramDataPoint with ToJson::{to_json}
+
+///|
+pub extend ExponentialHistogramDataPoint with @json.FromJson::{from_json}
+
+///|
+pub extend SummaryDataPoint_ValueAtQuantile with Eq::{equal, not_equal}
+
+///|
+pub extend SummaryDataPoint_ValueAtQuantile with @protobuf.Sized::{size_of}
+
+///|
+pub extend SummaryDataPoint_ValueAtQuantile with Default::{default}
+
+///|
+pub extend SummaryDataPoint_ValueAtQuantile with @protobuf.Read::{
+  read,
+  read_with_limit,
+}
+
+///|
+pub extend SummaryDataPoint_ValueAtQuantile with @protobuf.Write::{write}
+
+///|
+pub extend SummaryDataPoint_ValueAtQuantile with ToJson::{to_json}
+
+///|
+pub extend SummaryDataPoint_ValueAtQuantile with @json.FromJson::{from_json}
+
+///|
+pub extend SummaryDataPoint with Eq::{equal, not_equal}
+
+///|
+pub extend SummaryDataPoint with @protobuf.Sized::{size_of}
+
+///|
+pub extend SummaryDataPoint with Default::{default}
+
+///|
+pub extend SummaryDataPoint with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend SummaryDataPoint with @protobuf.Write::{write}
+
+///|
+pub extend SummaryDataPoint with ToJson::{to_json}
+
+///|
+pub extend SummaryDataPoint with @json.FromJson::{from_json}
+
+///|
+pub extend Exemplar with Eq::{equal, not_equal}
+
+///|
+pub extend Exemplar with @protobuf.Sized::{size_of}
+
+///|
+pub extend Exemplar with Default::{default}
+
+///|
+pub extend Exemplar with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend Exemplar with @protobuf.Write::{write}
+
+///|
+pub extend Exemplar with ToJson::{to_json}
+
+///|
+pub extend Exemplar with @json.FromJson::{from_json}
+
+///|
+pub extend Exemplar_Value with Eq::{equal, not_equal}
+
+///|
+pub extend Exemplar_Value with Default::{default}
+
+///|
+pub extend Exemplar_Value with @json.FromJson::{from_json}
+
+///|
+pub extend Exemplar_Value with ToJson::{to_json}

@@ -22,7 +22,7 @@ instrumentation scope, and trace correlation fields.
 ```mbt check
 ///|
 async fn _logs_readme_emit() -> Unit {
-  let logger = LoggerProvider::noop().logger("example")
+  let logger = @logs.LoggerProvider::noop().logger("example")
   if logger.event_enabled(Info, "example") {
     let record = logger.create_log_record()
     record.set_event_name("user.created")
@@ -72,7 +72,7 @@ Logs can be correlated with traces by adding trace context to the record:
 ```mbt check
 ///|
 fn _logs_readme_trace_context(
-  record : LogRecord,
+  record : @logs.LogRecord,
   trace_id : @common.TraceId,
   span_id : @common.SpanId,
 ) -> Unit {

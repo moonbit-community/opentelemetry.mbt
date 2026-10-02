@@ -169,3 +169,24 @@ pub impl @protobuf.AsyncWrite for Resource with fn write(
     @protobuf.AsyncWrite::write(item, writer)
   }
 }
+
+///|
+pub extend Resource with Eq::{equal, not_equal}
+
+///|
+pub extend Resource with @protobuf.Sized::{size_of}
+
+///|
+pub extend Resource with Default::{default}
+
+///|
+pub extend Resource with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend Resource with @protobuf.Write::{write}
+
+///|
+pub extend Resource with ToJson::{to_json}
+
+///|
+pub extend Resource with @json.FromJson::{from_json}

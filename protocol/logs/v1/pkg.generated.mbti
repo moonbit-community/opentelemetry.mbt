@@ -24,7 +24,16 @@ pub(all) struct LogRecord {
   mut span_id : Bytes
   mut event_name : String
 } derive(Eq)
+pub fn LogRecord::default() -> Self
+pub fn LogRecord::equal(Self, Self) -> Bool
+pub fn LogRecord::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn LogRecord::new(UInt64, UInt64, SeverityNumber, String, @moonbit-community/opentelemetry/protocol/common/v1.AnyValue, Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt, UInt, Bytes, Bytes, String) -> Self
+pub fn LogRecord::not_equal(Self, Self) -> Bool
+pub fn LogRecord::read(&@protobuf.Reader) -> Self raise
+pub fn LogRecord::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn LogRecord::size_of(Self) -> UInt
+pub fn LogRecord::to_json(Self) -> Json
+pub fn LogRecord::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for LogRecord
 pub impl ToJson for LogRecord
 pub impl @json.FromJson for LogRecord
@@ -38,8 +47,14 @@ pub(all) enum LogRecordFlags {
   LOG_RECORD_FLAGS_DO_NOT_USE
   LOG_RECORD_FLAGS_TRACE_FLAGS_MASK
 } derive(Eq)
+pub fn LogRecordFlags::default() -> Self
+pub fn LogRecordFlags::equal(Self, Self) -> Bool
 pub fn LogRecordFlags::from_enum(@protobuf.Enum) -> Self
+pub fn LogRecordFlags::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn LogRecordFlags::not_equal(Self, Self) -> Bool
+pub fn LogRecordFlags::size_of(Self) -> UInt
 pub fn LogRecordFlags::to_enum(Self) -> @protobuf.Enum
+pub fn LogRecordFlags::to_json(Self) -> Json
 pub impl Default for LogRecordFlags
 pub impl ToJson for LogRecordFlags
 pub impl @json.FromJson for LogRecordFlags
@@ -48,7 +63,16 @@ pub impl @protobuf.Sized for LogRecordFlags
 pub(all) struct LogsData {
   mut resource_logs : Array[ResourceLogs]
 } derive(Eq)
+pub fn LogsData::default() -> Self
+pub fn LogsData::equal(Self, Self) -> Bool
+pub fn LogsData::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn LogsData::new(Array[ResourceLogs]) -> Self
+pub fn LogsData::not_equal(Self, Self) -> Bool
+pub fn LogsData::read(&@protobuf.Reader) -> Self raise
+pub fn LogsData::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn LogsData::size_of(Self) -> UInt
+pub fn LogsData::to_json(Self) -> Json
+pub fn LogsData::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for LogsData
 pub impl ToJson for LogsData
 pub impl @json.FromJson for LogsData
@@ -63,7 +87,16 @@ pub(all) struct ResourceLogs {
   mut scope_logs : Array[ScopeLogs]
   mut schema_url : String
 } derive(Eq)
+pub fn ResourceLogs::default() -> Self
+pub fn ResourceLogs::equal(Self, Self) -> Bool
+pub fn ResourceLogs::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ResourceLogs::new(@moonbit-community/opentelemetry/protocol/resource/v1.Resource, Array[ScopeLogs], String) -> Self
+pub fn ResourceLogs::not_equal(Self, Self) -> Bool
+pub fn ResourceLogs::read(&@protobuf.Reader) -> Self raise
+pub fn ResourceLogs::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn ResourceLogs::size_of(Self) -> UInt
+pub fn ResourceLogs::to_json(Self) -> Json
+pub fn ResourceLogs::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ResourceLogs
 pub impl ToJson for ResourceLogs
 pub impl @json.FromJson for ResourceLogs
@@ -78,7 +111,16 @@ pub(all) struct ScopeLogs {
   mut log_records : Array[LogRecord]
   mut schema_url : String
 } derive(Eq)
+pub fn ScopeLogs::default() -> Self
+pub fn ScopeLogs::equal(Self, Self) -> Bool
+pub fn ScopeLogs::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ScopeLogs::new(@moonbit-community/opentelemetry/protocol/common/v1.InstrumentationScope, Array[LogRecord], String) -> Self
+pub fn ScopeLogs::not_equal(Self, Self) -> Bool
+pub fn ScopeLogs::read(&@protobuf.Reader) -> Self raise
+pub fn ScopeLogs::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn ScopeLogs::size_of(Self) -> UInt
+pub fn ScopeLogs::to_json(Self) -> Json
+pub fn ScopeLogs::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ScopeLogs
 pub impl ToJson for ScopeLogs
 pub impl @json.FromJson for ScopeLogs
@@ -115,8 +157,14 @@ pub(all) enum SeverityNumber {
   SEVERITY_NUMBER_FATAL3
   SEVERITY_NUMBER_FATAL4
 } derive(Eq)
+pub fn SeverityNumber::default() -> Self
+pub fn SeverityNumber::equal(Self, Self) -> Bool
 pub fn SeverityNumber::from_enum(@protobuf.Enum) -> Self
+pub fn SeverityNumber::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SeverityNumber::not_equal(Self, Self) -> Bool
+pub fn SeverityNumber::size_of(Self) -> UInt
 pub fn SeverityNumber::to_enum(Self) -> @protobuf.Enum
+pub fn SeverityNumber::to_json(Self) -> Json
 pub impl Default for SeverityNumber
 pub impl ToJson for SeverityNumber
 pub impl @json.FromJson for SeverityNumber

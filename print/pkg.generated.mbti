@@ -17,6 +17,7 @@ import {
 pub struct LogExporter {
   state : @ref.Ref[SignalExporterState]
 }
+pub fn LogExporter::default() -> Self
 pub fn LogExporter::export_batch(Self, ArrayView[@logs.LogRecord]) -> Result[Unit, @error.OTelSdkError]
 pub fn LogExporter::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
 pub fn LogExporter::into_log_exporter(Self) -> @logs.LogExporter
@@ -31,6 +32,7 @@ pub struct MetricExporter {
   temporality : @metrics.Temporality
 }
 pub fn MetricExporter::builder() -> MetricExporterBuilder
+pub fn MetricExporter::default() -> Self
 pub fn MetricExporter::export_batch(Self, ArrayView[@metrics.MetricData]) -> Result[Unit, @error.OTelSdkError]
 pub fn MetricExporter::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
 pub fn MetricExporter::into_metric_exporter(Self) -> @metrics.MetricExporter
@@ -54,6 +56,7 @@ type SignalExporterState
 pub struct SpanExporter {
   state : @ref.Ref[SignalExporterState]
 }
+pub fn SpanExporter::default() -> Self
 pub fn SpanExporter::export_batch(Self, ArrayView[@trace.SpanData]) -> Result[Unit, @error.OTelSdkError]
 pub fn SpanExporter::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
 pub fn SpanExporter::into_span_exporter(Self) -> @trace.SpanExporter

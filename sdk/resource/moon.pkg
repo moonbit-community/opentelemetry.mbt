@@ -1,10 +1,12 @@
 import {
-  "moonbitlang/core/debug",
   "moonbitlang/core/env",
-  "moonbitlang/core/string",
   "moonbit-community/opentelemetry/internal/utils",
   "moonbit-community/opentelemetry/interface/common",
 }
+
+import {
+  "moonbitlang/core/debug",
+} for "test"
 
 options(
   backend: [ "native" ],
