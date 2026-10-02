@@ -405,3 +405,75 @@ pub impl @protobuf.AsyncWrite for ExportProfilesPartialSuccess with fn write(
   writer |> @protobuf.async_write_varint(18UL)
   writer |> @protobuf.async_write_string(self.error_message)
 }
+
+///|
+pub extend ExportProfilesServiceRequest with Eq::{equal, not_equal}
+
+///|
+pub extend ExportProfilesServiceRequest with @protobuf.Sized::{size_of}
+
+///|
+pub extend ExportProfilesServiceRequest with Default::{default}
+
+///|
+pub extend ExportProfilesServiceRequest with @protobuf.Read::{
+  read,
+  read_with_limit,
+}
+
+///|
+pub extend ExportProfilesServiceRequest with @protobuf.Write::{write}
+
+///|
+pub extend ExportProfilesServiceRequest with ToJson::{to_json}
+
+///|
+pub extend ExportProfilesServiceRequest with @json.FromJson::{from_json}
+
+///|
+pub extend ExportProfilesServiceResponse with Eq::{equal, not_equal}
+
+///|
+pub extend ExportProfilesServiceResponse with @protobuf.Sized::{size_of}
+
+///|
+pub extend ExportProfilesServiceResponse with Default::{default}
+
+///|
+pub extend ExportProfilesServiceResponse with @protobuf.Read::{
+  read,
+  read_with_limit,
+}
+
+///|
+pub extend ExportProfilesServiceResponse with @protobuf.Write::{write}
+
+///|
+pub extend ExportProfilesServiceResponse with ToJson::{to_json}
+
+///|
+pub extend ExportProfilesServiceResponse with @json.FromJson::{from_json}
+
+///|
+pub extend ExportProfilesPartialSuccess with Eq::{equal, not_equal}
+
+///|
+pub extend ExportProfilesPartialSuccess with @protobuf.Sized::{size_of}
+
+///|
+pub extend ExportProfilesPartialSuccess with Default::{default}
+
+///|
+pub extend ExportProfilesPartialSuccess with @protobuf.Read::{
+  read,
+  read_with_limit,
+}
+
+///|
+pub extend ExportProfilesPartialSuccess with @protobuf.Write::{write}
+
+///|
+pub extend ExportProfilesPartialSuccess with ToJson::{to_json}
+
+///|
+pub extend ExportProfilesPartialSuccess with @json.FromJson::{from_json}

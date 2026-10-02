@@ -16,8 +16,14 @@ pub(all) enum AggregationTemporality {
   AGGREGATION_TEMPORALITY_DELTA
   AGGREGATION_TEMPORALITY_CUMULATIVE
 } derive(Eq)
+pub fn AggregationTemporality::default() -> Self
+pub fn AggregationTemporality::equal(Self, Self) -> Bool
 pub fn AggregationTemporality::from_enum(@protobuf.Enum) -> Self
+pub fn AggregationTemporality::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn AggregationTemporality::not_equal(Self, Self) -> Bool
+pub fn AggregationTemporality::size_of(Self) -> UInt
 pub fn AggregationTemporality::to_enum(Self) -> @protobuf.Enum
+pub fn AggregationTemporality::to_json(Self) -> Json
 pub impl Default for AggregationTemporality
 pub impl ToJson for AggregationTemporality
 pub impl @json.FromJson for AggregationTemporality
@@ -27,8 +33,14 @@ pub(all) enum DataPointFlags {
   DATA_POINT_FLAGS_DO_NOT_USE
   DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK
 } derive(Eq)
+pub fn DataPointFlags::default() -> Self
+pub fn DataPointFlags::equal(Self, Self) -> Bool
 pub fn DataPointFlags::from_enum(@protobuf.Enum) -> Self
+pub fn DataPointFlags::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn DataPointFlags::not_equal(Self, Self) -> Bool
+pub fn DataPointFlags::size_of(Self) -> UInt
 pub fn DataPointFlags::to_enum(Self) -> @protobuf.Enum
+pub fn DataPointFlags::to_json(Self) -> Json
 pub impl Default for DataPointFlags
 pub impl ToJson for DataPointFlags
 pub impl @json.FromJson for DataPointFlags
@@ -41,7 +53,16 @@ pub(all) struct Exemplar {
   mut trace_id : Bytes
   mut value : Exemplar_Value
 } derive(Eq)
+pub fn Exemplar::default() -> Self
+pub fn Exemplar::equal(Self, Self) -> Bool
+pub fn Exemplar::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Exemplar::new(Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt64, Bytes, Bytes, value? : Exemplar_Value) -> Self
+pub fn Exemplar::not_equal(Self, Self) -> Bool
+pub fn Exemplar::read(&@protobuf.Reader) -> Self raise
+pub fn Exemplar::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn Exemplar::size_of(Self) -> UInt
+pub fn Exemplar::to_json(Self) -> Json
+pub fn Exemplar::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for Exemplar
 pub impl ToJson for Exemplar
 pub impl @json.FromJson for Exemplar
@@ -56,6 +77,11 @@ pub(all) enum Exemplar_Value {
   AsInt(Int64)
   NotSet
 } derive(Eq)
+pub fn Exemplar_Value::default() -> Self
+pub fn Exemplar_Value::equal(Self, Self) -> Bool
+pub fn Exemplar_Value::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Exemplar_Value::not_equal(Self, Self) -> Bool
+pub fn Exemplar_Value::to_json(Self) -> Json
 pub impl Default for Exemplar_Value
 pub impl ToJson for Exemplar_Value
 pub impl @json.FromJson for Exemplar_Value
@@ -64,7 +90,16 @@ pub(all) struct ExponentialHistogram {
   mut data_points : Array[ExponentialHistogramDataPoint]
   mut aggregation_temporality : AggregationTemporality
 } derive(Eq)
+pub fn ExponentialHistogram::default() -> Self
+pub fn ExponentialHistogram::equal(Self, Self) -> Bool
+pub fn ExponentialHistogram::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ExponentialHistogram::new(Array[ExponentialHistogramDataPoint], AggregationTemporality) -> Self
+pub fn ExponentialHistogram::not_equal(Self, Self) -> Bool
+pub fn ExponentialHistogram::read(&@protobuf.Reader) -> Self raise
+pub fn ExponentialHistogram::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn ExponentialHistogram::size_of(Self) -> UInt
+pub fn ExponentialHistogram::to_json(Self) -> Json
+pub fn ExponentialHistogram::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ExponentialHistogram
 pub impl ToJson for ExponentialHistogram
 pub impl @json.FromJson for ExponentialHistogram
@@ -90,7 +125,16 @@ pub(all) struct ExponentialHistogramDataPoint {
   mut max : Double?
   mut zero_threshold : Double
 } derive(Eq)
+pub fn ExponentialHistogramDataPoint::default() -> Self
+pub fn ExponentialHistogramDataPoint::equal(Self, Self) -> Bool
+pub fn ExponentialHistogramDataPoint::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ExponentialHistogramDataPoint::new(Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt64, UInt64, UInt64, sum? : Double, Int, UInt64, ExponentialHistogramDataPoint_Buckets, ExponentialHistogramDataPoint_Buckets, UInt, Array[Exemplar], min? : Double, max? : Double, Double) -> Self
+pub fn ExponentialHistogramDataPoint::not_equal(Self, Self) -> Bool
+pub fn ExponentialHistogramDataPoint::read(&@protobuf.Reader) -> Self raise
+pub fn ExponentialHistogramDataPoint::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn ExponentialHistogramDataPoint::size_of(Self) -> UInt
+pub fn ExponentialHistogramDataPoint::to_json(Self) -> Json
+pub fn ExponentialHistogramDataPoint::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ExponentialHistogramDataPoint
 pub impl ToJson for ExponentialHistogramDataPoint
 pub impl @json.FromJson for ExponentialHistogramDataPoint
@@ -104,7 +148,16 @@ pub(all) struct ExponentialHistogramDataPoint_Buckets {
   mut offset : Int
   mut bucket_counts : Array[UInt64]
 } derive(Eq)
+pub fn ExponentialHistogramDataPoint_Buckets::default() -> Self
+pub fn ExponentialHistogramDataPoint_Buckets::equal(Self, Self) -> Bool
+pub fn ExponentialHistogramDataPoint_Buckets::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ExponentialHistogramDataPoint_Buckets::new(Int, Array[UInt64]) -> Self
+pub fn ExponentialHistogramDataPoint_Buckets::not_equal(Self, Self) -> Bool
+pub fn ExponentialHistogramDataPoint_Buckets::read(&@protobuf.Reader) -> Self raise
+pub fn ExponentialHistogramDataPoint_Buckets::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn ExponentialHistogramDataPoint_Buckets::size_of(Self) -> UInt
+pub fn ExponentialHistogramDataPoint_Buckets::to_json(Self) -> Json
+pub fn ExponentialHistogramDataPoint_Buckets::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ExponentialHistogramDataPoint_Buckets
 pub impl ToJson for ExponentialHistogramDataPoint_Buckets
 pub impl @json.FromJson for ExponentialHistogramDataPoint_Buckets
@@ -117,7 +170,16 @@ pub impl @protobuf.Write for ExponentialHistogramDataPoint_Buckets
 pub(all) struct Gauge {
   mut data_points : Array[NumberDataPoint]
 } derive(Eq)
+pub fn Gauge::default() -> Self
+pub fn Gauge::equal(Self, Self) -> Bool
+pub fn Gauge::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Gauge::new(Array[NumberDataPoint]) -> Self
+pub fn Gauge::not_equal(Self, Self) -> Bool
+pub fn Gauge::read(&@protobuf.Reader) -> Self raise
+pub fn Gauge::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn Gauge::size_of(Self) -> UInt
+pub fn Gauge::to_json(Self) -> Json
+pub fn Gauge::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for Gauge
 pub impl ToJson for Gauge
 pub impl @json.FromJson for Gauge
@@ -131,7 +193,16 @@ pub(all) struct Histogram {
   mut data_points : Array[HistogramDataPoint]
   mut aggregation_temporality : AggregationTemporality
 } derive(Eq)
+pub fn Histogram::default() -> Self
+pub fn Histogram::equal(Self, Self) -> Bool
+pub fn Histogram::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Histogram::new(Array[HistogramDataPoint], AggregationTemporality) -> Self
+pub fn Histogram::not_equal(Self, Self) -> Bool
+pub fn Histogram::read(&@protobuf.Reader) -> Self raise
+pub fn Histogram::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn Histogram::size_of(Self) -> UInt
+pub fn Histogram::to_json(Self) -> Json
+pub fn Histogram::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for Histogram
 pub impl ToJson for Histogram
 pub impl @json.FromJson for Histogram
@@ -154,7 +225,16 @@ pub(all) struct HistogramDataPoint {
   mut min : Double?
   mut max : Double?
 } derive(Eq)
+pub fn HistogramDataPoint::default() -> Self
+pub fn HistogramDataPoint::equal(Self, Self) -> Bool
+pub fn HistogramDataPoint::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn HistogramDataPoint::new(Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt64, UInt64, UInt64, sum? : Double, Array[UInt64], Array[Double], Array[Exemplar], UInt, min? : Double, max? : Double) -> Self
+pub fn HistogramDataPoint::not_equal(Self, Self) -> Bool
+pub fn HistogramDataPoint::read(&@protobuf.Reader) -> Self raise
+pub fn HistogramDataPoint::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn HistogramDataPoint::size_of(Self) -> UInt
+pub fn HistogramDataPoint::to_json(Self) -> Json
+pub fn HistogramDataPoint::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for HistogramDataPoint
 pub impl ToJson for HistogramDataPoint
 pub impl @json.FromJson for HistogramDataPoint
@@ -171,7 +251,16 @@ pub(all) struct Metric {
   mut metadata : Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue]
   mut data : Metric_Data
 } derive(Eq)
+pub fn Metric::default() -> Self
+pub fn Metric::equal(Self, Self) -> Bool
+pub fn Metric::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Metric::new(String, String, String, Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], data? : Metric_Data) -> Self
+pub fn Metric::not_equal(Self, Self) -> Bool
+pub fn Metric::read(&@protobuf.Reader) -> Self raise
+pub fn Metric::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn Metric::size_of(Self) -> UInt
+pub fn Metric::to_json(Self) -> Json
+pub fn Metric::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for Metric
 pub impl ToJson for Metric
 pub impl @json.FromJson for Metric
@@ -189,6 +278,11 @@ pub(all) enum Metric_Data {
   Summary(Summary)
   NotSet
 } derive(Eq)
+pub fn Metric_Data::default() -> Self
+pub fn Metric_Data::equal(Self, Self) -> Bool
+pub fn Metric_Data::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Metric_Data::not_equal(Self, Self) -> Bool
+pub fn Metric_Data::to_json(Self) -> Json
 pub impl Default for Metric_Data
 pub impl ToJson for Metric_Data
 pub impl @json.FromJson for Metric_Data
@@ -196,7 +290,16 @@ pub impl @json.FromJson for Metric_Data
 pub(all) struct MetricsData {
   mut resource_metrics : Array[ResourceMetrics]
 } derive(Eq)
+pub fn MetricsData::default() -> Self
+pub fn MetricsData::equal(Self, Self) -> Bool
+pub fn MetricsData::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn MetricsData::new(Array[ResourceMetrics]) -> Self
+pub fn MetricsData::not_equal(Self, Self) -> Bool
+pub fn MetricsData::read(&@protobuf.Reader) -> Self raise
+pub fn MetricsData::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn MetricsData::size_of(Self) -> UInt
+pub fn MetricsData::to_json(Self) -> Json
+pub fn MetricsData::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for MetricsData
 pub impl ToJson for MetricsData
 pub impl @json.FromJson for MetricsData
@@ -214,7 +317,16 @@ pub(all) struct NumberDataPoint {
   mut flags : UInt
   mut value : NumberDataPoint_Value
 } derive(Eq)
+pub fn NumberDataPoint::default() -> Self
+pub fn NumberDataPoint::equal(Self, Self) -> Bool
+pub fn NumberDataPoint::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn NumberDataPoint::new(Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt64, UInt64, Array[Exemplar], UInt, value? : NumberDataPoint_Value) -> Self
+pub fn NumberDataPoint::not_equal(Self, Self) -> Bool
+pub fn NumberDataPoint::read(&@protobuf.Reader) -> Self raise
+pub fn NumberDataPoint::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn NumberDataPoint::size_of(Self) -> UInt
+pub fn NumberDataPoint::to_json(Self) -> Json
+pub fn NumberDataPoint::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for NumberDataPoint
 pub impl ToJson for NumberDataPoint
 pub impl @json.FromJson for NumberDataPoint
@@ -229,6 +341,11 @@ pub(all) enum NumberDataPoint_Value {
   AsInt(Int64)
   NotSet
 } derive(Eq)
+pub fn NumberDataPoint_Value::default() -> Self
+pub fn NumberDataPoint_Value::equal(Self, Self) -> Bool
+pub fn NumberDataPoint_Value::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn NumberDataPoint_Value::not_equal(Self, Self) -> Bool
+pub fn NumberDataPoint_Value::to_json(Self) -> Json
 pub impl Default for NumberDataPoint_Value
 pub impl ToJson for NumberDataPoint_Value
 pub impl @json.FromJson for NumberDataPoint_Value
@@ -238,7 +355,16 @@ pub(all) struct ResourceMetrics {
   mut scope_metrics : Array[ScopeMetrics]
   mut schema_url : String
 } derive(Eq)
+pub fn ResourceMetrics::default() -> Self
+pub fn ResourceMetrics::equal(Self, Self) -> Bool
+pub fn ResourceMetrics::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ResourceMetrics::new(@moonbit-community/opentelemetry/protocol/resource/v1.Resource, Array[ScopeMetrics], String) -> Self
+pub fn ResourceMetrics::not_equal(Self, Self) -> Bool
+pub fn ResourceMetrics::read(&@protobuf.Reader) -> Self raise
+pub fn ResourceMetrics::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn ResourceMetrics::size_of(Self) -> UInt
+pub fn ResourceMetrics::to_json(Self) -> Json
+pub fn ResourceMetrics::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ResourceMetrics
 pub impl ToJson for ResourceMetrics
 pub impl @json.FromJson for ResourceMetrics
@@ -253,7 +379,16 @@ pub(all) struct ScopeMetrics {
   mut metrics : Array[Metric]
   mut schema_url : String
 } derive(Eq)
+pub fn ScopeMetrics::default() -> Self
+pub fn ScopeMetrics::equal(Self, Self) -> Bool
+pub fn ScopeMetrics::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ScopeMetrics::new(@moonbit-community/opentelemetry/protocol/common/v1.InstrumentationScope, Array[Metric], String) -> Self
+pub fn ScopeMetrics::not_equal(Self, Self) -> Bool
+pub fn ScopeMetrics::read(&@protobuf.Reader) -> Self raise
+pub fn ScopeMetrics::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn ScopeMetrics::size_of(Self) -> UInt
+pub fn ScopeMetrics::to_json(Self) -> Json
+pub fn ScopeMetrics::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ScopeMetrics
 pub impl ToJson for ScopeMetrics
 pub impl @json.FromJson for ScopeMetrics
@@ -268,7 +403,16 @@ pub(all) struct Sum {
   mut aggregation_temporality : AggregationTemporality
   mut is_monotonic : Bool
 } derive(Eq)
+pub fn Sum::default() -> Self
+pub fn Sum::equal(Self, Self) -> Bool
+pub fn Sum::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Sum::new(Array[NumberDataPoint], AggregationTemporality, Bool) -> Self
+pub fn Sum::not_equal(Self, Self) -> Bool
+pub fn Sum::read(&@protobuf.Reader) -> Self raise
+pub fn Sum::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn Sum::size_of(Self) -> UInt
+pub fn Sum::to_json(Self) -> Json
+pub fn Sum::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for Sum
 pub impl ToJson for Sum
 pub impl @json.FromJson for Sum
@@ -281,7 +425,16 @@ pub impl @protobuf.Write for Sum
 pub(all) struct Summary {
   mut data_points : Array[SummaryDataPoint]
 } derive(Eq)
+pub fn Summary::default() -> Self
+pub fn Summary::equal(Self, Self) -> Bool
+pub fn Summary::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Summary::new(Array[SummaryDataPoint]) -> Self
+pub fn Summary::not_equal(Self, Self) -> Bool
+pub fn Summary::read(&@protobuf.Reader) -> Self raise
+pub fn Summary::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn Summary::size_of(Self) -> UInt
+pub fn Summary::to_json(Self) -> Json
+pub fn Summary::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for Summary
 pub impl ToJson for Summary
 pub impl @json.FromJson for Summary
@@ -300,7 +453,16 @@ pub(all) struct SummaryDataPoint {
   mut quantile_values : Array[SummaryDataPoint_ValueAtQuantile]
   mut flags : UInt
 } derive(Eq)
+pub fn SummaryDataPoint::default() -> Self
+pub fn SummaryDataPoint::equal(Self, Self) -> Bool
+pub fn SummaryDataPoint::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn SummaryDataPoint::new(Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt64, UInt64, UInt64, Double, Array[SummaryDataPoint_ValueAtQuantile], UInt) -> Self
+pub fn SummaryDataPoint::not_equal(Self, Self) -> Bool
+pub fn SummaryDataPoint::read(&@protobuf.Reader) -> Self raise
+pub fn SummaryDataPoint::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn SummaryDataPoint::size_of(Self) -> UInt
+pub fn SummaryDataPoint::to_json(Self) -> Json
+pub fn SummaryDataPoint::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for SummaryDataPoint
 pub impl ToJson for SummaryDataPoint
 pub impl @json.FromJson for SummaryDataPoint
@@ -314,7 +476,16 @@ pub(all) struct SummaryDataPoint_ValueAtQuantile {
   mut quantile : Double
   mut value : Double
 } derive(Eq)
+pub fn SummaryDataPoint_ValueAtQuantile::default() -> Self
+pub fn SummaryDataPoint_ValueAtQuantile::equal(Self, Self) -> Bool
+pub fn SummaryDataPoint_ValueAtQuantile::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn SummaryDataPoint_ValueAtQuantile::new(Double, Double) -> Self
+pub fn SummaryDataPoint_ValueAtQuantile::not_equal(Self, Self) -> Bool
+pub fn SummaryDataPoint_ValueAtQuantile::read(&@protobuf.Reader) -> Self raise
+pub fn SummaryDataPoint_ValueAtQuantile::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn SummaryDataPoint_ValueAtQuantile::size_of(Self) -> UInt
+pub fn SummaryDataPoint_ValueAtQuantile::to_json(Self) -> Json
+pub fn SummaryDataPoint_ValueAtQuantile::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for SummaryDataPoint_ValueAtQuantile
 pub impl ToJson for SummaryDataPoint_ValueAtQuantile
 pub impl @json.FromJson for SummaryDataPoint_ValueAtQuantile

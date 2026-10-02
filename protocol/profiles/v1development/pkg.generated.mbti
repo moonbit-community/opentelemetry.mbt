@@ -17,7 +17,16 @@ pub(all) struct Function {
   mut filename_strindex : Int
   mut start_line : Int64
 } derive(Eq)
+pub fn Function::default() -> Self
+pub fn Function::equal(Self, Self) -> Bool
+pub fn Function::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Function::new(Int, Int, Int, Int64) -> Self
+pub fn Function::not_equal(Self, Self) -> Bool
+pub fn Function::read(&@protobuf.Reader) -> Self raise
+pub fn Function::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn Function::size_of(Self) -> UInt
+pub fn Function::to_json(Self) -> Json
+pub fn Function::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for Function
 pub impl ToJson for Function
 pub impl @json.FromJson for Function
@@ -32,7 +41,16 @@ pub(all) struct KeyValueAndUnit {
   mut value : @moonbit-community/opentelemetry/protocol/common/v1.AnyValue
   mut unit_strindex : Int
 } derive(Eq)
+pub fn KeyValueAndUnit::default() -> Self
+pub fn KeyValueAndUnit::equal(Self, Self) -> Bool
+pub fn KeyValueAndUnit::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn KeyValueAndUnit::new(Int, @moonbit-community/opentelemetry/protocol/common/v1.AnyValue, Int) -> Self
+pub fn KeyValueAndUnit::not_equal(Self, Self) -> Bool
+pub fn KeyValueAndUnit::read(&@protobuf.Reader) -> Self raise
+pub fn KeyValueAndUnit::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn KeyValueAndUnit::size_of(Self) -> UInt
+pub fn KeyValueAndUnit::to_json(Self) -> Json
+pub fn KeyValueAndUnit::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for KeyValueAndUnit
 pub impl ToJson for KeyValueAndUnit
 pub impl @json.FromJson for KeyValueAndUnit
@@ -47,7 +65,16 @@ pub(all) struct Line {
   mut line : Int64
   mut column : Int64
 } derive(Eq)
+pub fn Line::default() -> Self
+pub fn Line::equal(Self, Self) -> Bool
+pub fn Line::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Line::new(Int, Int64, Int64) -> Self
+pub fn Line::not_equal(Self, Self) -> Bool
+pub fn Line::read(&@protobuf.Reader) -> Self raise
+pub fn Line::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn Line::size_of(Self) -> UInt
+pub fn Line::to_json(Self) -> Json
+pub fn Line::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for Line
 pub impl ToJson for Line
 pub impl @json.FromJson for Line
@@ -61,7 +88,16 @@ pub(all) struct Link {
   mut trace_id : Bytes
   mut span_id : Bytes
 } derive(Eq)
+pub fn Link::default() -> Self
+pub fn Link::equal(Self, Self) -> Bool
+pub fn Link::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Link::new(Bytes, Bytes) -> Self
+pub fn Link::not_equal(Self, Self) -> Bool
+pub fn Link::read(&@protobuf.Reader) -> Self raise
+pub fn Link::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn Link::size_of(Self) -> UInt
+pub fn Link::to_json(Self) -> Json
+pub fn Link::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for Link
 pub impl ToJson for Link
 pub impl @json.FromJson for Link
@@ -77,7 +113,16 @@ pub(all) struct Location {
   mut lines : Array[Line]
   mut attribute_indices : Array[Int]
 } derive(Eq)
+pub fn Location::default() -> Self
+pub fn Location::equal(Self, Self) -> Bool
+pub fn Location::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Location::new(Int, UInt64, Array[Line], Array[Int]) -> Self
+pub fn Location::not_equal(Self, Self) -> Bool
+pub fn Location::read(&@protobuf.Reader) -> Self raise
+pub fn Location::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn Location::size_of(Self) -> UInt
+pub fn Location::to_json(Self) -> Json
+pub fn Location::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for Location
 pub impl ToJson for Location
 pub impl @json.FromJson for Location
@@ -94,7 +139,16 @@ pub(all) struct Mapping {
   mut filename_strindex : Int
   mut attribute_indices : Array[Int]
 } derive(Eq)
+pub fn Mapping::default() -> Self
+pub fn Mapping::equal(Self, Self) -> Bool
+pub fn Mapping::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Mapping::new(UInt64, UInt64, UInt64, Int, Array[Int]) -> Self
+pub fn Mapping::not_equal(Self, Self) -> Bool
+pub fn Mapping::read(&@protobuf.Reader) -> Self raise
+pub fn Mapping::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn Mapping::size_of(Self) -> UInt
+pub fn Mapping::to_json(Self) -> Json
+pub fn Mapping::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for Mapping
 pub impl ToJson for Mapping
 pub impl @json.FromJson for Mapping
@@ -117,7 +171,16 @@ pub(all) struct Profile {
   mut original_payload : Bytes
   mut attribute_indices : Array[Int]
 } derive(Eq)
+pub fn Profile::default() -> Self
+pub fn Profile::equal(Self, Self) -> Bool
+pub fn Profile::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Profile::new(ValueType, Array[Sample], UInt64, UInt64, ValueType, Int64, Bytes, UInt, String, Bytes, Array[Int]) -> Self
+pub fn Profile::not_equal(Self, Self) -> Bool
+pub fn Profile::read(&@protobuf.Reader) -> Self raise
+pub fn Profile::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn Profile::size_of(Self) -> UInt
+pub fn Profile::to_json(Self) -> Json
+pub fn Profile::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for Profile
 pub impl ToJson for Profile
 pub impl @json.FromJson for Profile
@@ -131,7 +194,16 @@ pub(all) struct ProfilesData {
   mut resource_profiles : Array[ResourceProfiles]
   mut dictionary : ProfilesDictionary
 } derive(Eq)
+pub fn ProfilesData::default() -> Self
+pub fn ProfilesData::equal(Self, Self) -> Bool
+pub fn ProfilesData::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ProfilesData::new(Array[ResourceProfiles], ProfilesDictionary) -> Self
+pub fn ProfilesData::not_equal(Self, Self) -> Bool
+pub fn ProfilesData::read(&@protobuf.Reader) -> Self raise
+pub fn ProfilesData::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn ProfilesData::size_of(Self) -> UInt
+pub fn ProfilesData::to_json(Self) -> Json
+pub fn ProfilesData::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ProfilesData
 pub impl ToJson for ProfilesData
 pub impl @json.FromJson for ProfilesData
@@ -150,7 +222,16 @@ pub(all) struct ProfilesDictionary {
   mut attribute_table : Array[KeyValueAndUnit]
   mut stack_table : Array[Stack]
 } derive(Eq)
+pub fn ProfilesDictionary::default() -> Self
+pub fn ProfilesDictionary::equal(Self, Self) -> Bool
+pub fn ProfilesDictionary::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ProfilesDictionary::new(Array[Mapping], Array[Location], Array[Function], Array[Link], Array[String], Array[KeyValueAndUnit], Array[Stack]) -> Self
+pub fn ProfilesDictionary::not_equal(Self, Self) -> Bool
+pub fn ProfilesDictionary::read(&@protobuf.Reader) -> Self raise
+pub fn ProfilesDictionary::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn ProfilesDictionary::size_of(Self) -> UInt
+pub fn ProfilesDictionary::to_json(Self) -> Json
+pub fn ProfilesDictionary::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ProfilesDictionary
 pub impl ToJson for ProfilesDictionary
 pub impl @json.FromJson for ProfilesDictionary
@@ -165,7 +246,16 @@ pub(all) struct ResourceProfiles {
   mut scope_profiles : Array[ScopeProfiles]
   mut schema_url : String
 } derive(Eq)
+pub fn ResourceProfiles::default() -> Self
+pub fn ResourceProfiles::equal(Self, Self) -> Bool
+pub fn ResourceProfiles::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ResourceProfiles::new(@moonbit-community/opentelemetry/protocol/resource/v1.Resource, Array[ScopeProfiles], String) -> Self
+pub fn ResourceProfiles::not_equal(Self, Self) -> Bool
+pub fn ResourceProfiles::read(&@protobuf.Reader) -> Self raise
+pub fn ResourceProfiles::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn ResourceProfiles::size_of(Self) -> UInt
+pub fn ResourceProfiles::to_json(Self) -> Json
+pub fn ResourceProfiles::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ResourceProfiles
 pub impl ToJson for ResourceProfiles
 pub impl @json.FromJson for ResourceProfiles
@@ -182,7 +272,16 @@ pub(all) struct Sample {
   mut values : Array[Int64]
   mut timestamps_unix_nano : Array[UInt64]
 } derive(Eq)
+pub fn Sample::default() -> Self
+pub fn Sample::equal(Self, Self) -> Bool
+pub fn Sample::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Sample::new(Int, Array[Int], Int, Array[Int64], Array[UInt64]) -> Self
+pub fn Sample::not_equal(Self, Self) -> Bool
+pub fn Sample::read(&@protobuf.Reader) -> Self raise
+pub fn Sample::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn Sample::size_of(Self) -> UInt
+pub fn Sample::to_json(Self) -> Json
+pub fn Sample::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for Sample
 pub impl ToJson for Sample
 pub impl @json.FromJson for Sample
@@ -197,7 +296,16 @@ pub(all) struct ScopeProfiles {
   mut profiles : Array[Profile]
   mut schema_url : String
 } derive(Eq)
+pub fn ScopeProfiles::default() -> Self
+pub fn ScopeProfiles::equal(Self, Self) -> Bool
+pub fn ScopeProfiles::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ScopeProfiles::new(@moonbit-community/opentelemetry/protocol/common/v1.InstrumentationScope, Array[Profile], String) -> Self
+pub fn ScopeProfiles::not_equal(Self, Self) -> Bool
+pub fn ScopeProfiles::read(&@protobuf.Reader) -> Self raise
+pub fn ScopeProfiles::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn ScopeProfiles::size_of(Self) -> UInt
+pub fn ScopeProfiles::to_json(Self) -> Json
+pub fn ScopeProfiles::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ScopeProfiles
 pub impl ToJson for ScopeProfiles
 pub impl @json.FromJson for ScopeProfiles
@@ -210,7 +318,16 @@ pub impl @protobuf.Write for ScopeProfiles
 pub(all) struct Stack {
   mut location_indices : Array[Int]
 } derive(Eq)
+pub fn Stack::default() -> Self
+pub fn Stack::equal(Self, Self) -> Bool
+pub fn Stack::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Stack::new(Array[Int]) -> Self
+pub fn Stack::not_equal(Self, Self) -> Bool
+pub fn Stack::read(&@protobuf.Reader) -> Self raise
+pub fn Stack::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn Stack::size_of(Self) -> UInt
+pub fn Stack::to_json(Self) -> Json
+pub fn Stack::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for Stack
 pub impl ToJson for Stack
 pub impl @json.FromJson for Stack
@@ -224,7 +341,16 @@ pub(all) struct ValueType {
   mut type_strindex : Int
   mut unit_strindex : Int
 } derive(Eq)
+pub fn ValueType::default() -> Self
+pub fn ValueType::equal(Self, Self) -> Bool
+pub fn ValueType::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ValueType::new(Int, Int) -> Self
+pub fn ValueType::not_equal(Self, Self) -> Bool
+pub fn ValueType::read(&@protobuf.Reader) -> Self raise
+pub fn ValueType::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn ValueType::size_of(Self) -> UInt
+pub fn ValueType::to_json(Self) -> Json
+pub fn ValueType::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ValueType
 pub impl ToJson for ValueType
 pub impl @json.FromJson for ValueType

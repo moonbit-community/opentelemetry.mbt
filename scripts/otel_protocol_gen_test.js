@@ -67,3 +67,25 @@ test("tracez protocol is not generated or vendored", () => {
   assert.equal(fs.existsSync(path.join(rootDir, "third_party", "otel-extra-proto", "tracez.proto")), false);
   assert.equal(fs.existsSync(path.join(rootDir, "protocol", "tracez")), false);
 });
+
+test("generator declares trait method promotion explicitly", () => {
+  const generator = require(generatorPath);
+  const source = [
+    "pub(all) struct Foo {",
+    "  x : Int",
+    "} derive(Eq)",
+    "",
+    "pub impl @protobuf.Read for Foo with fn read_with_limit(reader, limit) {",
+    "}",
+    "",
+    "pub impl @protobuf.AsyncRead for Foo with fn read_with_limit(reader, limit) {",
+    "}",
+    "",
+  ].join("\n");
+  const output = generator.addExplicitExtends(source);
+
+  assert.match(output, /pub extend Foo with Eq::\{equal, not_equal\}/);
+  assert.match(output, /pub extend Foo with @protobuf\.Read::\{read, read_with_limit\}/);
+  assert.equal(output.includes("@protobuf.AsyncRead::"), false);
+  assert.equal(generator.addExplicitExtends(output), output);
+});
