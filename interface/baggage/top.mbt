@@ -14,6 +14,21 @@ pub struct BaggageMetadata {
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
+pub extend BaggageMetadata with Eq::{not_equal, equal}
+
+///|
+pub extend BaggageMetadata with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+pub extend BaggageMetadata with Hash::{hash, hash_combine}
+
+///|
+pub extend BaggageMetadata with ToJson::{to_json}
+
+///|
+pub extend BaggageMetadata with Debug::{to_repr}
+
+///|
 /// One baggage entry together with its metadata payload.
 /// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#overview
 pub struct KeyValueMetadata {
@@ -21,6 +36,21 @@ pub struct KeyValueMetadata {
   value : String
   metadata : BaggageMetadata
 } derive(Eq, Compare, Hash, ToJson, Debug)
+
+///|
+pub extend KeyValueMetadata with Eq::{not_equal, equal}
+
+///|
+pub extend KeyValueMetadata with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+pub extend KeyValueMetadata with Hash::{hash, hash_combine}
+
+///|
+pub extend KeyValueMetadata with ToJson::{to_json}
+
+///|
+pub extend KeyValueMetadata with Debug::{to_repr}
 
 ///|
 /// Immutable baggage map used for cross-process propagation.
@@ -33,6 +63,15 @@ pub struct Baggage {
   entries : Map[String, KeyValueMetadata]
   kv_content_len : Int
 } derive(Eq, ToJson, Debug)
+
+///|
+pub extend Baggage with Eq::{not_equal, equal}
+
+///|
+pub extend Baggage with ToJson::{to_json}
+
+///|
+pub extend Baggage with Debug::{to_repr}
 
 ///|
 /// Creates metadata from one text fragment after trimming surrounding
@@ -53,6 +92,9 @@ pub fn BaggageMetadata::as_string(self : BaggageMetadata) -> String {
 pub impl Default for BaggageMetadata with fn default() -> BaggageMetadata {
   BaggageMetadata::new("")
 }
+
+///|
+pub extend BaggageMetadata with Default::{default}
 
 ///|
 /// Creates one baggage entry description.
@@ -261,3 +303,6 @@ pub fn Baggage::is_empty(self : Baggage) -> Bool {
 pub impl Default for Baggage with fn default() -> Baggage {
   Baggage::new()
 }
+
+///|
+pub extend Baggage with Default::{default}

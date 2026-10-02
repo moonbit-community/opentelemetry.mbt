@@ -1,6 +1,4 @@
 import {
-  "moonbitlang/core/debug",
-  "moonbitlang/core/string",
   "moonbit-community/opentelemetry/interface/common",
   "moonbit-community/opentelemetry/sdk/error",
   "moonbit-community/opentelemetry/sdk/logs" @sdklogs,
@@ -11,6 +9,7 @@ import {
 
 import {
   "moonbitlang/async",
+  "moonbitlang/core/debug",
 } for "wbtest"
 
 options(

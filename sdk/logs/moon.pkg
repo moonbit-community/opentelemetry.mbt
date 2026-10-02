@@ -1,7 +1,5 @@
 import {
-  "moonbitlang/core/debug",
   "moonbitlang/async",
-  "moonbitlang/core/env",
   "moonbitlang/core/string",
   "moonbit-community/opentelemetry/internal/utils",
   "moonbit-community/opentelemetry/interface/common",
@@ -10,6 +8,11 @@ import {
   "moonbit-community/opentelemetry/sdk/error",
   "moonbit-community/opentelemetry/sdk/resource",
 }
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/env",
+} for "test"
 
 options(
   backend: [ "native" ],

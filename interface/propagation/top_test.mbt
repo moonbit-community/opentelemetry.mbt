@@ -8,14 +8,14 @@ test "baggage propagator preserves metadata" {
     metadata=@baggage.BaggageMetadata::new("source=test"),
   )
   let carrier : Map[String, String] = Map([])
-  BaggagePropagator::new().inject_context(context, carrier)
+  @propagation.BaggagePropagator::new().inject_context(context, carrier)
 
   guard carrier.get("baggage") is Some(header) else {
     fail("expected baggage header")
   }
   assert_true(header.contains("source=test"))
 
-  let extracted = BaggagePropagator::new().extract_with_context(
+  let extracted = @propagation.BaggagePropagator::new().extract_with_context(
     Default::default(),
     carrier,
   )
@@ -37,7 +37,9 @@ test "baggage propagator merges into existing context baggage" {
   let carrier : Map[String, String] = Map([])
   carrier["baggage"] = "shared=new,remote=added"
 
-  let extracted = BaggagePropagator::new().extract_with_context(base, carrier)
+  let extracted = @propagation.BaggagePropagator::new().extract_with_context(
+    base, carrier,
+  )
   @debug.assert_eq(extracted.baggage().get("existing"), Some("keep"))
   @debug.assert_eq(extracted.baggage().get("shared"), Some("new"))
   @debug.assert_eq(extracted.baggage().get("remote"), Some("added"))
@@ -63,8 +65,8 @@ test "trace context propagator round trips span context" {
   let context = @context.Context::empty().with_span_context(span_context)
   let carrier : Map[String, String] = Map([])
 
-  TraceContextPropagator::new().inject_context(context, carrier)
-  let extracted = TraceContextPropagator::new().extract_with_context(
+  @propagation.TraceContextPropagator::new().inject_context(context, carrier)
+  let extracted = @propagation.TraceContextPropagator::new().extract_with_context(
     Default::default(),
     carrier,
   )
@@ -91,7 +93,7 @@ test "trace context propagator reads mixed-case map keys" {
     "TraceState": "foo=bar",
   }
 
-  let extracted = TraceContextPropagator::new().extract_with_context(
+  let extracted = @propagation.TraceContextPropagator::new().extract_with_context(
     Default::default(),
     carrier,
   )

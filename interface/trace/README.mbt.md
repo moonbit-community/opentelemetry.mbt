@@ -28,8 +28,8 @@ Use a stable instrumentation name, typically the library or component name.
 
 ```mbt check
 ///|
-fn _trace_readme_get_tracer() -> Tracer {
-  TracerProvider::noop().tracer("moonbit-community/example-library")
+fn _trace_readme_get_tracer() -> @trace.Tracer {
+  @trace.TracerProvider::noop().tracer("moonbit-community/example-library")
 }
 ```
 
@@ -46,7 +46,7 @@ links before the span starts.
 ```mbt check
 ///|
 async fn _trace_readme_span_lifecycle() -> Unit {
-  let tracer = TracerProvider::noop().tracer("example")
+  let tracer = @trace.TracerProvider::noop().tracer("example")
   let builder = tracer
     .span_builder("http.request")
     .with_kind(Server)
@@ -56,7 +56,7 @@ async fn _trace_readme_span_lifecycle() -> Unit {
   let span = tracer.build(builder)
 
   span.add_event("handler.start")
-  span.set_status(Status::ok())
+  span.set_status(@trace.Status::ok())
   span.end()
 }
 ```

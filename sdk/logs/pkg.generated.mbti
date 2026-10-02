@@ -25,7 +25,11 @@ pub(all) enum AnyValue {
   Array(Array[AnyValue])
   Map(Array[KeyValue])
 } derive(Eq, ToJson, @debug.Debug)
+pub fn AnyValue::equal(Self, Self) -> Bool
 pub fn AnyValue::from_common(@common.Value) -> Self
+pub fn AnyValue::not_equal(Self, Self) -> Bool
+pub fn AnyValue::to_json(Self) -> Json
+pub fn AnyValue::to_repr(Self) -> @debug.Repr
 
 pub struct BatchConfig {
   max_queue_size : Int
@@ -33,7 +37,19 @@ pub struct BatchConfig {
   scheduled_delay_millis : Int
   export_timeout_millis : Int
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn BatchConfig::compare(Self, Self) -> Int
+pub fn BatchConfig::default() -> Self
+pub fn BatchConfig::equal(Self, Self) -> Bool
+pub fn BatchConfig::hash(Self) -> Int
+pub fn BatchConfig::hash_combine(Self, Hasher) -> Unit
 pub fn BatchConfig::new(max_queue_size? : Int, max_export_batch_size? : Int, scheduled_delay_millis? : Int, export_timeout_millis? : Int) -> Self
+pub fn BatchConfig::not_equal(Self, Self) -> Bool
+pub fn BatchConfig::op_ge(Self, Self) -> Bool
+pub fn BatchConfig::op_gt(Self, Self) -> Bool
+pub fn BatchConfig::op_le(Self, Self) -> Bool
+pub fn BatchConfig::op_lt(Self, Self) -> Bool
+pub fn BatchConfig::to_json(Self) -> Json
+pub fn BatchConfig::to_repr(Self) -> @debug.Repr
 pub impl Default for BatchConfig
 
 pub struct BatchLogProcessor {
@@ -60,8 +76,12 @@ pub struct KeyValue {
   key : @common.Key
   value : AnyValue
 } derive(Eq, ToJson, @debug.Debug)
+pub fn KeyValue::equal(Self, Self) -> Bool
 pub fn KeyValue::from_common(@common.KeyValue) -> Self
 pub fn KeyValue::new(StringView, AnyValue) -> Self
+pub fn KeyValue::not_equal(Self, Self) -> Bool
+pub fn KeyValue::to_json(Self) -> Json
+pub fn KeyValue::to_repr(Self) -> @debug.Repr
 
 pub struct LogExporter {
   export_fn : async (ArrayView[LogRecord]) -> Result[Unit, @error.OTelSdkError]
@@ -100,7 +120,11 @@ pub struct LogRecord {
   resource : @resource.Resource
   instrumentation_scope : @common.InstrumentationScope
 } derive(Eq, ToJson, @debug.Debug)
+pub fn LogRecord::equal(Self, Self) -> Bool
 pub fn LogRecord::new(AnyValue, timestamp_unix_nano? : Int64, observed_timestamp_unix_nano? : Int64, severity_number? : SeverityNumber?, severity_text? : String?, event_name? : String?, target? : String?, attributes? : ArrayView[KeyValue], trace_context? : @common.SpanContext?, resource? : @resource.Resource, instrumentation_scope? : @common.InstrumentationScope) -> Self
+pub fn LogRecord::not_equal(Self, Self) -> Bool
+pub fn LogRecord::to_json(Self) -> Json
+pub fn LogRecord::to_repr(Self) -> @debug.Repr
 
 type LoggerProviderState
 
@@ -159,6 +183,17 @@ pub(all) enum SeverityNumber {
   Fatal3
   Fatal4
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn SeverityNumber::compare(Self, Self) -> Int
+pub fn SeverityNumber::equal(Self, Self) -> Bool
+pub fn SeverityNumber::hash(Self) -> Int
+pub fn SeverityNumber::hash_combine(Self, Hasher) -> Unit
+pub fn SeverityNumber::not_equal(Self, Self) -> Bool
+pub fn SeverityNumber::op_ge(Self, Self) -> Bool
+pub fn SeverityNumber::op_gt(Self, Self) -> Bool
+pub fn SeverityNumber::op_le(Self, Self) -> Bool
+pub fn SeverityNumber::op_lt(Self, Self) -> Bool
+pub fn SeverityNumber::to_json(Self) -> Json
+pub fn SeverityNumber::to_repr(Self) -> @debug.Repr
 
 pub struct SimpleLogProcessor {
   inner : LogProcessor

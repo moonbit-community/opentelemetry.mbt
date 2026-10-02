@@ -80,9 +80,27 @@ pub(all) enum Protocol {
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
+pub extend Protocol with Eq::{not_equal, equal}
+
+///|
+pub extend Protocol with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+pub extend Protocol with Hash::{hash, hash_combine}
+
+///|
+pub extend Protocol with ToJson::{to_json}
+
+///|
+pub extend Protocol with Debug::{to_repr}
+
+///|
 pub impl Default for Protocol with fn default() -> Protocol {
   HttpBinary
 }
+
+///|
+pub extend Protocol with Default::{default}
 
 ///|
 /// Requested payload compression algorithm.
@@ -96,6 +114,21 @@ pub(all) enum Compression {
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
+pub extend Compression with Eq::{not_equal, equal}
+
+///|
+pub extend Compression with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+pub extend Compression with Hash::{hash, hash_combine}
+
+///|
+pub extend Compression with ToJson::{to_json}
+
+///|
+pub extend Compression with Debug::{to_repr}
+
+///|
 /// Error returned when exporter configuration cannot be resolved.
 /// Spec: https://opentelemetry.io/docs/specs/otel/error-handling/#basic-error-handling-principles
 pub(all) enum ExporterBuildError {
@@ -103,6 +136,27 @@ pub(all) enum ExporterBuildError {
   UnsupportedProtocol(String)
   UnsupportedCompressionAlgorithm(String)
 } derive(Eq, Compare, Hash, ToJson, Debug)
+
+///|
+pub extend ExporterBuildError with Eq::{not_equal, equal}
+
+///|
+pub extend ExporterBuildError with Compare::{
+  op_lt,
+  op_le,
+  op_ge,
+  compare,
+  op_gt,
+}
+
+///|
+pub extend ExporterBuildError with Hash::{hash, hash_combine}
+
+///|
+pub extend ExporterBuildError with ToJson::{to_json}
+
+///|
+pub extend ExporterBuildError with Debug::{to_repr}
 
 ///|
 struct SignalConfig {
@@ -185,7 +239,7 @@ fn _socket_import_marker() -> Unit {
 
 ///|
 fn normalize_ascii_lower(value : StringView) -> String {
-  let builder = StringBuilder::new()
+  let builder = StringBuilder()
   for _, ch in value {
     builder.write_char(ch.to_ascii_lowercase())
   }
@@ -220,7 +274,7 @@ fn is_hex_digit(value : StringView) -> Bool {
 
 ///|
 fn percent_decode(value : StringView) -> String {
-  let builder = StringBuilder::new()
+  let builder = StringBuilder()
   let mut index = 0
   while index < value.length() {
     let ch = value[index:index + 1]
@@ -1249,7 +1303,7 @@ priv struct LogsRequestGroup {
 
 ///|
 fn resource_identity(resource : @resource.Resource) -> String {
-  let builder = StringBuilder::new()
+  let builder = StringBuilder()
   builder.write_string(string_or_empty(resource.schema_url()))
   let attributes = resource.attributes()
   let keys = sorted_strings(attributes.keys().to_array())
@@ -1271,7 +1325,7 @@ fn scope_identity(
   match target {
     Some(target) => "target|\{target}"
     None => {
-      let builder = StringBuilder::new()
+      let builder = StringBuilder()
       builder.write_string(instrumentation_scope.name())
       builder.write_char('|')
       builder.write_string(string_or_empty(instrumentation_scope.version()))

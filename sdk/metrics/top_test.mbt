@@ -1,5 +1,5 @@
 ///|
-fn has_metric(metrics : Array[MetricData], name : StringView) -> Bool {
+fn has_metric(metrics : Array[@metrics.MetricData], name : StringView) -> Bool {
   for metric in metrics {
     if metric.name == name.to_owned() {
       return true
@@ -17,7 +17,10 @@ fn restore_env_var(key : String, value : String?) -> Unit {
 }
 
 ///|
-fn counter_sum(metrics : Array[MetricData], name : StringView) -> Int64? {
+fn counter_sum(
+  metrics : Array[@metrics.MetricData],
+  name : StringView,
+) -> Int64? {
   for metric in metrics {
     if metric.name == name.to_owned() {
       match metric.aggregation {
@@ -30,7 +33,10 @@ fn counter_sum(metrics : Array[MetricData], name : StringView) -> Int64? {
 }
 
 ///|
-fn counter_sum_u64(metrics : Array[MetricData], name : StringView) -> UInt64? {
+fn counter_sum_u64(
+  metrics : Array[@metrics.MetricData],
+  name : StringView,
+) -> UInt64? {
   for metric in metrics {
     if metric.name == name.to_owned() {
       match metric.aggregation {
@@ -43,7 +49,10 @@ fn counter_sum_u64(metrics : Array[MetricData], name : StringView) -> UInt64? {
 }
 
 ///|
-fn gauge_value(metrics : Array[MetricData], name : StringView) -> Double? {
+fn gauge_value(
+  metrics : Array[@metrics.MetricData],
+  name : StringView,
+) -> Double? {
   for metric in metrics {
     if metric.name == name.to_owned() {
       match metric.aggregation {
@@ -56,7 +65,10 @@ fn gauge_value(metrics : Array[MetricData], name : StringView) -> Double? {
 }
 
 ///|
-fn gauge_value_u64(metrics : Array[MetricData], name : StringView) -> UInt64? {
+fn gauge_value_u64(
+  metrics : Array[@metrics.MetricData],
+  name : StringView,
+) -> UInt64? {
   for metric in metrics {
     if metric.name == name.to_owned() {
       match metric.aggregation {
@@ -69,7 +81,10 @@ fn gauge_value_u64(metrics : Array[MetricData], name : StringView) -> UInt64? {
 }
 
 ///|
-fn sum_double(metrics : Array[MetricData], name : StringView) -> Double? {
+fn sum_double(
+  metrics : Array[@metrics.MetricData],
+  name : StringView,
+) -> Double? {
   for metric in metrics {
     if metric.name == name.to_owned() {
       match metric.aggregation {
@@ -82,7 +97,10 @@ fn sum_double(metrics : Array[MetricData], name : StringView) -> Double? {
 }
 
 ///|
-fn histogram_sum_u64(metrics : Array[MetricData], name : StringView) -> UInt64? {
+fn histogram_sum_u64(
+  metrics : Array[@metrics.MetricData],
+  name : StringView,
+) -> UInt64? {
   for metric in metrics {
     if metric.name == name.to_owned() {
       match metric.aggregation {
@@ -99,7 +117,7 @@ fn histogram_sum_u64(metrics : Array[MetricData], name : StringView) -> UInt64? 
 }
 
 ///|
-fn metric_count(metrics : Array[MetricData], name : StringView) -> Int {
+fn metric_count(metrics : Array[@metrics.MetricData], name : StringView) -> Int {
   let mut count = 0
   for metric in metrics {
     if metric.name == name.to_owned() {
@@ -113,8 +131,8 @@ fn metric_count(metrics : Array[MetricData], name : StringView) -> Int {
 // Test target: Verify the manual reader captures metric snapshots from synchronous instruments and force_flush exports the same data.
 // Test method: Record counters, histograms, and gauges, collect through the manual reader, then force flush and assert the exported metric names and values.
 async test "manual reader collects metric snapshots" {
-  let exporter = InMemoryMetricExporter::new()
-  let provider = SdkMeterProvider::builder()
+  let exporter = @metrics.InMemoryMetricExporter::new()
+  let provider = @metrics.SdkMeterProvider::builder()
     .with_exporter(exporter.into_metric_exporter())
     .build()
   let meter = provider.meter("metrics-test")
@@ -154,8 +172,10 @@ async test "manual reader collects metric snapshots" {
 // Test target: Verify a manual reader registered through the builder can collect metrics from the provider.
 // Test method: Attach a manual reader, record one counter value, and assert collect returns the expected sum.
 test "builder-registered manual reader collects metrics" {
-  let reader = ManualReader::builder().build()
-  let provider = SdkMeterProvider::builder().with_reader(reader).build()
+  let reader = @metrics.ManualReader::builder().build()
+  let provider = @metrics.SdkMeterProvider::builder()
+    .with_reader(reader)
+    .build()
   let meter = provider.meter("metrics-reader")
   let counter = meter.counter("requests").build()
   counter.add(7)
@@ -168,7 +188,7 @@ test "builder-registered manual reader collects metrics" {
 // Test target: Verify collect_result reports an internal failure when a manual reader has not been registered with any provider.
 // Test method: Call collect_result on a detached reader and assert the returned error message matches the registration failure.
 test "manual reader collect_result reports detached readers" {
-  let reader = ManualReader::builder().build()
+  let reader = @metrics.ManualReader::builder().build()
 
   guard reader.collect_result() is Err(InternalFailure(message)) else {
     fail("expected detached manual reader collect_result to fail")
@@ -180,8 +200,10 @@ test "manual reader collect_result reports detached readers" {
 // Test target: Verify collect_result succeeds while a registered manual reader is still active.
 // Test method: Register a reader, record one counter update, then call collect_result and assert the returned metrics contain that value.
 test "manual reader collect_result succeeds before shutdown" {
-  let reader = ManualReader::builder().build()
-  let provider = SdkMeterProvider::builder().with_reader(reader).build()
+  let reader = @metrics.ManualReader::builder().build()
+  let provider = @metrics.SdkMeterProvider::builder()
+    .with_reader(reader)
+    .build()
   let counter = provider
     .meter("metrics-reader-result")
     .counter("requests")
@@ -198,8 +220,10 @@ test "manual reader collect_result succeeds before shutdown" {
 // Test target: Verify collect_result reports an already-shutdown error after the manual reader is shut down.
 // Test method: Register and shut down a reader, then call collect_result and assert it fails with the shutdown error.
 async test "manual reader collect_result reports shutdown" {
-  let reader = ManualReader::builder().build()
-  let provider = SdkMeterProvider::builder().with_reader(reader).build()
+  let reader = @metrics.ManualReader::builder().build()
+  let provider = @metrics.SdkMeterProvider::builder()
+    .with_reader(reader)
+    .build()
   let counter = provider
     .meter("metrics-reader-shutdown")
     .counter("requests")
@@ -218,8 +242,10 @@ async test "manual reader collect_result reports shutdown" {
 // Test target: Verify the convenience collect API degrades to an empty snapshot instead of failing after shutdown.
 // Test method: Register and shut down a reader, then call collect and assert it returns no metrics.
 async test "manual reader collect stays convenience-oriented after shutdown" {
-  let reader = ManualReader::builder().build()
-  let provider = SdkMeterProvider::builder().with_reader(reader).build()
+  let reader = @metrics.ManualReader::builder().build()
+  let provider = @metrics.SdkMeterProvider::builder()
+    .with_reader(reader)
+    .build()
   let counter = provider
     .meter("metrics-reader-convenience")
     .counter("requests")
@@ -236,8 +262,10 @@ async test "manual reader collect stays convenience-oriented after shutdown" {
 // Test target: Verify delta temporality readers report only the increment since the previous collection.
 // Test method: Add to a counter across multiple collections and assert each snapshot returns the delta for that interval.
 test "manual reader delta temporality reports counter deltas" {
-  let reader = ManualReader::builder().with_temporality(Delta).build()
-  let provider = SdkMeterProvider::builder().with_reader(reader).build()
+  let reader = @metrics.ManualReader::builder().with_temporality(Delta).build()
+  let provider = @metrics.SdkMeterProvider::builder()
+    .with_reader(reader)
+    .build()
   let counter = provider.meter("metrics-delta").counter("requests").build()
 
   counter.add(2)
@@ -251,8 +279,12 @@ test "manual reader delta temporality reports counter deltas" {
 // Test target: Verify low-memory temporality keeps monotonic counters delta-based while up-down counters remain cumulative.
 // Test method: Record both counter types across two collections and assert the counter resets to deltas while the active total stays cumulative.
 test "low memory temporality keeps up-down counters cumulative" {
-  let reader = ManualReader::builder().with_temporality(LowMemory).build()
-  let provider = SdkMeterProvider::builder().with_reader(reader).build()
+  let reader = @metrics.ManualReader::builder()
+    .with_temporality(LowMemory)
+    .build()
+  let provider = @metrics.SdkMeterProvider::builder()
+    .with_reader(reader)
+    .build()
   let meter = provider.meter("metrics-low-memory")
   let counter = meter.counter("requests").build()
   let active = meter.up_down_counter("active").build()
@@ -274,11 +306,11 @@ test "low memory temporality keeps up-down counters cumulative" {
 // Test target: Verify views can rename metrics, filter attributes, and enforce cardinality limits.
 // Test method: Register a view for one counter, record two attribute sets, and assert the collected stream uses the renamed metric with filtered attributes and one series.
 test "views rename metrics filter attributes and cap cardinality" {
-  let provider = SdkMeterProvider::builder()
+  let provider = @metrics.SdkMeterProvider::builder()
     .with_view(instrument => {
       if instrument.name == "requests" {
         Some(
-          Stream::builder()
+          @metrics.Stream::builder()
           .with_name("http.requests")
           .with_allowed_attribute_keys(["route"])
           .with_cardinality_limit(1)
@@ -313,8 +345,10 @@ test "views rename metrics filter attributes and cap cardinality" {
 // Test method: Change the observed value between two manual collections and assert each snapshot reports the latest reading only once.
 test "observable gauges refresh on each collection" {
   let current = Ref(1.5)
-  let reader = ManualReader::builder().build()
-  let provider = SdkMeterProvider::builder().with_reader(reader).build()
+  let reader = @metrics.ManualReader::builder().build()
+  let provider = @metrics.SdkMeterProvider::builder()
+    .with_reader(reader)
+    .build()
   ignore(
     provider
     .meter("metrics-observable")
@@ -335,10 +369,10 @@ test "observable gauges refresh on each collection" {
 // Test target: Verify a view can replace histogram aggregation with a sum aggregation.
 // Test method: Register a sum view for a histogram instrument, record two measurements, and assert the exported metric is the summed value.
 test "views can override histogram aggregation to sum" {
-  let provider = SdkMeterProvider::builder()
+  let provider = @metrics.SdkMeterProvider::builder()
     .with_view(instrument => {
       if instrument.name == "latency" {
-        Some(Stream::builder().with_aggregation(Sum).build())
+        Some(@metrics.Stream::builder().with_aggregation(Sum).build())
       } else {
         None
       }
@@ -359,10 +393,10 @@ test "views can override histogram aggregation to sum" {
 // Test target: Verify views can drop matching metric streams entirely.
 // Test method: Register a drop view for one counter, record a value, and assert the collected snapshot omits that metric.
 test "views can drop matching streams" {
-  let provider = SdkMeterProvider::builder()
+  let provider = @metrics.SdkMeterProvider::builder()
     .with_view(instrument => {
       if instrument.name == "drop.me" {
-        Some(Stream::builder().with_aggregation(Drop).build())
+        Some(@metrics.Stream::builder().with_aggregation(Drop).build())
       } else {
         None
       }
@@ -379,8 +413,10 @@ test "views can drop matching streams" {
 // Test target: Verify force_flush remains a successful no-op after a manual reader has been shut down.
 // Test method: Shut down the reader first, then call force_flush and assert it still returns success.
 async test "manual reader force flush is ok after shutdown" {
-  let reader = ManualReader::builder().build()
-  let provider = SdkMeterProvider::builder().with_reader(reader).build()
+  let reader = @metrics.ManualReader::builder().build()
+  let provider = @metrics.SdkMeterProvider::builder()
+    .with_reader(reader)
+    .build()
 
   guard reader.shutdown() is Ok(_) else {
     fail("expected manual reader shutdown to succeed")
@@ -395,12 +431,14 @@ async test "manual reader force flush is ok after shutdown" {
 // Test target: Verify a periodic reader registered through the builder respects delta temporality when force-flushed.
 // Test method: Force flush after two counter updates and assert each export contains only the delta added since the previous flush.
 async test "builder-registered periodic reader force flush honors delta temporality" {
-  let exporter = InMemoryMetricExporter::new()
-  let reader = PeriodicMetricReader::builder(exporter.into_metric_exporter())
+  let exporter = @metrics.InMemoryMetricExporter::new()
+  let reader = @metrics.PeriodicMetricReader::builder(
+      exporter.into_metric_exporter(),
+    )
     .with_interval(10)
     .with_temporality(Delta)
     .build()
-  let provider = SdkMeterProvider::builder()
+  let provider = @metrics.SdkMeterProvider::builder()
     .with_periodic_reader(reader)
     .build()
   let counter = provider
@@ -426,8 +464,8 @@ async test "builder-registered periodic reader force flush honors delta temporal
 // Test target: Verify periodic readers export metrics automatically while their background task is running.
 // Test method: Spawn the periodic reader task, record a counter value, wait past the interval, and assert the exporter receives it.
 async test "periodic reader exports in background" {
-  let exporter = InMemoryMetricExporter::new()
-  let provider = SdkMeterProvider::builder()
+  let exporter = @metrics.InMemoryMetricExporter::new()
+  let provider = @metrics.SdkMeterProvider::builder()
     .with_periodic_exporter(exporter.into_metric_exporter(), interval_millis=10)
     .build()
   @async.with_task_group(group => {
@@ -450,8 +488,8 @@ async test "periodic exporter default interval reads environment" {
   defer restore_env_var("OTEL_METRIC_EXPORT_INTERVAL", original_interval)
   @env.set_env_var("OTEL_METRIC_EXPORT_INTERVAL", "10")
 
-  let exporter = InMemoryMetricExporter::new()
-  let provider = SdkMeterProvider::builder()
+  let exporter = @metrics.InMemoryMetricExporter::new()
+  let provider = @metrics.SdkMeterProvider::builder()
     .with_periodic_exporter(exporter.into_metric_exporter())
     .build()
   @async.with_task_group(group => {
@@ -469,8 +507,10 @@ async test "periodic exporter default interval reads environment" {
 // Test target: Verify floating-point synchronous and observable instruments export double-valued sums across collections.
 // Test method: Record and observe double values, collect twice, and assert each metric reports the expected current totals.
 test "floating-point counters and observables export double sums" {
-  let reader = ManualReader::builder().build()
-  let provider = SdkMeterProvider::builder().with_reader(reader).build()
+  let reader = @metrics.ManualReader::builder().build()
+  let provider = @metrics.SdkMeterProvider::builder()
+    .with_reader(reader)
+    .build()
   let meter = provider.meter("metrics-double")
   let counter = meter.f64_counter("bytes").build()
   let up_down_counter = meter.f64_up_down_counter("balance").build()
@@ -512,8 +552,10 @@ test "floating-point counters and observables export double sums" {
 // Test target: Verify u64 synchronous and observable instruments preserve full-range unsigned values in the exported data.
 // Test method: Record one large u64 value through multiple instrument kinds and assert every collected aggregate matches it exactly.
 test "u64 instruments preserve full-range values" {
-  let reader = ManualReader::builder().build()
-  let provider = SdkMeterProvider::builder().with_reader(reader).build()
+  let reader = @metrics.ManualReader::builder().build()
+  let provider = @metrics.SdkMeterProvider::builder()
+    .with_reader(reader)
+    .build()
   let meter = provider.meter("metrics-u64")
   let counter = meter.u64_counter("bytes").build()
   let histogram = meter.u64_histogram("payload").build()

@@ -64,12 +64,34 @@ pub(all) enum Compression {
   Gzip
   Zstd
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn Compression::compare(Self, Self) -> Int
+pub fn Compression::equal(Self, Self) -> Bool
+pub fn Compression::hash(Self) -> Int
+pub fn Compression::hash_combine(Self, Hasher) -> Unit
+pub fn Compression::not_equal(Self, Self) -> Bool
+pub fn Compression::op_ge(Self, Self) -> Bool
+pub fn Compression::op_gt(Self, Self) -> Bool
+pub fn Compression::op_le(Self, Self) -> Bool
+pub fn Compression::op_lt(Self, Self) -> Bool
+pub fn Compression::to_json(Self) -> Json
+pub fn Compression::to_repr(Self) -> @debug.Repr
 
 pub(all) enum ExporterBuildError {
   InvalidConfig(String, String)
   UnsupportedProtocol(String)
   UnsupportedCompressionAlgorithm(String)
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn ExporterBuildError::compare(Self, Self) -> Int
+pub fn ExporterBuildError::equal(Self, Self) -> Bool
+pub fn ExporterBuildError::hash(Self) -> Int
+pub fn ExporterBuildError::hash_combine(Self, Hasher) -> Unit
+pub fn ExporterBuildError::not_equal(Self, Self) -> Bool
+pub fn ExporterBuildError::op_ge(Self, Self) -> Bool
+pub fn ExporterBuildError::op_gt(Self, Self) -> Bool
+pub fn ExporterBuildError::op_le(Self, Self) -> Bool
+pub fn ExporterBuildError::op_lt(Self, Self) -> Bool
+pub fn ExporterBuildError::to_json(Self) -> Json
+pub fn ExporterBuildError::to_repr(Self) -> @debug.Repr
 
 pub struct LogExporter {
   state : @ref.Ref[SignalExporterState]
@@ -137,6 +159,18 @@ pub(all) enum Protocol {
   HttpBinary
   HttpJson
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn Protocol::compare(Self, Self) -> Int
+pub fn Protocol::default() -> Self
+pub fn Protocol::equal(Self, Self) -> Bool
+pub fn Protocol::hash(Self) -> Int
+pub fn Protocol::hash_combine(Self, Hasher) -> Unit
+pub fn Protocol::not_equal(Self, Self) -> Bool
+pub fn Protocol::op_ge(Self, Self) -> Bool
+pub fn Protocol::op_gt(Self, Self) -> Bool
+pub fn Protocol::op_le(Self, Self) -> Bool
+pub fn Protocol::op_lt(Self, Self) -> Bool
+pub fn Protocol::to_json(Self) -> Json
+pub fn Protocol::to_repr(Self) -> @debug.Repr
 pub impl Default for Protocol
 
 type SignalConfig

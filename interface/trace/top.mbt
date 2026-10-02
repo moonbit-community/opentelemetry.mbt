@@ -13,6 +13,21 @@ pub(all) enum SpanKind {
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
+pub extend SpanKind with Eq::{not_equal, equal}
+
+///|
+pub extend SpanKind with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+pub extend SpanKind with Hash::{hash, hash_combine}
+
+///|
+pub extend SpanKind with ToJson::{to_json}
+
+///|
+pub extend SpanKind with Debug::{to_repr}
+
+///|
 /// Span status code: unset, ok, or error.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#set-status
 pub(all) enum StatusCode {
@@ -20,6 +35,21 @@ pub(all) enum StatusCode {
   Ok
   Error
 } derive(Eq, Compare, Hash, ToJson, Debug)
+
+///|
+pub extend StatusCode with Eq::{not_equal, equal}
+
+///|
+pub extend StatusCode with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+pub extend StatusCode with Hash::{hash, hash_combine}
+
+///|
+pub extend StatusCode with ToJson::{to_json}
+
+///|
+pub extend StatusCode with Debug::{to_repr}
 
 ///|
 /// Span status with a code and optional description.
@@ -32,6 +62,15 @@ pub struct Status {
   code : StatusCode
   description : String?
 } derive(Eq, ToJson, Debug)
+
+///|
+pub extend Status with Eq::{not_equal, equal}
+
+///|
+pub extend Status with ToJson::{to_json}
+
+///|
+pub extend Status with Debug::{to_repr}
 
 ///|
 /// Event attached to a span builder.
@@ -47,6 +86,15 @@ pub struct Event {
 } derive(Eq, ToJson, Debug)
 
 ///|
+pub extend Event with Eq::{not_equal, equal}
+
+///|
+pub extend Event with ToJson::{to_json}
+
+///|
+pub extend Event with Debug::{to_repr}
+
+///|
 /// Link attached to a span builder.
 ///
 /// Links connect this span to another span context without making that span the
@@ -57,6 +105,15 @@ pub struct Link {
   attributes : Array[@common.KeyValue]
   dropped_attributes_count : Int
 } derive(Eq, ToJson, Debug)
+
+///|
+pub extend Link with Eq::{not_equal, equal}
+
+///|
+pub extend Link with ToJson::{to_json}
+
+///|
+pub extend Link with Debug::{to_repr}
 
 ///|
 /// Immutable span-construction descriptor used by `Tracer::build*()`.
@@ -73,6 +130,15 @@ pub struct SpanBuilder {
   events : Array[Event]
   links : Array[Link]
 } derive(Eq, ToJson, Debug)
+
+///|
+pub extend SpanBuilder with Eq::{not_equal, equal}
+
+///|
+pub extend SpanBuilder with ToJson::{to_json}
+
+///|
+pub extend SpanBuilder with Debug::{to_repr}
 
 ///|
 /// Public span handle.
@@ -146,6 +212,9 @@ pub fn Status::error(description? : String? = None) -> Status {
 pub impl Default for Status with fn default() -> Status {
   Status::unset()
 }
+
+///|
+pub extend Status with Default::{default}
 
 ///|
 /// Creates one span event.

@@ -142,7 +142,7 @@ fn[T : @json.FromJson] decode_json_text(text : String) -> Result[T, String] {
 fn non_empty_lines(text : String) -> Array[String] {
   let lines = []
   for line in text.split("\n") {
-    let builder = StringBuilder::new()
+    let builder = StringBuilder()
     for _, ch in line {
       if ch != '\u{0000}' {
         builder.write_char(ch)

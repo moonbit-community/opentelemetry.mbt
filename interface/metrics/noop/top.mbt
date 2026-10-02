@@ -4,6 +4,9 @@
 pub struct NoopMeterProvider {} derive(Default)
 
 ///|
+pub extend NoopMeterProvider with Default::{default}
+
+///|
 /// Creates a no-op meter provider.
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/noop/#meterprovider
 pub fn NoopMeterProvider::new() -> NoopMeterProvider {

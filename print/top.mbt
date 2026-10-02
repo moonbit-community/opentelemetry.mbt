@@ -257,7 +257,7 @@ fn render_span_batch(
   batch : ArrayView[@sdktrace.SpanData],
   include_resource : Bool,
 ) -> String {
-  let builder = StringBuilder::new()
+  let builder = StringBuilder()
   push_line(builder, "Spans")
   if include_resource && batch.length() > 0 {
     write_resource(builder, batch[0].resource)
@@ -338,7 +338,7 @@ fn render_log_batch(
   batch : ArrayView[@sdklogs.LogRecord],
   include_resource : Bool,
 ) -> String {
-  let builder = StringBuilder::new()
+  let builder = StringBuilder()
   push_line(builder, "Logs")
   if include_resource && batch.length() > 0 {
     write_resource(builder, batch[0].resource)
@@ -430,7 +430,7 @@ fn write_metric_aggregation(
 
 ///|
 fn render_metric_batch(batch : ArrayView[@sdkmetrics.MetricData]) -> String {
-  let builder = StringBuilder::new()
+  let builder = StringBuilder()
   push_line(builder, "Metrics")
   if batch.length() > 0 {
     write_resource(builder, batch[0].resource)
@@ -463,14 +463,23 @@ pub impl Default for SpanExporter with fn default() -> SpanExporter {
 }
 
 ///|
+pub extend SpanExporter with Default::{default}
+
+///|
 pub impl Default for LogExporter with fn default() -> LogExporter {
   { state: Ref({ is_shutdown: false, resource_emitted: false, }), }
 }
 
 ///|
+pub extend LogExporter with Default::{default}
+
+///|
 pub impl Default for MetricExporter with fn default() -> MetricExporter {
   MetricExporter::builder().build()
 }
+
+///|
+pub extend MetricExporter with Default::{default}
 
 ///|
 /// Creates a stdout span exporter.
