@@ -14,7 +14,16 @@ import {
 pub(all) struct AnyValue {
   mut value : AnyValue_Value
 } derive(Eq)
+pub fn AnyValue::default() -> Self
+pub fn AnyValue::equal(Self, Self) -> Bool
+pub fn AnyValue::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn AnyValue::new(value? : AnyValue_Value) -> Self
+pub fn AnyValue::not_equal(Self, Self) -> Bool
+pub fn AnyValue::read(&@protobuf.Reader) -> Self raise
+pub fn AnyValue::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn AnyValue::size_of(Self) -> UInt
+pub fn AnyValue::to_json(Self) -> Json
+pub fn AnyValue::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for AnyValue
 pub impl ToJson for AnyValue
 pub impl @json.FromJson for AnyValue
@@ -35,6 +44,11 @@ pub(all) enum AnyValue_Value {
   StringValueStrindex(Int)
   NotSet
 } derive(Eq)
+pub fn AnyValue_Value::default() -> Self
+pub fn AnyValue_Value::equal(Self, Self) -> Bool
+pub fn AnyValue_Value::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn AnyValue_Value::not_equal(Self, Self) -> Bool
+pub fn AnyValue_Value::to_json(Self) -> Json
 pub impl Default for AnyValue_Value
 pub impl ToJson for AnyValue_Value
 pub impl @json.FromJson for AnyValue_Value
@@ -42,7 +56,16 @@ pub impl @json.FromJson for AnyValue_Value
 pub(all) struct ArrayValue {
   mut values : Array[AnyValue]
 } derive(Eq)
+pub fn ArrayValue::default() -> Self
+pub fn ArrayValue::equal(Self, Self) -> Bool
+pub fn ArrayValue::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ArrayValue::new(Array[AnyValue]) -> Self
+pub fn ArrayValue::not_equal(Self, Self) -> Bool
+pub fn ArrayValue::read(&@protobuf.Reader) -> Self raise
+pub fn ArrayValue::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn ArrayValue::size_of(Self) -> UInt
+pub fn ArrayValue::to_json(Self) -> Json
+pub fn ArrayValue::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ArrayValue
 pub impl ToJson for ArrayValue
 pub impl @json.FromJson for ArrayValue
@@ -58,7 +81,16 @@ pub(all) struct EntityRef {
   mut id_keys : Array[String]
   mut description_keys : Array[String]
 } derive(Eq)
+pub fn EntityRef::default() -> Self
+pub fn EntityRef::equal(Self, Self) -> Bool
+pub fn EntityRef::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn EntityRef::new(String, String, Array[String], Array[String]) -> Self
+pub fn EntityRef::not_equal(Self, Self) -> Bool
+pub fn EntityRef::read(&@protobuf.Reader) -> Self raise
+pub fn EntityRef::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn EntityRef::size_of(Self) -> UInt
+pub fn EntityRef::to_json(Self) -> Json
+pub fn EntityRef::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for EntityRef
 pub impl ToJson for EntityRef
 pub impl @json.FromJson for EntityRef
@@ -74,7 +106,16 @@ pub(all) struct InstrumentationScope {
   mut attributes : Array[KeyValue]
   mut dropped_attributes_count : UInt
 } derive(Eq)
+pub fn InstrumentationScope::default() -> Self
+pub fn InstrumentationScope::equal(Self, Self) -> Bool
+pub fn InstrumentationScope::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn InstrumentationScope::new(String, String, Array[KeyValue], UInt) -> Self
+pub fn InstrumentationScope::not_equal(Self, Self) -> Bool
+pub fn InstrumentationScope::read(&@protobuf.Reader) -> Self raise
+pub fn InstrumentationScope::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn InstrumentationScope::size_of(Self) -> UInt
+pub fn InstrumentationScope::to_json(Self) -> Json
+pub fn InstrumentationScope::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for InstrumentationScope
 pub impl ToJson for InstrumentationScope
 pub impl @json.FromJson for InstrumentationScope
@@ -89,7 +130,16 @@ pub(all) struct KeyValue {
   mut value : AnyValue
   mut key_strindex : Int
 } derive(Eq)
+pub fn KeyValue::default() -> Self
+pub fn KeyValue::equal(Self, Self) -> Bool
+pub fn KeyValue::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn KeyValue::new(String, AnyValue, Int) -> Self
+pub fn KeyValue::not_equal(Self, Self) -> Bool
+pub fn KeyValue::read(&@protobuf.Reader) -> Self raise
+pub fn KeyValue::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn KeyValue::size_of(Self) -> UInt
+pub fn KeyValue::to_json(Self) -> Json
+pub fn KeyValue::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for KeyValue
 pub impl ToJson for KeyValue
 pub impl @json.FromJson for KeyValue
@@ -102,7 +152,16 @@ pub impl @protobuf.Write for KeyValue
 pub(all) struct KeyValueList {
   mut values : Array[KeyValue]
 } derive(Eq)
+pub fn KeyValueList::default() -> Self
+pub fn KeyValueList::equal(Self, Self) -> Bool
+pub fn KeyValueList::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn KeyValueList::new(Array[KeyValue]) -> Self
+pub fn KeyValueList::not_equal(Self, Self) -> Bool
+pub fn KeyValueList::read(&@protobuf.Reader) -> Self raise
+pub fn KeyValueList::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn KeyValueList::size_of(Self) -> UInt
+pub fn KeyValueList::to_json(Self) -> Json
+pub fn KeyValueList::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for KeyValueList
 pub impl ToJson for KeyValueList
 pub impl @json.FromJson for KeyValueList

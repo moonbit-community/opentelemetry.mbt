@@ -376,3 +376,75 @@ pub impl @protobuf.AsyncWrite for ExportMetricsPartialSuccess with fn write(
   writer |> @protobuf.async_write_varint(18UL)
   writer |> @protobuf.async_write_string(self.error_message)
 }
+
+///|
+pub extend ExportMetricsServiceRequest with Eq::{equal, not_equal}
+
+///|
+pub extend ExportMetricsServiceRequest with @protobuf.Sized::{size_of}
+
+///|
+pub extend ExportMetricsServiceRequest with Default::{default}
+
+///|
+pub extend ExportMetricsServiceRequest with @protobuf.Read::{
+  read,
+  read_with_limit,
+}
+
+///|
+pub extend ExportMetricsServiceRequest with @protobuf.Write::{write}
+
+///|
+pub extend ExportMetricsServiceRequest with ToJson::{to_json}
+
+///|
+pub extend ExportMetricsServiceRequest with @json.FromJson::{from_json}
+
+///|
+pub extend ExportMetricsServiceResponse with Eq::{equal, not_equal}
+
+///|
+pub extend ExportMetricsServiceResponse with @protobuf.Sized::{size_of}
+
+///|
+pub extend ExportMetricsServiceResponse with Default::{default}
+
+///|
+pub extend ExportMetricsServiceResponse with @protobuf.Read::{
+  read,
+  read_with_limit,
+}
+
+///|
+pub extend ExportMetricsServiceResponse with @protobuf.Write::{write}
+
+///|
+pub extend ExportMetricsServiceResponse with ToJson::{to_json}
+
+///|
+pub extend ExportMetricsServiceResponse with @json.FromJson::{from_json}
+
+///|
+pub extend ExportMetricsPartialSuccess with Eq::{equal, not_equal}
+
+///|
+pub extend ExportMetricsPartialSuccess with @protobuf.Sized::{size_of}
+
+///|
+pub extend ExportMetricsPartialSuccess with Default::{default}
+
+///|
+pub extend ExportMetricsPartialSuccess with @protobuf.Read::{
+  read,
+  read_with_limit,
+}
+
+///|
+pub extend ExportMetricsPartialSuccess with @protobuf.Write::{write}
+
+///|
+pub extend ExportMetricsPartialSuccess with ToJson::{to_json}
+
+///|
+pub extend ExportMetricsPartialSuccess with @json.FromJson::{from_json}

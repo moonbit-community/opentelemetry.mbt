@@ -1605,3 +1605,195 @@ pub impl @protobuf.AsyncWrite for Status with fn write(
   writer |> @protobuf.async_write_varint(24UL)
   writer |> @protobuf.async_write_enum(self.code.to_enum())
 }
+
+///|
+pub extend SpanFlags with Eq::{equal, not_equal}
+
+///|
+pub extend SpanFlags with Default::{default}
+
+///|
+pub extend SpanFlags with @protobuf.Sized::{size_of}
+
+///|
+pub extend SpanFlags with @json.FromJson::{from_json}
+
+///|
+pub extend SpanFlags with ToJson::{to_json}
+
+///|
+pub extend TracesData with Eq::{equal, not_equal}
+
+///|
+pub extend TracesData with @protobuf.Sized::{size_of}
+
+///|
+pub extend TracesData with Default::{default}
+
+///|
+pub extend TracesData with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend TracesData with @protobuf.Write::{write}
+
+///|
+pub extend TracesData with ToJson::{to_json}
+
+///|
+pub extend TracesData with @json.FromJson::{from_json}
+
+///|
+pub extend ResourceSpans with Eq::{equal, not_equal}
+
+///|
+pub extend ResourceSpans with @protobuf.Sized::{size_of}
+
+///|
+pub extend ResourceSpans with Default::{default}
+
+///|
+pub extend ResourceSpans with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend ResourceSpans with @protobuf.Write::{write}
+
+///|
+pub extend ResourceSpans with ToJson::{to_json}
+
+///|
+pub extend ResourceSpans with @json.FromJson::{from_json}
+
+///|
+pub extend ScopeSpans with Eq::{equal, not_equal}
+
+///|
+pub extend ScopeSpans with @protobuf.Sized::{size_of}
+
+///|
+pub extend ScopeSpans with Default::{default}
+
+///|
+pub extend ScopeSpans with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend ScopeSpans with @protobuf.Write::{write}
+
+///|
+pub extend ScopeSpans with ToJson::{to_json}
+
+///|
+pub extend ScopeSpans with @json.FromJson::{from_json}
+
+///|
+pub extend Span_SpanKind with Eq::{equal, not_equal}
+
+///|
+pub extend Span_SpanKind with Default::{default}
+
+///|
+pub extend Span_SpanKind with @protobuf.Sized::{size_of}
+
+///|
+pub extend Span_SpanKind with @json.FromJson::{from_json}
+
+///|
+pub extend Span_SpanKind with ToJson::{to_json}
+
+///|
+pub extend Span_Event with Eq::{equal, not_equal}
+
+///|
+pub extend Span_Event with @protobuf.Sized::{size_of}
+
+///|
+pub extend Span_Event with Default::{default}
+
+///|
+pub extend Span_Event with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend Span_Event with @protobuf.Write::{write}
+
+///|
+pub extend Span_Event with ToJson::{to_json}
+
+///|
+pub extend Span_Event with @json.FromJson::{from_json}
+
+///|
+pub extend Span_Link with Eq::{equal, not_equal}
+
+///|
+pub extend Span_Link with @protobuf.Sized::{size_of}
+
+///|
+pub extend Span_Link with Default::{default}
+
+///|
+pub extend Span_Link with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend Span_Link with @protobuf.Write::{write}
+
+///|
+pub extend Span_Link with ToJson::{to_json}
+
+///|
+pub extend Span_Link with @json.FromJson::{from_json}
+
+///|
+pub extend Span with Eq::{equal, not_equal}
+
+///|
+pub extend Span with @protobuf.Sized::{size_of}
+
+///|
+pub extend Span with Default::{default}
+
+///|
+pub extend Span with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend Span with @protobuf.Write::{write}
+
+///|
+pub extend Span with ToJson::{to_json}
+
+///|
+pub extend Span with @json.FromJson::{from_json}
+
+///|
+pub extend Status_StatusCode with Eq::{equal, not_equal}
+
+///|
+pub extend Status_StatusCode with Default::{default}
+
+///|
+pub extend Status_StatusCode with @protobuf.Sized::{size_of}
+
+///|
+pub extend Status_StatusCode with @json.FromJson::{from_json}
+
+///|
+pub extend Status_StatusCode with ToJson::{to_json}
+
+///|
+pub extend Status with Eq::{equal, not_equal}
+
+///|
+pub extend Status with @protobuf.Sized::{size_of}
+
+///|
+pub extend Status with Default::{default}
+
+///|
+pub extend Status with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend Status with @protobuf.Write::{write}
+
+///|
+pub extend Status with ToJson::{to_json}
+
+///|
+pub extend Status with @json.FromJson::{from_json}

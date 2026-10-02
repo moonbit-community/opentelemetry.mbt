@@ -371,3 +371,75 @@ pub impl @protobuf.AsyncWrite for ExportTracePartialSuccess with fn write(
   writer |> @protobuf.async_write_varint(18UL)
   writer |> @protobuf.async_write_string(self.error_message)
 }
+
+///|
+pub extend ExportTraceServiceRequest with Eq::{equal, not_equal}
+
+///|
+pub extend ExportTraceServiceRequest with @protobuf.Sized::{size_of}
+
+///|
+pub extend ExportTraceServiceRequest with Default::{default}
+
+///|
+pub extend ExportTraceServiceRequest with @protobuf.Read::{
+  read,
+  read_with_limit,
+}
+
+///|
+pub extend ExportTraceServiceRequest with @protobuf.Write::{write}
+
+///|
+pub extend ExportTraceServiceRequest with ToJson::{to_json}
+
+///|
+pub extend ExportTraceServiceRequest with @json.FromJson::{from_json}
+
+///|
+pub extend ExportTraceServiceResponse with Eq::{equal, not_equal}
+
+///|
+pub extend ExportTraceServiceResponse with @protobuf.Sized::{size_of}
+
+///|
+pub extend ExportTraceServiceResponse with Default::{default}
+
+///|
+pub extend ExportTraceServiceResponse with @protobuf.Read::{
+  read,
+  read_with_limit,
+}
+
+///|
+pub extend ExportTraceServiceResponse with @protobuf.Write::{write}
+
+///|
+pub extend ExportTraceServiceResponse with ToJson::{to_json}
+
+///|
+pub extend ExportTraceServiceResponse with @json.FromJson::{from_json}
+
+///|
+pub extend ExportTracePartialSuccess with Eq::{equal, not_equal}
+
+///|
+pub extend ExportTracePartialSuccess with @protobuf.Sized::{size_of}
+
+///|
+pub extend ExportTracePartialSuccess with Default::{default}
+
+///|
+pub extend ExportTracePartialSuccess with @protobuf.Read::{
+  read,
+  read_with_limit,
+}
+
+///|
+pub extend ExportTracePartialSuccess with @protobuf.Write::{write}
+
+///|
+pub extend ExportTracePartialSuccess with ToJson::{to_json}
+
+///|
+pub extend ExportTracePartialSuccess with @json.FromJson::{from_json}

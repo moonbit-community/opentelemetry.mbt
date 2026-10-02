@@ -2569,3 +2569,297 @@ pub impl @protobuf.AsyncWrite for KeyValueAndUnit with fn write(
   writer |> @protobuf.async_write_varint(24UL)
   writer |> @protobuf.async_write_int32(self.unit_strindex)
 }
+
+///|
+pub extend ProfilesDictionary with Eq::{equal, not_equal}
+
+///|
+pub extend ProfilesDictionary with @protobuf.Sized::{size_of}
+
+///|
+pub extend ProfilesDictionary with Default::{default}
+
+///|
+pub extend ProfilesDictionary with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend ProfilesDictionary with @protobuf.Write::{write}
+
+///|
+pub extend ProfilesDictionary with ToJson::{to_json}
+
+///|
+pub extend ProfilesDictionary with @json.FromJson::{from_json}
+
+///|
+pub extend ProfilesData with Eq::{equal, not_equal}
+
+///|
+pub extend ProfilesData with @protobuf.Sized::{size_of}
+
+///|
+pub extend ProfilesData with Default::{default}
+
+///|
+pub extend ProfilesData with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend ProfilesData with @protobuf.Write::{write}
+
+///|
+pub extend ProfilesData with ToJson::{to_json}
+
+///|
+pub extend ProfilesData with @json.FromJson::{from_json}
+
+///|
+pub extend ResourceProfiles with Eq::{equal, not_equal}
+
+///|
+pub extend ResourceProfiles with @protobuf.Sized::{size_of}
+
+///|
+pub extend ResourceProfiles with Default::{default}
+
+///|
+pub extend ResourceProfiles with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend ResourceProfiles with @protobuf.Write::{write}
+
+///|
+pub extend ResourceProfiles with ToJson::{to_json}
+
+///|
+pub extend ResourceProfiles with @json.FromJson::{from_json}
+
+///|
+pub extend ScopeProfiles with Eq::{equal, not_equal}
+
+///|
+pub extend ScopeProfiles with @protobuf.Sized::{size_of}
+
+///|
+pub extend ScopeProfiles with Default::{default}
+
+///|
+pub extend ScopeProfiles with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend ScopeProfiles with @protobuf.Write::{write}
+
+///|
+pub extend ScopeProfiles with ToJson::{to_json}
+
+///|
+pub extend ScopeProfiles with @json.FromJson::{from_json}
+
+///|
+pub extend Profile with Eq::{equal, not_equal}
+
+///|
+pub extend Profile with @protobuf.Sized::{size_of}
+
+///|
+pub extend Profile with Default::{default}
+
+///|
+pub extend Profile with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend Profile with @protobuf.Write::{write}
+
+///|
+pub extend Profile with ToJson::{to_json}
+
+///|
+pub extend Profile with @json.FromJson::{from_json}
+
+///|
+pub extend Link with Eq::{equal, not_equal}
+
+///|
+pub extend Link with @protobuf.Sized::{size_of}
+
+///|
+pub extend Link with Default::{default}
+
+///|
+pub extend Link with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend Link with @protobuf.Write::{write}
+
+///|
+pub extend Link with ToJson::{to_json}
+
+///|
+pub extend Link with @json.FromJson::{from_json}
+
+///|
+pub extend ValueType with Eq::{equal, not_equal}
+
+///|
+pub extend ValueType with @protobuf.Sized::{size_of}
+
+///|
+pub extend ValueType with Default::{default}
+
+///|
+pub extend ValueType with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend ValueType with @protobuf.Write::{write}
+
+///|
+pub extend ValueType with ToJson::{to_json}
+
+///|
+pub extend ValueType with @json.FromJson::{from_json}
+
+///|
+pub extend Sample with Eq::{equal, not_equal}
+
+///|
+pub extend Sample with @protobuf.Sized::{size_of}
+
+///|
+pub extend Sample with Default::{default}
+
+///|
+pub extend Sample with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend Sample with @protobuf.Write::{write}
+
+///|
+pub extend Sample with ToJson::{to_json}
+
+///|
+pub extend Sample with @json.FromJson::{from_json}
+
+///|
+pub extend Mapping with Eq::{equal, not_equal}
+
+///|
+pub extend Mapping with @protobuf.Sized::{size_of}
+
+///|
+pub extend Mapping with Default::{default}
+
+///|
+pub extend Mapping with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend Mapping with @protobuf.Write::{write}
+
+///|
+pub extend Mapping with ToJson::{to_json}
+
+///|
+pub extend Mapping with @json.FromJson::{from_json}
+
+///|
+pub extend Stack with Eq::{equal, not_equal}
+
+///|
+pub extend Stack with @protobuf.Sized::{size_of}
+
+///|
+pub extend Stack with Default::{default}
+
+///|
+pub extend Stack with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend Stack with @protobuf.Write::{write}
+
+///|
+pub extend Stack with ToJson::{to_json}
+
+///|
+pub extend Stack with @json.FromJson::{from_json}
+
+///|
+pub extend Location with Eq::{equal, not_equal}
+
+///|
+pub extend Location with @protobuf.Sized::{size_of}
+
+///|
+pub extend Location with Default::{default}
+
+///|
+pub extend Location with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend Location with @protobuf.Write::{write}
+
+///|
+pub extend Location with ToJson::{to_json}
+
+///|
+pub extend Location with @json.FromJson::{from_json}
+
+///|
+pub extend Line with Eq::{equal, not_equal}
+
+///|
+pub extend Line with @protobuf.Sized::{size_of}
+
+///|
+pub extend Line with Default::{default}
+
+///|
+pub extend Line with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend Line with @protobuf.Write::{write}
+
+///|
+pub extend Line with ToJson::{to_json}
+
+///|
+pub extend Line with @json.FromJson::{from_json}
+
+///|
+pub extend Function with Eq::{equal, not_equal}
+
+///|
+pub extend Function with @protobuf.Sized::{size_of}
+
+///|
+pub extend Function with Default::{default}
+
+///|
+pub extend Function with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend Function with @protobuf.Write::{write}
+
+///|
+pub extend Function with ToJson::{to_json}
+
+///|
+pub extend Function with @json.FromJson::{from_json}
+
+///|
+pub extend KeyValueAndUnit with Eq::{equal, not_equal}
+
+///|
+pub extend KeyValueAndUnit with @protobuf.Sized::{size_of}
+
+///|
+pub extend KeyValueAndUnit with Default::{default}
+
+///|
+pub extend KeyValueAndUnit with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend KeyValueAndUnit with @protobuf.Write::{write}
+
+///|
+pub extend KeyValueAndUnit with ToJson::{to_json}
+
+///|
+pub extend KeyValueAndUnit with @json.FromJson::{from_json}

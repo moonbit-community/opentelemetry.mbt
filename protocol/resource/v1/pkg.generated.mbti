@@ -16,7 +16,16 @@ pub(all) struct Resource {
   mut dropped_attributes_count : UInt
   mut entity_refs : Array[@moonbit-community/opentelemetry/protocol/common/v1.EntityRef]
 } derive(Eq)
+pub fn Resource::default() -> Self
+pub fn Resource::equal(Self, Self) -> Bool
+pub fn Resource::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Resource::new(Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt, Array[@moonbit-community/opentelemetry/protocol/common/v1.EntityRef]) -> Self
+pub fn Resource::not_equal(Self, Self) -> Bool
+pub fn Resource::read(&@protobuf.Reader) -> Self raise
+pub fn Resource::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn Resource::size_of(Self) -> UInt
+pub fn Resource::to_json(Self) -> Json
+pub fn Resource::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for Resource
 pub impl ToJson for Resource
 pub impl @json.FromJson for Resource

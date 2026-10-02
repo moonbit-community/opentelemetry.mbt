@@ -375,3 +375,69 @@ pub impl @protobuf.AsyncWrite for ExportLogsPartialSuccess with fn write(
   writer |> @protobuf.async_write_varint(18UL)
   writer |> @protobuf.async_write_string(self.error_message)
 }
+
+///|
+pub extend ExportLogsServiceRequest with Eq::{equal, not_equal}
+
+///|
+pub extend ExportLogsServiceRequest with @protobuf.Sized::{size_of}
+
+///|
+pub extend ExportLogsServiceRequest with Default::{default}
+
+///|
+pub extend ExportLogsServiceRequest with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend ExportLogsServiceRequest with @protobuf.Write::{write}
+
+///|
+pub extend ExportLogsServiceRequest with ToJson::{to_json}
+
+///|
+pub extend ExportLogsServiceRequest with @json.FromJson::{from_json}
+
+///|
+pub extend ExportLogsServiceResponse with Eq::{equal, not_equal}
+
+///|
+pub extend ExportLogsServiceResponse with @protobuf.Sized::{size_of}
+
+///|
+pub extend ExportLogsServiceResponse with Default::{default}
+
+///|
+pub extend ExportLogsServiceResponse with @protobuf.Read::{
+  read,
+  read_with_limit,
+}
+
+///|
+pub extend ExportLogsServiceResponse with @protobuf.Write::{write}
+
+///|
+pub extend ExportLogsServiceResponse with ToJson::{to_json}
+
+///|
+pub extend ExportLogsServiceResponse with @json.FromJson::{from_json}
+
+///|
+pub extend ExportLogsPartialSuccess with Eq::{equal, not_equal}
+
+///|
+pub extend ExportLogsPartialSuccess with @protobuf.Sized::{size_of}
+
+///|
+pub extend ExportLogsPartialSuccess with Default::{default}
+
+///|
+pub extend ExportLogsPartialSuccess with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend ExportLogsPartialSuccess with @protobuf.Write::{write}
+
+///|
+pub extend ExportLogsPartialSuccess with ToJson::{to_json}
+
+///|
+pub extend ExportLogsPartialSuccess with @json.FromJson::{from_json}

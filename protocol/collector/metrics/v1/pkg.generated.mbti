@@ -15,7 +15,16 @@ pub(all) struct ExportMetricsPartialSuccess {
   mut rejected_data_points : Int64
   mut error_message : String
 } derive(Eq)
+pub fn ExportMetricsPartialSuccess::default() -> Self
+pub fn ExportMetricsPartialSuccess::equal(Self, Self) -> Bool
+pub fn ExportMetricsPartialSuccess::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ExportMetricsPartialSuccess::new(Int64, String) -> Self
+pub fn ExportMetricsPartialSuccess::not_equal(Self, Self) -> Bool
+pub fn ExportMetricsPartialSuccess::read(&@protobuf.Reader) -> Self raise
+pub fn ExportMetricsPartialSuccess::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn ExportMetricsPartialSuccess::size_of(Self) -> UInt
+pub fn ExportMetricsPartialSuccess::to_json(Self) -> Json
+pub fn ExportMetricsPartialSuccess::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ExportMetricsPartialSuccess
 pub impl ToJson for ExportMetricsPartialSuccess
 pub impl @json.FromJson for ExportMetricsPartialSuccess
@@ -28,7 +37,16 @@ pub impl @protobuf.Write for ExportMetricsPartialSuccess
 pub(all) struct ExportMetricsServiceRequest {
   mut resource_metrics : Array[@moonbit-community/opentelemetry/protocol/metrics/v1.ResourceMetrics]
 } derive(Eq)
+pub fn ExportMetricsServiceRequest::default() -> Self
+pub fn ExportMetricsServiceRequest::equal(Self, Self) -> Bool
+pub fn ExportMetricsServiceRequest::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ExportMetricsServiceRequest::new(Array[@moonbit-community/opentelemetry/protocol/metrics/v1.ResourceMetrics]) -> Self
+pub fn ExportMetricsServiceRequest::not_equal(Self, Self) -> Bool
+pub fn ExportMetricsServiceRequest::read(&@protobuf.Reader) -> Self raise
+pub fn ExportMetricsServiceRequest::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn ExportMetricsServiceRequest::size_of(Self) -> UInt
+pub fn ExportMetricsServiceRequest::to_json(Self) -> Json
+pub fn ExportMetricsServiceRequest::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ExportMetricsServiceRequest
 pub impl ToJson for ExportMetricsServiceRequest
 pub impl @json.FromJson for ExportMetricsServiceRequest
@@ -41,7 +59,16 @@ pub impl @protobuf.Write for ExportMetricsServiceRequest
 pub(all) struct ExportMetricsServiceResponse {
   mut partial_success : ExportMetricsPartialSuccess
 } derive(Eq)
+pub fn ExportMetricsServiceResponse::default() -> Self
+pub fn ExportMetricsServiceResponse::equal(Self, Self) -> Bool
+pub fn ExportMetricsServiceResponse::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ExportMetricsServiceResponse::new(ExportMetricsPartialSuccess) -> Self
+pub fn ExportMetricsServiceResponse::not_equal(Self, Self) -> Bool
+pub fn ExportMetricsServiceResponse::read(&@protobuf.Reader) -> Self raise
+pub fn ExportMetricsServiceResponse::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn ExportMetricsServiceResponse::size_of(Self) -> UInt
+pub fn ExportMetricsServiceResponse::to_json(Self) -> Json
+pub fn ExportMetricsServiceResponse::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ExportMetricsServiceResponse
 pub impl ToJson for ExportMetricsServiceResponse
 pub impl @json.FromJson for ExportMetricsServiceResponse

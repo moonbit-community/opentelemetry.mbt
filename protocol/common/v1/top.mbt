@@ -1065,3 +1065,141 @@ pub impl @protobuf.AsyncWrite for EntityRef with fn write(
     writer |> @protobuf.async_write_string(item)
   }
 }
+
+///|
+pub extend AnyValue with Eq::{equal, not_equal}
+
+///|
+pub extend AnyValue with @protobuf.Sized::{size_of}
+
+///|
+pub extend AnyValue with Default::{default}
+
+///|
+pub extend AnyValue with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend AnyValue with @protobuf.Write::{write}
+
+///|
+pub extend AnyValue with ToJson::{to_json}
+
+///|
+pub extend AnyValue with @json.FromJson::{from_json}
+
+///|
+pub extend AnyValue_Value with Eq::{equal, not_equal}
+
+///|
+pub extend AnyValue_Value with Default::{default}
+
+///|
+pub extend AnyValue_Value with @json.FromJson::{from_json}
+
+///|
+pub extend AnyValue_Value with ToJson::{to_json}
+
+///|
+pub extend ArrayValue with Eq::{equal, not_equal}
+
+///|
+pub extend ArrayValue with @protobuf.Sized::{size_of}
+
+///|
+pub extend ArrayValue with Default::{default}
+
+///|
+pub extend ArrayValue with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend ArrayValue with @protobuf.Write::{write}
+
+///|
+pub extend ArrayValue with ToJson::{to_json}
+
+///|
+pub extend ArrayValue with @json.FromJson::{from_json}
+
+///|
+pub extend KeyValueList with Eq::{equal, not_equal}
+
+///|
+pub extend KeyValueList with @protobuf.Sized::{size_of}
+
+///|
+pub extend KeyValueList with Default::{default}
+
+///|
+pub extend KeyValueList with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend KeyValueList with @protobuf.Write::{write}
+
+///|
+pub extend KeyValueList with ToJson::{to_json}
+
+///|
+pub extend KeyValueList with @json.FromJson::{from_json}
+
+///|
+pub extend KeyValue with Eq::{equal, not_equal}
+
+///|
+pub extend KeyValue with @protobuf.Sized::{size_of}
+
+///|
+pub extend KeyValue with Default::{default}
+
+///|
+pub extend KeyValue with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend KeyValue with @protobuf.Write::{write}
+
+///|
+pub extend KeyValue with ToJson::{to_json}
+
+///|
+pub extend KeyValue with @json.FromJson::{from_json}
+
+///|
+pub extend InstrumentationScope with Eq::{equal, not_equal}
+
+///|
+pub extend InstrumentationScope with @protobuf.Sized::{size_of}
+
+///|
+pub extend InstrumentationScope with Default::{default}
+
+///|
+pub extend InstrumentationScope with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend InstrumentationScope with @protobuf.Write::{write}
+
+///|
+pub extend InstrumentationScope with ToJson::{to_json}
+
+///|
+pub extend InstrumentationScope with @json.FromJson::{from_json}
+
+///|
+pub extend EntityRef with Eq::{equal, not_equal}
+
+///|
+pub extend EntityRef with @protobuf.Sized::{size_of}
+
+///|
+pub extend EntityRef with Default::{default}
+
+///|
+pub extend EntityRef with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend EntityRef with @protobuf.Write::{write}
+
+///|
+pub extend EntityRef with ToJson::{to_json}
+
+///|
+pub extend EntityRef with @json.FromJson::{from_json}

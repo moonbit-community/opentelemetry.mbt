@@ -15,7 +15,16 @@ pub(all) struct ExportProfilesPartialSuccess {
   mut rejected_profiles : Int64
   mut error_message : String
 } derive(Eq)
+pub fn ExportProfilesPartialSuccess::default() -> Self
+pub fn ExportProfilesPartialSuccess::equal(Self, Self) -> Bool
+pub fn ExportProfilesPartialSuccess::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ExportProfilesPartialSuccess::new(Int64, String) -> Self
+pub fn ExportProfilesPartialSuccess::not_equal(Self, Self) -> Bool
+pub fn ExportProfilesPartialSuccess::read(&@protobuf.Reader) -> Self raise
+pub fn ExportProfilesPartialSuccess::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn ExportProfilesPartialSuccess::size_of(Self) -> UInt
+pub fn ExportProfilesPartialSuccess::to_json(Self) -> Json
+pub fn ExportProfilesPartialSuccess::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ExportProfilesPartialSuccess
 pub impl ToJson for ExportProfilesPartialSuccess
 pub impl @json.FromJson for ExportProfilesPartialSuccess
@@ -29,7 +38,16 @@ pub(all) struct ExportProfilesServiceRequest {
   mut resource_profiles : Array[@moonbit-community/opentelemetry/protocol/profiles/v1development.ResourceProfiles]
   mut dictionary : @moonbit-community/opentelemetry/protocol/profiles/v1development.ProfilesDictionary
 } derive(Eq)
+pub fn ExportProfilesServiceRequest::default() -> Self
+pub fn ExportProfilesServiceRequest::equal(Self, Self) -> Bool
+pub fn ExportProfilesServiceRequest::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ExportProfilesServiceRequest::new(Array[@moonbit-community/opentelemetry/protocol/profiles/v1development.ResourceProfiles], @moonbit-community/opentelemetry/protocol/profiles/v1development.ProfilesDictionary) -> Self
+pub fn ExportProfilesServiceRequest::not_equal(Self, Self) -> Bool
+pub fn ExportProfilesServiceRequest::read(&@protobuf.Reader) -> Self raise
+pub fn ExportProfilesServiceRequest::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn ExportProfilesServiceRequest::size_of(Self) -> UInt
+pub fn ExportProfilesServiceRequest::to_json(Self) -> Json
+pub fn ExportProfilesServiceRequest::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ExportProfilesServiceRequest
 pub impl ToJson for ExportProfilesServiceRequest
 pub impl @json.FromJson for ExportProfilesServiceRequest
@@ -42,7 +60,16 @@ pub impl @protobuf.Write for ExportProfilesServiceRequest
 pub(all) struct ExportProfilesServiceResponse {
   mut partial_success : ExportProfilesPartialSuccess
 } derive(Eq)
+pub fn ExportProfilesServiceResponse::default() -> Self
+pub fn ExportProfilesServiceResponse::equal(Self, Self) -> Bool
+pub fn ExportProfilesServiceResponse::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ExportProfilesServiceResponse::new(ExportProfilesPartialSuccess) -> Self
+pub fn ExportProfilesServiceResponse::not_equal(Self, Self) -> Bool
+pub fn ExportProfilesServiceResponse::read(&@protobuf.Reader) -> Self raise
+pub fn ExportProfilesServiceResponse::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn ExportProfilesServiceResponse::size_of(Self) -> UInt
+pub fn ExportProfilesServiceResponse::to_json(Self) -> Json
+pub fn ExportProfilesServiceResponse::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ExportProfilesServiceResponse
 pub impl ToJson for ExportProfilesServiceResponse
 pub impl @json.FromJson for ExportProfilesServiceResponse

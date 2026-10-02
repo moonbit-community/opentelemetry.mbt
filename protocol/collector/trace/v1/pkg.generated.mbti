@@ -15,7 +15,16 @@ pub(all) struct ExportTracePartialSuccess {
   mut rejected_spans : Int64
   mut error_message : String
 } derive(Eq)
+pub fn ExportTracePartialSuccess::default() -> Self
+pub fn ExportTracePartialSuccess::equal(Self, Self) -> Bool
+pub fn ExportTracePartialSuccess::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ExportTracePartialSuccess::new(Int64, String) -> Self
+pub fn ExportTracePartialSuccess::not_equal(Self, Self) -> Bool
+pub fn ExportTracePartialSuccess::read(&@protobuf.Reader) -> Self raise
+pub fn ExportTracePartialSuccess::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn ExportTracePartialSuccess::size_of(Self) -> UInt
+pub fn ExportTracePartialSuccess::to_json(Self) -> Json
+pub fn ExportTracePartialSuccess::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ExportTracePartialSuccess
 pub impl ToJson for ExportTracePartialSuccess
 pub impl @json.FromJson for ExportTracePartialSuccess
@@ -28,7 +37,16 @@ pub impl @protobuf.Write for ExportTracePartialSuccess
 pub(all) struct ExportTraceServiceRequest {
   mut resource_spans : Array[@moonbit-community/opentelemetry/protocol/trace/v1.ResourceSpans]
 } derive(Eq)
+pub fn ExportTraceServiceRequest::default() -> Self
+pub fn ExportTraceServiceRequest::equal(Self, Self) -> Bool
+pub fn ExportTraceServiceRequest::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ExportTraceServiceRequest::new(Array[@moonbit-community/opentelemetry/protocol/trace/v1.ResourceSpans]) -> Self
+pub fn ExportTraceServiceRequest::not_equal(Self, Self) -> Bool
+pub fn ExportTraceServiceRequest::read(&@protobuf.Reader) -> Self raise
+pub fn ExportTraceServiceRequest::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn ExportTraceServiceRequest::size_of(Self) -> UInt
+pub fn ExportTraceServiceRequest::to_json(Self) -> Json
+pub fn ExportTraceServiceRequest::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ExportTraceServiceRequest
 pub impl ToJson for ExportTraceServiceRequest
 pub impl @json.FromJson for ExportTraceServiceRequest
@@ -41,7 +59,16 @@ pub impl @protobuf.Write for ExportTraceServiceRequest
 pub(all) struct ExportTraceServiceResponse {
   mut partial_success : ExportTracePartialSuccess
 } derive(Eq)
+pub fn ExportTraceServiceResponse::default() -> Self
+pub fn ExportTraceServiceResponse::equal(Self, Self) -> Bool
+pub fn ExportTraceServiceResponse::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ExportTraceServiceResponse::new(ExportTracePartialSuccess) -> Self
+pub fn ExportTraceServiceResponse::not_equal(Self, Self) -> Bool
+pub fn ExportTraceServiceResponse::read(&@protobuf.Reader) -> Self raise
+pub fn ExportTraceServiceResponse::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
+pub fn ExportTraceServiceResponse::size_of(Self) -> UInt
+pub fn ExportTraceServiceResponse::to_json(Self) -> Json
+pub fn ExportTraceServiceResponse::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ExportTraceServiceResponse
 pub impl ToJson for ExportTraceServiceResponse
 pub impl @json.FromJson for ExportTraceServiceResponse

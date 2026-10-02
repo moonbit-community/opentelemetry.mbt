@@ -1020,3 +1020,117 @@ pub impl @protobuf.AsyncWrite for LogRecord with fn write(
   writer |> @protobuf.async_write_varint(98UL)
   writer |> @protobuf.async_write_string(self.event_name)
 }
+
+///|
+pub extend SeverityNumber with Eq::{equal, not_equal}
+
+///|
+pub extend SeverityNumber with Default::{default}
+
+///|
+pub extend SeverityNumber with @protobuf.Sized::{size_of}
+
+///|
+pub extend SeverityNumber with @json.FromJson::{from_json}
+
+///|
+pub extend SeverityNumber with ToJson::{to_json}
+
+///|
+pub extend LogRecordFlags with Eq::{equal, not_equal}
+
+///|
+pub extend LogRecordFlags with Default::{default}
+
+///|
+pub extend LogRecordFlags with @protobuf.Sized::{size_of}
+
+///|
+pub extend LogRecordFlags with @json.FromJson::{from_json}
+
+///|
+pub extend LogRecordFlags with ToJson::{to_json}
+
+///|
+pub extend LogsData with Eq::{equal, not_equal}
+
+///|
+pub extend LogsData with @protobuf.Sized::{size_of}
+
+///|
+pub extend LogsData with Default::{default}
+
+///|
+pub extend LogsData with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend LogsData with @protobuf.Write::{write}
+
+///|
+pub extend LogsData with ToJson::{to_json}
+
+///|
+pub extend LogsData with @json.FromJson::{from_json}
+
+///|
+pub extend ResourceLogs with Eq::{equal, not_equal}
+
+///|
+pub extend ResourceLogs with @protobuf.Sized::{size_of}
+
+///|
+pub extend ResourceLogs with Default::{default}
+
+///|
+pub extend ResourceLogs with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend ResourceLogs with @protobuf.Write::{write}
+
+///|
+pub extend ResourceLogs with ToJson::{to_json}
+
+///|
+pub extend ResourceLogs with @json.FromJson::{from_json}
+
+///|
+pub extend ScopeLogs with Eq::{equal, not_equal}
+
+///|
+pub extend ScopeLogs with @protobuf.Sized::{size_of}
+
+///|
+pub extend ScopeLogs with Default::{default}
+
+///|
+pub extend ScopeLogs with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend ScopeLogs with @protobuf.Write::{write}
+
+///|
+pub extend ScopeLogs with ToJson::{to_json}
+
+///|
+pub extend ScopeLogs with @json.FromJson::{from_json}
+
+///|
+pub extend LogRecord with Eq::{equal, not_equal}
+
+///|
+pub extend LogRecord with @protobuf.Sized::{size_of}
+
+///|
+pub extend LogRecord with Default::{default}
+
+///|
+pub extend LogRecord with @protobuf.Read::{read, read_with_limit}
+
+///|
+pub extend LogRecord with @protobuf.Write::{write}
+
+///|
+pub extend LogRecord with ToJson::{to_json}
+
+///|
+pub extend LogRecord with @json.FromJson::{from_json}
