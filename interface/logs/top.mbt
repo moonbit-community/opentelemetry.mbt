@@ -16,6 +16,15 @@ pub(all) enum AnyValue {
 } derive(Eq, ToJson, Debug)
 
 ///|
+pub extend AnyValue with Eq::{not_equal, equal}
+
+///|
+pub extend AnyValue with ToJson::{to_json}
+
+///|
+pub extend AnyValue with Debug::{to_repr}
+
+///|
 /// Public severity ladder matching the OpenTelemetry log data model.
 ///
 /// The variants map to OpenTelemetry's 24 severity slots. `Severity::name()`
@@ -49,12 +58,36 @@ pub(all) enum Severity {
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
+pub extend Severity with Eq::{not_equal, equal}
+
+///|
+pub extend Severity with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+pub extend Severity with Hash::{hash, hash_combine}
+
+///|
+pub extend Severity with ToJson::{to_json}
+
+///|
+pub extend Severity with Debug::{to_repr}
+
+///|
 /// Structured log attribute key/value pair used by the public logging API.
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-attributes
 pub struct KeyValue {
   key : @common.Key
   value : AnyValue
 } derive(Eq, ToJson, Debug)
+
+///|
+pub extend KeyValue with Eq::{not_equal, equal}
+
+///|
+pub extend KeyValue with ToJson::{to_json}
+
+///|
+pub extend KeyValue with Debug::{to_repr}
 
 ///|
 /// Mutable log record builder used by `Logger::emit()`.
@@ -74,6 +107,15 @@ pub struct LogRecord {
   attributes : Array[KeyValue]
   mut trace_context : @common.SpanContext?
 } derive(Eq, ToJson, Debug)
+
+///|
+pub extend LogRecord with Eq::{not_equal, equal}
+
+///|
+pub extend LogRecord with ToJson::{to_json}
+
+///|
+pub extend LogRecord with Debug::{to_repr}
 
 ///|
 /// Public logger handle.
@@ -336,6 +378,9 @@ pub fn LogRecord::set_trace_context(
 pub impl Default for LogRecord with fn default() -> LogRecord {
   LogRecord::new()
 }
+
+///|
+pub extend LogRecord with Default::{default}
 
 ///|
 /// Builds a logger from emission and filtering callbacks.

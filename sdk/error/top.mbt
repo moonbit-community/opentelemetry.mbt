@@ -10,6 +10,21 @@ pub(all) enum OTelSdkError {
 } derive(Debug, Eq, Compare, Hash, ToJson)
 
 ///|
+pub extend OTelSdkError with Debug::{to_repr}
+
+///|
+pub extend OTelSdkError with Eq::{not_equal, equal}
+
+///|
+pub extend OTelSdkError with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+pub extend OTelSdkError with Hash::{hash, hash_combine}
+
+///|
+pub extend OTelSdkError with ToJson::{to_json}
+
+///|
 /// Common result type for operations that succeed with `Unit`.
 /// Spec: https://opentelemetry.io/docs/specs/otel/error-handling/#basic-error-handling-principles
 pub type OTelSdkResult = Result[Unit, OTelSdkError]

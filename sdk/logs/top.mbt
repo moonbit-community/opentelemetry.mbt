@@ -32,6 +32,21 @@ pub(all) enum SeverityNumber {
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
+pub extend SeverityNumber with Eq::{not_equal, equal}
+
+///|
+pub extend SeverityNumber with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+pub extend SeverityNumber with Hash::{hash, hash_combine}
+
+///|
+pub extend SeverityNumber with ToJson::{to_json}
+
+///|
+pub extend SeverityNumber with Debug::{to_repr}
+
+///|
 /// Structured log value preserved by the SDK and OTLP exporter.
 ///
 /// Use `Map` and `Array` when the backend should receive structured payloads
@@ -48,12 +63,30 @@ pub(all) enum AnyValue {
 } derive(Eq, ToJson, Debug)
 
 ///|
+pub extend AnyValue with Eq::{not_equal, equal}
+
+///|
+pub extend AnyValue with ToJson::{to_json}
+
+///|
+pub extend AnyValue with Debug::{to_repr}
+
+///|
 /// Structured log attribute key/value pair.
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-attributes
 pub struct KeyValue {
   key : @common.Key
   value : AnyValue
 } derive(Eq, ToJson, Debug)
+
+///|
+pub extend KeyValue with Eq::{not_equal, equal}
+
+///|
+pub extend KeyValue with ToJson::{to_json}
+
+///|
+pub extend KeyValue with Debug::{to_repr}
 
 ///|
 /// Immutable log payload exported by processors and exporters.
@@ -71,6 +104,15 @@ pub struct LogRecord {
   resource : @resource.Resource
   instrumentation_scope : @common.InstrumentationScope
 } derive(Eq, ToJson, Debug)
+
+///|
+pub extend LogRecord with Eq::{not_equal, equal}
+
+///|
+pub extend LogRecord with ToJson::{to_json}
+
+///|
+pub extend LogRecord with Debug::{to_repr}
 
 ///|
 /// Exporter callback wrapper for log batches.
@@ -124,6 +166,21 @@ pub struct BatchConfig {
   scheduled_delay_millis : Int
   export_timeout_millis : Int
 } derive(Eq, Compare, Hash, ToJson, Debug)
+
+///|
+pub extend BatchConfig with Eq::{not_equal, equal}
+
+///|
+pub extend BatchConfig with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+pub extend BatchConfig with Hash::{hash, hash_combine}
+
+///|
+pub extend BatchConfig with ToJson::{to_json}
+
+///|
+pub extend BatchConfig with Debug::{to_repr}
 
 ///|
 struct InMemoryLogExporterState {
@@ -319,6 +376,9 @@ pub impl Default for BatchConfig with fn default() -> BatchConfig {
     export_timeout_millis=env_or("OTEL_BLRP_EXPORT_TIMEOUT", 30000),
   )
 }
+
+///|
+pub extend BatchConfig with Default::{default}
 
 ///|
 /// Builds a log exporter from callbacks.

@@ -22,7 +22,19 @@ pub struct BatchConfig {
   scheduled_delay_millis : Int
   export_timeout_millis : Int
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn BatchConfig::compare(Self, Self) -> Int
+pub fn BatchConfig::default() -> Self
+pub fn BatchConfig::equal(Self, Self) -> Bool
+pub fn BatchConfig::hash(Self) -> Int
+pub fn BatchConfig::hash_combine(Self, Hasher) -> Unit
 pub fn BatchConfig::new(max_queue_size? : Int, max_export_batch_size? : Int, scheduled_delay_millis? : Int, export_timeout_millis? : Int) -> Self
+pub fn BatchConfig::not_equal(Self, Self) -> Bool
+pub fn BatchConfig::op_ge(Self, Self) -> Bool
+pub fn BatchConfig::op_gt(Self, Self) -> Bool
+pub fn BatchConfig::op_le(Self, Self) -> Bool
+pub fn BatchConfig::op_lt(Self, Self) -> Bool
+pub fn BatchConfig::to_json(Self) -> Json
+pub fn BatchConfig::to_repr(Self) -> @debug.Repr
 pub impl Default for BatchConfig
 
 type BatchProcessorState
@@ -41,6 +53,7 @@ pub struct Config {
   span_limits : SpanLimits
   resource : @resource.Resource
 }
+pub fn Config::default() -> Self
 pub fn Config::new(sampler? : Sampler, id_generator? : IdGenerator, span_limits? : SpanLimits, resource? : @resource.Resource) -> Self
 pub impl Default for Config
 
@@ -77,6 +90,7 @@ pub struct Sampler {
 }
 pub fn Sampler::always_off() -> Self
 pub fn Sampler::always_on() -> Self
+pub fn Sampler::default() -> Self
 pub fn Sampler::description(Self) -> String
 pub fn Sampler::new((SamplingParameters) -> SamplingResult, () -> String) -> Self
 pub fn Sampler::parent_based(Self) -> Self
@@ -89,6 +103,17 @@ pub(all) enum SamplingDecision {
   RecordOnly
   RecordAndSample
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn SamplingDecision::compare(Self, Self) -> Int
+pub fn SamplingDecision::equal(Self, Self) -> Bool
+pub fn SamplingDecision::hash(Self) -> Int
+pub fn SamplingDecision::hash_combine(Self, Hasher) -> Unit
+pub fn SamplingDecision::not_equal(Self, Self) -> Bool
+pub fn SamplingDecision::op_ge(Self, Self) -> Bool
+pub fn SamplingDecision::op_gt(Self, Self) -> Bool
+pub fn SamplingDecision::op_le(Self, Self) -> Bool
+pub fn SamplingDecision::op_lt(Self, Self) -> Bool
+pub fn SamplingDecision::to_json(Self) -> Json
+pub fn SamplingDecision::to_repr(Self) -> @debug.Repr
 
 pub struct SamplingParameters {
   parent_context : @context.Context
@@ -98,13 +123,21 @@ pub struct SamplingParameters {
   attributes : Array[@common.KeyValue]
   links : Array[SpanLink]
 } derive(Eq, ToJson, @debug.Debug)
+pub fn SamplingParameters::equal(Self, Self) -> Bool
+pub fn SamplingParameters::not_equal(Self, Self) -> Bool
+pub fn SamplingParameters::to_json(Self) -> Json
+pub fn SamplingParameters::to_repr(Self) -> @debug.Repr
 
 pub struct SamplingResult {
   decision : SamplingDecision
   attributes : Array[@common.KeyValue]
   trace_state : @common.TraceState
 } derive(Eq, ToJson, @debug.Debug)
+pub fn SamplingResult::equal(Self, Self) -> Bool
 pub fn SamplingResult::new(SamplingDecision, attributes? : ArrayView[@common.KeyValue], trace_state? : @common.TraceState) -> Self
+pub fn SamplingResult::not_equal(Self, Self) -> Bool
+pub fn SamplingResult::to_json(Self) -> Json
+pub fn SamplingResult::to_repr(Self) -> @debug.Repr
 
 pub struct SdkTracer {
   provider : SdkTracerProvider
@@ -177,6 +210,10 @@ pub struct SpanData {
   resource : @resource.Resource
   instrumentation_scope : @common.InstrumentationScope
 } derive(Eq, ToJson, @debug.Debug)
+pub fn SpanData::equal(Self, Self) -> Bool
+pub fn SpanData::not_equal(Self, Self) -> Bool
+pub fn SpanData::to_json(Self) -> Json
+pub fn SpanData::to_repr(Self) -> @debug.Repr
 
 pub struct SpanEvent {
   name : String
@@ -184,7 +221,11 @@ pub struct SpanEvent {
   attributes : Array[@common.KeyValue]
   dropped_attributes_count : Int
 } derive(Eq, ToJson, @debug.Debug)
+pub fn SpanEvent::equal(Self, Self) -> Bool
 pub fn SpanEvent::new(StringView, attributes? : ArrayView[@common.KeyValue], timestamp_unix_nano? : Int64, dropped_attributes_count? : Int) -> Self
+pub fn SpanEvent::not_equal(Self, Self) -> Bool
+pub fn SpanEvent::to_json(Self) -> Json
+pub fn SpanEvent::to_repr(Self) -> @debug.Repr
 
 pub struct SpanExporter {
   export_fn : async (ArrayView[SpanData]) -> Result[Unit, @error.OTelSdkError]
@@ -206,6 +247,17 @@ pub(all) enum SpanKind {
   Producer
   Consumer
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn SpanKind::compare(Self, Self) -> Int
+pub fn SpanKind::equal(Self, Self) -> Bool
+pub fn SpanKind::hash(Self) -> Int
+pub fn SpanKind::hash_combine(Self, Hasher) -> Unit
+pub fn SpanKind::not_equal(Self, Self) -> Bool
+pub fn SpanKind::op_ge(Self, Self) -> Bool
+pub fn SpanKind::op_gt(Self, Self) -> Bool
+pub fn SpanKind::op_le(Self, Self) -> Bool
+pub fn SpanKind::op_lt(Self, Self) -> Bool
+pub fn SpanKind::to_json(Self) -> Json
+pub fn SpanKind::to_repr(Self) -> @debug.Repr
 
 pub struct SpanLimits {
   max_attributes_per_span : Int
@@ -214,7 +266,19 @@ pub struct SpanLimits {
   max_attributes_per_event : Int
   max_attributes_per_link : Int
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn SpanLimits::compare(Self, Self) -> Int
+pub fn SpanLimits::default() -> Self
+pub fn SpanLimits::equal(Self, Self) -> Bool
+pub fn SpanLimits::hash(Self) -> Int
+pub fn SpanLimits::hash_combine(Self, Hasher) -> Unit
 pub fn SpanLimits::new(max_attributes_per_span? : Int, max_events_per_span? : Int, max_links_per_span? : Int, max_attributes_per_event? : Int, max_attributes_per_link? : Int) -> Self
+pub fn SpanLimits::not_equal(Self, Self) -> Bool
+pub fn SpanLimits::op_ge(Self, Self) -> Bool
+pub fn SpanLimits::op_gt(Self, Self) -> Bool
+pub fn SpanLimits::op_le(Self, Self) -> Bool
+pub fn SpanLimits::op_lt(Self, Self) -> Bool
+pub fn SpanLimits::to_json(Self) -> Json
+pub fn SpanLimits::to_repr(Self) -> @debug.Repr
 pub impl Default for SpanLimits
 
 pub struct SpanLink {
@@ -222,7 +286,11 @@ pub struct SpanLink {
   attributes : Array[@common.KeyValue]
   dropped_attributes_count : Int
 } derive(Eq, ToJson, @debug.Debug)
+pub fn SpanLink::equal(Self, Self) -> Bool
 pub fn SpanLink::new(@common.SpanContext, attributes? : ArrayView[@common.KeyValue], dropped_attributes_count? : Int) -> Self
+pub fn SpanLink::not_equal(Self, Self) -> Bool
+pub fn SpanLink::to_json(Self) -> Json
+pub fn SpanLink::to_repr(Self) -> @debug.Repr
 
 pub struct SpanProcessor {
   on_start_fn : (@context.Context, SpanData) -> Unit
@@ -243,9 +311,14 @@ pub struct Status {
   code : StatusCode
   description : String?
 } derive(Eq, ToJson, @debug.Debug)
+pub fn Status::default() -> Self
+pub fn Status::equal(Self, Self) -> Bool
 pub fn Status::error(description? : String?) -> Self
 pub fn Status::new(StatusCode, description? : String?) -> Self
+pub fn Status::not_equal(Self, Self) -> Bool
 pub fn Status::ok() -> Self
+pub fn Status::to_json(Self) -> Json
+pub fn Status::to_repr(Self) -> @debug.Repr
 pub fn Status::unset() -> Self
 pub impl Default for Status
 
@@ -254,6 +327,17 @@ pub(all) enum StatusCode {
   Ok
   Error
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn StatusCode::compare(Self, Self) -> Int
+pub fn StatusCode::equal(Self, Self) -> Bool
+pub fn StatusCode::hash(Self) -> Int
+pub fn StatusCode::hash_combine(Self, Hasher) -> Unit
+pub fn StatusCode::not_equal(Self, Self) -> Bool
+pub fn StatusCode::op_ge(Self, Self) -> Bool
+pub fn StatusCode::op_gt(Self, Self) -> Bool
+pub fn StatusCode::op_le(Self, Self) -> Bool
+pub fn StatusCode::op_lt(Self, Self) -> Bool
+pub fn StatusCode::to_json(Self) -> Json
+pub fn StatusCode::to_repr(Self) -> @debug.Repr
 
 // Type aliases
 

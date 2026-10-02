@@ -28,6 +28,17 @@ pub(all) enum OTelSdkError {
   InternalFailure(String)
   ExportFailure(String, String)
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn OTelSdkError::compare(Self, Self) -> Int
+pub fn OTelSdkError::equal(Self, Self) -> Bool
+pub fn OTelSdkError::hash(Self) -> Int
+pub fn OTelSdkError::hash_combine(Self, Hasher) -> Unit
+pub fn OTelSdkError::not_equal(Self, Self) -> Bool
+pub fn OTelSdkError::op_ge(Self, Self) -> Bool
+pub fn OTelSdkError::op_gt(Self, Self) -> Bool
+pub fn OTelSdkError::op_le(Self, Self) -> Bool
+pub fn OTelSdkError::op_lt(Self, Self) -> Bool
+pub fn OTelSdkError::to_json(Self) -> Json
+pub fn OTelSdkError::to_repr(Self) -> @debug.Repr
 
 // Type aliases
 pub type OTelSdkResult = Result[Unit, OTelSdkError]

@@ -18,8 +18,20 @@ pub struct InstrumentationScope {
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
 pub fn InstrumentationScope::attributes(Self) -> Array[KeyValue]
 pub fn InstrumentationScope::builder(StringView) -> InstrumentationScopeBuilder
+pub fn InstrumentationScope::compare(Self, Self) -> Int
+pub fn InstrumentationScope::default() -> Self
+pub fn InstrumentationScope::equal(Self, Self) -> Bool
+pub fn InstrumentationScope::hash(Self) -> Int
+pub fn InstrumentationScope::hash_combine(Self, Hasher) -> Unit
 pub fn InstrumentationScope::name(Self) -> String
+pub fn InstrumentationScope::not_equal(Self, Self) -> Bool
+pub fn InstrumentationScope::op_ge(Self, Self) -> Bool
+pub fn InstrumentationScope::op_gt(Self, Self) -> Bool
+pub fn InstrumentationScope::op_le(Self, Self) -> Bool
+pub fn InstrumentationScope::op_lt(Self, Self) -> Bool
 pub fn InstrumentationScope::schema_url(Self) -> String?
+pub fn InstrumentationScope::to_json(Self) -> Json
+pub fn InstrumentationScope::to_repr(Self) -> @debug.Repr
 pub fn InstrumentationScope::version(Self) -> String?
 pub impl Default for InstrumentationScope
 
@@ -38,14 +50,37 @@ pub struct Key {
   name : String
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
 pub fn Key::as_string(Self) -> String
+pub fn Key::compare(Self, Self) -> Int
+pub fn Key::default() -> Self
+pub fn Key::equal(Self, Self) -> Bool
+pub fn Key::hash(Self) -> Int
+pub fn Key::hash_combine(Self, Hasher) -> Unit
 pub fn Key::new(StringView) -> Self
+pub fn Key::not_equal(Self, Self) -> Bool
+pub fn Key::op_ge(Self, Self) -> Bool
+pub fn Key::op_gt(Self, Self) -> Bool
+pub fn Key::op_le(Self, Self) -> Bool
+pub fn Key::op_lt(Self, Self) -> Bool
+pub fn Key::to_json(Self) -> Json
+pub fn Key::to_repr(Self) -> @debug.Repr
 pub impl Default for Key
 
 pub struct KeyValue {
   key : Key
   value : Value
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn KeyValue::compare(Self, Self) -> Int
+pub fn KeyValue::equal(Self, Self) -> Bool
+pub fn KeyValue::hash(Self) -> Int
+pub fn KeyValue::hash_combine(Self, Hasher) -> Unit
 pub fn KeyValue::new(StringView, Value) -> Self
+pub fn KeyValue::not_equal(Self, Self) -> Bool
+pub fn KeyValue::op_ge(Self, Self) -> Bool
+pub fn KeyValue::op_gt(Self, Self) -> Bool
+pub fn KeyValue::op_le(Self, Self) -> Bool
+pub fn KeyValue::op_lt(Self, Self) -> Bool
+pub fn KeyValue::to_json(Self) -> Json
+pub fn KeyValue::to_repr(Self) -> @debug.Repr
 
 pub struct SpanContext {
   trace_id : TraceId
@@ -54,12 +89,17 @@ pub struct SpanContext {
   is_remote : Bool
   trace_state : TraceState
 } derive(Eq, ToJson, @debug.Debug)
+pub fn SpanContext::default() -> Self
 pub fn SpanContext::empty() -> Self
+pub fn SpanContext::equal(Self, Self) -> Bool
 pub fn SpanContext::is_remote(Self) -> Bool
 pub fn SpanContext::is_sampled(Self) -> Bool
 pub fn SpanContext::is_valid(Self) -> Bool
 pub fn SpanContext::new(TraceId, SpanId, trace_flags? : TraceFlags, is_remote? : Bool, trace_state? : TraceState) -> Self
+pub fn SpanContext::not_equal(Self, Self) -> Bool
 pub fn SpanContext::span_id(Self) -> SpanId
+pub fn SpanContext::to_json(Self) -> Json
+pub fn SpanContext::to_repr(Self) -> @debug.Repr
 pub fn SpanContext::trace_flags(Self) -> TraceFlags
 pub fn SpanContext::trace_id(Self) -> TraceId
 pub fn SpanContext::trace_state(Self) -> TraceState
@@ -70,20 +110,44 @@ pub struct SpanId {
   bytes : Bytes
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
 pub fn SpanId::bytes(Self) -> Bytes
+pub fn SpanId::compare(Self, Self) -> Int
+pub fn SpanId::default() -> Self
+pub fn SpanId::equal(Self, Self) -> Bool
 pub fn SpanId::from_bytes(Bytes) -> Self?
 pub fn SpanId::from_hex(StringView) -> Self?
+pub fn SpanId::hash(Self) -> Int
+pub fn SpanId::hash_combine(Self, Hasher) -> Unit
 pub fn SpanId::invalid() -> Self
 pub fn SpanId::is_valid(Self) -> Bool
+pub fn SpanId::not_equal(Self, Self) -> Bool
+pub fn SpanId::op_ge(Self, Self) -> Bool
+pub fn SpanId::op_gt(Self, Self) -> Bool
+pub fn SpanId::op_le(Self, Self) -> Bool
+pub fn SpanId::op_lt(Self, Self) -> Bool
 pub fn SpanId::to_hex(Self) -> String
+pub fn SpanId::to_json(Self) -> Json
+pub fn SpanId::to_repr(Self) -> @debug.Repr
 pub impl Default for SpanId
 
 pub struct TraceFlags {
   flags : UInt
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn TraceFlags::compare(Self, Self) -> Int
+pub fn TraceFlags::default() -> Self
+pub fn TraceFlags::equal(Self, Self) -> Bool
 pub fn TraceFlags::from_hex(StringView) -> Self?
+pub fn TraceFlags::hash(Self) -> Int
+pub fn TraceFlags::hash_combine(Self, Hasher) -> Unit
 pub fn TraceFlags::is_sampled(Self) -> Bool
 pub fn TraceFlags::new(UInt) -> Self
+pub fn TraceFlags::not_equal(Self, Self) -> Bool
+pub fn TraceFlags::op_ge(Self, Self) -> Bool
+pub fn TraceFlags::op_gt(Self, Self) -> Bool
+pub fn TraceFlags::op_le(Self, Self) -> Bool
+pub fn TraceFlags::op_lt(Self, Self) -> Bool
 pub fn TraceFlags::to_hex(Self) -> String
+pub fn TraceFlags::to_json(Self) -> Json
+pub fn TraceFlags::to_repr(Self) -> @debug.Repr
 pub fn TraceFlags::with_sampled(Self, Bool) -> Self
 pub impl Default for TraceFlags
 
@@ -91,23 +155,40 @@ pub struct TraceId {
   bytes : Bytes
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
 pub fn TraceId::bytes(Self) -> Bytes
+pub fn TraceId::compare(Self, Self) -> Int
+pub fn TraceId::default() -> Self
+pub fn TraceId::equal(Self, Self) -> Bool
 pub fn TraceId::from_bytes(Bytes) -> Self?
 pub fn TraceId::from_hex(StringView) -> Self?
+pub fn TraceId::hash(Self) -> Int
+pub fn TraceId::hash_combine(Self, Hasher) -> Unit
 pub fn TraceId::invalid() -> Self
 pub fn TraceId::is_valid(Self) -> Bool
+pub fn TraceId::not_equal(Self, Self) -> Bool
+pub fn TraceId::op_ge(Self, Self) -> Bool
+pub fn TraceId::op_gt(Self, Self) -> Bool
+pub fn TraceId::op_le(Self, Self) -> Bool
+pub fn TraceId::op_lt(Self, Self) -> Bool
 pub fn TraceId::to_hex(Self) -> String
+pub fn TraceId::to_json(Self) -> Json
+pub fn TraceId::to_repr(Self) -> @debug.Repr
 pub impl Default for TraceId
 
 pub struct TraceState {
   entries : Map[String, String]
 } derive(Eq, ToJson, @debug.Debug)
+pub fn TraceState::default() -> Self
 pub fn TraceState::empty() -> Self
 pub fn TraceState::entries(Self) -> Map[String, String]
+pub fn TraceState::equal(Self, Self) -> Bool
 pub fn TraceState::from_header(StringView) -> Self
 pub fn TraceState::get(Self, StringView) -> String?
 pub fn TraceState::new(Map[String, String]) -> Self
+pub fn TraceState::not_equal(Self, Self) -> Bool
 pub fn TraceState::set(Self, StringView, StringView) -> Self
 pub fn TraceState::to_header(Self) -> String?
+pub fn TraceState::to_json(Self) -> Json
+pub fn TraceState::to_repr(Self) -> @debug.Repr
 pub impl Default for TraceState
 
 pub(all) enum Value {
@@ -118,6 +199,17 @@ pub(all) enum Value {
   Bytes(Bytes)
   Array(Array[Value])
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn Value::compare(Self, Self) -> Int
+pub fn Value::equal(Self, Self) -> Bool
+pub fn Value::hash(Self) -> Int
+pub fn Value::hash_combine(Self, Hasher) -> Unit
+pub fn Value::not_equal(Self, Self) -> Bool
+pub fn Value::op_ge(Self, Self) -> Bool
+pub fn Value::op_gt(Self, Self) -> Bool
+pub fn Value::op_le(Self, Self) -> Bool
+pub fn Value::op_lt(Self, Self) -> Bool
+pub fn Value::to_json(Self) -> Json
+pub fn Value::to_repr(Self) -> @debug.Repr
 
 // Type aliases
 

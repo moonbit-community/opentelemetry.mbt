@@ -16,6 +16,15 @@ pub struct Context {
 } derive(Eq, ToJson, Debug)
 
 ///|
+pub extend Context with Eq::{not_equal, equal}
+
+///|
+pub extend Context with ToJson::{to_json}
+
+///|
+pub extend Context with Debug::{to_repr}
+
+///|
 /// Returns a new empty context.
 ///
 /// This is an alias for `Context::empty()`.
@@ -141,3 +150,6 @@ pub fn Context::with_telemetry_suppressed(
 pub impl Default for Context with fn default() -> Context {
   Context::empty()
 }
+
+///|
+pub extend Context with Default::{default}

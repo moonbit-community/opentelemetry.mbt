@@ -26,8 +26,8 @@ fn sample_span_context(
 // Test target: Verify the simple span processor exports parent and child spans with the expected relationships and payload data.
 // Test method: Create nested spans with attributes and events, end them, and assert the in-memory exporter receives both snapshots in order.
 async test "simple processor exports parent child spans" {
-  let exporter = InMemorySpanExporter::new()
-  let provider = SdkTracerProvider::builder()
+  let exporter = @trace.InMemorySpanExporter::new()
+  let provider = @trace.SdkTracerProvider::builder()
     .with_simple_exporter(exporter.into_span_exporter())
     .build()
   let tracer = provider.tracer("trace-test")
@@ -57,11 +57,11 @@ async test "simple processor exports parent child spans" {
 // Test target: Verify the batch span processor keeps spans queued until an explicit flush is requested.
 // Test method: End one span, assert nothing is exported immediately, then call force_flush and assert the span is delivered.
 async test "batch processor flushes queued spans" {
-  let exporter = InMemorySpanExporter::new()
-  let provider = SdkTracerProvider::builder()
+  let exporter = @trace.InMemorySpanExporter::new()
+  let provider = @trace.SdkTracerProvider::builder()
     .with_batch_exporter(
       exporter.into_span_exporter(),
-      config=BatchConfig::new(max_queue_size=8, max_export_batch_size=8),
+      config=@trace.BatchConfig::new(max_queue_size=8, max_export_batch_size=8),
     )
     .build()
   let tracer = provider.tracer("trace-batch")
@@ -108,7 +108,7 @@ test "default trace config reads environment variables" {
   @env.set_env_var("OTEL_BSP_MAX_QUEUE_SIZE", "23")
   @env.set_env_var("OTEL_BSP_MAX_EXPORT_BATCH_SIZE", "29")
 
-  let config : Config = Default::default()
+  let config : @trace.Config = Default::default()
   @debug.assert_eq(
     config.sampler.description(),
     "parent_based(trace_id_ratio(0.25))",
@@ -117,7 +117,7 @@ test "default trace config reads environment variables" {
   @debug.assert_eq(config.span_limits.max_events_per_span, 9)
   @debug.assert_eq(config.span_limits.max_links_per_span, 11)
 
-  let batch : BatchConfig = Default::default()
+  let batch : @trace.BatchConfig = Default::default()
   @debug.assert_eq(batch.scheduled_delay_millis, 17)
   @debug.assert_eq(batch.export_timeout_millis, 19)
   @debug.assert_eq(batch.max_queue_size, 23)
@@ -128,11 +128,11 @@ test "default trace config reads environment variables" {
 // Test target: Verify the batch span processor flushes automatically once its scheduled delay expires.
 // Test method: Spawn the processor background tasks, finish one span, wait past the delay, and assert the exporter receives it.
 async test "batch processor flushes on scheduled delay in background" {
-  let exporter = InMemorySpanExporter::new()
-  let provider = SdkTracerProvider::builder()
+  let exporter = @trace.InMemorySpanExporter::new()
+  let provider = @trace.SdkTracerProvider::builder()
     .with_batch_exporter(
       exporter.into_span_exporter(),
-      config=BatchConfig::new(
+      config=@trace.BatchConfig::new(
         max_queue_size=8,
         max_export_batch_size=8,
         scheduled_delay_millis=10,
@@ -154,8 +154,8 @@ async test "batch processor flushes on scheduled delay in background" {
 // Test target: Verify shutdown_with_timeout leaves the tracer provider permanently shut down.
 // Test method: Shut the provider down with a timeout, then call shutdown again and assert the already-shutdown error is returned.
 async test "provider shutdown with timeout marks provider unavailable" {
-  let exporter = InMemorySpanExporter::new()
-  let provider = SdkTracerProvider::builder()
+  let exporter = @trace.InMemorySpanExporter::new()
+  let provider = @trace.SdkTracerProvider::builder()
     .with_batch_exporter(exporter.into_span_exporter())
     .build()
   guard provider.shutdown_with_timeout(1) is Ok(_) else {
@@ -170,15 +170,15 @@ async test "provider shutdown with timeout marks provider unavailable" {
 // Test target: Verify span status obeys the OpenTelemetry precedence rules between unset, error, and ok.
 // Test method: Apply status updates in different orders to one span snapshot and assert the later disallowed transitions are ignored.
 test "span status follows ok error unset precedence" {
-  let span = SdkTracerProvider::builder()
+  let span = @trace.SdkTracerProvider::builder()
     .build()
     .tracer("trace-status")
     .start("status")
-  span.set_status(Status::error(description=Some("boom")))
-  span.set_status(Status::unset())
+  span.set_status(@trace.Status::error(description=Some("boom")))
+  span.set_status(@trace.Status::unset())
   assert_true(span.snapshot().status.code == Error)
-  span.set_status(Status::ok())
-  span.set_status(Status::error(description=Some("later")))
+  span.set_status(@trace.Status::ok())
+  span.set_status(@trace.Status::error(description=Some("later")))
   let status = span.snapshot().status
   assert_true(status.code == Ok)
   @debug.assert_eq(status.description, None)
@@ -188,14 +188,17 @@ test "span status follows ok error unset precedence" {
 // Test target: Verify per-event and per-link attribute limits trim stored attributes while tracking drop counts.
 // Test method: Add oversized event and link attribute sets to a span and assert the snapshot keeps one attribute plus the correct drop counters.
 test "event and link attributes honor per-item limits" {
-  let tracer = SdkTracerProvider::builder()
+  let tracer = @trace.SdkTracerProvider::builder()
     .with_span_limits(
-      SpanLimits::new(max_attributes_per_event=1, max_attributes_per_link=1),
+      @trace.SpanLimits::new(
+        max_attributes_per_event=1,
+        max_attributes_per_link=1,
+      ),
     )
     .build()
     .tracer("trace-limits")
   let span = tracer.start("limited", links=[
-    SpanLink::new(
+    @trace.SpanLink::new(
       sample_span_context(
         "4bf92f3577b34da6a3ce929d0e0e4736", "00f067aa0ba902b7",
       ),

@@ -25,8 +25,8 @@ async test "logger exports trace-aware log records" {
   )
   let context = @context.Context::empty().with_span_context(span_context)
 
-  let exporter = InMemoryLogExporter::new()
-  let provider = SdkLoggerProvider::builder()
+  let exporter = @logs.InMemoryLogExporter::new()
+  let provider = @logs.SdkLoggerProvider::builder()
     .with_simple_exporter(exporter.into_log_exporter())
     .build()
   let logger = provider.logger("logs-test")
@@ -37,7 +37,7 @@ async test "logger exports trace-aware log records" {
     severity_text=Some("ERROR3"),
     event_name=Some("checkout.failed"),
     target=Some("api"),
-    attributes=[KeyValue::new("http.status_code", Int64(500))],
+    attributes=[@logs.KeyValue::new("http.status_code", Int64(500))],
   )
 
   let records = exporter.finished_logs()
@@ -63,11 +63,11 @@ async test "logger exports trace-aware log records" {
 // Test target: Verify the batch log processor flushes queued records once the scheduled delay elapses.
 // Test method: Spawn the processor background tasks, emit one record, wait past the delay, and assert the exporter received it.
 async test "batch log processor flushes on scheduled delay in background" {
-  let exporter = InMemoryLogExporter::new()
-  let provider = SdkLoggerProvider::builder()
+  let exporter = @logs.InMemoryLogExporter::new()
+  let provider = @logs.SdkLoggerProvider::builder()
     .with_batch_exporter(
       exporter.into_log_exporter(),
-      config=BatchConfig::new(
+      config=@logs.BatchConfig::new(
         max_queue_size=8,
         max_export_batch_size=8,
         scheduled_delay_millis=10,
@@ -102,7 +102,7 @@ test "default batch log config reads environment variables" {
   @env.set_env_var("OTEL_BLRP_MAX_QUEUE_SIZE", "19")
   @env.set_env_var("OTEL_BLRP_MAX_EXPORT_BATCH_SIZE", "23")
 
-  let config : BatchConfig = Default::default()
+  let config : @logs.BatchConfig = Default::default()
   @debug.assert_eq(config.scheduled_delay_millis, 13)
   @debug.assert_eq(config.export_timeout_millis, 17)
   @debug.assert_eq(config.max_queue_size, 19)
@@ -113,8 +113,8 @@ test "default batch log config reads environment variables" {
 // Test target: Verify shutdown_with_timeout closes the logger provider and keeps it unavailable for later shutdown calls.
 // Test method: Shut the provider down with a timeout, then call shutdown again and assert the already-shutdown error is returned.
 async test "logger provider shutdown with timeout marks provider unavailable" {
-  let exporter = InMemoryLogExporter::new()
-  let provider = SdkLoggerProvider::builder()
+  let exporter = @logs.InMemoryLogExporter::new()
+  let provider = @logs.SdkLoggerProvider::builder()
     .with_batch_exporter(exporter.into_log_exporter())
     .build()
   guard provider.shutdown_with_timeout(1) is Ok(_) else {

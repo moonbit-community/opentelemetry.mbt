@@ -4,6 +4,9 @@
 pub struct NoopTracerProvider {} derive(Default)
 
 ///|
+pub extend NoopTracerProvider with Default::{default}
+
+///|
 /// Creates a no-op tracer provider.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#behavior-of-the-api-in-the-absence-of-an-installed-sdk
 pub fn NoopTracerProvider::new() -> NoopTracerProvider {

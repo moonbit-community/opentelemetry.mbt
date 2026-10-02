@@ -10,7 +10,7 @@ test "noop tracer propagates parent span context without recording" {
     fail("expected span id")
   }
   let parent_span_context = @common.SpanContext::new(trace_id, span_id)
-  let tracer = TracerProvider::noop().tracer("noop")
+  let tracer = @trace.TracerProvider::noop().tracer("noop")
   let span = tracer.start_with_context(
     "child",
     @context.Context::empty().with_remote_span_context(parent_span_context),
@@ -48,15 +48,15 @@ async test "builder events and links preserve dropped attribute counts" {
   let span = provider
     .tracer("trace-builder")
     .build(
-      SpanBuilder::from_name("root")
+      @trace.SpanBuilder::from_name("root")
       .with_events([
-        Event::new("db.query", attributes=[
+        @trace.Event::new("db.query", attributes=[
           @common.KeyValue::new("kept", String("one")),
           @common.KeyValue::new("dropped", String("two")),
         ]),
       ])
       .with_links([
-        Link::new(@common.SpanContext::new(trace_id, span_id), attributes=[
+        @trace.Link::new(@common.SpanContext::new(trace_id, span_id), attributes=[
           @common.KeyValue::new("kept", String("one")),
           @common.KeyValue::new("dropped", String("two")),
         ]),

@@ -6,6 +6,21 @@ pub struct Key {
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
+pub extend Key with Eq::{not_equal, equal}
+
+///|
+pub extend Key with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+pub extend Key with Hash::{hash, hash_combine}
+
+///|
+pub extend Key with ToJson::{to_json}
+
+///|
+pub extend Key with Debug::{to_repr}
+
+///|
 /// Creates a key from its canonical string representation.
 /// Spec: https://opentelemetry.io/docs/specs/otel/common/#attribute
 pub fn Key::new(name : StringView) -> Key {
@@ -25,6 +40,9 @@ pub impl Default for Key with fn default() -> Key {
 }
 
 ///|
+pub extend Key with Default::{default}
+
+///|
 /// Attribute value supported by this SDK implementation.
 /// Spec: https://opentelemetry.io/docs/specs/otel/common/#anyvalue
 pub(all) enum Value {
@@ -37,12 +55,42 @@ pub(all) enum Value {
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
+pub extend Value with Eq::{not_equal, equal}
+
+///|
+pub extend Value with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+pub extend Value with Hash::{hash, hash_combine}
+
+///|
+pub extend Value with ToJson::{to_json}
+
+///|
+pub extend Value with Debug::{to_repr}
+
+///|
 /// Pair of attribute key and value.
 /// Spec: https://opentelemetry.io/docs/specs/otel/common/#attribute
 pub struct KeyValue {
   key : Key
   value : Value
 } derive(Eq, Compare, Hash, ToJson, Debug)
+
+///|
+pub extend KeyValue with Eq::{not_equal, equal}
+
+///|
+pub extend KeyValue with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+pub extend KeyValue with Hash::{hash, hash_combine}
+
+///|
+pub extend KeyValue with ToJson::{to_json}
+
+///|
+pub extend KeyValue with Debug::{to_repr}
 
 ///|
 /// Creates a key/value pair using a string key.
@@ -57,6 +105,15 @@ pub fn KeyValue::new(key : StringView, value : Value) -> KeyValue {
 pub struct TraceState {
   entries : Map[String, String]
 } derive(Eq, ToJson, Debug)
+
+///|
+pub extend TraceState with Eq::{not_equal, equal}
+
+///|
+pub extend TraceState with ToJson::{to_json}
+
+///|
+pub extend TraceState with Debug::{to_repr}
 
 ///|
 /// Creates trace state from a full entry map.
@@ -106,7 +163,7 @@ pub fn TraceState::to_header(self : TraceState) -> String? {
   if self.entries.is_empty() {
     return None
   }
-  let builder = StringBuilder::new()
+  let builder = StringBuilder()
   let mut is_first = true
   for key, value in self.entries {
     if !is_first {
@@ -146,11 +203,29 @@ pub impl Default for TraceState with fn default() -> TraceState {
 }
 
 ///|
+pub extend TraceState with Default::{default}
+
+///|
 /// Low 8 bits of the W3C trace flags field.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#spancontext
 pub struct TraceFlags {
   flags : UInt
 } derive(Eq, Compare, Hash, ToJson, Debug)
+
+///|
+pub extend TraceFlags with Eq::{not_equal, equal}
+
+///|
+pub extend TraceFlags with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+pub extend TraceFlags with Hash::{hash, hash_combine}
+
+///|
+pub extend TraceFlags with ToJson::{to_json}
+
+///|
+pub extend TraceFlags with Debug::{to_repr}
 
 ///|
 /// Creates trace flags while masking away bits outside the W3C byte.
@@ -213,6 +288,9 @@ pub impl Default for TraceFlags with fn default() -> TraceFlags {
 }
 
 ///|
+pub extend TraceFlags with Default::{default}
+
+///|
 /// 16-byte trace identifier.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#spancontext
 pub struct TraceId {
@@ -220,11 +298,41 @@ pub struct TraceId {
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
+pub extend TraceId with Eq::{not_equal, equal}
+
+///|
+pub extend TraceId with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+pub extend TraceId with Hash::{hash, hash_combine}
+
+///|
+pub extend TraceId with ToJson::{to_json}
+
+///|
+pub extend TraceId with Debug::{to_repr}
+
+///|
 /// 8-byte span identifier.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#spancontext
 pub struct SpanId {
   bytes : Bytes
 } derive(Eq, Compare, Hash, ToJson, Debug)
+
+///|
+pub extend SpanId with Eq::{not_equal, equal}
+
+///|
+pub extend SpanId with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+pub extend SpanId with Hash::{hash, hash_combine}
+
+///|
+pub extend SpanId with ToJson::{to_json}
+
+///|
+pub extend SpanId with Debug::{to_repr}
 
 ///|
 fn all_zero(bytes : Bytes) -> Bool {
@@ -239,7 +347,7 @@ fn all_zero(bytes : Bytes) -> Bool {
 
 ///|
 fn encode_hex(bytes : Bytes) -> String {
-  let builder = StringBuilder::new()
+  let builder = StringBuilder()
   for byte in bytes {
     let value = byte.to_int()
     if value < 16 {
@@ -316,6 +424,9 @@ pub impl Default for TraceId with fn default() -> TraceId {
 }
 
 ///|
+pub extend TraceId with Default::{default}
+
+///|
 /// Returns the invalid all-zero span ID.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#spancontext
 pub fn SpanId::invalid() -> SpanId {
@@ -367,6 +478,9 @@ pub impl Default for SpanId with fn default() -> SpanId {
 }
 
 ///|
+pub extend SpanId with Default::{default}
+
+///|
 /// Immutable span identity and propagation state carried in contexts, spans,
 /// logs, and links.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#spancontext
@@ -377,6 +491,15 @@ pub struct SpanContext {
   is_remote : Bool
   trace_state : TraceState
 } derive(Eq, ToJson, Debug)
+
+///|
+pub extend SpanContext with Eq::{not_equal, equal}
+
+///|
+pub extend SpanContext with ToJson::{to_json}
+
+///|
+pub extend SpanContext with Debug::{to_repr}
 
 ///|
 /// Creates a span context with explicit trace identity, flags, and state.
@@ -463,6 +586,9 @@ pub impl Default for SpanContext with fn default() -> SpanContext {
 }
 
 ///|
+pub extend SpanContext with Default::{default}
+
+///|
 /// Identifies the instrumentation library or component that produced telemetry.
 /// Spec: https://opentelemetry.io/docs/specs/otel/common/instrumentation-scope/
 pub struct InstrumentationScope {
@@ -471,6 +597,27 @@ pub struct InstrumentationScope {
   schema_url : String?
   attributes : Array[KeyValue]
 } derive(Eq, Compare, Hash, ToJson, Debug)
+
+///|
+pub extend InstrumentationScope with Eq::{not_equal, equal}
+
+///|
+pub extend InstrumentationScope with Compare::{
+  op_lt,
+  op_le,
+  op_ge,
+  compare,
+  op_gt,
+}
+
+///|
+pub extend InstrumentationScope with Hash::{hash, hash_combine}
+
+///|
+pub extend InstrumentationScope with ToJson::{to_json}
+
+///|
+pub extend InstrumentationScope with Debug::{to_repr}
 
 ///|
 /// Builder for `InstrumentationScope`.
@@ -572,3 +719,6 @@ pub fn InstrumentationScopeBuilder::build(
 pub impl Default for InstrumentationScope with fn default() -> InstrumentationScope {
   InstrumentationScope::builder("").build()
 }
+
+///|
+pub extend InstrumentationScope with Default::{default}

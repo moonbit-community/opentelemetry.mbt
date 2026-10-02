@@ -15,6 +15,21 @@ pub(all) enum InstrumentKind {
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
+pub extend InstrumentKind with Eq::{not_equal, equal}
+
+///|
+pub extend InstrumentKind with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+pub extend InstrumentKind with Hash::{hash, hash_combine}
+
+///|
+pub extend InstrumentKind with ToJson::{to_json}
+
+///|
+pub extend InstrumentKind with Debug::{to_repr}
+
+///|
 /// Numeric value stored inside metric aggregations.
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#aggregation
 pub(all) enum Number {
@@ -22,6 +37,15 @@ pub(all) enum Number {
   UInt64(UInt64)
   Double(Double)
 } derive(Eq, ToJson, Debug)
+
+///|
+pub extend Number with Eq::{not_equal, equal}
+
+///|
+pub extend Number with ToJson::{to_json}
+
+///|
+pub extend Number with Debug::{to_repr}
 
 ///|
 /// Compact histogram summary emitted by the current implementation.
@@ -34,6 +58,15 @@ pub struct HistogramSummary {
 } derive(Eq, ToJson, Debug)
 
 ///|
+pub extend HistogramSummary with Eq::{not_equal, equal}
+
+///|
+pub extend HistogramSummary with ToJson::{to_json}
+
+///|
+pub extend HistogramSummary with Debug::{to_repr}
+
+///|
 /// Aggregated metric payload for one attribute set.
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#aggregation
 pub(all) enum Aggregation {
@@ -41,6 +74,15 @@ pub(all) enum Aggregation {
   Gauge(Number)
   Histogram(HistogramSummary)
 } derive(Eq, ToJson, Debug)
+
+///|
+pub extend Aggregation with Eq::{not_equal, equal}
+
+///|
+pub extend Aggregation with ToJson::{to_json}
+
+///|
+pub extend Aggregation with Debug::{to_repr}
 
 ///|
 /// Aggregation selection used by metric views.
@@ -56,6 +98,15 @@ pub(all) enum StreamAggregation {
 } derive(Eq, ToJson, Debug)
 
 ///|
+pub extend StreamAggregation with Eq::{not_equal, equal}
+
+///|
+pub extend StreamAggregation with ToJson::{to_json}
+
+///|
+pub extend StreamAggregation with Debug::{to_repr}
+
+///|
 /// Defines the time window used when readers report aggregated measurements.
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#metricreader
 pub(all) enum Temporality {
@@ -63,6 +114,21 @@ pub(all) enum Temporality {
   Delta
   LowMemory
 } derive(Eq, Compare, Hash, ToJson, Debug)
+
+///|
+pub extend Temporality with Eq::{not_equal, equal}
+
+///|
+pub extend Temporality with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+pub extend Temporality with Hash::{hash, hash_combine}
+
+///|
+pub extend Temporality with ToJson::{to_json}
+
+///|
+pub extend Temporality with Debug::{to_repr}
 
 ///|
 /// Immutable metric data item exported from a meter provider.
@@ -80,6 +146,15 @@ pub struct MetricData {
 } derive(Eq, ToJson, Debug)
 
 ///|
+pub extend MetricData with Eq::{not_equal, equal}
+
+///|
+pub extend MetricData with ToJson::{to_json}
+
+///|
+pub extend MetricData with Debug::{to_repr}
+
+///|
 /// Instrument metadata used by views to match and transform streams.
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#view
 pub struct Instrument {
@@ -89,6 +164,15 @@ pub struct Instrument {
   kind : InstrumentKind
   instrumentation_scope : @common.InstrumentationScope
 } derive(Eq, ToJson, Debug)
+
+///|
+pub extend Instrument with Eq::{not_equal, equal}
+
+///|
+pub extend Instrument with ToJson::{to_json}
+
+///|
+pub extend Instrument with Debug::{to_repr}
 
 ///|
 /// Stream configuration returned by a view.
@@ -101,6 +185,15 @@ pub struct Stream {
   allowed_attribute_keys : Array[String]?
   cardinality_limit : Int?
 } derive(Eq, ToJson, Debug)
+
+///|
+pub extend Stream with Eq::{not_equal, equal}
+
+///|
+pub extend Stream with ToJson::{to_json}
+
+///|
+pub extend Stream with Debug::{to_repr}
 
 ///|
 /// Builder for stream transformations.
@@ -864,7 +957,7 @@ pub fn InMemoryMetricExporter::into_metric_exporter(
 ///|
 /// Encodes attributes into a stable map key for point storage.
 fn encode_attributes(attributes : ArrayView[@common.KeyValue]) -> String {
-  let builder = StringBuilder::new()
+  let builder = StringBuilder()
   let mut is_first = true
   for attribute in attributes {
     if !is_first {
@@ -936,7 +1029,7 @@ fn use_delta_temporality(
 
 ///|
 fn metric_identity(metric : MetricData) -> String {
-  let builder = StringBuilder::new()
+  let builder = StringBuilder()
   builder.write_string(metric.name)
   builder.write_char('|')
   builder.write_string(ToJson::to_json(metric.kind).stringify())

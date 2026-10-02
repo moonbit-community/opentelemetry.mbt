@@ -39,7 +39,7 @@ state; recording is the hot path.
 ```mbt check
 ///|
 fn _metrics_readme_record() -> Unit {
-  let meter = MeterProvider::noop().meter("example")
+  let meter = @metrics.MeterProvider::noop().meter("example")
   let counter = meter
     .u64_counter("request.count")
     .with_description("Total handled requests")
@@ -67,7 +67,7 @@ memory, queue length, connection pool size, or OS counters.
 ```mbt check
 ///|
 fn _metrics_readme_observable() -> Unit {
-  let meter = MeterProvider::noop().meter("example")
+  let meter = @metrics.MeterProvider::noop().meter("example")
   let observable = meter
     .i64_observable_up_down_counter("queue.depth")
     .with_callback(observer => observer.observe(42L))

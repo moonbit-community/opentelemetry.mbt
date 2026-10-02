@@ -1,5 +1,4 @@
 import {
-  "moonbitlang/core/debug",
   "moonbit-community/opentelemetry/interface/context",
   "moonbit-community/opentelemetry/internal/utils",
   "moonbit-community/opentelemetry/interface/common",
@@ -8,6 +7,7 @@ import {
 import {
   "moonbitlang/async",
   "moonbit-community/opentelemetry/sdk/trace" @sdktrace,
+  "moonbitlang/core/debug",
 } for "test"
 
 options(

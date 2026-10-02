@@ -4,6 +4,9 @@
 pub struct NoopLoggerProvider {} derive(Default)
 
 ///|
+pub extend NoopLoggerProvider with Default::{default}
+
+///|
 /// Creates a no-op logger provider.
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/noop/#loggerprovider
 pub fn NoopLoggerProvider::new() -> NoopLoggerProvider {

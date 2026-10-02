@@ -20,6 +20,10 @@ pub(all) enum Aggregation {
   Gauge(Number)
   Histogram(HistogramSummary)
 } derive(Eq, ToJson, @debug.Debug)
+pub fn Aggregation::equal(Self, Self) -> Bool
+pub fn Aggregation::not_equal(Self, Self) -> Bool
+pub fn Aggregation::to_json(Self) -> Json
+pub fn Aggregation::to_repr(Self) -> @debug.Repr
 
 pub struct Counter {
   state : @ref.Ref[SyncInstrumentState]
@@ -102,6 +106,10 @@ pub struct HistogramSummary {
   min : Number?
   max : Number?
 } derive(Eq, ToJson, @debug.Debug)
+pub fn HistogramSummary::equal(Self, Self) -> Bool
+pub fn HistogramSummary::not_equal(Self, Self) -> Bool
+pub fn HistogramSummary::to_json(Self) -> Json
+pub fn HistogramSummary::to_repr(Self) -> @debug.Repr
 
 pub struct InMemoryMetricExporter {
   state : @ref.Ref[InMemoryMetricExporterState]
@@ -120,6 +128,10 @@ pub struct Instrument {
   kind : InstrumentKind
   instrumentation_scope : @common.InstrumentationScope
 } derive(Eq, ToJson, @debug.Debug)
+pub fn Instrument::equal(Self, Self) -> Bool
+pub fn Instrument::not_equal(Self, Self) -> Bool
+pub fn Instrument::to_json(Self) -> Json
+pub fn Instrument::to_repr(Self) -> @debug.Repr
 
 pub(all) enum InstrumentKind {
   Counter
@@ -130,6 +142,17 @@ pub(all) enum InstrumentKind {
   ObservableUpDownCounter
   ObservableGauge
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn InstrumentKind::compare(Self, Self) -> Int
+pub fn InstrumentKind::equal(Self, Self) -> Bool
+pub fn InstrumentKind::hash(Self) -> Int
+pub fn InstrumentKind::hash_combine(Self, Hasher) -> Unit
+pub fn InstrumentKind::not_equal(Self, Self) -> Bool
+pub fn InstrumentKind::op_ge(Self, Self) -> Bool
+pub fn InstrumentKind::op_gt(Self, Self) -> Bool
+pub fn InstrumentKind::op_le(Self, Self) -> Bool
+pub fn InstrumentKind::op_lt(Self, Self) -> Bool
+pub fn InstrumentKind::to_json(Self) -> Json
+pub fn InstrumentKind::to_repr(Self) -> @debug.Repr
 
 pub struct ManualReader {
   state : @ref.Ref[ManualReaderState]
@@ -162,6 +185,10 @@ pub struct MetricData {
   resource : @resource.Resource
   instrumentation_scope : @common.InstrumentationScope
 } derive(Eq, ToJson, @debug.Debug)
+pub fn MetricData::equal(Self, Self) -> Bool
+pub fn MetricData::not_equal(Self, Self) -> Bool
+pub fn MetricData::to_json(Self) -> Json
+pub fn MetricData::to_repr(Self) -> @debug.Repr
 
 pub struct MetricExporter {
   export_fn : async (ArrayView[MetricData]) -> Result[Unit, @error.OTelSdkError]
@@ -181,6 +208,10 @@ pub(all) enum Number {
   UInt64(UInt64)
   Double(Double)
 } derive(Eq, ToJson, @debug.Debug)
+pub fn Number::equal(Self, Self) -> Bool
+pub fn Number::not_equal(Self, Self) -> Bool
+pub fn Number::to_json(Self) -> Json
+pub fn Number::to_repr(Self) -> @debug.Repr
 
 pub struct ObservableCounter {
   state : @ref.Ref[SyncInstrumentState]
@@ -381,6 +412,10 @@ pub struct Stream {
   cardinality_limit : Int?
 } derive(Eq, ToJson, @debug.Debug)
 pub fn Stream::builder() -> StreamBuilder
+pub fn Stream::equal(Self, Self) -> Bool
+pub fn Stream::not_equal(Self, Self) -> Bool
+pub fn Stream::to_json(Self) -> Json
+pub fn Stream::to_repr(Self) -> @debug.Repr
 
 pub(all) enum StreamAggregation {
   Default
@@ -389,6 +424,10 @@ pub(all) enum StreamAggregation {
   LastValue
   Histogram
 } derive(Eq, ToJson, @debug.Debug)
+pub fn StreamAggregation::equal(Self, Self) -> Bool
+pub fn StreamAggregation::not_equal(Self, Self) -> Bool
+pub fn StreamAggregation::to_json(Self) -> Json
+pub fn StreamAggregation::to_repr(Self) -> @debug.Repr
 
 pub struct StreamBuilder {
   mut name : String?
@@ -413,6 +452,17 @@ pub(all) enum Temporality {
   Delta
   LowMemory
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
+pub fn Temporality::compare(Self, Self) -> Int
+pub fn Temporality::equal(Self, Self) -> Bool
+pub fn Temporality::hash(Self) -> Int
+pub fn Temporality::hash_combine(Self, Hasher) -> Unit
+pub fn Temporality::not_equal(Self, Self) -> Bool
+pub fn Temporality::op_ge(Self, Self) -> Bool
+pub fn Temporality::op_gt(Self, Self) -> Bool
+pub fn Temporality::op_le(Self, Self) -> Bool
+pub fn Temporality::op_lt(Self, Self) -> Bool
+pub fn Temporality::to_json(Self) -> Json
+pub fn Temporality::to_repr(Self) -> @debug.Repr
 
 pub struct UInt64Counter {
   state : @ref.Ref[SyncInstrumentState]

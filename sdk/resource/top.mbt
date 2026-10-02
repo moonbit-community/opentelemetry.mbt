@@ -7,6 +7,15 @@ pub struct Resource {
 } derive(Eq, ToJson, Debug)
 
 ///|
+pub extend Resource with Eq::{not_equal, equal}
+
+///|
+pub extend Resource with ToJson::{to_json}
+
+///|
+pub extend Resource with Debug::{to_repr}
+
+///|
 /// Detector callback used to discover resource attributes from the runtime or
 /// environment.
 /// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#detecting-resource-information-from-the-environment
@@ -134,6 +143,9 @@ pub fn Resource::merge(self : Resource, other : Resource) -> Resource {
 pub impl Default for Resource with fn default() -> Resource {
   Resource::empty()
 }
+
+///|
+pub extend Resource with Default::{default}
 
 ///|
 /// Creates a detector from a callback.

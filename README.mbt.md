@@ -64,9 +64,11 @@ async fn _readme_trace_to_stdout() -> Unit {
 
   @sdk.set_tracer_provider(provider)
 
-  let tracer = tracer("checkout-service", version=Some("1.0.0"))
+  let tracer = @opentelemetry.tracer("checkout-service", version=Some("1.0.0"))
   let span = tracer.start("charge-card")
-  span.set_attribute(KeyValue::new("payment.system", String("test")))
+  span.set_attribute(
+    @opentelemetry.KeyValue::new("payment.system", String("test")),
+  )
   span.set_status(@trace.Status::ok())
   span.end()
 
@@ -87,12 +89,14 @@ is enabled.
 ```mbt check
 ///|
 pub async fn _library_operation() -> Unit {
-  let tracer = tracer(
+  let tracer = @opentelemetry.tracer(
     "moonbit-community/example-library",
     version=Some("0.1.0"),
   )
   let span = tracer.start("example.operation")
-  span.set_attribute(KeyValue::new("example.kind", String("demo")))
+  span.set_attribute(
+    @opentelemetry.KeyValue::new("example.kind", String("demo")),
+  )
   // Library work goes here.
   span.end()
 }
@@ -144,7 +148,7 @@ Choose instruments by meaning:
 ```mbt check
 ///|
 fn _record_request_metrics() -> Unit {
-  let meter = meter("checkout-service")
+  let meter = @opentelemetry.meter("checkout-service")
   let request_count = meter.u64_counter("http.server.request.count").build()
   let request_latency = meter
     .f64_histogram("http.server.duration")
@@ -152,10 +156,10 @@ fn _record_request_metrics() -> Unit {
     .build()
 
   request_count.add(1UL, attributes=[
-    KeyValue::new("http.request.method", String("POST")),
+    @opentelemetry.KeyValue::new("http.request.method", String("POST")),
   ])
   request_latency.record(32.5, attributes=[
-    KeyValue::new("http.route", String("/checkout")),
+    @opentelemetry.KeyValue::new("http.route", String("/checkout")),
   ])
 }
 ```
@@ -169,7 +173,7 @@ events into `LogRecord` values.
 ```mbt check
 ///|
 async fn _emit_structured_log() -> Unit {
-  let logger = logger("checkout-service")
+  let logger = @opentelemetry.logger("checkout-service")
   if logger.event_enabled(Info, "checkout") {
     let record = logger.create_log_record()
     record.set_event_name("checkout.completed")
@@ -194,9 +198,9 @@ extract it from incoming headers.
 
 ```mbt check
 ///|
-fn _inject_headers(context : Context) -> Map[String, String] {
+fn _inject_headers(context : @opentelemetry.Context) -> Map[String, String] {
   let headers = Map([])
-  get_text_map_propagator(propagator => {
+  @opentelemetry.get_text_map_propagator(propagator => {
     propagator.inject_context(context, headers)
   })
   headers
@@ -253,8 +257,8 @@ where both are available.
 
 ```mbt check
 ///|
-fn _semantic_convention_attribute() -> Array[KeyValue] {
-  [KeyValue::new(@semtrace.HTTP_REQUEST_METHOD, String("GET"))]
+fn _semantic_convention_attribute() -> Array[@opentelemetry.KeyValue] {
+  [@opentelemetry.KeyValue::new(@semtrace.HTTP_REQUEST_METHOD, String("GET"))]
 }
 ```
 

@@ -18,11 +18,16 @@ pub struct Context {
   suppress_telemetry : Bool
 } derive(Eq, ToJson, @debug.Debug)
 pub fn Context::baggage(Self) -> @baggage.Baggage
+pub fn Context::default() -> Self
 pub fn Context::empty() -> Self
+pub fn Context::equal(Self, Self) -> Bool
 pub fn Context::has_active_span(Self) -> Bool
 pub fn Context::is_telemetry_suppressed(Self) -> Bool
 pub fn Context::new() -> Self
+pub fn Context::not_equal(Self, Self) -> Bool
 pub fn Context::span_context(Self) -> @common.SpanContext?
+pub fn Context::to_json(Self) -> Json
+pub fn Context::to_repr(Self) -> @debug.Repr
 pub fn Context::with_baggage(Self, @baggage.Baggage) -> Self
 pub fn Context::with_baggage_item(Self, StringView, StringView, metadata? : @baggage.BaggageMetadata) -> Self
 pub fn Context::with_remote_span_context(Self, @common.SpanContext) -> Self

@@ -12,6 +12,7 @@ import {
 // Types and methods
 pub struct NoopMeterProvider {
 } derive(Default)
+pub fn NoopMeterProvider::default() -> Self
 pub fn NoopMeterProvider::into_meter_provider(Self) -> @metrics.MeterProvider
 pub fn NoopMeterProvider::new() -> Self
 
