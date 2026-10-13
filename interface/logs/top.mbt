@@ -360,7 +360,7 @@ pub fn LogRecord::set_trace_context(
   self : LogRecord,
   trace_id : @common.TraceId,
   span_id : @common.SpanId,
-  trace_flags? : @common.TraceFlags? = None,
+  trace_flags~ : @common.TraceFlags? = None,
 ) -> Unit {
   self.trace_context = Some(
     @common.SpanContext::new(
@@ -387,7 +387,7 @@ pub extend LogRecord with Default::{default}
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/api/#logger
 pub fn Logger::from_functions(
   emit_fn : async (LogRecord) -> Unit,
-  event_enabled_fn? : (Severity, StringView, String?) -> Bool = (_, _, _) => {
+  event_enabled_fn~ : (Severity, StringView, String?) -> Bool = (_, _, _) => {
     true
   },
 ) -> Logger {
@@ -473,7 +473,7 @@ pub fn Logger::event_enabled(
   self : Logger,
   severity : Severity,
   target : StringView,
-  name? : String? = None,
+  name~ : String? = None,
 ) -> Bool {
   (self.event_enabled_fn)(severity, target, name)
 }

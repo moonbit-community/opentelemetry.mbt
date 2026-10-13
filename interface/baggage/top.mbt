@@ -61,7 +61,7 @@ pub extend KeyValueMetadata with Debug::{to_repr}
 /// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#overview
 pub struct Baggage {
   entries : Map[String, KeyValueMetadata]
-  kv_content_len : Int
+  kv_content_len : Int32
 } derive(Eq, ToJson, Debug)
 
 ///|
@@ -105,7 +105,7 @@ pub extend BaggageMetadata with Default::{default}
 pub fn KeyValueMetadata::new(
   key : StringView,
   value : StringView,
-  metadata? : BaggageMetadata = Default::default(),
+  metadata~ : BaggageMetadata = Default::default(),
 ) -> KeyValueMetadata {
   { key: @common.Key::new(key), value: value.to_owned(), metadata, }
 }
@@ -122,7 +122,7 @@ fn key_value_metadata_bytes_size(
   key : StringView,
   value : StringView,
   metadata : StringView,
-) -> Int {
+) -> Int32 {
   let base = key.length() + value.length() + 1
   if metadata == "" {
     base
@@ -141,7 +141,7 @@ fn is_key_valid(key : StringView) -> Bool {
   if key == "" || key.length() > 256 {
     return false
   }
-  let mut vendor_start : Int? = None
+  let mut vendor_start : Int32? = None
   for index = 0; index < key.length(); index = index + 1 {
     let byte = key.unsafe_get(index).to_byte()
     let is_allowed_special = byte == b'_' ||
@@ -288,7 +288,7 @@ pub fn Baggage::entries(self : Baggage) -> Array[KeyValueMetadata] {
 ///|
 /// Returns the current number of baggage entries.
 /// Spec: https://opentelemetry.io/docs/specs/otel/baggage/api/#get-all-values
-pub fn Baggage::len(self : Baggage) -> Int {
+pub fn Baggage::len(self : Baggage) -> Int32 {
   self.entries.length()
 }
 

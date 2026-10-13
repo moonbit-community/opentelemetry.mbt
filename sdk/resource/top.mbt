@@ -34,7 +34,7 @@ pub struct ResourceBuilder {
 ///|
 fn resource_from_attributes(
   attributes : ArrayView[@common.KeyValue],
-  schema_url? : String? = None,
+  schema_url~ : String? = None,
 ) -> Resource {
   let map : Map[String, @common.Value] = Map([])
   for attribute in attributes {
@@ -89,7 +89,7 @@ pub fn Resource::schema_url(self : Resource) -> String? {
 ///|
 /// Returns the number of attributes stored in the resource.
 /// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#retrieve-attributes
-pub fn Resource::len(self : Resource) -> Int {
+pub fn Resource::len(self : Resource) -> Int32 {
   self.attributes.length()
 }
 

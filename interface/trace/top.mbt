@@ -82,7 +82,7 @@ pub struct Event {
   name : String
   timestamp_unix_nano : Int64
   attributes : Array[@common.KeyValue]
-  dropped_attributes_count : Int
+  dropped_attributes_count : Int32
 } derive(Eq, ToJson, Debug)
 
 ///|
@@ -103,7 +103,7 @@ pub extend Event with Debug::{to_repr}
 pub struct Link {
   span_context : @common.SpanContext
   attributes : Array[@common.KeyValue]
-  dropped_attributes_count : Int
+  dropped_attributes_count : Int32
 } derive(Eq, ToJson, Debug)
 
 ///|
@@ -183,7 +183,7 @@ pub struct TracerProvider {
 ///|
 /// Creates a span status.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#set-status
-pub fn Status::new(code : StatusCode, description? : String? = None) -> Status {
+pub fn Status::new(code : StatusCode, description~ : String? = None) -> Status {
   { code, description, }
 }
 
@@ -204,7 +204,7 @@ pub fn Status::ok() -> Status {
 ///|
 /// Returns an error status with an optional description.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#set-status
-pub fn Status::error(description? : String? = None) -> Status {
+pub fn Status::error(description~ : String? = None) -> Status {
   Status::new(Error, description~)
 }
 
@@ -224,9 +224,9 @@ pub extend Status with Default::{default}
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#add-events
 pub fn Event::new(
   name : StringView,
-  timestamp_unix_nano? : Int64 = @utils.now_unix_nano(),
-  attributes? : ArrayView[@common.KeyValue] = [],
-  dropped_attributes_count? : Int = 0,
+  timestamp_unix_nano~ : Int64 = @utils.now_unix_nano(),
+  attributes~ : ArrayView[@common.KeyValue] = [],
+  dropped_attributes_count~ : Int32 = 0,
 ) -> Event {
   {
     name: name.to_owned(),
@@ -244,8 +244,8 @@ pub fn Event::new(
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#link
 pub fn Link::new(
   span_context : @common.SpanContext,
-  attributes? : ArrayView[@common.KeyValue] = [],
-  dropped_attributes_count? : Int = 0,
+  attributes~ : ArrayView[@common.KeyValue] = [],
+  dropped_attributes_count~ : Int32 = 0,
 ) -> Link {
   { span_context, attributes: attributes.to_owned(), dropped_attributes_count, }
 }
@@ -586,7 +586,7 @@ pub fn Span::has_ended(self : Span) -> Bool {
 pub fn Span::add_event(
   self : Span,
   name : StringView,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   self.add_event_with_timestamp(name, @utils.now_unix_nano(), attributes~)
 }
@@ -598,7 +598,7 @@ pub fn Span::add_event_with_timestamp(
   self : Span,
   name : StringView,
   timestamp_unix_nano : Int64,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   (self.add_event_fn)(name, timestamp_unix_nano, attributes)
 }
@@ -654,7 +654,7 @@ pub fn Span::update_name(self : Span, new_name : StringView) -> Unit {
 pub fn Span::add_link(
   self : Span,
   span_context : @common.SpanContext,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   (self.add_link_fn)(span_context, attributes)
 }

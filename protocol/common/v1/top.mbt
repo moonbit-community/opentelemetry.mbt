@@ -12,7 +12,7 @@ pub(all) enum AnyValue_Value {
   ArrayValue(ArrayValue)
   KvlistValue(KeyValueList)
   BytesValue(Bytes)
-  StringValueStrindex(Int)
+  StringValueStrindex(Int32)
   NotSet
 } derive(Eq)
 
@@ -74,14 +74,14 @@ pub impl @json.FromJson for AnyValue_Value with fn from_json(
 ///|
 pub impl ToJson for AnyValue_Value with fn to_json(self : AnyValue_Value) -> Json {
   match self {
-    StringValue(v) => v.to_json()
-    BoolValue(v) => v.to_json()
-    IntValue(v) => v.to_json()
-    DoubleValue(v) => v.to_json()
+    StringValue(v) => Json(v)
+    BoolValue(v) => Json(v)
+    IntValue(v) => Json(v)
+    DoubleValue(v) => Json(v)
     ArrayValue(v) => ToJson::to_json(v)
     KvlistValue(v) => ToJson::to_json(v)
-    BytesValue(v) => v.to_json()
-    StringValueStrindex(v) => v.to_json()
+    BytesValue(v) => Json(v)
+    StringValueStrindex(v) => Json(v)
     NotSet => Json::null()
   }
 }
@@ -129,7 +129,7 @@ pub impl Default for AnyValue with fn default() -> AnyValue {
 }
 
 ///|
-pub fn AnyValue::new(value? : AnyValue_Value = NotSet) -> AnyValue {
+pub fn AnyValue::new(value~ : AnyValue_Value = NotSet) -> AnyValue {
   { value, }
 }
 
@@ -213,14 +213,14 @@ pub impl ToJson for AnyValue with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   match self.value {
     NotSet => ()
-    StringValue(v) => json["stringValue"] = v.to_json()
-    BoolValue(v) => json["boolValue"] = v.to_json()
-    IntValue(v) => json["intValue"] = v.to_json()
-    DoubleValue(v) => json["doubleValue"] = v.to_json()
+    StringValue(v) => json["stringValue"] = Json(v)
+    BoolValue(v) => json["boolValue"] = Json(v)
+    IntValue(v) => json["intValue"] = Json(v)
+    DoubleValue(v) => json["doubleValue"] = Json(v)
     ArrayValue(v) => json["arrayValue"] = ToJson::to_json(v)
     KvlistValue(v) => json["kvlistValue"] = ToJson::to_json(v)
-    BytesValue(v) => json["bytesValue"] = v.to_json()
-    StringValueStrindex(v) => json["stringValueStrindex"] = v.to_json()
+    BytesValue(v) => json["bytesValue"] = Json(v)
+    StringValueStrindex(v) => json["stringValueStrindex"] = Json(v)
   }
   Json::object(json)
 }
@@ -392,7 +392,7 @@ pub impl @protobuf.Write for ArrayValue with fn write(
 pub impl ToJson for ArrayValue with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.values != Default::default() {
-    json["values"] = self.values.to_json()
+    json["values"] = Json(self.values)
   }
   Json::object(json)
 }
@@ -509,7 +509,7 @@ pub impl @protobuf.Write for KeyValueList with fn write(
 pub impl ToJson for KeyValueList with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.values != Default::default() {
-    json["values"] = self.values.to_json()
+    json["values"] = Json(self.values)
   }
   Json::object(json)
 }
@@ -569,7 +569,7 @@ pub impl @protobuf.AsyncWrite for KeyValueList with fn write(
 pub(all) struct KeyValue {
   mut key : String
   mut value : AnyValue
-  mut key_strindex : Int
+  mut key_strindex : Int32
 } derive(Eq)
 
 ///|
@@ -602,7 +602,7 @@ pub impl Default for KeyValue with fn default() -> KeyValue {
 pub fn KeyValue::new(
   key : String,
   value : AnyValue,
-  key_strindex : Int,
+  key_strindex : Int32,
 ) -> KeyValue {
   { key, value, key_strindex, }
 }
@@ -646,13 +646,13 @@ pub impl @protobuf.Write for KeyValue with fn write(
 pub impl ToJson for KeyValue with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.key != Default::default() {
-    json["key"] = self.key.to_json()
+    json["key"] = Json(self.key)
   }
   if self.value != Default::default() {
     json["value"] = ToJson::to_json(self.value)
   }
   if self.key_strindex != Default::default() {
-    json["keyStrindex"] = self.key_strindex.to_json()
+    json["keyStrindex"] = Json(self.key_strindex)
   }
   Json::object(json)
 }
@@ -719,7 +719,7 @@ pub(all) struct InstrumentationScope {
   mut name : String
   mut version : String
   mut attributes : Array[KeyValue]
-  mut dropped_attributes_count : UInt
+  mut dropped_attributes_count : UInt32
 } derive(Eq)
 
 ///|
@@ -758,7 +758,7 @@ pub fn InstrumentationScope::new(
   name : String,
   version : String,
   attributes : Array[KeyValue],
-  dropped_attributes_count : UInt,
+  dropped_attributes_count : UInt32,
 ) -> InstrumentationScope {
   { name, version, attributes, dropped_attributes_count, }
 }
@@ -809,16 +809,16 @@ pub impl @protobuf.Write for InstrumentationScope with fn write(
 pub impl ToJson for InstrumentationScope with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.name != Default::default() {
-    json["name"] = self.name.to_json()
+    json["name"] = Json(self.name)
   }
   if self.version != Default::default() {
-    json["version"] = self.version.to_json()
+    json["version"] = Json(self.version)
   }
   if self.attributes != Default::default() {
-    json["attributes"] = self.attributes.to_json()
+    json["attributes"] = Json(self.attributes)
   }
   if self.dropped_attributes_count != Default::default() {
-    json["droppedAttributesCount"] = self.dropped_attributes_count.to_json()
+    json["droppedAttributesCount"] = Json(self.dropped_attributes_count)
   }
   Json::object(json)
 }
@@ -987,16 +987,16 @@ pub impl @protobuf.Write for EntityRef with fn write(
 pub impl ToJson for EntityRef with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.schema_url != Default::default() {
-    json["schemaUrl"] = self.schema_url.to_json()
+    json["schemaUrl"] = Json(self.schema_url)
   }
   if self.type_ != Default::default() {
-    json["type"] = self.type_.to_json()
+    json["type"] = Json(self.type_)
   }
   if self.id_keys != Default::default() {
-    json["idKeys"] = self.id_keys.to_json()
+    json["idKeys"] = Json(self.id_keys)
   }
   if self.description_keys != Default::default() {
-    json["descriptionKeys"] = self.description_keys.to_json()
+    json["descriptionKeys"] = Json(self.description_keys)
   }
   Json::object(json)
 }

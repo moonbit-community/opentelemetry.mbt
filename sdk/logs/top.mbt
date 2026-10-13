@@ -161,10 +161,10 @@ pub struct BatchLogProcessor {
 /// Configuration for batch log processing.
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#batching-processor
 pub struct BatchConfig {
-  max_queue_size : Int
-  max_export_batch_size : Int
-  scheduled_delay_millis : Int
-  export_timeout_millis : Int
+  max_queue_size : Int32
+  max_export_batch_size : Int32
+  scheduled_delay_millis : Int32
+  export_timeout_millis : Int32
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
@@ -283,16 +283,16 @@ pub fn KeyValue::from_common(attribute : @common.KeyValue) -> KeyValue {
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#additional-logrecord-interfaces
 pub fn LogRecord::new(
   body : AnyValue,
-  timestamp_unix_nano? : Int64 = @utils.now_unix_nano(),
-  observed_timestamp_unix_nano? : Int64 = @utils.now_unix_nano(),
-  severity_number? : SeverityNumber? = None,
-  severity_text? : String? = None,
-  event_name? : String? = None,
-  target? : String? = None,
-  attributes? : ArrayView[KeyValue] = [],
-  trace_context? : @common.SpanContext? = None,
-  resource? : @resource.Resource = @resource.Resource::empty(),
-  instrumentation_scope? : @common.InstrumentationScope = Default::default(),
+  timestamp_unix_nano~ : Int64 = @utils.now_unix_nano(),
+  observed_timestamp_unix_nano~ : Int64 = @utils.now_unix_nano(),
+  severity_number~ : SeverityNumber? = None,
+  severity_text~ : String? = None,
+  event_name~ : String? = None,
+  target~ : String? = None,
+  attributes~ : ArrayView[KeyValue] = [],
+  trace_context~ : @common.SpanContext? = None,
+  resource~ : @resource.Resource = @resource.Resource::empty(),
+  instrumentation_scope~ : @common.InstrumentationScope = Default::default(),
 ) -> LogRecord {
   {
     event_name,
@@ -310,7 +310,7 @@ pub fn LogRecord::new(
 }
 
 ///|
-fn parse_env_int(key : StringView) -> Int? {
+fn parse_env_int(key : StringView) -> Int32? {
   match @utils.getenv(key) {
     Some(value) => {
       let value = value.trim()
@@ -325,7 +325,7 @@ fn parse_env_int(key : StringView) -> Int? {
 }
 
 ///|
-fn env_or(key : StringView, fallback : Int) -> Int {
+fn env_or(key : StringView, fallback : Int32) -> Int32 {
   match parse_env_int(key) {
     Some(value) => value
     None => fallback
@@ -336,10 +336,10 @@ fn env_or(key : StringView, fallback : Int) -> Int {
 /// Creates normalized batch log processor configuration.
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#batching-processor
 pub fn BatchConfig::new(
-  max_queue_size? : Int = 2048,
-  max_export_batch_size? : Int = 512,
-  scheduled_delay_millis? : Int = 1000,
-  export_timeout_millis? : Int = 30000,
+  max_queue_size~ : Int32 = 2048,
+  max_export_batch_size~ : Int32 = 512,
+  scheduled_delay_millis~ : Int32 = 1000,
+  export_timeout_millis~ : Int32 = 30000,
 ) -> BatchConfig {
   let max_queue_size = if max_queue_size <= 0 { 1 } else { max_queue_size }
   let max_export_batch_size = if max_export_batch_size <= 0 {
@@ -385,9 +385,9 @@ pub extend BatchConfig with Default::{default}
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#logrecordexporter
 pub fn LogExporter::new(
   export_fn : async (ArrayView[LogRecord]) -> @error.OTelSdkResult,
-  force_flush_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
-  shutdown_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
-  name_fn? : () -> String = () => "custom",
+  force_flush_fn~ : async () -> @error.OTelSdkResult = () => @error.ok(),
+  shutdown_fn~ : async () -> @error.OTelSdkResult = () => @error.ok(),
+  name_fn~ : () -> String = () => "custom",
 ) -> LogExporter {
   { export_fn, force_flush_fn, shutdown_fn, name_fn, }
 }
@@ -416,7 +416,7 @@ pub async fn LogExporter::force_flush(
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#shutdown
 pub async fn LogExporter::shutdown_with_timeout(
   self : LogExporter,
-  timeout_millis : Int,
+  timeout_millis : Int32,
 ) -> @error.OTelSdkResult {
   ignore(timeout_millis)
   (self.shutdown_fn)()
@@ -440,9 +440,9 @@ pub fn LogExporter::name(self : LogExporter) -> String {
 /// Builds a log processor from callbacks.
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#logrecordprocessor
 pub fn LogProcessor::new(
-  emit_fn? : async (LogRecord) -> Unit = _ => (),
-  force_flush_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
-  shutdown_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
+  emit_fn~ : async (LogRecord) -> Unit = _ => (),
+  force_flush_fn~ : async () -> @error.OTelSdkResult = () => @error.ok(),
+  shutdown_fn~ : async () -> @error.OTelSdkResult = () => @error.ok(),
 ) -> LogProcessor {
   { emit_fn, force_flush_fn, shutdown_fn, }
 }
@@ -471,7 +471,7 @@ pub async fn LogProcessor::force_flush(
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#logrecordprocessor
 pub async fn LogProcessor::shutdown_with_timeout(
   self : LogProcessor,
-  timeout_millis : Int,
+  timeout_millis : Int32,
 ) -> @error.OTelSdkResult {
   ignore(timeout_millis)
   (self.shutdown_fn)()
@@ -593,7 +593,7 @@ async fn flush_log_queue(
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#batching-processor
 pub fn BatchLogProcessor::new(
   exporter : LogExporter,
-  config? : BatchConfig = Default::default(),
+  config~ : BatchConfig = Default::default(),
 ) -> BatchLogProcessor {
   let state : Ref[BatchProcessorState] = Ref({
     exporter,
@@ -725,7 +725,7 @@ pub fn SdkLoggerProviderBuilder::with_simple_exporter(
 pub fn SdkLoggerProviderBuilder::with_batch_exporter(
   self : SdkLoggerProviderBuilder,
   exporter : LogExporter,
-  config? : BatchConfig = Default::default(),
+  config~ : BatchConfig = Default::default(),
 ) -> SdkLoggerProviderBuilder {
   let batch_processor = BatchLogProcessor::new(exporter, config~)
   self.batch_processors.push(batch_processor)
@@ -763,7 +763,7 @@ pub fn SdkLoggerProvider::resource(
 pub fn SdkLoggerProvider::spawn_batch_processor_tasks(
   self : SdkLoggerProvider,
   group : @async.TaskGroup[Unit],
-  allow_failure? : Bool = false,
+  allow_failure~ : Bool = false,
 ) -> Unit {
   for batch_processor in self.state.val.batch_processors {
     group.spawn_bg(no_wait=true, allow_failure~, () => batch_processor.run())
@@ -776,9 +776,9 @@ pub fn SdkLoggerProvider::spawn_batch_processor_tasks(
 pub fn SdkLoggerProvider::logger(
   self : SdkLoggerProvider,
   name : StringView,
-  version? : String? = None,
-  schema_url? : String? = None,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  version~ : String? = None,
+  schema_url~ : String? = None,
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> SdkLogger {
   let mut scope = @common.InstrumentationScope::builder(name)
   match version {
@@ -816,7 +816,7 @@ pub async fn SdkLoggerProvider::force_flush(
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#shutdown
 pub async fn SdkLoggerProvider::shutdown_with_timeout(
   self : SdkLoggerProvider,
-  timeout_millis : Int,
+  timeout_millis : Int32,
 ) -> @error.OTelSdkResult {
   if self.state.val.is_shutdown {
     return @error.already_shutdown()
@@ -1006,14 +1006,14 @@ fn trace_context_from_context(
 pub async fn SdkLogger::emit(
   self : SdkLogger,
   body : AnyValue,
-  context? : @context.Context = Default::default(),
-  severity_number? : SeverityNumber? = None,
-  severity_text? : String? = None,
-  event_name? : String? = None,
-  target? : String? = None,
-  attributes? : ArrayView[KeyValue] = [],
-  timestamp_unix_nano? : Int64 = @utils.now_unix_nano(),
-  observed_timestamp_unix_nano? : Int64 = @utils.now_unix_nano(),
+  context~ : @context.Context = Default::default(),
+  severity_number~ : SeverityNumber? = None,
+  severity_text~ : String? = None,
+  event_name~ : String? = None,
+  target~ : String? = None,
+  attributes~ : ArrayView[KeyValue] = [],
+  timestamp_unix_nano~ : Int64 = @utils.now_unix_nano(),
+  observed_timestamp_unix_nano~ : Int64 = @utils.now_unix_nano(),
 ) -> Unit {
   if self.provider.state.val.is_shutdown {
     return

@@ -392,9 +392,9 @@ pub fn meter_provider_builder() -> @metrics.SdkMeterProviderBuilder {
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-creation
 pub fn tracer(
   name : StringView,
-  version? : String? = None,
-  schema_url? : String? = None,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  version~ : String? = None,
+  schema_url~ : String? = None,
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> @trace.SdkTracer {
   @global.tracer(name, version~, schema_url~, attributes~)
 }
@@ -404,9 +404,9 @@ pub fn tracer(
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#logger-creation
 pub fn logger(
   name : StringView,
-  version? : String? = None,
-  schema_url? : String? = None,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  version~ : String? = None,
+  schema_url~ : String? = None,
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> @logs.SdkLogger {
   @global.logger(name, version~, schema_url~, attributes~)
 }
@@ -416,9 +416,9 @@ pub fn logger(
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#meter
 pub fn meter(
   name : StringView,
-  version? : String? = None,
-  schema_url? : String? = None,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  version~ : String? = None,
+  schema_url~ : String? = None,
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> @metrics.SdkMeter {
   @global.meter(name, version~, schema_url~, attributes~)
 }
@@ -462,7 +462,7 @@ pub fn set_meter_provider(provider : @metrics.SdkMeterProvider) -> Unit {
 /// - https://opentelemetry.io/docs/specs/otel/metrics/sdk/#periodic-exporting-metricreader
 pub fn spawn_background_tasks(
   group : @async.TaskGroup[Unit],
-  allow_failure? : Bool = false,
+  allow_failure~ : Bool = false,
 ) -> Unit {
   @global.spawn_background_tasks(group, allow_failure~)
 }

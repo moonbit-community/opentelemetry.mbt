@@ -132,7 +132,10 @@ fn log_body_is_empty_string(record : @otlp_logs.LogRecord) -> Bool {
 }
 
 ///|
-fn log_body_is_array(record : @otlp_logs.LogRecord, expected_len : Int) -> Bool {
+fn log_body_is_array(
+  record : @otlp_logs.LogRecord,
+  expected_len : Int32,
+) -> Bool {
   match record.body.value {
     ArrayValue(values) => values.values.length() == expected_len
     _ => false

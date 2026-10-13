@@ -171,7 +171,7 @@ pub fn TextMapPropagator::fields(self : TextMapPropagator) -> Array[String] {
 }
 
 ///|
-fn hex_digit(value : Int) -> String {
+fn hex_digit(value : Int32) -> String {
   if value < 10 {
     value.to_string()
   } else {

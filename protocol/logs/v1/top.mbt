@@ -314,7 +314,7 @@ pub impl @protobuf.Write for LogsData with fn write(
 pub impl ToJson for LogsData with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.resource_logs != Default::default() {
-    json["resourceLogs"] = self.resource_logs.to_json()
+    json["resourceLogs"] = Json(self.resource_logs)
   }
   Json::object(json)
 }
@@ -461,13 +461,13 @@ pub impl @protobuf.Write for ResourceLogs with fn write(
 pub impl ToJson for ResourceLogs with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.resource != Default::default() {
-    json["resource"] = self.resource.to_json()
+    json["resource"] = Json(self.resource)
   }
   if self.scope_logs != Default::default() {
-    json["scopeLogs"] = self.scope_logs.to_json()
+    json["scopeLogs"] = Json(self.scope_logs)
   }
   if self.schema_url != Default::default() {
-    json["schemaUrl"] = self.schema_url.to_json()
+    json["schemaUrl"] = Json(self.schema_url)
   }
   Json::object(json)
 }
@@ -626,13 +626,13 @@ pub impl @protobuf.Write for ScopeLogs with fn write(
 pub impl ToJson for ScopeLogs with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.scope != Default::default() {
-    json["scope"] = self.scope.to_json()
+    json["scope"] = Json(self.scope)
   }
   if self.log_records != Default::default() {
-    json["logRecords"] = self.log_records.to_json()
+    json["logRecords"] = Json(self.log_records)
   }
   if self.schema_url != Default::default() {
-    json["schemaUrl"] = self.schema_url.to_json()
+    json["schemaUrl"] = Json(self.schema_url)
   }
   Json::object(json)
 }
@@ -710,8 +710,8 @@ pub(all) struct LogRecord {
   mut severity_text : String
   mut body : @v1_dep.AnyValue
   mut attributes : Array[@v1_dep.KeyValue]
-  mut dropped_attributes_count : UInt
-  mut flags : UInt
+  mut dropped_attributes_count : UInt32
+  mut flags : UInt32
   mut trace_id : Bytes
   mut span_id : Bytes
   mut event_name : String
@@ -782,8 +782,8 @@ pub fn LogRecord::new(
   severity_text : String,
   body : @v1_dep.AnyValue,
   attributes : Array[@v1_dep.KeyValue],
-  dropped_attributes_count : UInt,
-  flags : UInt,
+  dropped_attributes_count : UInt32,
+  flags : UInt32,
   trace_id : Bytes,
   span_id : Bytes,
   event_name : String,
@@ -878,37 +878,37 @@ pub impl @protobuf.Write for LogRecord with fn write(
 pub impl ToJson for LogRecord with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.time_unix_nano != Default::default() {
-    json["timeUnixNano"] = self.time_unix_nano.to_json()
+    json["timeUnixNano"] = Json(self.time_unix_nano)
   }
   if self.observed_time_unix_nano != Default::default() {
-    json["observedTimeUnixNano"] = self.observed_time_unix_nano.to_json()
+    json["observedTimeUnixNano"] = Json(self.observed_time_unix_nano)
   }
   if self.severity_number != Default::default() {
     json["severityNumber"] = ToJson::to_json(self.severity_number)
   }
   if self.severity_text != Default::default() {
-    json["severityText"] = self.severity_text.to_json()
+    json["severityText"] = Json(self.severity_text)
   }
   if self.body != Default::default() {
-    json["body"] = self.body.to_json()
+    json["body"] = Json(self.body)
   }
   if self.attributes != Default::default() {
-    json["attributes"] = self.attributes.to_json()
+    json["attributes"] = Json(self.attributes)
   }
   if self.dropped_attributes_count != Default::default() {
-    json["droppedAttributesCount"] = self.dropped_attributes_count.to_json()
+    json["droppedAttributesCount"] = Json(self.dropped_attributes_count)
   }
   if self.flags != Default::default() {
-    json["flags"] = self.flags.to_json()
+    json["flags"] = Json(self.flags)
   }
   if self.trace_id != Default::default() {
-    json["traceId"] = @protobuf.base64_encode(self.trace_id).to_json()
+    json["traceId"] = Json(@protobuf.base64_encode(self.trace_id))
   }
   if self.span_id != Default::default() {
-    json["spanId"] = @protobuf.base64_encode(self.span_id).to_json()
+    json["spanId"] = Json(@protobuf.base64_encode(self.span_id))
   }
   if self.event_name != Default::default() {
-    json["eventName"] = self.event_name.to_json()
+    json["eventName"] = Json(self.event_name)
   }
   Json::object(json)
 }

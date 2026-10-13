@@ -183,7 +183,7 @@ pub struct Stream {
   unit : String?
   aggregation : StreamAggregation?
   allowed_attribute_keys : Array[String]?
-  cardinality_limit : Int?
+  cardinality_limit : Int32?
 } derive(Eq, ToJson, Debug)
 
 ///|
@@ -204,7 +204,7 @@ pub struct StreamBuilder {
   mut unit : String?
   mut aggregation : StreamAggregation?
   mut allowed_attribute_keys : Array[String]?
-  mut cardinality_limit : Int?
+  mut cardinality_limit : Int32?
 }
 
 ///|
@@ -274,7 +274,7 @@ pub struct PeriodicMetricReader {
 struct PeriodicMetricReaderState {
   provider : SdkMeterProvider?
   exporter : MetricExporter
-  interval_millis : Int
+  interval_millis : Int32
   temporality : Temporality
   last_metrics : Map[String, Aggregation]
   is_shutdown : Bool
@@ -287,7 +287,7 @@ priv struct MetricStreamState {
   resource : @resource.Resource
   aggregation : StreamAggregation
   allowed_attribute_keys : Array[String]?
-  cardinality_limit : Int
+  cardinality_limit : Int32
   points : Map[String, PointState]
 }
 
@@ -295,7 +295,7 @@ priv struct MetricStreamState {
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#periodic-exporting-metricreader
 pub struct PeriodicMetricReaderBuilder {
   exporter : MetricExporter
-  mut interval_millis : Int
+  mut interval_millis : Int32
   mut temporality : Temporality
 }
 
@@ -650,9 +650,9 @@ pub struct ObservableUInt64Gauge {
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#metricexporter
 pub fn MetricExporter::new(
   export_fn : async (ArrayView[MetricData]) -> @error.OTelSdkResult,
-  force_flush_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
-  shutdown_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
-  name_fn? : () -> String = () => "custom",
+  force_flush_fn~ : async () -> @error.OTelSdkResult = () => @error.ok(),
+  shutdown_fn~ : async () -> @error.OTelSdkResult = () => @error.ok(),
+  name_fn~ : () -> String = () => "custom",
 ) -> MetricExporter {
   { export_fn, force_flush_fn, shutdown_fn, name_fn, }
 }
@@ -681,7 +681,7 @@ pub async fn MetricExporter::force_flush(
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#shutdown
 pub async fn MetricExporter::shutdown_with_timeout(
   self : MetricExporter,
-  timeout_millis : Int,
+  timeout_millis : Int32,
 ) -> @error.OTelSdkResult {
   ignore(timeout_millis)
   (self.shutdown_fn)()
@@ -727,7 +727,7 @@ pub fn InMemoryMetricExporter::reset(self : InMemoryMetricExporter) -> Unit {
 }
 
 ///|
-fn parse_env_int(key : StringView) -> Int? {
+fn parse_env_int(key : StringView) -> Int32? {
   match @utils.getenv(key) {
     Some(value) => {
       let value = value.trim()
@@ -742,7 +742,7 @@ fn parse_env_int(key : StringView) -> Int? {
 }
 
 ///|
-fn default_metric_export_interval_millis() -> Int {
+fn default_metric_export_interval_millis() -> Int32 {
   match parse_env_int("OTEL_METRIC_EXPORT_INTERVAL") {
     Some(value) if value > 0 => value
     _ => 60000
@@ -821,7 +821,7 @@ pub fn StreamBuilder::with_allowed_attribute_keys(
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#stream-configuration
 pub fn StreamBuilder::with_cardinality_limit(
   self : StreamBuilder,
-  limit : Int,
+  limit : Int32,
 ) -> StreamBuilder {
   self.cardinality_limit = Some(limit)
   self
@@ -892,7 +892,7 @@ pub fn PeriodicMetricReader::builder(
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#periodic-exporting-metricreader
 pub fn PeriodicMetricReaderBuilder::with_interval(
   self : PeriodicMetricReaderBuilder,
-  interval_millis : Int,
+  interval_millis : Int32,
 ) -> PeriodicMetricReaderBuilder {
   self.interval_millis = if interval_millis <= 0 { 1 } else { interval_millis }
   self
@@ -975,7 +975,7 @@ fn encode_attributes(attributes : ArrayView[@common.KeyValue]) -> String {
 }
 
 ///|
-fn normalize_cardinality_limit(limit : Int?) -> Int {
+fn normalize_cardinality_limit(limit : Int32?) -> Int32 {
   match limit {
     Some(limit) if limit <= 0 => 1
     Some(limit) => limit
@@ -1713,7 +1713,7 @@ pub fn SdkMeterProviderBuilder::with_view(
 pub fn SdkMeterProviderBuilder::with_periodic_exporter(
   self : SdkMeterProviderBuilder,
   exporter : MetricExporter,
-  interval_millis? : Int = -1,
+  interval_millis~ : Int32 = -1,
 ) -> SdkMeterProviderBuilder {
   let interval_millis = if interval_millis < 0 {
     default_metric_export_interval_millis()
@@ -1775,9 +1775,9 @@ pub fn SdkMeterProvider::resource(
 pub fn SdkMeterProvider::meter(
   self : SdkMeterProvider,
   name : StringView,
-  version? : String? = None,
-  schema_url? : String? = None,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  version~ : String? = None,
+  schema_url~ : String? = None,
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> SdkMeter {
   let mut scope = @common.InstrumentationScope::builder(name)
   match version {
@@ -1853,7 +1853,7 @@ pub async fn SdkMeterProvider::force_flush(
 pub fn SdkMeterProvider::spawn_periodic_readers(
   self : SdkMeterProvider,
   group : @async.TaskGroup[Unit],
-  allow_failure? : Bool = false,
+  allow_failure~ : Bool = false,
 ) -> Unit {
   for reader in self.state.val.periodic_readers {
     group.spawn_bg(no_wait=true, allow_failure~, () => reader.run())
@@ -1865,7 +1865,7 @@ pub fn SdkMeterProvider::spawn_periodic_readers(
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#shutdown
 pub async fn SdkMeterProvider::shutdown_with_timeout(
   self : SdkMeterProvider,
-  timeout_millis : Int,
+  timeout_millis : Int32,
 ) -> @error.OTelSdkResult {
   if self.state.val.is_shutdown {
     return @error.already_shutdown()
@@ -2499,7 +2499,7 @@ pub async fn ManualReader::force_flush(
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#shutdown
 pub async fn ManualReader::shutdown_with_timeout(
   self : ManualReader,
-  timeout_millis : Int,
+  timeout_millis : Int32,
 ) -> @error.OTelSdkResult {
   ignore(timeout_millis)
   if self.state.val.is_shutdown {
@@ -2569,7 +2569,7 @@ pub async fn PeriodicMetricReader::force_flush(
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#shutdown
 pub async fn PeriodicMetricReader::shutdown_with_timeout(
   self : PeriodicMetricReader,
-  timeout_millis : Int,
+  timeout_millis : Int32,
 ) -> @error.OTelSdkResult {
   if self.state.val.is_shutdown {
     return @error.already_shutdown()
@@ -3462,7 +3462,7 @@ pub fn ObservableUInt64GaugeBuilder::build(
 pub fn Counter::add(
   self : Counter,
   value : Int64,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   if value < 0 {
     return
@@ -3476,7 +3476,7 @@ pub fn Counter::add(
 pub fn DoubleCounter::add(
   self : DoubleCounter,
   value : Double,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   if value < 0.0 {
     return
@@ -3490,7 +3490,7 @@ pub fn DoubleCounter::add(
 pub fn UInt64Counter::add(
   self : UInt64Counter,
   value : UInt64,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   update_u64_sum(self.state, attributes, value)
 }
@@ -3501,7 +3501,7 @@ pub fn UInt64Counter::add(
 pub fn UpDownCounter::add(
   self : UpDownCounter,
   value : Int64,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   update_sum(self.state, attributes, value)
 }
@@ -3512,7 +3512,7 @@ pub fn UpDownCounter::add(
 pub fn DoubleUpDownCounter::add(
   self : DoubleUpDownCounter,
   value : Double,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   update_double_sum(self.state, attributes, value)
 }
@@ -3523,7 +3523,7 @@ pub fn DoubleUpDownCounter::add(
 pub fn Histogram::record(
   self : Histogram,
   value : Double,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   update_histogram(self.state, attributes, value)
 }
@@ -3534,7 +3534,7 @@ pub fn Histogram::record(
 pub fn UInt64Histogram::record(
   self : UInt64Histogram,
   value : UInt64,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   update_u64_histogram(self.state, attributes, value)
 }
@@ -3545,7 +3545,7 @@ pub fn UInt64Histogram::record(
 pub fn Gauge::record(
   self : Gauge,
   value : Double,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   update_gauge(self.state, attributes, value)
 }
@@ -3556,7 +3556,7 @@ pub fn Gauge::record(
 pub fn UInt64Gauge::record(
   self : UInt64Gauge,
   value : UInt64,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   update_u64_gauge(self.state, attributes, value)
 }
@@ -3567,7 +3567,7 @@ pub fn UInt64Gauge::record(
 pub fn ObservableCounter::observe(
   self : ObservableCounter,
   value : Int64,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   if value < 0 {
     return
@@ -3581,7 +3581,7 @@ pub fn ObservableCounter::observe(
 pub fn ObservableDoubleCounter::observe(
   self : ObservableDoubleCounter,
   value : Double,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   if value < 0.0 {
     return
@@ -3595,7 +3595,7 @@ pub fn ObservableDoubleCounter::observe(
 pub fn ObservableUInt64Counter::observe(
   self : ObservableUInt64Counter,
   value : UInt64,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   update_u64_sum(self.state, attributes, value)
 }
@@ -3607,7 +3607,7 @@ pub fn ObservableUInt64Counter::observe(
 pub fn ObservableUpDownCounter::observe(
   self : ObservableUpDownCounter,
   value : Int64,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   update_sum(self.state, attributes, value)
 }
@@ -3619,7 +3619,7 @@ pub fn ObservableUpDownCounter::observe(
 pub fn ObservableDoubleUpDownCounter::observe(
   self : ObservableDoubleUpDownCounter,
   value : Double,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   update_double_sum(self.state, attributes, value)
 }
@@ -3630,7 +3630,7 @@ pub fn ObservableDoubleUpDownCounter::observe(
 pub fn ObservableGauge::observe(
   self : ObservableGauge,
   value : Double,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   update_gauge(self.state, attributes, value)
 }
@@ -3641,7 +3641,7 @@ pub fn ObservableGauge::observe(
 pub fn ObservableUInt64Gauge::observe(
   self : ObservableUInt64Gauge,
   value : UInt64,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   update_u64_gauge(self.state, attributes, value)
 }

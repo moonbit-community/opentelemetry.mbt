@@ -87,9 +87,9 @@ pub type KeyValueMetadata = @baggage.KeyValueMetadata
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#get-a-tracer
 pub fn tracer(
   name : StringView,
-  version? : String? = None,
-  schema_url? : String? = None,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  version~ : String? = None,
+  schema_url~ : String? = None,
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> @trace.Tracer {
   @global.tracer(name, version~, schema_url~, attributes~)
 }
@@ -106,9 +106,9 @@ pub fn tracer(
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#get-a-meter
 pub fn meter(
   name : StringView,
-  version? : String? = None,
-  schema_url? : String? = None,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  version~ : String? = None,
+  schema_url~ : String? = None,
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> @metrics.Meter {
   @global.meter(name, version~, schema_url~, attributes~)
 }
@@ -125,9 +125,9 @@ pub fn meter(
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/api/#get-a-logger
 pub fn logger(
   name : StringView,
-  version? : String? = None,
-  schema_url? : String? = None,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  version~ : String? = None,
+  schema_url~ : String? = None,
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> @logs.Logger {
   @global.logger(name, version~, schema_url~, attributes~)
 }

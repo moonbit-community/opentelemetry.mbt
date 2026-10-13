@@ -119,7 +119,7 @@ pub fn Context::with_baggage_item(
   self : Context,
   key : StringView,
   value : StringView,
-  metadata? : @baggage.BaggageMetadata = Default::default(),
+  metadata~ : @baggage.BaggageMetadata = Default::default(),
 ) -> Context {
   { ..self, baggage: self.baggage.insert_with_metadata(key, value, metadata), }
 }
@@ -141,7 +141,7 @@ pub fn Context::is_telemetry_suppressed(self : Context) -> Bool {
 /// Related spec: https://opentelemetry.io/docs/specs/otel/context/#overview
 pub fn Context::with_telemetry_suppressed(
   self : Context,
-  suppressed? : Bool = true,
+  suppressed~ : Bool = true,
 ) -> Context {
   { ..self, suppress_telemetry: suppressed, }
 }

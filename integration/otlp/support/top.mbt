@@ -10,7 +10,7 @@ pub let metrics_actual_path : String = "actual/metrics.json"
 ///|
 pub struct DelayedHttpServer {
   endpoint : String
-  request_count : Ref[Int]
+  request_count : Ref[Int32]
   request_path : Ref[String]
 }
 
@@ -20,7 +20,7 @@ pub fn DelayedHttpServer::endpoint(self : DelayedHttpServer) -> String {
 }
 
 ///|
-pub fn DelayedHttpServer::request_count(self : DelayedHttpServer) -> Int {
+pub fn DelayedHttpServer::request_count(self : DelayedHttpServer) -> Int32 {
   self.request_count.val
 }
 
@@ -32,8 +32,8 @@ pub fn DelayedHttpServer::request_path(self : DelayedHttpServer) -> String {
 ///|
 pub async fn DelayedHttpServer::wait_until_requested(
   self : DelayedHttpServer,
-  attempts? : Int = 40,
-  sleep_millis? : Int = 10,
+  attempts~ : Int32 = 40,
+  sleep_millis~ : Int32 = 10,
 ) -> Result[String, String] {
   let attempts = if attempts <= 0 { 1 } else { attempts }
   for _ in 0..<attempts {
@@ -50,7 +50,7 @@ pub async fn DelayedHttpServer::wait_until_requested(
 /// real otelcol once the integration runner can manage both processes.
 pub async fn start_delayed_http_server(
   group : @async.TaskGroup[Unit],
-  response_delay_millis? : Int = 300,
+  response_delay_millis~ : Int32 = 300,
 ) -> DelayedHttpServer {
   let server = @http.Server(
     @socket.Addr::parse("127.0.0.1:0") catch {
@@ -211,8 +211,8 @@ pub async fn[T : @json.FromJson] wait_for_latest_matching_record(
   path : StringView,
   matches : (T) -> Bool,
   description : StringView,
-  attempts? : Int = 40,
-  sleep_millis? : Int = 50,
+  attempts~ : Int32 = 40,
+  sleep_millis~ : Int32 = 50,
 ) -> Result[T, String] {
   let attempts = if attempts <= 0 { 1 } else { attempts }
   let mut last_error = "no matching record found for \{description}"
@@ -238,8 +238,8 @@ pub async fn wait_for_latest_matching_json(
   path : StringView,
   matches : (Json) -> Bool,
   description : StringView,
-  attempts? : Int = 40,
-  sleep_millis? : Int = 50,
+  attempts~ : Int32 = 40,
+  sleep_millis~ : Int32 = 50,
 ) -> Result[Json, String] {
   let attempts = if attempts <= 0 { 1 } else { attempts }
   let mut last_error = "no matching json record found for \{description}"

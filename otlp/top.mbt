@@ -23,7 +23,7 @@ pub const OTEL_EXPORTER_OTLP_PROTOCOL_HTTP_JSON : String = "http/json"
 pub const OTEL_EXPORTER_OTLP_TIMEOUT : String = "OTEL_EXPORTER_OTLP_TIMEOUT"
 
 ///|
-pub const OTEL_EXPORTER_OTLP_TIMEOUT_DEFAULT : Int = 10000
+pub const OTEL_EXPORTER_OTLP_TIMEOUT_DEFAULT : Int32 = 10000
 
 ///|
 pub const OTEL_EXPORTER_OTLP_COMPRESSION : String = "OTEL_EXPORTER_OTLP_COMPRESSION"
@@ -163,7 +163,7 @@ struct SignalConfig {
   signal_name : String
   endpoint : String
   protocol : Protocol
-  timeout_millis : Int
+  timeout_millis : Int32
   headers : Map[String, String]
 }
 
@@ -178,7 +178,7 @@ struct SignalExporterState {
 pub struct SpanExporterBuilder {
   mut endpoint : String?
   mut protocol : Protocol?
-  mut timeout_millis : Int?
+  mut timeout_millis : Int32?
   mut headers : Map[String, String]
   mut compression : Compression?
 }
@@ -189,7 +189,7 @@ pub struct SpanExporterBuilder {
 pub struct LogExporterBuilder {
   mut endpoint : String?
   mut protocol : Protocol?
-  mut timeout_millis : Int?
+  mut timeout_millis : Int32?
   mut headers : Map[String, String]
   mut compression : Compression?
 }
@@ -200,7 +200,7 @@ pub struct LogExporterBuilder {
 pub struct MetricExporterBuilder {
   mut endpoint : String?
   mut protocol : Protocol?
-  mut timeout_millis : Int?
+  mut timeout_millis : Int32?
   mut headers : Map[String, String]
   mut compression : Compression?
   mut temporality : @sdkmetrics.Temporality?
@@ -414,7 +414,7 @@ fn parse_compression(
 fn parse_positive_int(
   key : String,
   value : StringView,
-) -> Result[Int, ExporterBuildError] {
+) -> Result[Int32, ExporterBuildError] {
   let value = value.trim()
   if value == "" {
     return Err(InvalidConfig(key, "value must not be empty"))
@@ -457,8 +457,8 @@ fn resolve_protocol(
 ///|
 fn resolve_timeout(
   signal_timeout_var : String,
-  provided : Int?,
-) -> Result[Int, ExporterBuildError] {
+  provided : Int32?,
+) -> Result[Int32, ExporterBuildError] {
   match provided {
     Some(timeout_millis) =>
       parse_positive_int(signal_timeout_var, timeout_millis.to_string())
@@ -649,7 +649,7 @@ fn build_signal_config(
   signal_compression_var : String,
   endpoint : String?,
   protocol : Protocol?,
-  timeout_millis : Int?,
+  timeout_millis : Int32?,
   headers : Map[String, String],
   compression : Compression?,
 ) -> Result[SignalConfig, ExporterBuildError] {
@@ -699,7 +699,7 @@ fn string_or_empty(value : String?) -> String {
 }
 
 ///|
-fn to_uint_non_negative(value : Int) -> UInt {
+fn to_uint_non_negative(value : Int32) -> UInt32 {
   if value <= 0 {
     0U
   } else {
@@ -717,13 +717,13 @@ fn to_uint64_non_negative(value : Int64) -> UInt64 {
 }
 
 ///|
-fn trace_flags_uint(trace_flags : @common.TraceFlags) -> UInt {
+fn trace_flags_uint(trace_flags : @common.TraceFlags) -> UInt32 {
   let parsed = @string.parse_int(trace_flags.to_hex(), base=16) catch { _ => 0 }
   parsed.reinterpret_as_uint()
 }
 
 ///|
-fn span_context_flags(span_context : @common.SpanContext) -> UInt {
+fn span_context_flags(span_context : @common.SpanContext) -> UInt32 {
   let mut flags = trace_flags_uint(span_context.trace_flags()) | 0x100U
   if span_context.is_remote() {
     flags = flags | 0x200U
@@ -1745,7 +1745,7 @@ pub fn MetricExporterBuilder::with_protocol(
 /// Spec: https://opentelemetry.io/docs/specs/otel/protocol/exporter/#configuration-options
 pub fn SpanExporterBuilder::with_timeout(
   self : SpanExporterBuilder,
-  timeout_millis : Int,
+  timeout_millis : Int32,
 ) -> SpanExporterBuilder {
   self.timeout_millis = Some(timeout_millis)
   self
@@ -1758,7 +1758,7 @@ pub fn SpanExporterBuilder::with_timeout(
 /// Spec: https://opentelemetry.io/docs/specs/otel/protocol/exporter/#configuration-options
 pub fn LogExporterBuilder::with_timeout(
   self : LogExporterBuilder,
-  timeout_millis : Int,
+  timeout_millis : Int32,
 ) -> LogExporterBuilder {
   self.timeout_millis = Some(timeout_millis)
   self
@@ -1771,7 +1771,7 @@ pub fn LogExporterBuilder::with_timeout(
 /// Spec: https://opentelemetry.io/docs/specs/otel/protocol/exporter/#configuration-options
 pub fn MetricExporterBuilder::with_timeout(
   self : MetricExporterBuilder,
-  timeout_millis : Int,
+  timeout_millis : Int32,
 ) -> MetricExporterBuilder {
   self.timeout_millis = Some(timeout_millis)
   self
@@ -2181,7 +2181,7 @@ pub async fn MetricExporter::force_flush(
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#shutdown
 pub async fn SpanExporter::shutdown_with_timeout(
   self : SpanExporter,
-  timeout_millis : Int,
+  timeout_millis : Int32,
 ) -> @error.OTelSdkResult {
   ignore(timeout_millis)
   if self.state.val.is_shutdown {
@@ -2200,7 +2200,7 @@ pub async fn SpanExporter::shutdown_with_timeout(
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk/#shutdown
 pub async fn LogExporter::shutdown_with_timeout(
   self : LogExporter,
-  timeout_millis : Int,
+  timeout_millis : Int32,
 ) -> @error.OTelSdkResult {
   ignore(timeout_millis)
   if self.state.val.is_shutdown {
@@ -2219,7 +2219,7 @@ pub async fn LogExporter::shutdown_with_timeout(
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#shutdown
 pub async fn MetricExporter::shutdown_with_timeout(
   self : MetricExporter,
-  timeout_millis : Int,
+  timeout_millis : Int32,
 ) -> @error.OTelSdkResult {
   ignore(timeout_millis)
   if self.state.val.is_shutdown {
@@ -2303,7 +2303,7 @@ pub fn MetricExporter::into_metric_exporter(
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#periodic-exporting-metricreader
 pub fn MetricExporter::into_periodic_reader(
   self : MetricExporter,
-  interval_millis? : Int = -1,
+  interval_millis~ : Int32 = -1,
 ) -> @sdkmetrics.PeriodicMetricReader {
   let builder = @sdkmetrics.PeriodicMetricReader::builder(
     self.into_metric_exporter(),

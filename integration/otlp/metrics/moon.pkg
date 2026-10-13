@@ -12,7 +12,8 @@ import {
   "moonbit-community/opentelemetry-integration-otlp/support",
 } for "test"
 
+max_concurrent_tests = 1
+
 options(
   backend: [ "native" ],
-  "max-concurrent-tests": 1,
 )
