@@ -63,7 +63,7 @@ pub impl @protobuf.Write for ExportTraceServiceRequest with fn write(
 pub impl ToJson for ExportTraceServiceRequest with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.resource_spans != Default::default() {
-    json["resourceSpans"] = self.resource_spans.to_json()
+    json["resourceSpans"] = Json(self.resource_spans)
   }
   Json::object(json)
 }
@@ -310,10 +310,10 @@ pub impl @protobuf.Write for ExportTracePartialSuccess with fn write(
 pub impl ToJson for ExportTracePartialSuccess with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.rejected_spans != Default::default() {
-    json["rejectedSpans"] = self.rejected_spans.to_json()
+    json["rejectedSpans"] = Json(self.rejected_spans)
   }
   if self.error_message != Default::default() {
-    json["errorMessage"] = self.error_message.to_json()
+    json["errorMessage"] = Json(self.error_message)
   }
   Json::object(json)
 }

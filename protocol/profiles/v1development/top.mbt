@@ -159,25 +159,25 @@ pub impl @protobuf.Write for ProfilesDictionary with fn write(
 pub impl ToJson for ProfilesDictionary with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.mapping_table != Default::default() {
-    json["mappingTable"] = self.mapping_table.to_json()
+    json["mappingTable"] = Json(self.mapping_table)
   }
   if self.location_table != Default::default() {
-    json["locationTable"] = self.location_table.to_json()
+    json["locationTable"] = Json(self.location_table)
   }
   if self.function_table != Default::default() {
-    json["functionTable"] = self.function_table.to_json()
+    json["functionTable"] = Json(self.function_table)
   }
   if self.link_table != Default::default() {
-    json["linkTable"] = self.link_table.to_json()
+    json["linkTable"] = Json(self.link_table)
   }
   if self.string_table != Default::default() {
-    json["stringTable"] = self.string_table.to_json()
+    json["stringTable"] = Json(self.string_table)
   }
   if self.attribute_table != Default::default() {
-    json["attributeTable"] = self.attribute_table.to_json()
+    json["attributeTable"] = Json(self.attribute_table)
   }
   if self.stack_table != Default::default() {
-    json["stackTable"] = self.stack_table.to_json()
+    json["stackTable"] = Json(self.stack_table)
   }
   Json::object(json)
 }
@@ -373,7 +373,7 @@ pub impl @protobuf.Write for ProfilesData with fn write(
 pub impl ToJson for ProfilesData with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.resource_profiles != Default::default() {
-    json["resourceProfiles"] = self.resource_profiles.to_json()
+    json["resourceProfiles"] = Json(self.resource_profiles)
   }
   if self.dictionary != Default::default() {
     json["dictionary"] = ToJson::to_json(self.dictionary)
@@ -533,13 +533,13 @@ pub impl @protobuf.Write for ResourceProfiles with fn write(
 pub impl ToJson for ResourceProfiles with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.resource != Default::default() {
-    json["resource"] = self.resource.to_json()
+    json["resource"] = Json(self.resource)
   }
   if self.scope_profiles != Default::default() {
-    json["scopeProfiles"] = self.scope_profiles.to_json()
+    json["scopeProfiles"] = Json(self.scope_profiles)
   }
   if self.schema_url != Default::default() {
-    json["schemaUrl"] = self.schema_url.to_json()
+    json["schemaUrl"] = Json(self.schema_url)
   }
   Json::object(json)
 }
@@ -698,13 +698,13 @@ pub impl @protobuf.Write for ScopeProfiles with fn write(
 pub impl ToJson for ScopeProfiles with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.scope != Default::default() {
-    json["scope"] = self.scope.to_json()
+    json["scope"] = Json(self.scope)
   }
   if self.profiles != Default::default() {
-    json["profiles"] = self.profiles.to_json()
+    json["profiles"] = Json(self.profiles)
   }
   if self.schema_url != Default::default() {
-    json["schemaUrl"] = self.schema_url.to_json()
+    json["schemaUrl"] = Json(self.schema_url)
   }
   Json::object(json)
 }
@@ -782,10 +782,10 @@ pub(all) struct Profile {
   mut period_type : ValueType
   mut period : Int64
   mut profile_id : Bytes
-  mut dropped_attributes_count : UInt
+  mut dropped_attributes_count : UInt32
   mut original_payload_format : String
   mut original_payload : Bytes
-  mut attribute_indices : Array[Int]
+  mut attribute_indices : Array[Int32]
 } derive(Eq)
 
 ///|
@@ -829,7 +829,7 @@ pub impl @protobuf.Sized for Profile with fn size_of(self) {
       let size = self.attribute_indices
         .iter()
         .map(@protobuf.size_of)
-        .fold(init=0U, UInt::add)
+        .fold(init=0U, UInt32::add)
       @protobuf.size_of(size) + size
     })
   size
@@ -861,10 +861,10 @@ pub fn Profile::new(
   period_type : ValueType,
   period : Int64,
   profile_id : Bytes,
-  dropped_attributes_count : UInt,
+  dropped_attributes_count : UInt32,
   original_payload_format : String,
   original_payload : Bytes,
-  attribute_indices : Array[Int],
+  attribute_indices : Array[Int32],
 ) -> Profile {
   {
     sample_type,
@@ -952,7 +952,7 @@ pub impl @protobuf.Write for Profile with fn write(
   let size = self.attribute_indices
     .iter()
     .map(@protobuf.size_of)
-    .fold(init=0U, UInt::add)
+    .fold(init=0U, UInt32::add)
   writer |> @protobuf.write_uint32(size)
   for item in self.attribute_indices {
     writer |> @protobuf.write_int32(item)
@@ -966,34 +966,36 @@ pub impl ToJson for Profile with fn to_json(self) {
     json["sampleType"] = ToJson::to_json(self.sample_type)
   }
   if self.samples != Default::default() {
-    json["samples"] = self.samples.to_json()
+    json["samples"] = Json(self.samples)
   }
   if self.time_unix_nano != Default::default() {
-    json["timeUnixNano"] = self.time_unix_nano.to_json()
+    json["timeUnixNano"] = Json(self.time_unix_nano)
   }
   if self.duration_nano != Default::default() {
-    json["durationNano"] = self.duration_nano.to_json()
+    json["durationNano"] = Json(self.duration_nano)
   }
   if self.period_type != Default::default() {
     json["periodType"] = ToJson::to_json(self.period_type)
   }
   if self.period != Default::default() {
-    json["period"] = self.period.to_json()
+    json["period"] = Json(self.period)
   }
   if self.profile_id != Default::default() {
-    json["profileId"] = @protobuf.base64_encode(self.profile_id).to_json()
+    json["profileId"] = Json(@protobuf.base64_encode(self.profile_id))
   }
   if self.dropped_attributes_count != Default::default() {
-    json["droppedAttributesCount"] = self.dropped_attributes_count.to_json()
+    json["droppedAttributesCount"] = Json(self.dropped_attributes_count)
   }
   if self.original_payload_format != Default::default() {
-    json["originalPayloadFormat"] = self.original_payload_format.to_json()
+    json["originalPayloadFormat"] = Json(self.original_payload_format)
   }
   if self.original_payload != Default::default() {
-    json["originalPayload"] = @protobuf.base64_encode(self.original_payload).to_json()
+    json["originalPayload"] = Json(
+      @protobuf.base64_encode(self.original_payload),
+    )
   }
   if self.attribute_indices != Default::default() {
-    json["attributeIndices"] = self.attribute_indices.to_json()
+    json["attributeIndices"] = Json(self.attribute_indices)
   }
   Json::object(json)
 }
@@ -1110,7 +1112,7 @@ pub impl @protobuf.AsyncWrite for Profile with fn write(
   let size = self.attribute_indices
     .iter()
     .map(@protobuf.size_of)
-    .fold(init=0U, UInt::add)
+    .fold(init=0U, UInt32::add)
   writer |> @protobuf.async_write_uint32(size)
   for item in self.attribute_indices {
     writer |> @protobuf.async_write_int32(item)
@@ -1184,10 +1186,10 @@ pub impl @protobuf.Write for Link with fn write(
 pub impl ToJson for Link with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.trace_id != Default::default() {
-    json["traceId"] = @protobuf.base64_encode(self.trace_id).to_json()
+    json["traceId"] = Json(@protobuf.base64_encode(self.trace_id))
   }
   if self.span_id != Default::default() {
-    json["spanId"] = @protobuf.base64_encode(self.span_id).to_json()
+    json["spanId"] = Json(@protobuf.base64_encode(self.span_id))
   }
   Json::object(json)
 }
@@ -1246,8 +1248,8 @@ pub impl @protobuf.AsyncWrite for Link with fn write(
 
 ///|
 pub(all) struct ValueType {
-  mut type_strindex : Int
-  mut unit_strindex : Int
+  mut type_strindex : Int32
+  mut unit_strindex : Int32
 } derive(Eq)
 
 ///|
@@ -1264,7 +1266,10 @@ pub impl Default for ValueType with fn default() -> ValueType {
 }
 
 ///|
-pub fn ValueType::new(type_strindex : Int, unit_strindex : Int) -> ValueType {
+pub fn ValueType::new(
+  type_strindex : Int32,
+  unit_strindex : Int32,
+) -> ValueType {
   { type_strindex, unit_strindex, }
 }
 
@@ -1303,10 +1308,10 @@ pub impl @protobuf.Write for ValueType with fn write(
 pub impl ToJson for ValueType with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.type_strindex != Default::default() {
-    json["typeStrindex"] = self.type_strindex.to_json()
+    json["typeStrindex"] = Json(self.type_strindex)
   }
   if self.unit_strindex != Default::default() {
-    json["unitStrindex"] = self.unit_strindex.to_json()
+    json["unitStrindex"] = Json(self.unit_strindex)
   }
   Json::object(json)
 }
@@ -1365,9 +1370,9 @@ pub impl @protobuf.AsyncWrite for ValueType with fn write(
 
 ///|
 pub(all) struct Sample {
-  mut stack_index : Int
-  mut attribute_indices : Array[Int]
-  mut link_index : Int
+  mut stack_index : Int32
+  mut attribute_indices : Array[Int32]
+  mut link_index : Int32
   mut values : Array[Int64]
   mut timestamps_unix_nano : Array[UInt64]
 } derive(Eq)
@@ -1381,7 +1386,7 @@ pub impl @protobuf.Sized for Sample with fn size_of(self) {
       let size = self.attribute_indices
         .iter()
         .map(@protobuf.size_of)
-        .fold(init=0U, UInt::add)
+        .fold(init=0U, UInt32::add)
       @protobuf.size_of(size) + size
     })
   size += 1U + @protobuf.size_of(self.link_index)
@@ -1390,7 +1395,7 @@ pub impl @protobuf.Sized for Sample with fn size_of(self) {
       let size = self.values
         .iter()
         .map(@protobuf.size_of)
-        .fold(init=0U, UInt::add)
+        .fold(init=0U, UInt32::add)
       @protobuf.size_of(size) + size
     })
   size += 1U +
@@ -1414,9 +1419,9 @@ pub impl Default for Sample with fn default() -> Sample {
 
 ///|
 pub fn Sample::new(
-  stack_index : Int,
-  attribute_indices : Array[Int],
-  link_index : Int,
+  stack_index : Int32,
+  attribute_indices : Array[Int32],
+  link_index : Int32,
   values : Array[Int64],
   timestamps_unix_nano : Array[UInt64],
 ) -> Sample {
@@ -1466,7 +1471,7 @@ pub impl @protobuf.Write for Sample with fn write(
   let size = self.attribute_indices
     .iter()
     .map(@protobuf.size_of)
-    .fold(init=0U, UInt::add)
+    .fold(init=0U, UInt32::add)
   writer |> @protobuf.write_uint32(size)
   for item in self.attribute_indices {
     writer |> @protobuf.write_int32(item)
@@ -1474,7 +1479,10 @@ pub impl @protobuf.Write for Sample with fn write(
   writer |> @protobuf.write_varint(24UL)
   writer |> @protobuf.write_int32(self.link_index)
   writer |> @protobuf.write_varint(34UL)
-  let size = self.values.iter().map(@protobuf.size_of).fold(init=0U, UInt::add)
+  let size = self.values
+    .iter()
+    .map(@protobuf.size_of)
+    .fold(init=0U, UInt32::add)
   writer |> @protobuf.write_uint32(size)
   for item in self.values {
     writer |> @protobuf.write_int64(item)
@@ -1491,19 +1499,19 @@ pub impl @protobuf.Write for Sample with fn write(
 pub impl ToJson for Sample with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.stack_index != Default::default() {
-    json["stackIndex"] = self.stack_index.to_json()
+    json["stackIndex"] = Json(self.stack_index)
   }
   if self.attribute_indices != Default::default() {
-    json["attributeIndices"] = self.attribute_indices.to_json()
+    json["attributeIndices"] = Json(self.attribute_indices)
   }
   if self.link_index != Default::default() {
-    json["linkIndex"] = self.link_index.to_json()
+    json["linkIndex"] = Json(self.link_index)
   }
   if self.values != Default::default() {
-    json["values"] = self.values.to_json()
+    json["values"] = Json(self.values)
   }
   if self.timestamps_unix_nano != Default::default() {
-    json["timestampsUnixNano"] = self.timestamps_unix_nano.to_json()
+    json["timestampsUnixNano"] = Json(self.timestamps_unix_nano)
   }
   Json::object(json)
 }
@@ -1583,7 +1591,7 @@ pub impl @protobuf.AsyncWrite for Sample with fn write(
   let size = self.attribute_indices
     .iter()
     .map(@protobuf.size_of)
-    .fold(init=0U, UInt::add)
+    .fold(init=0U, UInt32::add)
   writer |> @protobuf.async_write_uint32(size)
   for item in self.attribute_indices {
     writer |> @protobuf.async_write_int32(item)
@@ -1591,7 +1599,10 @@ pub impl @protobuf.AsyncWrite for Sample with fn write(
   writer |> @protobuf.async_write_varint(24UL)
   writer |> @protobuf.async_write_int32(self.link_index)
   writer |> @protobuf.async_write_varint(34UL)
-  let size = self.values.iter().map(@protobuf.size_of).fold(init=0U, UInt::add)
+  let size = self.values
+    .iter()
+    .map(@protobuf.size_of)
+    .fold(init=0U, UInt32::add)
   writer |> @protobuf.async_write_uint32(size)
   for item in self.values {
     writer |> @protobuf.async_write_int64(item)
@@ -1609,8 +1620,8 @@ pub(all) struct Mapping {
   mut memory_start : UInt64
   mut memory_limit : UInt64
   mut file_offset : UInt64
-  mut filename_strindex : Int
-  mut attribute_indices : Array[Int]
+  mut filename_strindex : Int32
+  mut attribute_indices : Array[Int32]
 } derive(Eq)
 
 ///|
@@ -1625,7 +1636,7 @@ pub impl @protobuf.Sized for Mapping with fn size_of(self) {
       let size = self.attribute_indices
         .iter()
         .map(@protobuf.size_of)
-        .fold(init=0U, UInt::add)
+        .fold(init=0U, UInt32::add)
       @protobuf.size_of(size) + size
     })
   size
@@ -1647,8 +1658,8 @@ pub fn Mapping::new(
   memory_start : UInt64,
   memory_limit : UInt64,
   file_offset : UInt64,
-  filename_strindex : Int,
-  attribute_indices : Array[Int],
+  filename_strindex : Int32,
+  attribute_indices : Array[Int32],
 ) -> Mapping {
   {
     memory_start,
@@ -1702,7 +1713,7 @@ pub impl @protobuf.Write for Mapping with fn write(
   let size = self.attribute_indices
     .iter()
     .map(@protobuf.size_of)
-    .fold(init=0U, UInt::add)
+    .fold(init=0U, UInt32::add)
   writer |> @protobuf.write_uint32(size)
   for item in self.attribute_indices {
     writer |> @protobuf.write_int32(item)
@@ -1713,19 +1724,19 @@ pub impl @protobuf.Write for Mapping with fn write(
 pub impl ToJson for Mapping with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.memory_start != Default::default() {
-    json["memoryStart"] = self.memory_start.to_json()
+    json["memoryStart"] = Json(self.memory_start)
   }
   if self.memory_limit != Default::default() {
-    json["memoryLimit"] = self.memory_limit.to_json()
+    json["memoryLimit"] = Json(self.memory_limit)
   }
   if self.file_offset != Default::default() {
-    json["fileOffset"] = self.file_offset.to_json()
+    json["fileOffset"] = Json(self.file_offset)
   }
   if self.filename_strindex != Default::default() {
-    json["filenameStrindex"] = self.filename_strindex.to_json()
+    json["filenameStrindex"] = Json(self.filename_strindex)
   }
   if self.attribute_indices != Default::default() {
-    json["attributeIndices"] = self.attribute_indices.to_json()
+    json["attributeIndices"] = Json(self.attribute_indices)
   }
   Json::object(json)
 }
@@ -1801,7 +1812,7 @@ pub impl @protobuf.AsyncWrite for Mapping with fn write(
   let size = self.attribute_indices
     .iter()
     .map(@protobuf.size_of)
-    .fold(init=0U, UInt::add)
+    .fold(init=0U, UInt32::add)
   writer |> @protobuf.async_write_uint32(size)
   for item in self.attribute_indices {
     writer |> @protobuf.async_write_int32(item)
@@ -1810,7 +1821,7 @@ pub impl @protobuf.AsyncWrite for Mapping with fn write(
 
 ///|
 pub(all) struct Stack {
-  mut location_indices : Array[Int]
+  mut location_indices : Array[Int32]
 } derive(Eq)
 
 ///|
@@ -1821,7 +1832,7 @@ pub impl @protobuf.Sized for Stack with fn size_of(self) {
       let size = self.location_indices
         .iter()
         .map(@protobuf.size_of)
-        .fold(init=0U, UInt::add)
+        .fold(init=0U, UInt32::add)
       @protobuf.size_of(size) + size
     })
   size
@@ -1833,7 +1844,7 @@ pub impl Default for Stack with fn default() -> Stack {
 }
 
 ///|
-pub fn Stack::new(location_indices : Array[Int]) -> Stack {
+pub fn Stack::new(location_indices : Array[Int32]) -> Stack {
   { location_indices, }
 }
 
@@ -1868,7 +1879,7 @@ pub impl @protobuf.Write for Stack with fn write(
   let size = self.location_indices
     .iter()
     .map(@protobuf.size_of)
-    .fold(init=0U, UInt::add)
+    .fold(init=0U, UInt32::add)
   writer |> @protobuf.write_uint32(size)
   for item in self.location_indices {
     writer |> @protobuf.write_int32(item)
@@ -1879,7 +1890,7 @@ pub impl @protobuf.Write for Stack with fn write(
 pub impl ToJson for Stack with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.location_indices != Default::default() {
-    json["locationIndices"] = self.location_indices.to_json()
+    json["locationIndices"] = Json(self.location_indices)
   }
   Json::object(json)
 }
@@ -1935,7 +1946,7 @@ pub impl @protobuf.AsyncWrite for Stack with fn write(
   let size = self.location_indices
     .iter()
     .map(@protobuf.size_of)
-    .fold(init=0U, UInt::add)
+    .fold(init=0U, UInt32::add)
   writer |> @protobuf.async_write_uint32(size)
   for item in self.location_indices {
     writer |> @protobuf.async_write_int32(item)
@@ -1944,10 +1955,10 @@ pub impl @protobuf.AsyncWrite for Stack with fn write(
 
 ///|
 pub(all) struct Location {
-  mut mapping_index : Int
+  mut mapping_index : Int32
   mut address : UInt64
   mut lines : Array[Line]
-  mut attribute_indices : Array[Int]
+  mut attribute_indices : Array[Int32]
 } derive(Eq)
 
 ///|
@@ -1964,7 +1975,7 @@ pub impl @protobuf.Sized for Location with fn size_of(self) {
       let size = self.attribute_indices
         .iter()
         .map(@protobuf.size_of)
-        .fold(init=0U, UInt::add)
+        .fold(init=0U, UInt32::add)
       @protobuf.size_of(size) + size
     })
   size
@@ -1982,10 +1993,10 @@ pub impl Default for Location with fn default() -> Location {
 
 ///|
 pub fn Location::new(
-  mapping_index : Int,
+  mapping_index : Int32,
   address : UInt64,
   lines : Array[Line],
-  attribute_indices : Array[Int],
+  attribute_indices : Array[Int32],
 ) -> Location {
   { mapping_index, address, lines, attribute_indices, }
 }
@@ -2033,7 +2044,7 @@ pub impl @protobuf.Write for Location with fn write(
   let size = self.attribute_indices
     .iter()
     .map(@protobuf.size_of)
-    .fold(init=0U, UInt::add)
+    .fold(init=0U, UInt32::add)
   writer |> @protobuf.write_uint32(size)
   for item in self.attribute_indices {
     writer |> @protobuf.write_int32(item)
@@ -2044,16 +2055,16 @@ pub impl @protobuf.Write for Location with fn write(
 pub impl ToJson for Location with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.mapping_index != Default::default() {
-    json["mappingIndex"] = self.mapping_index.to_json()
+    json["mappingIndex"] = Json(self.mapping_index)
   }
   if self.address != Default::default() {
-    json["address"] = self.address.to_json()
+    json["address"] = Json(self.address)
   }
   if self.lines != Default::default() {
-    json["lines"] = self.lines.to_json()
+    json["lines"] = Json(self.lines)
   }
   if self.attribute_indices != Default::default() {
-    json["attributeIndices"] = self.attribute_indices.to_json()
+    json["attributeIndices"] = Json(self.attribute_indices)
   }
   Json::object(json)
 }
@@ -2127,7 +2138,7 @@ pub impl @protobuf.AsyncWrite for Location with fn write(
   let size = self.attribute_indices
     .iter()
     .map(@protobuf.size_of)
-    .fold(init=0U, UInt::add)
+    .fold(init=0U, UInt32::add)
   writer |> @protobuf.async_write_uint32(size)
   for item in self.attribute_indices {
     writer |> @protobuf.async_write_int32(item)
@@ -2136,7 +2147,7 @@ pub impl @protobuf.AsyncWrite for Location with fn write(
 
 ///|
 pub(all) struct Line {
-  mut function_index : Int
+  mut function_index : Int32
   mut line : Int64
   mut column : Int64
 } derive(Eq)
@@ -2160,7 +2171,7 @@ pub impl Default for Line with fn default() -> Line {
 }
 
 ///|
-pub fn Line::new(function_index : Int, line : Int64, column : Int64) -> Line {
+pub fn Line::new(function_index : Int32, line : Int64, column : Int64) -> Line {
   { function_index, line, column, }
 }
 
@@ -2202,13 +2213,13 @@ pub impl @protobuf.Write for Line with fn write(
 pub impl ToJson for Line with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.function_index != Default::default() {
-    json["functionIndex"] = self.function_index.to_json()
+    json["functionIndex"] = Json(self.function_index)
   }
   if self.line != Default::default() {
-    json["line"] = self.line.to_json()
+    json["line"] = Json(self.line)
   }
   if self.column != Default::default() {
-    json["column"] = self.column.to_json()
+    json["column"] = Json(self.column)
   }
   Json::object(json)
 }
@@ -2270,9 +2281,9 @@ pub impl @protobuf.AsyncWrite for Line with fn write(
 
 ///|
 pub(all) struct Function {
-  mut name_strindex : Int
-  mut system_name_strindex : Int
-  mut filename_strindex : Int
+  mut name_strindex : Int32
+  mut system_name_strindex : Int32
+  mut filename_strindex : Int32
   mut start_line : Int64
 } derive(Eq)
 
@@ -2298,9 +2309,9 @@ pub impl Default for Function with fn default() -> Function {
 
 ///|
 pub fn Function::new(
-  name_strindex : Int,
-  system_name_strindex : Int,
-  filename_strindex : Int,
+  name_strindex : Int32,
+  system_name_strindex : Int32,
+  filename_strindex : Int32,
   start_line : Int64,
 ) -> Function {
   { name_strindex, system_name_strindex, filename_strindex, start_line, }
@@ -2347,16 +2358,16 @@ pub impl @protobuf.Write for Function with fn write(
 pub impl ToJson for Function with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.name_strindex != Default::default() {
-    json["nameStrindex"] = self.name_strindex.to_json()
+    json["nameStrindex"] = Json(self.name_strindex)
   }
   if self.system_name_strindex != Default::default() {
-    json["systemNameStrindex"] = self.system_name_strindex.to_json()
+    json["systemNameStrindex"] = Json(self.system_name_strindex)
   }
   if self.filename_strindex != Default::default() {
-    json["filenameStrindex"] = self.filename_strindex.to_json()
+    json["filenameStrindex"] = Json(self.filename_strindex)
   }
   if self.start_line != Default::default() {
-    json["startLine"] = self.start_line.to_json()
+    json["startLine"] = Json(self.start_line)
   }
   Json::object(json)
 }
@@ -2425,9 +2436,9 @@ pub impl @protobuf.AsyncWrite for Function with fn write(
 
 ///|
 pub(all) struct KeyValueAndUnit {
-  mut key_strindex : Int
+  mut key_strindex : Int32
   mut value : @v1.AnyValue
-  mut unit_strindex : Int
+  mut unit_strindex : Int32
 } derive(Eq)
 
 ///|
@@ -2454,9 +2465,9 @@ pub impl Default for KeyValueAndUnit with fn default() -> KeyValueAndUnit {
 
 ///|
 pub fn KeyValueAndUnit::new(
-  key_strindex : Int,
+  key_strindex : Int32,
   value : @v1.AnyValue,
-  unit_strindex : Int,
+  unit_strindex : Int32,
 ) -> KeyValueAndUnit {
   { key_strindex, value, unit_strindex, }
 }
@@ -2501,13 +2512,13 @@ pub impl @protobuf.Write for KeyValueAndUnit with fn write(
 pub impl ToJson for KeyValueAndUnit with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.key_strindex != Default::default() {
-    json["keyStrindex"] = self.key_strindex.to_json()
+    json["keyStrindex"] = Json(self.key_strindex)
   }
   if self.value != Default::default() {
-    json["value"] = self.value.to_json()
+    json["value"] = Json(self.value)
   }
   if self.unit_strindex != Default::default() {
-    json["unitStrindex"] = self.unit_strindex.to_json()
+    json["unitStrindex"] = Json(self.unit_strindex)
   }
   Json::object(json)
 }

@@ -46,7 +46,7 @@ fn push_line(builder : StringBuilder, line : String) -> Unit {
 }
 
 ///|
-fn push_indent(builder : StringBuilder, indent : Int) -> Unit {
+fn push_indent(builder : StringBuilder, indent : Int32) -> Unit {
   for _ in 0..<indent {
     builder.write_char(' ')
   }
@@ -55,7 +55,7 @@ fn push_indent(builder : StringBuilder, indent : Int) -> Unit {
 ///|
 fn push_field(
   builder : StringBuilder,
-  indent : Int,
+  indent : Int32,
   label : String,
   value : String,
 ) -> Unit {
@@ -84,7 +84,7 @@ fn format_status(status : @sdktrace.Status) -> String {
     Error => "Error"
   }
   match status.description {
-    Some(description) => "\{code}(\{description.to_json().stringify()})"
+    Some(description) => "\{code}(\{Json(description).stringify()})"
     None => code
   }
 }
@@ -155,8 +155,8 @@ fn format_number(number : @sdkmetrics.Number) -> String {
 ///|
 fn write_array_attributes(
   builder : StringBuilder,
-  header_indent : Int,
-  item_indent : Int,
+  header_indent : Int32,
+  item_indent : Int32,
   attributes : ArrayView[@common.KeyValue],
 ) -> Unit {
   if attributes.length() == 0 {
@@ -177,8 +177,8 @@ fn write_array_attributes(
 ///|
 fn write_log_attributes(
   builder : StringBuilder,
-  header_indent : Int,
-  item_indent : Int,
+  header_indent : Int32,
+  item_indent : Int32,
   attributes : ArrayView[@sdklogs.KeyValue],
 ) -> Unit {
   if attributes.length() == 0 {
@@ -199,8 +199,8 @@ fn write_log_attributes(
 ///|
 fn write_map_attributes(
   builder : StringBuilder,
-  header_indent : Int,
-  item_indent : Int,
+  header_indent : Int32,
+  item_indent : Int32,
   attributes : Map[String, @common.Value],
 ) -> Unit {
   if attributes.is_empty() {
@@ -226,7 +226,7 @@ fn write_resource(
   push_line(builder, "Resource")
   match resource.schema_url() {
     Some(schema_url) =>
-      push_field(builder, 2, "SchemaUrl", schema_url.to_json().stringify())
+      push_field(builder, 2, "SchemaUrl", Json(schema_url).stringify())
     None => ()
   }
   write_map_attributes(builder, 2, 4, resource.attributes())
@@ -238,15 +238,15 @@ fn write_scope(
   scope : @common.InstrumentationScope,
 ) -> Unit {
   push_line(builder, "  Instrumentation Scope")
-  push_field(builder, 4, "Name", scope.name().to_json().stringify())
+  push_field(builder, 4, "Name", Json(scope.name()).stringify())
   match scope.version() {
     Some(version) =>
-      push_field(builder, 4, "Version", version.to_json().stringify())
+      push_field(builder, 4, "Version", Json(version).stringify())
     None => ()
   }
   match scope.schema_url() {
     Some(schema_url) =>
-      push_field(builder, 4, "SchemaUrl", schema_url.to_json().stringify())
+      push_field(builder, 4, "SchemaUrl", Json(schema_url).stringify())
     None => ()
   }
   write_array_attributes(builder, 4, 6, scope.attributes())
@@ -266,7 +266,7 @@ fn render_span_batch(
     let span = batch[i]
     push_line(builder, "Span #\{i}")
     write_scope(builder, span.instrumentation_scope)
-    push_field(builder, 2, "Name", span.name.to_json().stringify())
+    push_field(builder, 2, "Name", Json(span.name).stringify())
     push_field(builder, 2, "TraceId", span.span_context.trace_id().to_hex())
     push_field(builder, 2, "SpanId", span.span_context.span_id().to_hex())
     push_field(
@@ -309,7 +309,7 @@ fn render_span_batch(
       for index = 0; index < span.events.length(); index = index + 1 {
         let event = span.events[index]
         push_line(builder, "    Event #\{index}")
-        push_field(builder, 6, "Name", event.name.to_json().stringify())
+        push_field(builder, 6, "Name", Json(event.name).stringify())
         push_field(
           builder,
           6,
@@ -374,12 +374,7 @@ fn render_log_batch(
     )
     match record.severity_text {
       Some(severity_text) =>
-        push_field(
-          builder,
-          2,
-          "SeverityText",
-          severity_text.to_json().stringify(),
-        )
+        push_field(builder, 2, "SeverityText", Json(severity_text).stringify())
       None => ()
     }
     match record.severity_number {
@@ -439,14 +434,14 @@ fn render_metric_batch(batch : ArrayView[@sdkmetrics.MetricData]) -> String {
     let metric = batch[i]
     push_line(builder, "Metric #\{i}")
     write_scope(builder, metric.instrumentation_scope)
-    push_field(builder, 2, "Name", metric.name.to_json().stringify())
+    push_field(builder, 2, "Name", Json(metric.name).stringify())
     match metric.description {
       Some(description) =>
-        push_field(builder, 2, "Description", description.to_json().stringify())
+        push_field(builder, 2, "Description", Json(description).stringify())
       None => ()
     }
     match metric.unit {
-      Some(unit) => push_field(builder, 2, "Unit", unit.to_json().stringify())
+      Some(unit) => push_field(builder, 2, "Unit", Json(unit).stringify())
       None => ()
     }
     push_field(builder, 2, "Kind", format_instrument_kind(metric.kind))
@@ -620,7 +615,7 @@ pub fn MetricExporter::force_flush(
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk_exporters/stdout/#span-exporter---standard-output
 pub fn SpanExporter::shutdown_with_timeout(
   self : SpanExporter,
-  timeout_millis : Int,
+  timeout_millis : Int32,
 ) -> @error.OTelSdkResult {
   ignore(timeout_millis)
   if self.state.val.is_shutdown {
@@ -636,7 +631,7 @@ pub fn SpanExporter::shutdown_with_timeout(
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/sdk_exporters/stdout/#logs-exporter---standard-output
 pub fn LogExporter::shutdown_with_timeout(
   self : LogExporter,
-  timeout_millis : Int,
+  timeout_millis : Int32,
 ) -> @error.OTelSdkResult {
   ignore(timeout_millis)
   if self.state.val.is_shutdown {
@@ -652,7 +647,7 @@ pub fn LogExporter::shutdown_with_timeout(
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/stdout/#metrics-exporter---standard-output
 pub fn MetricExporter::shutdown_with_timeout(
   self : MetricExporter,
-  timeout_millis : Int,
+  timeout_millis : Int32,
 ) -> @error.OTelSdkResult {
   ignore(timeout_millis)
   if self.state.val.is_shutdown {
@@ -755,7 +750,7 @@ pub fn MetricExporter::into_metric_exporter(
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/stdout/#metrics-exporter---standard-output
 pub fn MetricExporter::into_periodic_reader(
   self : MetricExporter,
-  interval_millis? : Int = -1,
+  interval_millis~ : Int32 = -1,
 ) -> @sdkmetrics.PeriodicMetricReader {
   let builder = @sdkmetrics.PeriodicMetricReader::builder(
     self.into_metric_exporter(),

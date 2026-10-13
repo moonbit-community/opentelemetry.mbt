@@ -117,7 +117,10 @@ fn histogram_sum_u64(
 }
 
 ///|
-fn metric_count(metrics : Array[@metrics.MetricData], name : StringView) -> Int {
+fn metric_count(
+  metrics : Array[@metrics.MetricData],
+  name : StringView,
+) -> Int32 {
   let mut count = 0
   for metric in metrics {
     if metric.name == name.to_owned() {

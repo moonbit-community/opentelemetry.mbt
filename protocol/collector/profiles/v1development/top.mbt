@@ -82,10 +82,10 @@ pub impl @protobuf.Write for ExportProfilesServiceRequest with fn write(
 pub impl ToJson for ExportProfilesServiceRequest with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.resource_profiles != Default::default() {
-    json["resourceProfiles"] = self.resource_profiles.to_json()
+    json["resourceProfiles"] = Json(self.resource_profiles)
   }
   if self.dictionary != Default::default() {
-    json["dictionary"] = self.dictionary.to_json()
+    json["dictionary"] = Json(self.dictionary)
   }
   Json::object(json)
 }
@@ -344,10 +344,10 @@ pub impl @protobuf.Write for ExportProfilesPartialSuccess with fn write(
 pub impl ToJson for ExportProfilesPartialSuccess with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.rejected_profiles != Default::default() {
-    json["rejectedProfiles"] = self.rejected_profiles.to_json()
+    json["rejectedProfiles"] = Json(self.rejected_profiles)
   }
   if self.error_message != Default::default() {
-    json["errorMessage"] = self.error_message.to_json()
+    json["errorMessage"] = Json(self.error_message)
   }
   Json::object(json)
 }

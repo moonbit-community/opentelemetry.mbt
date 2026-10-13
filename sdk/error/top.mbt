@@ -3,7 +3,7 @@
 /// Spec: https://opentelemetry.io/docs/specs/otel/error-handling/#basic-error-handling-principles
 pub(all) enum OTelSdkError {
   AlreadyShutdown
-  Timeout(Int)
+  Timeout(Int32)
   InvalidArgument(String)
   InternalFailure(String)
   ExportFailure(String, String)
@@ -46,7 +46,7 @@ pub fn already_shutdown() -> OTelSdkResult {
 ///|
 /// Convenience helper returning `Timeout`.
 /// Spec: https://opentelemetry.io/docs/specs/otel/error-handling/#basic-error-handling-principles
-pub fn timeout(timeout_millis : Int) -> OTelSdkResult {
+pub fn timeout(timeout_millis : Int32) -> OTelSdkResult {
   Err(Timeout(timeout_millis))
 }
 

@@ -47,6 +47,11 @@ const shadowedBy = new Map([
   ["@protobuf.AsyncWrite", "@protobuf.Write"],
 ]);
 
+// `x.to_json()` on core types is deprecated in favour of `Json(x)`; the
+// constructor works for every `ToJson` type, so rewrite all the calls.
+const toJsonCallPattern =
+  /((?:@[A-Za-z_][\w/]*\.)?[A-Za-z_][\w.]*(?:\([^()\n]*\))?)\.to_json\(\)/g;
+
 if (require.main === module) {
   main();
 }
@@ -376,6 +381,7 @@ function addExplicitExtends(content) {
 
 function rewriteTopMbt(content) {
   return content
+    .replace(toJsonCallPattern, "Json($1)")
     .replaceAll("for {", "for ;; {")
     .replaceAll("DoubleValue(v) => { size += 1U + 8U }", "DoubleValue(_) => { size += 1U + 8U }")
     .replaceAll("AsDouble(v) => { size += 1U + 8U }", "AsDouble(_) => { size += 1U + 8U }")

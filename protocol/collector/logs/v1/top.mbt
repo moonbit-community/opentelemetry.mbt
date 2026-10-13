@@ -63,7 +63,7 @@ pub impl @protobuf.Write for ExportLogsServiceRequest with fn write(
 pub impl ToJson for ExportLogsServiceRequest with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.resource_logs != Default::default() {
-    json["resourceLogs"] = self.resource_logs.to_json()
+    json["resourceLogs"] = Json(self.resource_logs)
   }
   Json::object(json)
 }
@@ -313,10 +313,10 @@ pub impl @protobuf.Write for ExportLogsPartialSuccess with fn write(
 pub impl ToJson for ExportLogsPartialSuccess with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.rejected_log_records != Default::default() {
-    json["rejectedLogRecords"] = self.rejected_log_records.to_json()
+    json["rejectedLogRecords"] = Json(self.rejected_log_records)
   }
   if self.error_message != Default::default() {
-    json["errorMessage"] = self.error_message.to_json()
+    json["errorMessage"] = Json(self.error_message)
   }
   Json::object(json)
 }

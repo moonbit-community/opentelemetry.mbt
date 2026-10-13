@@ -63,7 +63,7 @@ pub impl @protobuf.Write for ExportMetricsServiceRequest with fn write(
 pub impl ToJson for ExportMetricsServiceRequest with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.resource_metrics != Default::default() {
-    json["resourceMetrics"] = self.resource_metrics.to_json()
+    json["resourceMetrics"] = Json(self.resource_metrics)
   }
   Json::object(json)
 }
@@ -314,10 +314,10 @@ pub impl @protobuf.Write for ExportMetricsPartialSuccess with fn write(
 pub impl ToJson for ExportMetricsPartialSuccess with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.rejected_data_points != Default::default() {
-    json["rejectedDataPoints"] = self.rejected_data_points.to_json()
+    json["rejectedDataPoints"] = Json(self.rejected_data_points)
   }
   if self.error_message != Default::default() {
-    json["errorMessage"] = self.error_message.to_json()
+    json["errorMessage"] = Json(self.error_message)
   }
   Json::object(json)
 }

@@ -134,9 +134,9 @@ pub fn[T] get_text_map_propagator(
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#get-a-tracer
 pub fn tracer(
   name : StringView,
-  version? : String? = None,
-  schema_url? : String? = None,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  version~ : String? = None,
+  schema_url~ : String? = None,
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> @trace.Tracer {
   tracer_provider_ref.val.tracer_with_scope(
     build_scope(name, version, schema_url, attributes),
@@ -158,9 +158,9 @@ pub fn tracer_with_scope(scope : @common.InstrumentationScope) -> @trace.Tracer 
 /// Spec: https://opentelemetry.io/docs/specs/otel/logs/api/#get-a-logger
 pub fn logger(
   name : StringView,
-  version? : String? = None,
-  schema_url? : String? = None,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  version~ : String? = None,
+  schema_url~ : String? = None,
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> @logs.Logger {
   logger_provider_ref.val.logger_with_scope(
     build_scope(name, version, schema_url, attributes),
@@ -182,9 +182,9 @@ pub fn logger_with_scope(scope : @common.InstrumentationScope) -> @logs.Logger {
 /// Spec: https://opentelemetry.io/docs/specs/otel/metrics/api/#get-a-meter
 pub fn meter(
   name : StringView,
-  version? : String? = None,
-  schema_url? : String? = None,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  version~ : String? = None,
+  schema_url~ : String? = None,
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> @metrics.Meter {
   meter_provider_ref.val.meter_with_scope(
     build_scope(name, version, schema_url, attributes),

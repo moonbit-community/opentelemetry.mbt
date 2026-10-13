@@ -1,7 +1,7 @@
 ///|
 pub(all) struct Resource {
   mut attributes : Array[@v1_dep.KeyValue]
-  mut dropped_attributes_count : UInt
+  mut dropped_attributes_count : UInt32
   mut entity_refs : Array[@v1_dep.EntityRef]
 } derive(Eq)
 
@@ -32,7 +32,7 @@ pub impl Default for Resource with fn default() -> Resource {
 ///|
 pub fn Resource::new(
   attributes : Array[@v1_dep.KeyValue],
-  dropped_attributes_count : UInt,
+  dropped_attributes_count : UInt32,
   entity_refs : Array[@v1_dep.EntityRef],
 ) -> Resource {
   { attributes, dropped_attributes_count, entity_refs, }
@@ -89,13 +89,13 @@ pub impl @protobuf.Write for Resource with fn write(
 pub impl ToJson for Resource with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.attributes != Default::default() {
-    json["attributes"] = self.attributes.to_json()
+    json["attributes"] = Json(self.attributes)
   }
   if self.dropped_attributes_count != Default::default() {
-    json["droppedAttributesCount"] = self.dropped_attributes_count.to_json()
+    json["droppedAttributesCount"] = Json(self.dropped_attributes_count)
   }
   if self.entity_refs != Default::default() {
-    json["entityRefs"] = self.entity_refs.to_json()
+    json["entityRefs"] = Json(self.entity_refs)
   }
   Json::object(json)
 }

@@ -209,7 +209,7 @@ pub extend TraceState with Default::{default}
 /// Low 8 bits of the W3C trace flags field.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#spancontext
 pub struct TraceFlags {
-  flags : UInt
+  flags : UInt32
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
@@ -230,7 +230,7 @@ pub extend TraceFlags with Debug::{to_repr}
 ///|
 /// Creates trace flags while masking away bits outside the W3C byte.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#spancontext
-pub fn TraceFlags::new(flags : UInt) -> TraceFlags {
+pub fn TraceFlags::new(flags : UInt32) -> TraceFlags {
   { flags: flags & 0xffU, }
 }
 
@@ -359,7 +359,7 @@ fn encode_hex(bytes : Bytes) -> String {
 }
 
 ///|
-fn decode_hex(hex : StringView, expected_len : Int) -> Bytes? {
+fn decode_hex(hex : StringView, expected_len : Int32) -> Bytes? {
   if hex.length() != expected_len * 2 {
     return None
   }
@@ -507,9 +507,9 @@ pub extend SpanContext with Debug::{to_repr}
 pub fn SpanContext::new(
   trace_id : TraceId,
   span_id : SpanId,
-  trace_flags? : TraceFlags = Default::default(),
-  is_remote? : Bool = false,
-  trace_state? : TraceState = Default::default(),
+  trace_flags~ : TraceFlags = Default::default(),
+  is_remote~ : Bool = false,
+  trace_state~ : TraceState = Default::default(),
 ) -> SpanContext {
   { trace_id, span_id, trace_flags, is_remote, trace_state, }
 }

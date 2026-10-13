@@ -131,7 +131,7 @@ pub impl @protobuf.Write for TracesData with fn write(
 pub impl ToJson for TracesData with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.resource_spans != Default::default() {
-    json["resourceSpans"] = self.resource_spans.to_json()
+    json["resourceSpans"] = Json(self.resource_spans)
   }
   Json::object(json)
 }
@@ -280,13 +280,13 @@ pub impl @protobuf.Write for ResourceSpans with fn write(
 pub impl ToJson for ResourceSpans with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.resource != Default::default() {
-    json["resource"] = self.resource.to_json()
+    json["resource"] = Json(self.resource)
   }
   if self.scope_spans != Default::default() {
-    json["scopeSpans"] = self.scope_spans.to_json()
+    json["scopeSpans"] = Json(self.scope_spans)
   }
   if self.schema_url != Default::default() {
-    json["schemaUrl"] = self.schema_url.to_json()
+    json["schemaUrl"] = Json(self.schema_url)
   }
   Json::object(json)
 }
@@ -444,13 +444,13 @@ pub impl @protobuf.Write for ScopeSpans with fn write(
 pub impl ToJson for ScopeSpans with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.scope != Default::default() {
-    json["scope"] = self.scope.to_json()
+    json["scope"] = Json(self.scope)
   }
   if self.spans != Default::default() {
-    json["spans"] = self.spans.to_json()
+    json["spans"] = Json(self.spans)
   }
   if self.schema_url != Default::default() {
-    json["schemaUrl"] = self.schema_url.to_json()
+    json["schemaUrl"] = Json(self.schema_url)
   }
   Json::object(json)
 }
@@ -602,7 +602,7 @@ pub(all) struct Span_Event {
   mut time_unix_nano : UInt64
   mut name : String
   mut attributes : Array[@v1_dep.KeyValue]
-  mut dropped_attributes_count : UInt
+  mut dropped_attributes_count : UInt32
 } derive(Eq)
 
 ///|
@@ -637,7 +637,7 @@ pub fn Span_Event::new(
   time_unix_nano : UInt64,
   name : String,
   attributes : Array[@v1_dep.KeyValue],
-  dropped_attributes_count : UInt,
+  dropped_attributes_count : UInt32,
 ) -> Span_Event {
   { time_unix_nano, name, attributes, dropped_attributes_count, }
 }
@@ -690,16 +690,16 @@ pub impl @protobuf.Write for Span_Event with fn write(
 pub impl ToJson for Span_Event with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.time_unix_nano != Default::default() {
-    json["timeUnixNano"] = self.time_unix_nano.to_json()
+    json["timeUnixNano"] = Json(self.time_unix_nano)
   }
   if self.name != Default::default() {
-    json["name"] = self.name.to_json()
+    json["name"] = Json(self.name)
   }
   if self.attributes != Default::default() {
-    json["attributes"] = self.attributes.to_json()
+    json["attributes"] = Json(self.attributes)
   }
   if self.dropped_attributes_count != Default::default() {
-    json["droppedAttributesCount"] = self.dropped_attributes_count.to_json()
+    json["droppedAttributesCount"] = Json(self.dropped_attributes_count)
   }
   Json::object(json)
 }
@@ -778,8 +778,8 @@ pub(all) struct Span_Link {
   mut span_id : Bytes
   mut trace_state : String
   mut attributes : Array[@v1_dep.KeyValue]
-  mut dropped_attributes_count : UInt
-  mut flags : UInt
+  mut dropped_attributes_count : UInt32
+  mut flags : UInt32
 } derive(Eq)
 
 ///|
@@ -827,8 +827,8 @@ pub fn Span_Link::new(
   span_id : Bytes,
   trace_state : String,
   attributes : Array[@v1_dep.KeyValue],
-  dropped_attributes_count : UInt,
-  flags : UInt,
+  dropped_attributes_count : UInt32,
+  flags : UInt32,
 ) -> Span_Link {
   {
     trace_id,
@@ -894,22 +894,22 @@ pub impl @protobuf.Write for Span_Link with fn write(
 pub impl ToJson for Span_Link with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.trace_id != Default::default() {
-    json["traceId"] = @protobuf.base64_encode(self.trace_id).to_json()
+    json["traceId"] = Json(@protobuf.base64_encode(self.trace_id))
   }
   if self.span_id != Default::default() {
-    json["spanId"] = @protobuf.base64_encode(self.span_id).to_json()
+    json["spanId"] = Json(@protobuf.base64_encode(self.span_id))
   }
   if self.trace_state != Default::default() {
-    json["traceState"] = self.trace_state.to_json()
+    json["traceState"] = Json(self.trace_state)
   }
   if self.attributes != Default::default() {
-    json["attributes"] = self.attributes.to_json()
+    json["attributes"] = Json(self.attributes)
   }
   if self.dropped_attributes_count != Default::default() {
-    json["droppedAttributesCount"] = self.dropped_attributes_count.to_json()
+    json["droppedAttributesCount"] = Json(self.dropped_attributes_count)
   }
   if self.flags != Default::default() {
-    json["flags"] = self.flags.to_json()
+    json["flags"] = Json(self.flags)
   }
   Json::object(json)
 }
@@ -998,17 +998,17 @@ pub(all) struct Span {
   mut span_id : Bytes
   mut trace_state : String
   mut parent_span_id : Bytes
-  mut flags : UInt
+  mut flags : UInt32
   mut name : String
   mut kind : Span_SpanKind
   mut start_time_unix_nano : UInt64
   mut end_time_unix_nano : UInt64
   mut attributes : Array[@v1_dep.KeyValue]
-  mut dropped_attributes_count : UInt
+  mut dropped_attributes_count : UInt32
   mut events : Array[Span_Event]
-  mut dropped_events_count : UInt
+  mut dropped_events_count : UInt32
   mut links : Array[Span_Link]
-  mut dropped_links_count : UInt
+  mut dropped_links_count : UInt32
   mut status : Status
 } derive(Eq)
 
@@ -1095,17 +1095,17 @@ pub fn Span::new(
   span_id : Bytes,
   trace_state : String,
   parent_span_id : Bytes,
-  flags : UInt,
+  flags : UInt32,
   name : String,
   kind : Span_SpanKind,
   start_time_unix_nano : UInt64,
   end_time_unix_nano : UInt64,
   attributes : Array[@v1_dep.KeyValue],
-  dropped_attributes_count : UInt,
+  dropped_attributes_count : UInt32,
   events : Array[Span_Event],
-  dropped_events_count : UInt,
+  dropped_events_count : UInt32,
   links : Array[Span_Link],
-  dropped_links_count : UInt,
+  dropped_links_count : UInt32,
   status : Status,
 ) -> Span {
   {
@@ -1222,49 +1222,49 @@ pub impl @protobuf.Write for Span with fn write(
 pub impl ToJson for Span with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.trace_id != Default::default() {
-    json["traceId"] = @protobuf.base64_encode(self.trace_id).to_json()
+    json["traceId"] = Json(@protobuf.base64_encode(self.trace_id))
   }
   if self.span_id != Default::default() {
-    json["spanId"] = @protobuf.base64_encode(self.span_id).to_json()
+    json["spanId"] = Json(@protobuf.base64_encode(self.span_id))
   }
   if self.trace_state != Default::default() {
-    json["traceState"] = self.trace_state.to_json()
+    json["traceState"] = Json(self.trace_state)
   }
   if self.parent_span_id != Default::default() {
-    json["parentSpanId"] = @protobuf.base64_encode(self.parent_span_id).to_json()
+    json["parentSpanId"] = Json(@protobuf.base64_encode(self.parent_span_id))
   }
   if self.flags != Default::default() {
-    json["flags"] = self.flags.to_json()
+    json["flags"] = Json(self.flags)
   }
   if self.name != Default::default() {
-    json["name"] = self.name.to_json()
+    json["name"] = Json(self.name)
   }
   if self.kind != Default::default() {
     json["kind"] = ToJson::to_json(self.kind)
   }
   if self.start_time_unix_nano != Default::default() {
-    json["startTimeUnixNano"] = self.start_time_unix_nano.to_json()
+    json["startTimeUnixNano"] = Json(self.start_time_unix_nano)
   }
   if self.end_time_unix_nano != Default::default() {
-    json["endTimeUnixNano"] = self.end_time_unix_nano.to_json()
+    json["endTimeUnixNano"] = Json(self.end_time_unix_nano)
   }
   if self.attributes != Default::default() {
-    json["attributes"] = self.attributes.to_json()
+    json["attributes"] = Json(self.attributes)
   }
   if self.dropped_attributes_count != Default::default() {
-    json["droppedAttributesCount"] = self.dropped_attributes_count.to_json()
+    json["droppedAttributesCount"] = Json(self.dropped_attributes_count)
   }
   if self.events != Default::default() {
-    json["events"] = self.events.to_json()
+    json["events"] = Json(self.events)
   }
   if self.dropped_events_count != Default::default() {
-    json["droppedEventsCount"] = self.dropped_events_count.to_json()
+    json["droppedEventsCount"] = Json(self.dropped_events_count)
   }
   if self.links != Default::default() {
-    json["links"] = self.links.to_json()
+    json["links"] = Json(self.links)
   }
   if self.dropped_links_count != Default::default() {
-    json["droppedLinksCount"] = self.dropped_links_count.to_json()
+    json["droppedLinksCount"] = Json(self.dropped_links_count)
   }
   if self.status != Default::default() {
     json["status"] = ToJson::to_json(self.status)
@@ -1545,7 +1545,7 @@ pub impl @protobuf.Write for Status with fn write(
 pub impl ToJson for Status with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.message != Default::default() {
-    json["message"] = self.message.to_json()
+    json["message"] = Json(self.message)
   }
   if self.code != Default::default() {
     json["code"] = ToJson::to_json(self.code)

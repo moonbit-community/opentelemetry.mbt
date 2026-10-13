@@ -76,7 +76,7 @@ pub struct SpanEvent {
   name : String
   timestamp_unix_nano : Int64
   attributes : Array[@common.KeyValue]
-  dropped_attributes_count : Int
+  dropped_attributes_count : Int32
 } derive(Eq, ToJson, Debug)
 
 ///|
@@ -94,7 +94,7 @@ pub extend SpanEvent with Debug::{to_repr}
 pub struct SpanLink {
   span_context : @common.SpanContext
   attributes : Array[@common.KeyValue]
-  dropped_attributes_count : Int
+  dropped_attributes_count : Int32
 } derive(Eq, ToJson, Debug)
 
 ///|
@@ -110,11 +110,11 @@ pub extend SpanLink with Debug::{to_repr}
 /// Per-span limits for attributes, events, and links.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-limits
 pub struct SpanLimits {
-  max_attributes_per_span : Int
-  max_events_per_span : Int
-  max_links_per_span : Int
-  max_attributes_per_event : Int
-  max_attributes_per_link : Int
+  max_attributes_per_span : Int32
+  max_events_per_span : Int32
+  max_links_per_span : Int32
+  max_attributes_per_event : Int32
+  max_attributes_per_link : Int32
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
@@ -227,10 +227,10 @@ pub struct RandomIdGenerator {
 /// Configuration for batch span processing.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#batching-processor
 pub struct BatchConfig {
-  max_queue_size : Int
-  max_export_batch_size : Int
-  scheduled_delay_millis : Int
-  export_timeout_millis : Int
+  max_queue_size : Int32
+  max_export_batch_size : Int32
+  scheduled_delay_millis : Int32
+  export_timeout_millis : Int32
 } derive(Eq, Compare, Hash, ToJson, Debug)
 
 ///|
@@ -272,11 +272,11 @@ pub struct SpanData {
   start_time_unix_nano : Int64
   end_time_unix_nano : Int64?
   attributes : Array[@common.KeyValue]
-  dropped_attributes_count : Int
+  dropped_attributes_count : Int32
   events : Array[SpanEvent]
-  dropped_events_count : Int
+  dropped_events_count : Int32
   links : Array[SpanLink]
-  dropped_links_count : Int
+  dropped_links_count : Int32
   status : Status
   resource : @resource.Resource
   instrumentation_scope : @common.InstrumentationScope
@@ -357,11 +357,11 @@ struct SpanState {
   start_time_unix_nano : Int64
   end_time_unix_nano : Int64?
   attributes : Array[@common.KeyValue]
-  dropped_attributes_count : Int
+  dropped_attributes_count : Int32
   events : Array[SpanEvent]
-  dropped_events_count : Int
+  dropped_events_count : Int32
   links : Array[SpanLink]
-  dropped_links_count : Int
+  dropped_links_count : Int32
   status : Status
   resource : @resource.Resource
   instrumentation_scope : @common.InstrumentationScope
@@ -419,7 +419,7 @@ pub struct SdkTracer {
 ///|
 /// Creates a span status.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#set-status
-pub fn Status::new(code : StatusCode, description? : String? = None) -> Status {
+pub fn Status::new(code : StatusCode, description~ : String? = None) -> Status {
   { code, description, }
 }
 
@@ -440,7 +440,7 @@ pub fn Status::ok() -> Status {
 ///|
 /// Returns an error status with an optional description.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#set-status
-pub fn Status::error(description? : String? = None) -> Status {
+pub fn Status::error(description~ : String? = None) -> Status {
   Status::new(Error, description~)
 }
 
@@ -457,9 +457,9 @@ pub extend Status with Default::{default}
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#add-events
 pub fn SpanEvent::new(
   name : StringView,
-  attributes? : ArrayView[@common.KeyValue] = [],
-  timestamp_unix_nano? : Int64 = @utils.now_unix_nano(),
-  dropped_attributes_count? : Int = 0,
+  attributes~ : ArrayView[@common.KeyValue] = [],
+  timestamp_unix_nano~ : Int64 = @utils.now_unix_nano(),
+  dropped_attributes_count~ : Int32 = 0,
 ) -> SpanEvent {
   {
     name: name.to_owned(),
@@ -474,8 +474,8 @@ pub fn SpanEvent::new(
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#link
 pub fn SpanLink::new(
   span_context : @common.SpanContext,
-  attributes? : ArrayView[@common.KeyValue] = [],
-  dropped_attributes_count? : Int = 0,
+  attributes~ : ArrayView[@common.KeyValue] = [],
+  dropped_attributes_count~ : Int32 = 0,
 ) -> SpanLink {
   { span_context, attributes: attributes.to_owned(), dropped_attributes_count, }
 }
@@ -484,11 +484,11 @@ pub fn SpanLink::new(
 /// Creates bounded span limits.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-limits
 pub fn SpanLimits::new(
-  max_attributes_per_span? : Int = 128,
-  max_events_per_span? : Int = 128,
-  max_links_per_span? : Int = 128,
-  max_attributes_per_event? : Int = 128,
-  max_attributes_per_link? : Int = 128,
+  max_attributes_per_span~ : Int32 = 128,
+  max_events_per_span~ : Int32 = 128,
+  max_links_per_span~ : Int32 = 128,
+  max_attributes_per_event~ : Int32 = 128,
+  max_attributes_per_link~ : Int32 = 128,
 ) -> SpanLimits {
   {
     max_attributes_per_span,
@@ -512,8 +512,8 @@ pub extend SpanLimits with Default::{default}
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#sampling
 pub fn SamplingResult::new(
   decision : SamplingDecision,
-  attributes? : ArrayView[@common.KeyValue] = [],
-  trace_state? : @common.TraceState = Default::default(),
+  attributes~ : ArrayView[@common.KeyValue] = [],
+  trace_state~ : @common.TraceState = Default::default(),
 ) -> SamplingResult {
   { decision, attributes: attributes.to_owned(), trace_state, }
 }
@@ -595,14 +595,14 @@ fn clamp_ratio(ratio : Double) -> Double {
 }
 
 ///|
-fn trace_id_prefix(trace_id : @common.TraceId) -> Int {
+fn trace_id_prefix(trace_id : @common.TraceId) -> Int32 {
   @string.parse_int(trace_id.to_hex()[:8].to_owned(), base=16) catch {
     _ => 0
   }
 }
 
 ///|
-fn parse_env_int(key : StringView) -> Int? {
+fn parse_env_int(key : StringView) -> Int32? {
   match @utils.getenv(key) {
     Some(value) => {
       let value = value.trim()
@@ -663,7 +663,7 @@ fn parse_env_ratio(key : StringView) -> Double? {
 }
 
 ///|
-fn env_or(key : StringView, fallback : Int) -> Int {
+fn env_or(key : StringView, fallback : Int32) -> Int32 {
   match parse_env_int(key) {
     Some(value) => value
     None => fallback
@@ -808,7 +808,7 @@ fn random_hex_16(random : @random.Rand) -> String {
 /// Creates the default random ID generator.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#id-generators
 pub fn RandomIdGenerator::new() -> RandomIdGenerator {
-  let random = Ref(@random.Rand::new())
+  let random = Ref(@random.Rand())
   {
     inner: IdGenerator::new(
       () => {
@@ -842,10 +842,10 @@ pub fn RandomIdGenerator::into_id_generator(
 /// Creates normalized batch processor configuration.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#batching-processor
 pub fn BatchConfig::new(
-  max_queue_size? : Int = 2048,
-  max_export_batch_size? : Int = 512,
-  scheduled_delay_millis? : Int = 5000,
-  export_timeout_millis? : Int = 30000,
+  max_queue_size~ : Int32 = 2048,
+  max_export_batch_size~ : Int32 = 512,
+  scheduled_delay_millis~ : Int32 = 5000,
+  export_timeout_millis~ : Int32 = 30000,
 ) -> BatchConfig {
   let max_queue_size = if max_queue_size <= 0 { 1 } else { max_queue_size }
   let max_export_batch_size = if max_export_batch_size <= 0 {
@@ -893,10 +893,10 @@ pub extend BatchConfig with Default::{default}
 /// resource. Environment variables are applied through `Default`.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#tracer-provider
 pub fn Config::new(
-  sampler? : Sampler = Default::default(),
-  id_generator? : IdGenerator = RandomIdGenerator::new().into_id_generator(),
-  span_limits? : SpanLimits = Default::default(),
-  resource? : @resource.Resource = @resource.Resource::builder().build(),
+  sampler~ : Sampler = Default::default(),
+  id_generator~ : IdGenerator = RandomIdGenerator::new().into_id_generator(),
+  span_limits~ : SpanLimits = Default::default(),
+  resource~ : @resource.Resource = @resource.Resource::builder().build(),
 ) -> Config {
   { sampler, id_generator, span_limits, resource, }
 }
@@ -914,9 +914,9 @@ pub extend Config with Default::{default}
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-exporter
 pub fn SpanExporter::new(
   export_fn : async (ArrayView[SpanData]) -> @error.OTelSdkResult,
-  force_flush_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
-  shutdown_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
-  name_fn? : () -> String = () => "custom",
+  force_flush_fn~ : async () -> @error.OTelSdkResult = () => @error.ok(),
+  shutdown_fn~ : async () -> @error.OTelSdkResult = () => @error.ok(),
+  name_fn~ : () -> String = () => "custom",
 ) -> SpanExporter {
   { export_fn, force_flush_fn, shutdown_fn, name_fn, }
 }
@@ -945,7 +945,7 @@ pub async fn SpanExporter::force_flush(
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#shutdown
 pub async fn SpanExporter::shutdown_with_timeout(
   self : SpanExporter,
-  timeout_millis : Int,
+  timeout_millis : Int32,
 ) -> @error.OTelSdkResult {
   ignore(timeout_millis)
   (self.shutdown_fn)()
@@ -971,10 +971,10 @@ pub fn SpanExporter::name(self : SpanExporter) -> String {
 /// Builds a span processor from callbacks.
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-processor
 pub fn SpanProcessor::new(
-  on_start_fn? : (@context.Context, SpanData) -> Unit = (_, _) => (),
-  on_end_fn? : async (SpanData) -> Unit = _ => (),
-  force_flush_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
-  shutdown_fn? : async () -> @error.OTelSdkResult = () => @error.ok(),
+  on_start_fn~ : (@context.Context, SpanData) -> Unit = (_, _) => (),
+  on_end_fn~ : async (SpanData) -> Unit = _ => (),
+  force_flush_fn~ : async () -> @error.OTelSdkResult = () => @error.ok(),
+  shutdown_fn~ : async () -> @error.OTelSdkResult = () => @error.ok(),
 ) -> SpanProcessor {
   { on_start_fn, on_end_fn, force_flush_fn, shutdown_fn, }
 }
@@ -1014,7 +1014,7 @@ pub async fn SpanProcessor::force_flush(
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-processor
 pub async fn SpanProcessor::shutdown_with_timeout(
   self : SpanProcessor,
-  timeout_millis : Int,
+  timeout_millis : Int32,
 ) -> @error.OTelSdkResult {
   ignore(timeout_millis)
   (self.shutdown_fn)()
@@ -1153,7 +1153,7 @@ async fn flush_span_queue(
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#batching-processor
 pub fn BatchSpanProcessor::new(
   exporter : SpanExporter,
-  config? : BatchConfig = Default::default(),
+  config~ : BatchConfig = Default::default(),
 ) -> BatchSpanProcessor {
   let state : Ref[BatchProcessorState] = Ref({
     exporter,
@@ -1251,8 +1251,8 @@ fn span_data_from_state(state : SpanState) -> SpanData {
 fn[T] push_bounded(
   values : Array[T],
   value : T,
-  limit : Int,
-) -> (Array[T], Int) {
+  limit : Int32,
+) -> (Array[T], Int32) {
   if limit <= 0 {
     return (values, 1)
   }
@@ -1267,9 +1267,9 @@ fn[T] push_bounded(
 ///|
 fn truncate_attributes(
   attributes : ArrayView[@common.KeyValue],
-  limit : Int,
-  dropped_attributes_count? : Int = 0,
-) -> (Array[@common.KeyValue], Int) {
+  limit : Int32,
+  dropped_attributes_count~ : Int32 = 0,
+) -> (Array[@common.KeyValue], Int32) {
   let copied = attributes.to_owned()
   if limit <= 0 {
     return ([], copied.length() + dropped_attributes_count)
@@ -1284,7 +1284,7 @@ fn truncate_attributes(
 }
 
 ///|
-fn status_priority(code : StatusCode) -> Int {
+fn status_priority(code : StatusCode) -> Int32 {
   match code {
     Unset => 0
     Error => 1
@@ -1357,9 +1357,9 @@ pub fn Span::set_attribute(
 pub fn Span::add_event(
   self : Span,
   name : StringView,
-  attributes? : ArrayView[@common.KeyValue] = [],
-  timestamp_unix_nano? : Int64 = @utils.now_unix_nano(),
-  dropped_attributes_count? : Int = 0,
+  attributes~ : ArrayView[@common.KeyValue] = [],
+  timestamp_unix_nano~ : Int64 = @utils.now_unix_nano(),
+  dropped_attributes_count~ : Int32 = 0,
 ) -> Unit {
   if !self.is_recording() {
     return
@@ -1392,8 +1392,8 @@ pub fn Span::add_event(
 pub fn Span::add_link(
   self : Span,
   span_context : @common.SpanContext,
-  attributes? : ArrayView[@common.KeyValue] = [],
-  dropped_attributes_count? : Int = 0,
+  attributes~ : ArrayView[@common.KeyValue] = [],
+  dropped_attributes_count~ : Int32 = 0,
 ) -> Unit {
   if !self.is_recording() {
     return
@@ -1449,7 +1449,7 @@ pub fn Span::snapshot(self : Span) -> SpanData {
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/api/#end
 pub async fn Span::end(
   self : Span,
-  end_time_unix_nano? : Int64 = @utils.now_unix_nano(),
+  end_time_unix_nano~ : Int64 = @utils.now_unix_nano(),
 ) -> Unit {
   if self.state.val.has_ended {
     return
@@ -1570,7 +1570,7 @@ pub fn SdkTracerProviderBuilder::with_simple_exporter(
 pub fn SdkTracerProviderBuilder::with_batch_exporter(
   self : SdkTracerProviderBuilder,
   exporter : SpanExporter,
-  config? : BatchConfig = Default::default(),
+  config~ : BatchConfig = Default::default(),
 ) -> SdkTracerProviderBuilder {
   let batch_processor = BatchSpanProcessor::new(exporter, config~)
   self.batch_processors.push(batch_processor)
@@ -1608,7 +1608,7 @@ pub fn SdkTracerProvider::resource(
 pub fn SdkTracerProvider::spawn_batch_processor_tasks(
   self : SdkTracerProvider,
   group : @async.TaskGroup[Unit],
-  allow_failure? : Bool = false,
+  allow_failure~ : Bool = false,
 ) -> Unit {
   for batch_processor in self.state.val.batch_processors {
     group.spawn_bg(no_wait=true, allow_failure~, () => batch_processor.run())
@@ -1621,9 +1621,9 @@ pub fn SdkTracerProvider::spawn_batch_processor_tasks(
 pub fn SdkTracerProvider::tracer(
   self : SdkTracerProvider,
   name : StringView,
-  version? : String? = None,
-  schema_url? : String? = None,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  version~ : String? = None,
+  schema_url~ : String? = None,
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> SdkTracer {
   let mut scope = @common.InstrumentationScope::builder(name)
   match version {
@@ -1661,7 +1661,7 @@ pub async fn SdkTracerProvider::force_flush(
 /// Spec: https://opentelemetry.io/docs/specs/otel/trace/sdk/#shutdown
 pub async fn SdkTracerProvider::shutdown_with_timeout(
   self : SdkTracerProvider,
-  timeout_millis : Int,
+  timeout_millis : Int32,
 ) -> @error.OTelSdkResult {
   if self.state.val.is_shutdown {
     return @error.already_shutdown()
@@ -1852,11 +1852,11 @@ fn span_state(
 pub fn SdkTracer::start(
   self : SdkTracer,
   name : StringView,
-  parent_context? : @context.Context = Default::default(),
-  kind? : SpanKind = Internal,
-  attributes? : ArrayView[@common.KeyValue] = [],
-  links? : ArrayView[SpanLink] = [],
-  start_time_unix_nano? : Int64 = @utils.now_unix_nano(),
+  parent_context~ : @context.Context = Default::default(),
+  kind~ : SpanKind = Internal,
+  attributes~ : ArrayView[@common.KeyValue] = [],
+  links~ : ArrayView[SpanLink] = [],
+  start_time_unix_nano~ : Int64 = @utils.now_unix_nano(),
 ) -> Span {
   let provider_state = self.provider.state.val
   if provider_state.is_shutdown {

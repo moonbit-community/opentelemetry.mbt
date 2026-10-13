@@ -498,7 +498,7 @@ pub fn MeterProvider::meter_with_scope(
 pub fn[T] Counter::add(
   self : Counter[T],
   value : T,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   (self.add_fn)(value, attributes)
 }
@@ -512,7 +512,7 @@ pub fn[T] Counter::add(
 pub fn[T] UpDownCounter::add(
   self : UpDownCounter[T],
   value : T,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   (self.add_fn)(value, attributes)
 }
@@ -526,7 +526,7 @@ pub fn[T] UpDownCounter::add(
 pub fn[T] Histogram::record(
   self : Histogram[T],
   value : T,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   (self.record_fn)(value, attributes)
 }
@@ -539,7 +539,7 @@ pub fn[T] Histogram::record(
 pub fn[T] Gauge::record(
   self : Gauge[T],
   value : T,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   (self.record_fn)(value, attributes)
 }
@@ -550,7 +550,7 @@ pub fn[T] Gauge::record(
 pub fn[T] ObservableCounter::observe(
   self : ObservableCounter[T],
   value : T,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   (self.observe_fn)(value, attributes)
 }
@@ -561,7 +561,7 @@ pub fn[T] ObservableCounter::observe(
 pub fn[T] ObservableUpDownCounter::observe(
   self : ObservableUpDownCounter[T],
   value : T,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   (self.observe_fn)(value, attributes)
 }
@@ -572,7 +572,7 @@ pub fn[T] ObservableUpDownCounter::observe(
 pub fn[T] ObservableGauge::observe(
   self : ObservableGauge[T],
   value : T,
-  attributes? : ArrayView[@common.KeyValue] = [],
+  attributes~ : ArrayView[@common.KeyValue] = [],
 ) -> Unit {
   (self.observe_fn)(value, attributes)
 }

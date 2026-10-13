@@ -28,7 +28,7 @@ fn sample_scope() -> @common.InstrumentationScope {
 fn sample_span_context(
   trace_id_hex : String,
   span_id_hex : String,
-  is_remote? : Bool = false,
+  is_remote~ : Bool = false,
 ) -> @common.SpanContext {
   let trace_id = match @common.TraceId::from_hex(trace_id_hex) {
     Some(trace_id) => trace_id

@@ -193,7 +193,7 @@ pub impl @protobuf.Write for MetricsData with fn write(
 pub impl ToJson for MetricsData with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.resource_metrics != Default::default() {
-    json["resourceMetrics"] = self.resource_metrics.to_json()
+    json["resourceMetrics"] = Json(self.resource_metrics)
   }
   Json::object(json)
 }
@@ -342,13 +342,13 @@ pub impl @protobuf.Write for ResourceMetrics with fn write(
 pub impl ToJson for ResourceMetrics with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.resource != Default::default() {
-    json["resource"] = self.resource.to_json()
+    json["resource"] = Json(self.resource)
   }
   if self.scope_metrics != Default::default() {
-    json["scopeMetrics"] = self.scope_metrics.to_json()
+    json["scopeMetrics"] = Json(self.scope_metrics)
   }
   if self.schema_url != Default::default() {
-    json["schemaUrl"] = self.schema_url.to_json()
+    json["schemaUrl"] = Json(self.schema_url)
   }
   Json::object(json)
 }
@@ -507,13 +507,13 @@ pub impl @protobuf.Write for ScopeMetrics with fn write(
 pub impl ToJson for ScopeMetrics with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.scope != Default::default() {
-    json["scope"] = self.scope.to_json()
+    json["scope"] = Json(self.scope)
   }
   if self.metrics != Default::default() {
-    json["metrics"] = self.metrics.to_json()
+    json["metrics"] = Json(self.metrics)
   }
   if self.schema_url != Default::default() {
-    json["schemaUrl"] = self.schema_url.to_json()
+    json["schemaUrl"] = Json(self.schema_url)
   }
   Json::object(json)
 }
@@ -725,7 +725,7 @@ pub fn Metric::new(
   description : String,
   unit : String,
   metadata : Array[@v1_dep.KeyValue],
-  data? : Metric_Data = NotSet,
+  data~ : Metric_Data = NotSet,
 ) -> Metric {
   { name, description, unit, metadata, data, }
 }
@@ -816,16 +816,16 @@ pub impl @protobuf.Write for Metric with fn write(
 pub impl ToJson for Metric with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.name != Default::default() {
-    json["name"] = self.name.to_json()
+    json["name"] = Json(self.name)
   }
   if self.description != Default::default() {
-    json["description"] = self.description.to_json()
+    json["description"] = Json(self.description)
   }
   if self.unit != Default::default() {
-    json["unit"] = self.unit.to_json()
+    json["unit"] = Json(self.unit)
   }
   if self.metadata != Default::default() {
-    json["metadata"] = self.metadata.to_json()
+    json["metadata"] = Json(self.metadata)
   }
   match self.data {
     NotSet => ()
@@ -1015,7 +1015,7 @@ pub impl @protobuf.Write for Gauge with fn write(
 pub impl ToJson for Gauge with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.data_points != Default::default() {
-    json["dataPoints"] = self.data_points.to_json()
+    json["dataPoints"] = Json(self.data_points)
   }
   Json::object(json)
 }
@@ -1157,7 +1157,7 @@ pub impl @protobuf.Write for Sum with fn write(
 pub impl ToJson for Sum with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.data_points != Default::default() {
-    json["dataPoints"] = self.data_points.to_json()
+    json["dataPoints"] = Json(self.data_points)
   }
   if self.aggregation_temporality != Default::default() {
     json["aggregationTemporality"] = ToJson::to_json(
@@ -1165,7 +1165,7 @@ pub impl ToJson for Sum with fn to_json(self) {
     )
   }
   if self.is_monotonic != Default::default() {
-    json["isMonotonic"] = self.is_monotonic.to_json()
+    json["isMonotonic"] = Json(self.is_monotonic)
   }
   Json::object(json)
 }
@@ -1310,7 +1310,7 @@ pub impl @protobuf.Write for Histogram with fn write(
 pub impl ToJson for Histogram with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.data_points != Default::default() {
-    json["dataPoints"] = self.data_points.to_json()
+    json["dataPoints"] = Json(self.data_points)
   }
   if self.aggregation_temporality != Default::default() {
     json["aggregationTemporality"] = ToJson::to_json(
@@ -1455,7 +1455,7 @@ pub impl @protobuf.Write for ExponentialHistogram with fn write(
 pub impl ToJson for ExponentialHistogram with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.data_points != Default::default() {
-    json["dataPoints"] = self.data_points.to_json()
+    json["dataPoints"] = Json(self.data_points)
   }
   if self.aggregation_temporality != Default::default() {
     json["aggregationTemporality"] = ToJson::to_json(
@@ -1591,7 +1591,7 @@ pub impl @protobuf.Write for Summary with fn write(
 pub impl ToJson for Summary with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.data_points != Default::default() {
-    json["dataPoints"] = self.data_points.to_json()
+    json["dataPoints"] = Json(self.data_points)
   }
   Json::object(json)
 }
@@ -1655,7 +1655,7 @@ pub(all) struct NumberDataPoint {
   mut start_time_unix_nano : UInt64
   mut time_unix_nano : UInt64
   mut exemplars : Array[Exemplar]
-  mut flags : UInt
+  mut flags : UInt32
   mut value : NumberDataPoint_Value
 } derive(Eq)
 
@@ -1694,8 +1694,8 @@ pub impl ToJson for NumberDataPoint_Value with fn to_json(
   self : NumberDataPoint_Value,
 ) -> Json {
   match self {
-    AsDouble(v) => v.to_json()
-    AsInt(v) => v.to_json()
+    AsDouble(v) => Json(v)
+    AsInt(v) => Json(v)
     NotSet => Json::null()
   }
 }
@@ -1740,8 +1740,8 @@ pub fn NumberDataPoint::new(
   start_time_unix_nano : UInt64,
   time_unix_nano : UInt64,
   exemplars : Array[Exemplar],
-  flags : UInt,
-  value? : NumberDataPoint_Value = NotSet,
+  flags : UInt32,
+  value~ : NumberDataPoint_Value = NotSet,
 ) -> NumberDataPoint {
   { attributes, start_time_unix_nano, time_unix_nano, exemplars, flags, value, }
 }
@@ -1813,24 +1813,24 @@ pub impl @protobuf.Write for NumberDataPoint with fn write(
 pub impl ToJson for NumberDataPoint with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.attributes != Default::default() {
-    json["attributes"] = self.attributes.to_json()
+    json["attributes"] = Json(self.attributes)
   }
   if self.start_time_unix_nano != Default::default() {
-    json["startTimeUnixNano"] = self.start_time_unix_nano.to_json()
+    json["startTimeUnixNano"] = Json(self.start_time_unix_nano)
   }
   if self.time_unix_nano != Default::default() {
-    json["timeUnixNano"] = self.time_unix_nano.to_json()
+    json["timeUnixNano"] = Json(self.time_unix_nano)
   }
   if self.exemplars != Default::default() {
-    json["exemplars"] = self.exemplars.to_json()
+    json["exemplars"] = Json(self.exemplars)
   }
   if self.flags != Default::default() {
-    json["flags"] = self.flags.to_json()
+    json["flags"] = Json(self.flags)
   }
   match self.value {
     NotSet => ()
-    AsDouble(v) => json["asDouble"] = v.to_json()
-    AsInt(v) => json["asInt"] = v.to_json()
+    AsDouble(v) => json["asDouble"] = Json(v)
+    AsInt(v) => json["asInt"] = Json(v)
   }
   Json::object(json)
 }
@@ -1940,7 +1940,7 @@ pub(all) struct HistogramDataPoint {
   mut bucket_counts : Array[UInt64]
   mut explicit_bounds : Array[Double]
   mut exemplars : Array[Exemplar]
-  mut flags : UInt
+  mut flags : UInt32
   mut min : Double?
   mut max : Double?
 } derive(Eq)
@@ -2009,7 +2009,7 @@ pub fn HistogramDataPoint::new(
   bucket_counts : Array[UInt64],
   explicit_bounds : Array[Double],
   exemplars : Array[Exemplar],
-  flags : UInt,
+  flags : UInt32,
   min? : Double,
   max? : Double,
 ) -> HistogramDataPoint {
@@ -2120,39 +2120,39 @@ pub impl @protobuf.Write for HistogramDataPoint with fn write(
 pub impl ToJson for HistogramDataPoint with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.attributes != Default::default() {
-    json["attributes"] = self.attributes.to_json()
+    json["attributes"] = Json(self.attributes)
   }
   if self.start_time_unix_nano != Default::default() {
-    json["startTimeUnixNano"] = self.start_time_unix_nano.to_json()
+    json["startTimeUnixNano"] = Json(self.start_time_unix_nano)
   }
   if self.time_unix_nano != Default::default() {
-    json["timeUnixNano"] = self.time_unix_nano.to_json()
+    json["timeUnixNano"] = Json(self.time_unix_nano)
   }
   if self.count != Default::default() {
-    json["count"] = self.count.to_json()
+    json["count"] = Json(self.count)
   }
   match self.sum {
-    Some(v) => json["sum"] = v.to_json()
+    Some(v) => json["sum"] = Json(v)
     _ => ()
   }
   if self.bucket_counts != Default::default() {
-    json["bucketCounts"] = self.bucket_counts.to_json()
+    json["bucketCounts"] = Json(self.bucket_counts)
   }
   if self.explicit_bounds != Default::default() {
-    json["explicitBounds"] = self.explicit_bounds.to_json()
+    json["explicitBounds"] = Json(self.explicit_bounds)
   }
   if self.exemplars != Default::default() {
-    json["exemplars"] = self.exemplars.to_json()
+    json["exemplars"] = Json(self.exemplars)
   }
   if self.flags != Default::default() {
-    json["flags"] = self.flags.to_json()
+    json["flags"] = Json(self.flags)
   }
   match self.min {
-    Some(v) => json["min"] = v.to_json()
+    Some(v) => json["min"] = Json(v)
     _ => ()
   }
   match self.max {
-    Some(v) => json["max"] = v.to_json()
+    Some(v) => json["max"] = Json(v)
     _ => ()
   }
   Json::object(json)
@@ -2290,7 +2290,7 @@ pub impl @protobuf.AsyncWrite for HistogramDataPoint with fn write(
 
 ///|
 pub(all) struct ExponentialHistogramDataPoint_Buckets {
-  mut offset : Int
+  mut offset : Int32
   mut bucket_counts : Array[UInt64]
 } derive(Eq)
 
@@ -2305,7 +2305,7 @@ pub impl @protobuf.Sized for ExponentialHistogramDataPoint_Buckets with fn size_
       let size = self.bucket_counts
         .iter()
         .map(@protobuf.size_of)
-        .fold(init=0U, UInt::add)
+        .fold(init=0U, UInt32::add)
       @protobuf.size_of(size) + size
     })
   size
@@ -2318,7 +2318,7 @@ pub impl Default for ExponentialHistogramDataPoint_Buckets with fn default() -> 
 
 ///|
 pub fn ExponentialHistogramDataPoint_Buckets::new(
-  offset : Int,
+  offset : Int32,
   bucket_counts : Array[UInt64],
 ) -> ExponentialHistogramDataPoint_Buckets {
   { offset, bucket_counts, }
@@ -2358,7 +2358,7 @@ pub impl @protobuf.Write for ExponentialHistogramDataPoint_Buckets with fn write
   let size = self.bucket_counts
     .iter()
     .map(@protobuf.size_of)
-    .fold(init=0U, UInt::add)
+    .fold(init=0U, UInt32::add)
   writer |> @protobuf.write_uint32(size)
   for item in self.bucket_counts {
     writer |> @protobuf.write_uint64(item)
@@ -2369,10 +2369,10 @@ pub impl @protobuf.Write for ExponentialHistogramDataPoint_Buckets with fn write
 pub impl ToJson for ExponentialHistogramDataPoint_Buckets with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.offset != Default::default() {
-    json["offset"] = self.offset.to_json()
+    json["offset"] = Json(self.offset)
   }
   if self.bucket_counts != Default::default() {
-    json["bucketCounts"] = self.bucket_counts.to_json()
+    json["bucketCounts"] = Json(self.bucket_counts)
   }
   Json::object(json)
 }
@@ -2434,7 +2434,7 @@ pub impl @protobuf.AsyncWrite for ExponentialHistogramDataPoint_Buckets with fn 
   let size = self.bucket_counts
     .iter()
     .map(@protobuf.size_of)
-    .fold(init=0U, UInt::add)
+    .fold(init=0U, UInt32::add)
   writer |> @protobuf.async_write_uint32(size)
   for item in self.bucket_counts {
     writer |> @protobuf.async_write_uint64(item)
@@ -2448,11 +2448,11 @@ pub(all) struct ExponentialHistogramDataPoint {
   mut time_unix_nano : UInt64
   mut count : UInt64
   mut sum : Double?
-  mut scale : Int
+  mut scale : Int32
   mut zero_count : UInt64
   mut positive : ExponentialHistogramDataPoint_Buckets
   mut negative : ExponentialHistogramDataPoint_Buckets
-  mut flags : UInt
+  mut flags : UInt32
   mut exemplars : Array[Exemplar]
   mut min : Double?
   mut max : Double?
@@ -2526,11 +2526,11 @@ pub fn ExponentialHistogramDataPoint::new(
   time_unix_nano : UInt64,
   count : UInt64,
   sum? : Double,
-  scale : Int,
+  scale : Int32,
   zero_count : UInt64,
   positive : ExponentialHistogramDataPoint_Buckets,
   negative : ExponentialHistogramDataPoint_Buckets,
-  flags : UInt,
+  flags : UInt32,
   exemplars : Array[Exemplar],
   min? : Double,
   max? : Double,
@@ -2649,26 +2649,26 @@ pub impl @protobuf.Write for ExponentialHistogramDataPoint with fn write(
 pub impl ToJson for ExponentialHistogramDataPoint with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.attributes != Default::default() {
-    json["attributes"] = self.attributes.to_json()
+    json["attributes"] = Json(self.attributes)
   }
   if self.start_time_unix_nano != Default::default() {
-    json["startTimeUnixNano"] = self.start_time_unix_nano.to_json()
+    json["startTimeUnixNano"] = Json(self.start_time_unix_nano)
   }
   if self.time_unix_nano != Default::default() {
-    json["timeUnixNano"] = self.time_unix_nano.to_json()
+    json["timeUnixNano"] = Json(self.time_unix_nano)
   }
   if self.count != Default::default() {
-    json["count"] = self.count.to_json()
+    json["count"] = Json(self.count)
   }
   match self.sum {
-    Some(v) => json["sum"] = v.to_json()
+    Some(v) => json["sum"] = Json(v)
     _ => ()
   }
   if self.scale != Default::default() {
-    json["scale"] = self.scale.to_json()
+    json["scale"] = Json(self.scale)
   }
   if self.zero_count != Default::default() {
-    json["zeroCount"] = self.zero_count.to_json()
+    json["zeroCount"] = Json(self.zero_count)
   }
   if self.positive != Default::default() {
     json["positive"] = ToJson::to_json(self.positive)
@@ -2677,21 +2677,21 @@ pub impl ToJson for ExponentialHistogramDataPoint with fn to_json(self) {
     json["negative"] = ToJson::to_json(self.negative)
   }
   if self.flags != Default::default() {
-    json["flags"] = self.flags.to_json()
+    json["flags"] = Json(self.flags)
   }
   if self.exemplars != Default::default() {
-    json["exemplars"] = self.exemplars.to_json()
+    json["exemplars"] = Json(self.exemplars)
   }
   match self.min {
-    Some(v) => json["min"] = v.to_json()
+    Some(v) => json["min"] = Json(v)
     _ => ()
   }
   match self.max {
-    Some(v) => json["max"] = v.to_json()
+    Some(v) => json["max"] = Json(v)
     _ => ()
   }
   if self.zero_threshold != Default::default() {
-    json["zeroThreshold"] = self.zero_threshold.to_json()
+    json["zeroThreshold"] = Json(self.zero_threshold)
   }
   Json::object(json)
 }
@@ -2892,10 +2892,10 @@ pub impl @protobuf.Write for SummaryDataPoint_ValueAtQuantile with fn write(
 pub impl ToJson for SummaryDataPoint_ValueAtQuantile with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.quantile != Default::default() {
-    json["quantile"] = self.quantile.to_json()
+    json["quantile"] = Json(self.quantile)
   }
   if self.value != Default::default() {
-    json["value"] = self.value.to_json()
+    json["value"] = Json(self.value)
   }
   Json::object(json)
 }
@@ -2960,7 +2960,7 @@ pub(all) struct SummaryDataPoint {
   mut count : UInt64
   mut sum : Double
   mut quantile_values : Array[SummaryDataPoint_ValueAtQuantile]
-  mut flags : UInt
+  mut flags : UInt32
 } derive(Eq)
 
 ///|
@@ -3003,7 +3003,7 @@ pub fn SummaryDataPoint::new(
   count : UInt64,
   sum : Double,
   quantile_values : Array[SummaryDataPoint_ValueAtQuantile],
-  flags : UInt,
+  flags : UInt32,
 ) -> SummaryDataPoint {
   {
     attributes,
@@ -3080,25 +3080,25 @@ pub impl @protobuf.Write for SummaryDataPoint with fn write(
 pub impl ToJson for SummaryDataPoint with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.attributes != Default::default() {
-    json["attributes"] = self.attributes.to_json()
+    json["attributes"] = Json(self.attributes)
   }
   if self.start_time_unix_nano != Default::default() {
-    json["startTimeUnixNano"] = self.start_time_unix_nano.to_json()
+    json["startTimeUnixNano"] = Json(self.start_time_unix_nano)
   }
   if self.time_unix_nano != Default::default() {
-    json["timeUnixNano"] = self.time_unix_nano.to_json()
+    json["timeUnixNano"] = Json(self.time_unix_nano)
   }
   if self.count != Default::default() {
-    json["count"] = self.count.to_json()
+    json["count"] = Json(self.count)
   }
   if self.sum != Default::default() {
-    json["sum"] = self.sum.to_json()
+    json["sum"] = Json(self.sum)
   }
   if self.quantile_values != Default::default() {
-    json["quantileValues"] = self.quantile_values.to_json()
+    json["quantileValues"] = Json(self.quantile_values)
   }
   if self.flags != Default::default() {
-    json["flags"] = self.flags.to_json()
+    json["flags"] = Json(self.flags)
   }
   Json::object(json)
 }
@@ -3234,8 +3234,8 @@ pub impl @json.FromJson for Exemplar_Value with fn from_json(
 ///|
 pub impl ToJson for Exemplar_Value with fn to_json(self : Exemplar_Value) -> Json {
   match self {
-    AsDouble(v) => v.to_json()
-    AsInt(v) => v.to_json()
+    AsDouble(v) => Json(v)
+    AsInt(v) => Json(v)
     NotSet => Json::null()
   }
 }
@@ -3283,7 +3283,7 @@ pub fn Exemplar::new(
   time_unix_nano : UInt64,
   span_id : Bytes,
   trace_id : Bytes,
-  value? : Exemplar_Value = NotSet,
+  value~ : Exemplar_Value = NotSet,
 ) -> Exemplar {
   { filtered_attributes, time_unix_nano, span_id, trace_id, value, }
 }
@@ -3348,21 +3348,21 @@ pub impl @protobuf.Write for Exemplar with fn write(
 pub impl ToJson for Exemplar with fn to_json(self) {
   let json : Map[String, Json] = Map([])
   if self.filtered_attributes != Default::default() {
-    json["filteredAttributes"] = self.filtered_attributes.to_json()
+    json["filteredAttributes"] = Json(self.filtered_attributes)
   }
   if self.time_unix_nano != Default::default() {
-    json["timeUnixNano"] = self.time_unix_nano.to_json()
+    json["timeUnixNano"] = Json(self.time_unix_nano)
   }
   if self.span_id != Default::default() {
-    json["spanId"] = @protobuf.base64_encode(self.span_id).to_json()
+    json["spanId"] = Json(@protobuf.base64_encode(self.span_id))
   }
   if self.trace_id != Default::default() {
-    json["traceId"] = @protobuf.base64_encode(self.trace_id).to_json()
+    json["traceId"] = Json(@protobuf.base64_encode(self.trace_id))
   }
   match self.value {
     NotSet => ()
-    AsDouble(v) => json["asDouble"] = v.to_json()
-    AsInt(v) => json["asInt"] = v.to_json()
+    AsDouble(v) => json["asDouble"] = Json(v)
+    AsInt(v) => json["asInt"] = Json(v)
   }
   Json::object(json)
 }
