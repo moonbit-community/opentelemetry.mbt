@@ -381,6 +381,13 @@ function addExplicitExtends(content) {
 
 function rewriteTopMbt(content) {
   return content
+    // protobuf 0.1.3 makes Base64 decoding fallible. Keep FromJson's
+    // JsonDecodeError contract, including the field path, and skip calls
+    // that already have an error handler so post-processing is idempotent.
+    .replace(
+      /@protobuf\.base64_decode\(value\)(?!\s*catch\b)/g,
+      '@protobuf.base64_decode(value) catch {\n          _ => raise JsonDecodeError((path.add_key(key), "Invalid base64"))\n        }',
+    )
     .replace(toJsonCallPattern, "Json($1)")
     .replaceAll("for {", "for ;; {")
     .replaceAll("DoubleValue(v) => { size += 1U + 8U }", "DoubleValue(_) => { size += 1U + 8U }")
@@ -430,5 +437,6 @@ module.exports = {
   addExplicitExtends,
   loadProtoManifest,
   parseModuleName,
+  postprocessTopMbt,
   readModuleName,
 };

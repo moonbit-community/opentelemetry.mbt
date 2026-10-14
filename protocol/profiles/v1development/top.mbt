@@ -1023,13 +1023,17 @@ pub impl @json.FromJson for Profile with fn from_json(
         message.period_type = @json.from_json(value, path~)
       ("period", value) => message.period = @json.from_json(value, path~)
       ("profileId", String(value)) =>
-        message.profile_id = @protobuf.base64_decode(value)
+        message.profile_id = @protobuf.base64_decode(value) catch {
+          _ => raise JsonDecodeError((path.add_key(key), "Invalid base64"))
+        }
       ("droppedAttributesCount", value) =>
         message.dropped_attributes_count = @json.from_json(value, path~)
       ("originalPayloadFormat", value) =>
         message.original_payload_format = @json.from_json(value, path~)
       ("originalPayload", String(value)) =>
-        message.original_payload = @protobuf.base64_decode(value)
+        message.original_payload = @protobuf.base64_decode(value) catch {
+          _ => raise JsonDecodeError((path.add_key(key), "Invalid base64"))
+        }
       ("attributeIndices", Array(value)) =>
         message.attribute_indices = value.map(v => @json.from_json(v, path~))
       (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
@@ -1206,9 +1210,13 @@ pub impl @json.FromJson for Link with fn from_json(
   for key, value in obj {
     match (key, value) {
       ("traceId", String(value)) =>
-        message.trace_id = @protobuf.base64_decode(value)
+        message.trace_id = @protobuf.base64_decode(value) catch {
+          _ => raise JsonDecodeError((path.add_key(key), "Invalid base64"))
+        }
       ("spanId", String(value)) =>
-        message.span_id = @protobuf.base64_decode(value)
+        message.span_id = @protobuf.base64_decode(value) catch {
+          _ => raise JsonDecodeError((path.add_key(key), "Invalid base64"))
+        }
       (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }
   }

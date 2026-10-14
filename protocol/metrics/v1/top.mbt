@@ -3383,9 +3383,13 @@ pub impl @json.FromJson for Exemplar with fn from_json(
       ("timeUnixNano", value) =>
         message.time_unix_nano = @json.from_json(value, path~)
       ("spanId", String(value)) =>
-        message.span_id = @protobuf.base64_decode(value)
+        message.span_id = @protobuf.base64_decode(value) catch {
+          _ => raise JsonDecodeError((path.add_key(key), "Invalid base64"))
+        }
       ("traceId", String(value)) =>
-        message.trace_id = @protobuf.base64_decode(value)
+        message.trace_id = @protobuf.base64_decode(value) catch {
+          _ => raise JsonDecodeError((path.add_key(key), "Invalid base64"))
+        }
       ("asDouble", value) => message.value = @json.from_json(value, path~)
       ("asInt", value) => message.value = @json.from_json(value, path~)
       (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
