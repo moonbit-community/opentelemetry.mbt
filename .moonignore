@@ -1,0 +1,10 @@
+# Keep the existing packaging exclusions from .gitignore.
+.DS_Store
+_build/
+.mooncakes/
+.moonagent/
+protoc-gen-mbt.exe
+.codex
+
+# Collector-backed integration tests are a separate module.
+/integration/
