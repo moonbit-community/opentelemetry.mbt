@@ -939,9 +939,13 @@ pub impl @json.FromJson for LogRecord with fn from_json(
         message.dropped_attributes_count = @json.from_json(value, path~)
       ("flags", value) => message.flags = @json.from_json(value, path~)
       ("traceId", String(value)) =>
-        message.trace_id = @protobuf.base64_decode(value)
+        message.trace_id = @protobuf.base64_decode(value) catch {
+          _ => raise JsonDecodeError((path.add_key(key), "Invalid base64"))
+        }
       ("spanId", String(value)) =>
-        message.span_id = @protobuf.base64_decode(value)
+        message.span_id = @protobuf.base64_decode(value) catch {
+          _ => raise JsonDecodeError((path.add_key(key), "Invalid base64"))
+        }
       ("eventName", value) => message.event_name = @json.from_json(value, path~)
       (key, _) => raise JsonDecodeError((path, "Unknown field " + key))
     }

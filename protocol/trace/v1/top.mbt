@@ -926,9 +926,13 @@ pub impl @json.FromJson for Span_Link with fn from_json(
   for key, value in obj {
     match (key, value) {
       ("traceId", String(value)) =>
-        message.trace_id = @protobuf.base64_decode(value)
+        message.trace_id = @protobuf.base64_decode(value) catch {
+          _ => raise JsonDecodeError((path.add_key(key), "Invalid base64"))
+        }
       ("spanId", String(value)) =>
-        message.span_id = @protobuf.base64_decode(value)
+        message.span_id = @protobuf.base64_decode(value) catch {
+          _ => raise JsonDecodeError((path.add_key(key), "Invalid base64"))
+        }
       ("traceState", value) =>
         message.trace_state = @json.from_json(value, path~)
       ("attributes", Array(value)) =>
@@ -1284,13 +1288,19 @@ pub impl @json.FromJson for Span with fn from_json(
   for key, value in obj {
     match (key, value) {
       ("traceId", String(value)) =>
-        message.trace_id = @protobuf.base64_decode(value)
+        message.trace_id = @protobuf.base64_decode(value) catch {
+          _ => raise JsonDecodeError((path.add_key(key), "Invalid base64"))
+        }
       ("spanId", String(value)) =>
-        message.span_id = @protobuf.base64_decode(value)
+        message.span_id = @protobuf.base64_decode(value) catch {
+          _ => raise JsonDecodeError((path.add_key(key), "Invalid base64"))
+        }
       ("traceState", value) =>
         message.trace_state = @json.from_json(value, path~)
       ("parentSpanId", String(value)) =>
-        message.parent_span_id = @protobuf.base64_decode(value)
+        message.parent_span_id = @protobuf.base64_decode(value) catch {
+          _ => raise JsonDecodeError((path.add_key(key), "Invalid base64"))
+        }
       ("flags", value) => message.flags = @json.from_json(value, path~)
       ("name", value) => message.name = @json.from_json(value, path~)
       ("kind", value) => message.kind = @json.from_json(value, path~)

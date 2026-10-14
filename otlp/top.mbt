@@ -1113,7 +1113,9 @@ fn[T : @protobuf.Write] encode_protobuf(message : T) -> Result[Bytes, String] {
 
 ///|
 fn encode_trace_id_json(value : String) -> Json {
-  let bytes = @protobuf.base64_decode(value)
+  let bytes = @protobuf.base64_decode(value) catch {
+    _ => return Json::string(value)
+  }
   match @common.TraceId::from_bytes(bytes) {
     Some(trace_id) => Json::string(trace_id.to_hex())
     None => Json::string(value)
@@ -1125,7 +1127,9 @@ fn encode_span_id_json(value : String, allow_empty : Bool) -> Json {
   if allow_empty && value == "" {
     return Json::string("")
   }
-  let bytes = @protobuf.base64_decode(value)
+  let bytes = @protobuf.base64_decode(value) catch {
+    _ => return Json::string(value)
+  }
   match @common.SpanId::from_bytes(bytes) {
     Some(span_id) => Json::string(span_id.to_hex())
     None => Json::string(value)

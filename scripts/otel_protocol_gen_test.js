@@ -89,3 +89,22 @@ test("generator declares trait method promotion explicitly", () => {
   assert.equal(output.includes("@protobuf.AsyncRead::"), false);
   assert.equal(generator.addExplicitExtends(output), output);
 });
+
+test("generator handles fallible Base64 decoding without duplicate handlers", () => {
+  const { postprocessTopMbt } = require(generatorPath);
+  const source = [
+    '      ("traceId", String(value)) =>',
+    "        message.trace_id = @protobuf.base64_decode(value)",
+    '      ("spanId", String(value)) =>',
+    "        message.span_id = @protobuf.base64_decode(value) catch {",
+    '          _ => raise @json.JsonDecodeError((path.add_key(key), "Existing handler"))',
+    "        }",
+    "",
+  ].join("\n");
+  const output = postprocessTopMbt(source);
+
+  assert.equal((output.match(/base64_decode\(value\) catch/g) ?? []).length, 2);
+  assert.ok(output.includes('path.add_key(key), "Invalid base64"'));
+  assert.ok(output.includes('path.add_key(key), "Existing handler"'));
+  assert.equal(postprocessTopMbt(output), output);
+});
