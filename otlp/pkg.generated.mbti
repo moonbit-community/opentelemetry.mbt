@@ -47,7 +47,7 @@ pub const OTEL_EXPORTER_OTLP_PROTOCOL_HTTP_PROTOBUF : String = "http/protobuf"
 
 pub const OTEL_EXPORTER_OTLP_TIMEOUT : String = "OTEL_EXPORTER_OTLP_TIMEOUT"
 
-pub const OTEL_EXPORTER_OTLP_TIMEOUT_DEFAULT : Int = 10000
+pub const OTEL_EXPORTER_OTLP_TIMEOUT_DEFAULT : Int32 = 10000
 
 pub const OTEL_EXPORTER_OTLP_TRACES_COMPRESSION : String = "OTEL_EXPORTER_OTLP_TRACES_COMPRESSION"
 
@@ -64,9 +64,9 @@ pub(all) enum Compression {
   Gzip
   Zstd
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
-pub fn Compression::compare(Self, Self) -> Int
+pub fn Compression::compare(Self, Self) -> Int32
 pub fn Compression::equal(Self, Self) -> Bool
-pub fn Compression::hash(Self) -> Int
+pub fn Compression::hash(Self) -> Int32
 pub fn Compression::hash_combine(Self, Hasher) -> Unit
 pub fn Compression::not_equal(Self, Self) -> Bool
 pub fn Compression::op_ge(Self, Self) -> Bool
@@ -81,9 +81,9 @@ pub(all) enum ExporterBuildError {
   UnsupportedProtocol(String)
   UnsupportedCompressionAlgorithm(String)
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
-pub fn ExporterBuildError::compare(Self, Self) -> Int
+pub fn ExporterBuildError::compare(Self, Self) -> Int32
 pub fn ExporterBuildError::equal(Self, Self) -> Bool
-pub fn ExporterBuildError::hash(Self) -> Int
+pub fn ExporterBuildError::hash(Self) -> Int32
 pub fn ExporterBuildError::hash_combine(Self, Hasher) -> Unit
 pub fn ExporterBuildError::not_equal(Self, Self) -> Bool
 pub fn ExporterBuildError::op_ge(Self, Self) -> Bool
@@ -104,12 +104,12 @@ pub fn LogExporter::into_log_exporter(Self) -> @logs.LogExporter
 pub fn LogExporter::name(Self) -> String
 pub fn LogExporter::new() -> Result[Self, ExporterBuildError]
 pub async fn LogExporter::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
-pub async fn LogExporter::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub async fn LogExporter::shutdown_with_timeout(Self, Int32) -> Result[Unit, @error.OTelSdkError]
 
 pub struct LogExporterBuilder {
   mut endpoint : String?
   mut protocol : Protocol?
-  mut timeout_millis : Int?
+  mut timeout_millis : Int32?
   mut headers : Map[String, String]
   mut compression : Compression?
 }
@@ -119,7 +119,7 @@ pub fn LogExporterBuilder::with_endpoint(Self, StringView) -> Self
 pub fn LogExporterBuilder::with_headers(Self, Map[String, String]) -> Self
 pub fn LogExporterBuilder::with_http(Self) -> Self
 pub fn LogExporterBuilder::with_protocol(Self, Protocol) -> Self
-pub fn LogExporterBuilder::with_timeout(Self, Int) -> Self
+pub fn LogExporterBuilder::with_timeout(Self, Int32) -> Self
 
 pub struct MetricExporter {
   state : @ref.Ref[SignalExporterState]
@@ -130,17 +130,17 @@ pub fn MetricExporter::builder() -> MetricExporterBuilder
 pub async fn MetricExporter::export_batch(Self, ArrayView[@metrics.MetricData]) -> Result[Unit, @error.OTelSdkError]
 pub async fn MetricExporter::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
 pub fn MetricExporter::into_metric_exporter(Self) -> @metrics.MetricExporter
-pub fn MetricExporter::into_periodic_reader(Self, interval_millis? : Int) -> @metrics.PeriodicMetricReader
+pub fn MetricExporter::into_periodic_reader(Self, interval_millis? : Int32) -> @metrics.PeriodicMetricReader
 pub fn MetricExporter::name(Self) -> String
 pub fn MetricExporter::new() -> Result[Self, ExporterBuildError]
 pub async fn MetricExporter::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
-pub async fn MetricExporter::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub async fn MetricExporter::shutdown_with_timeout(Self, Int32) -> Result[Unit, @error.OTelSdkError]
 pub fn MetricExporter::temporality(Self) -> @metrics.Temporality
 
 pub struct MetricExporterBuilder {
   mut endpoint : String?
   mut protocol : Protocol?
-  mut timeout_millis : Int?
+  mut timeout_millis : Int32?
   mut headers : Map[String, String]
   mut compression : Compression?
   mut temporality : @metrics.Temporality?
@@ -152,17 +152,17 @@ pub fn MetricExporterBuilder::with_headers(Self, Map[String, String]) -> Self
 pub fn MetricExporterBuilder::with_http(Self) -> Self
 pub fn MetricExporterBuilder::with_protocol(Self, Protocol) -> Self
 pub fn MetricExporterBuilder::with_temporality(Self, @metrics.Temporality) -> Self
-pub fn MetricExporterBuilder::with_timeout(Self, Int) -> Self
+pub fn MetricExporterBuilder::with_timeout(Self, Int32) -> Self
 
 pub(all) enum Protocol {
   Grpc
   HttpBinary
   HttpJson
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
-pub fn Protocol::compare(Self, Self) -> Int
+pub fn Protocol::compare(Self, Self) -> Int32
 pub fn Protocol::default() -> Self
 pub fn Protocol::equal(Self, Self) -> Bool
-pub fn Protocol::hash(Self) -> Int
+pub fn Protocol::hash(Self) -> Int32
 pub fn Protocol::hash_combine(Self, Hasher) -> Unit
 pub fn Protocol::not_equal(Self, Self) -> Bool
 pub fn Protocol::op_ge(Self, Self) -> Bool
@@ -188,12 +188,12 @@ pub fn SpanExporter::into_span_exporter(Self) -> @trace.SpanExporter
 pub fn SpanExporter::name(Self) -> String
 pub fn SpanExporter::new() -> Result[Self, ExporterBuildError]
 pub async fn SpanExporter::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
-pub async fn SpanExporter::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub async fn SpanExporter::shutdown_with_timeout(Self, Int32) -> Result[Unit, @error.OTelSdkError]
 
 pub struct SpanExporterBuilder {
   mut endpoint : String?
   mut protocol : Protocol?
-  mut timeout_millis : Int?
+  mut timeout_millis : Int32?
   mut headers : Map[String, String]
   mut compression : Compression?
 }
@@ -203,7 +203,7 @@ pub fn SpanExporterBuilder::with_endpoint(Self, StringView) -> Self
 pub fn SpanExporterBuilder::with_headers(Self, Map[String, String]) -> Self
 pub fn SpanExporterBuilder::with_http(Self) -> Self
 pub fn SpanExporterBuilder::with_protocol(Self, Protocol) -> Self
-pub fn SpanExporterBuilder::with_timeout(Self, Int) -> Self
+pub fn SpanExporterBuilder::with_timeout(Self, Int32) -> Self
 
 // Type aliases
 

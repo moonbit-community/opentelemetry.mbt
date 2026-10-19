@@ -26,15 +26,15 @@ pub async fn read_json_value_file(StringView) -> Result[Json, String]
 
 pub fn restore_env_var(String, String?) -> Unit
 
-pub async fn start_delayed_http_server(@async.TaskGroup[Unit], response_delay_millis? : Int) -> DelayedHttpServer
+pub async fn start_delayed_http_server(@async.TaskGroup[Unit], response_delay_millis? : Int32) -> DelayedHttpServer
 
 pub let traces_actual_path : String
 
 pub fn traces_data_has_scope(@moonbit-community/opentelemetry/protocol/trace/v1.TracesData, StringView) -> Bool
 
-pub async fn wait_for_latest_matching_json(StringView, (Json) -> Bool, StringView, attempts? : Int, sleep_millis? : Int) -> Result[Json, String]
+pub async fn wait_for_latest_matching_json(StringView, (Json) -> Bool, StringView, attempts? : Int32, sleep_millis? : Int32) -> Result[Json, String]
 
-pub async fn[T : @json.FromJson] wait_for_latest_matching_record(StringView, (T) -> Bool, StringView, attempts? : Int, sleep_millis? : Int) -> Result[T, String]
+pub async fn[T : @json.FromJson] wait_for_latest_matching_record(StringView, (T) -> Bool, StringView, attempts? : Int32, sleep_millis? : Int32) -> Result[T, String]
 
 pub fn zero_metric_timestamps(Json) -> Json
 
@@ -43,13 +43,13 @@ pub fn zero_metric_timestamps(Json) -> Json
 // Types and methods
 pub struct DelayedHttpServer {
   endpoint : String
-  request_count : @ref.Ref[Int]
+  request_count : @ref.Ref[Int32]
   request_path : @ref.Ref[String]
 }
 pub fn DelayedHttpServer::endpoint(Self) -> String
-pub fn DelayedHttpServer::request_count(Self) -> Int
+pub fn DelayedHttpServer::request_count(Self) -> Int32
 pub fn DelayedHttpServer::request_path(Self) -> String
-pub async fn DelayedHttpServer::wait_until_requested(Self, attempts? : Int, sleep_millis? : Int) -> Result[String, String]
+pub async fn DelayedHttpServer::wait_until_requested(Self, attempts? : Int32, sleep_millis? : Int32) -> Result[String, String]
 
 // Type aliases
 

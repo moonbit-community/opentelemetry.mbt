@@ -21,7 +21,7 @@ pub fn AnyValue::new(value? : AnyValue_Value) -> Self
 pub fn AnyValue::not_equal(Self, Self) -> Bool
 pub fn AnyValue::read(&@protobuf.Reader) -> Self raise
 pub fn AnyValue::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
-pub fn AnyValue::size_of(Self) -> UInt
+pub fn AnyValue::size_of(Self) -> UInt32
 pub fn AnyValue::to_json(Self) -> Json
 pub fn AnyValue::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for AnyValue
@@ -41,7 +41,7 @@ pub(all) enum AnyValue_Value {
   ArrayValue(ArrayValue)
   KvlistValue(KeyValueList)
   BytesValue(Bytes)
-  StringValueStrindex(Int)
+  StringValueStrindex(Int32)
   NotSet
 } derive(Eq)
 pub fn AnyValue_Value::default() -> Self
@@ -63,7 +63,7 @@ pub fn ArrayValue::new(Array[AnyValue]) -> Self
 pub fn ArrayValue::not_equal(Self, Self) -> Bool
 pub fn ArrayValue::read(&@protobuf.Reader) -> Self raise
 pub fn ArrayValue::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
-pub fn ArrayValue::size_of(Self) -> UInt
+pub fn ArrayValue::size_of(Self) -> UInt32
 pub fn ArrayValue::to_json(Self) -> Json
 pub fn ArrayValue::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ArrayValue
@@ -88,7 +88,7 @@ pub fn EntityRef::new(String, String, Array[String], Array[String]) -> Self
 pub fn EntityRef::not_equal(Self, Self) -> Bool
 pub fn EntityRef::read(&@protobuf.Reader) -> Self raise
 pub fn EntityRef::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
-pub fn EntityRef::size_of(Self) -> UInt
+pub fn EntityRef::size_of(Self) -> UInt32
 pub fn EntityRef::to_json(Self) -> Json
 pub fn EntityRef::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for EntityRef
@@ -104,16 +104,16 @@ pub(all) struct InstrumentationScope {
   mut name : String
   mut version : String
   mut attributes : Array[KeyValue]
-  mut dropped_attributes_count : UInt
+  mut dropped_attributes_count : UInt32
 } derive(Eq)
 pub fn InstrumentationScope::default() -> Self
 pub fn InstrumentationScope::equal(Self, Self) -> Bool
 pub fn InstrumentationScope::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn InstrumentationScope::new(String, String, Array[KeyValue], UInt) -> Self
+pub fn InstrumentationScope::new(String, String, Array[KeyValue], UInt32) -> Self
 pub fn InstrumentationScope::not_equal(Self, Self) -> Bool
 pub fn InstrumentationScope::read(&@protobuf.Reader) -> Self raise
 pub fn InstrumentationScope::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
-pub fn InstrumentationScope::size_of(Self) -> UInt
+pub fn InstrumentationScope::size_of(Self) -> UInt32
 pub fn InstrumentationScope::to_json(Self) -> Json
 pub fn InstrumentationScope::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for InstrumentationScope
@@ -128,16 +128,16 @@ pub impl @protobuf.Write for InstrumentationScope
 pub(all) struct KeyValue {
   mut key : String
   mut value : AnyValue
-  mut key_strindex : Int
+  mut key_strindex : Int32
 } derive(Eq)
 pub fn KeyValue::default() -> Self
 pub fn KeyValue::equal(Self, Self) -> Bool
 pub fn KeyValue::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn KeyValue::new(String, AnyValue, Int) -> Self
+pub fn KeyValue::new(String, AnyValue, Int32) -> Self
 pub fn KeyValue::not_equal(Self, Self) -> Bool
 pub fn KeyValue::read(&@protobuf.Reader) -> Self raise
 pub fn KeyValue::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
-pub fn KeyValue::size_of(Self) -> UInt
+pub fn KeyValue::size_of(Self) -> UInt32
 pub fn KeyValue::to_json(Self) -> Json
 pub fn KeyValue::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for KeyValue
@@ -159,7 +159,7 @@ pub fn KeyValueList::new(Array[KeyValue]) -> Self
 pub fn KeyValueList::not_equal(Self, Self) -> Bool
 pub fn KeyValueList::read(&@protobuf.Reader) -> Self raise
 pub fn KeyValueList::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
-pub fn KeyValueList::size_of(Self) -> UInt
+pub fn KeyValueList::size_of(Self) -> UInt32
 pub fn KeyValueList::to_json(Self) -> Json
 pub fn KeyValueList::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for KeyValueList

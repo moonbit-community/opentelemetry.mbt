@@ -28,7 +28,7 @@ pub fn Resource::empty() -> Self
 pub fn Resource::equal(Self, Self) -> Bool
 pub fn Resource::get(Self, StringView) -> @common.Value?
 pub fn Resource::is_empty(Self) -> Bool
-pub fn Resource::len(Self) -> Int
+pub fn Resource::len(Self) -> Int32
 pub fn Resource::merge(Self, Self) -> Self
 pub fn Resource::new(ArrayView[@common.KeyValue]) -> Self
 pub fn Resource::not_equal(Self, Self) -> Bool

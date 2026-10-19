@@ -24,7 +24,7 @@ pub fn LogExporter::into_log_exporter(Self) -> @logs.LogExporter
 pub fn LogExporter::name(Self) -> String
 pub fn LogExporter::new() -> Self
 pub fn LogExporter::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
-pub fn LogExporter::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub fn LogExporter::shutdown_with_timeout(Self, Int32) -> Result[Unit, @error.OTelSdkError]
 pub impl Default for LogExporter
 
 pub struct MetricExporter {
@@ -36,10 +36,10 @@ pub fn MetricExporter::default() -> Self
 pub fn MetricExporter::export_batch(Self, ArrayView[@metrics.MetricData]) -> Result[Unit, @error.OTelSdkError]
 pub fn MetricExporter::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
 pub fn MetricExporter::into_metric_exporter(Self) -> @metrics.MetricExporter
-pub fn MetricExporter::into_periodic_reader(Self, interval_millis? : Int) -> @metrics.PeriodicMetricReader
+pub fn MetricExporter::into_periodic_reader(Self, interval_millis? : Int32) -> @metrics.PeriodicMetricReader
 pub fn MetricExporter::name(Self) -> String
 pub fn MetricExporter::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
-pub fn MetricExporter::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub fn MetricExporter::shutdown_with_timeout(Self, Int32) -> Result[Unit, @error.OTelSdkError]
 pub fn MetricExporter::temporality(Self) -> @metrics.Temporality
 pub impl Default for MetricExporter
 
@@ -63,7 +63,7 @@ pub fn SpanExporter::into_span_exporter(Self) -> @trace.SpanExporter
 pub fn SpanExporter::name(Self) -> String
 pub fn SpanExporter::new() -> Self
 pub fn SpanExporter::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
-pub fn SpanExporter::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub fn SpanExporter::shutdown_with_timeout(Self, Int32) -> Result[Unit, @error.OTelSdkError]
 pub impl Default for SpanExporter
 
 // Type aliases

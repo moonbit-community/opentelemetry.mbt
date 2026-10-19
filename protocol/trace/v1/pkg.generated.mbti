@@ -23,7 +23,7 @@ pub fn ResourceSpans::new(@moonbit-community/opentelemetry/protocol/resource/v1.
 pub fn ResourceSpans::not_equal(Self, Self) -> Bool
 pub fn ResourceSpans::read(&@protobuf.Reader) -> Self raise
 pub fn ResourceSpans::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
-pub fn ResourceSpans::size_of(Self) -> UInt
+pub fn ResourceSpans::size_of(Self) -> UInt32
 pub fn ResourceSpans::to_json(Self) -> Json
 pub fn ResourceSpans::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ResourceSpans
@@ -47,7 +47,7 @@ pub fn ScopeSpans::new(@moonbit-community/opentelemetry/protocol/common/v1.Instr
 pub fn ScopeSpans::not_equal(Self, Self) -> Bool
 pub fn ScopeSpans::read(&@protobuf.Reader) -> Self raise
 pub fn ScopeSpans::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
-pub fn ScopeSpans::size_of(Self) -> UInt
+pub fn ScopeSpans::size_of(Self) -> UInt32
 pub fn ScopeSpans::to_json(Self) -> Json
 pub fn ScopeSpans::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ScopeSpans
@@ -64,27 +64,27 @@ pub(all) struct Span {
   mut span_id : Bytes
   mut trace_state : String
   mut parent_span_id : Bytes
-  mut flags : UInt
+  mut flags : UInt32
   mut name : String
   mut kind : Span_SpanKind
   mut start_time_unix_nano : UInt64
   mut end_time_unix_nano : UInt64
   mut attributes : Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue]
-  mut dropped_attributes_count : UInt
+  mut dropped_attributes_count : UInt32
   mut events : Array[Span_Event]
-  mut dropped_events_count : UInt
+  mut dropped_events_count : UInt32
   mut links : Array[Span_Link]
-  mut dropped_links_count : UInt
+  mut dropped_links_count : UInt32
   mut status : Status
 } derive(Eq)
 pub fn Span::default() -> Self
 pub fn Span::equal(Self, Self) -> Bool
 pub fn Span::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn Span::new(Bytes, Bytes, String, Bytes, UInt, String, Span_SpanKind, UInt64, UInt64, Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt, Array[Span_Event], UInt, Array[Span_Link], UInt, Status) -> Self
+pub fn Span::new(Bytes, Bytes, String, Bytes, UInt32, String, Span_SpanKind, UInt64, UInt64, Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt32, Array[Span_Event], UInt32, Array[Span_Link], UInt32, Status) -> Self
 pub fn Span::not_equal(Self, Self) -> Bool
 pub fn Span::read(&@protobuf.Reader) -> Self raise
 pub fn Span::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
-pub fn Span::size_of(Self) -> UInt
+pub fn Span::size_of(Self) -> UInt32
 pub fn Span::to_json(Self) -> Json
 pub fn Span::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for Span
@@ -107,7 +107,7 @@ pub fn SpanFlags::equal(Self, Self) -> Bool
 pub fn SpanFlags::from_enum(@protobuf.Enum) -> Self
 pub fn SpanFlags::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn SpanFlags::not_equal(Self, Self) -> Bool
-pub fn SpanFlags::size_of(Self) -> UInt
+pub fn SpanFlags::size_of(Self) -> UInt32
 pub fn SpanFlags::to_enum(Self) -> @protobuf.Enum
 pub fn SpanFlags::to_json(Self) -> Json
 pub impl Default for SpanFlags
@@ -119,16 +119,16 @@ pub(all) struct Span_Event {
   mut time_unix_nano : UInt64
   mut name : String
   mut attributes : Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue]
-  mut dropped_attributes_count : UInt
+  mut dropped_attributes_count : UInt32
 } derive(Eq)
 pub fn Span_Event::default() -> Self
 pub fn Span_Event::equal(Self, Self) -> Bool
 pub fn Span_Event::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn Span_Event::new(UInt64, String, Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt) -> Self
+pub fn Span_Event::new(UInt64, String, Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt32) -> Self
 pub fn Span_Event::not_equal(Self, Self) -> Bool
 pub fn Span_Event::read(&@protobuf.Reader) -> Self raise
 pub fn Span_Event::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
-pub fn Span_Event::size_of(Self) -> UInt
+pub fn Span_Event::size_of(Self) -> UInt32
 pub fn Span_Event::to_json(Self) -> Json
 pub fn Span_Event::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for Span_Event
@@ -145,17 +145,17 @@ pub(all) struct Span_Link {
   mut span_id : Bytes
   mut trace_state : String
   mut attributes : Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue]
-  mut dropped_attributes_count : UInt
-  mut flags : UInt
+  mut dropped_attributes_count : UInt32
+  mut flags : UInt32
 } derive(Eq)
 pub fn Span_Link::default() -> Self
 pub fn Span_Link::equal(Self, Self) -> Bool
 pub fn Span_Link::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn Span_Link::new(Bytes, Bytes, String, Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt, UInt) -> Self
+pub fn Span_Link::new(Bytes, Bytes, String, Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt32, UInt32) -> Self
 pub fn Span_Link::not_equal(Self, Self) -> Bool
 pub fn Span_Link::read(&@protobuf.Reader) -> Self raise
 pub fn Span_Link::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
-pub fn Span_Link::size_of(Self) -> UInt
+pub fn Span_Link::size_of(Self) -> UInt32
 pub fn Span_Link::to_json(Self) -> Json
 pub fn Span_Link::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for Span_Link
@@ -180,7 +180,7 @@ pub fn Span_SpanKind::equal(Self, Self) -> Bool
 pub fn Span_SpanKind::from_enum(@protobuf.Enum) -> Self
 pub fn Span_SpanKind::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Span_SpanKind::not_equal(Self, Self) -> Bool
-pub fn Span_SpanKind::size_of(Self) -> UInt
+pub fn Span_SpanKind::size_of(Self) -> UInt32
 pub fn Span_SpanKind::to_enum(Self) -> @protobuf.Enum
 pub fn Span_SpanKind::to_json(Self) -> Json
 pub impl Default for Span_SpanKind
@@ -199,7 +199,7 @@ pub fn Status::new(String, Status_StatusCode) -> Self
 pub fn Status::not_equal(Self, Self) -> Bool
 pub fn Status::read(&@protobuf.Reader) -> Self raise
 pub fn Status::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
-pub fn Status::size_of(Self) -> UInt
+pub fn Status::size_of(Self) -> UInt32
 pub fn Status::to_json(Self) -> Json
 pub fn Status::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for Status
@@ -221,7 +221,7 @@ pub fn Status_StatusCode::equal(Self, Self) -> Bool
 pub fn Status_StatusCode::from_enum(@protobuf.Enum) -> Self
 pub fn Status_StatusCode::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Status_StatusCode::not_equal(Self, Self) -> Bool
-pub fn Status_StatusCode::size_of(Self) -> UInt
+pub fn Status_StatusCode::size_of(Self) -> UInt32
 pub fn Status_StatusCode::to_enum(Self) -> @protobuf.Enum
 pub fn Status_StatusCode::to_json(Self) -> Json
 pub impl Default for Status_StatusCode
@@ -239,7 +239,7 @@ pub fn TracesData::new(Array[ResourceSpans]) -> Self
 pub fn TracesData::not_equal(Self, Self) -> Bool
 pub fn TracesData::read(&@protobuf.Reader) -> Self raise
 pub fn TracesData::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
-pub fn TracesData::size_of(Self) -> UInt
+pub fn TracesData::size_of(Self) -> UInt32
 pub fn TracesData::to_json(Self) -> Json
 pub fn TracesData::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for TracesData

@@ -13,7 +13,7 @@ import {
 // Types and methods
 pub struct Baggage {
   entries : Map[String, KeyValueMetadata]
-  kv_content_len : Int
+  kv_content_len : Int32
 } derive(Eq, ToJson, @debug.Debug)
 pub fn Baggage::default() -> Self
 pub fn Baggage::entries(Self) -> Array[KeyValueMetadata]
@@ -23,7 +23,7 @@ pub fn Baggage::get_with_metadata(Self, StringView) -> (String, BaggageMetadata)
 pub fn Baggage::insert(Self, StringView, StringView) -> Self
 pub fn Baggage::insert_with_metadata(Self, StringView, StringView, BaggageMetadata) -> Self
 pub fn Baggage::is_empty(Self) -> Bool
-pub fn Baggage::len(Self) -> Int
+pub fn Baggage::len(Self) -> Int32
 pub fn Baggage::new() -> Self
 pub fn Baggage::not_equal(Self, Self) -> Bool
 pub fn Baggage::remove(Self, StringView) -> Self
@@ -35,10 +35,10 @@ pub struct BaggageMetadata {
   metadata : String
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
 pub fn BaggageMetadata::as_string(Self) -> String
-pub fn BaggageMetadata::compare(Self, Self) -> Int
+pub fn BaggageMetadata::compare(Self, Self) -> Int32
 pub fn BaggageMetadata::default() -> Self
 pub fn BaggageMetadata::equal(Self, Self) -> Bool
-pub fn BaggageMetadata::hash(Self) -> Int
+pub fn BaggageMetadata::hash(Self) -> Int32
 pub fn BaggageMetadata::hash_combine(Self, Hasher) -> Unit
 pub fn BaggageMetadata::new(StringView) -> Self
 pub fn BaggageMetadata::not_equal(Self, Self) -> Bool
@@ -55,9 +55,9 @@ pub struct KeyValueMetadata {
   value : String
   metadata : BaggageMetadata
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
-pub fn KeyValueMetadata::compare(Self, Self) -> Int
+pub fn KeyValueMetadata::compare(Self, Self) -> Int32
 pub fn KeyValueMetadata::equal(Self, Self) -> Bool
-pub fn KeyValueMetadata::hash(Self) -> Int
+pub fn KeyValueMetadata::hash(Self) -> Int32
 pub fn KeyValueMetadata::hash_combine(Self, Hasher) -> Unit
 pub fn KeyValueMetadata::new(StringView, StringView, metadata? : BaggageMetadata) -> Self
 pub fn KeyValueMetadata::not_equal(Self, Self) -> Bool

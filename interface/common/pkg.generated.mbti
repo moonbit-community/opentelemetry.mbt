@@ -18,10 +18,10 @@ pub struct InstrumentationScope {
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
 pub fn InstrumentationScope::attributes(Self) -> Array[KeyValue]
 pub fn InstrumentationScope::builder(StringView) -> InstrumentationScopeBuilder
-pub fn InstrumentationScope::compare(Self, Self) -> Int
+pub fn InstrumentationScope::compare(Self, Self) -> Int32
 pub fn InstrumentationScope::default() -> Self
 pub fn InstrumentationScope::equal(Self, Self) -> Bool
-pub fn InstrumentationScope::hash(Self) -> Int
+pub fn InstrumentationScope::hash(Self) -> Int32
 pub fn InstrumentationScope::hash_combine(Self, Hasher) -> Unit
 pub fn InstrumentationScope::name(Self) -> String
 pub fn InstrumentationScope::not_equal(Self, Self) -> Bool
@@ -50,10 +50,10 @@ pub struct Key {
   name : String
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
 pub fn Key::as_string(Self) -> String
-pub fn Key::compare(Self, Self) -> Int
+pub fn Key::compare(Self, Self) -> Int32
 pub fn Key::default() -> Self
 pub fn Key::equal(Self, Self) -> Bool
-pub fn Key::hash(Self) -> Int
+pub fn Key::hash(Self) -> Int32
 pub fn Key::hash_combine(Self, Hasher) -> Unit
 pub fn Key::new(StringView) -> Self
 pub fn Key::not_equal(Self, Self) -> Bool
@@ -69,9 +69,9 @@ pub struct KeyValue {
   key : Key
   value : Value
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
-pub fn KeyValue::compare(Self, Self) -> Int
+pub fn KeyValue::compare(Self, Self) -> Int32
 pub fn KeyValue::equal(Self, Self) -> Bool
-pub fn KeyValue::hash(Self) -> Int
+pub fn KeyValue::hash(Self) -> Int32
 pub fn KeyValue::hash_combine(Self, Hasher) -> Unit
 pub fn KeyValue::new(StringView, Value) -> Self
 pub fn KeyValue::not_equal(Self, Self) -> Bool
@@ -110,12 +110,12 @@ pub struct SpanId {
   bytes : Bytes
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
 pub fn SpanId::bytes(Self) -> Bytes
-pub fn SpanId::compare(Self, Self) -> Int
+pub fn SpanId::compare(Self, Self) -> Int32
 pub fn SpanId::default() -> Self
 pub fn SpanId::equal(Self, Self) -> Bool
 pub fn SpanId::from_bytes(Bytes) -> Self?
 pub fn SpanId::from_hex(StringView) -> Self?
-pub fn SpanId::hash(Self) -> Int
+pub fn SpanId::hash(Self) -> Int32
 pub fn SpanId::hash_combine(Self, Hasher) -> Unit
 pub fn SpanId::invalid() -> Self
 pub fn SpanId::is_valid(Self) -> Bool
@@ -130,16 +130,16 @@ pub fn SpanId::to_repr(Self) -> @debug.Repr
 pub impl Default for SpanId
 
 pub struct TraceFlags {
-  flags : UInt
+  flags : UInt32
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
-pub fn TraceFlags::compare(Self, Self) -> Int
+pub fn TraceFlags::compare(Self, Self) -> Int32
 pub fn TraceFlags::default() -> Self
 pub fn TraceFlags::equal(Self, Self) -> Bool
 pub fn TraceFlags::from_hex(StringView) -> Self?
-pub fn TraceFlags::hash(Self) -> Int
+pub fn TraceFlags::hash(Self) -> Int32
 pub fn TraceFlags::hash_combine(Self, Hasher) -> Unit
 pub fn TraceFlags::is_sampled(Self) -> Bool
-pub fn TraceFlags::new(UInt) -> Self
+pub fn TraceFlags::new(UInt32) -> Self
 pub fn TraceFlags::not_equal(Self, Self) -> Bool
 pub fn TraceFlags::op_ge(Self, Self) -> Bool
 pub fn TraceFlags::op_gt(Self, Self) -> Bool
@@ -155,12 +155,12 @@ pub struct TraceId {
   bytes : Bytes
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
 pub fn TraceId::bytes(Self) -> Bytes
-pub fn TraceId::compare(Self, Self) -> Int
+pub fn TraceId::compare(Self, Self) -> Int32
 pub fn TraceId::default() -> Self
 pub fn TraceId::equal(Self, Self) -> Bool
 pub fn TraceId::from_bytes(Bytes) -> Self?
 pub fn TraceId::from_hex(StringView) -> Self?
-pub fn TraceId::hash(Self) -> Int
+pub fn TraceId::hash(Self) -> Int32
 pub fn TraceId::hash_combine(Self, Hasher) -> Unit
 pub fn TraceId::invalid() -> Self
 pub fn TraceId::is_valid(Self) -> Bool
@@ -199,9 +199,9 @@ pub(all) enum Value {
   Bytes(Bytes)
   Array(Array[Value])
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
-pub fn Value::compare(Self, Self) -> Int
+pub fn Value::compare(Self, Self) -> Int32
 pub fn Value::equal(Self, Self) -> Bool
-pub fn Value::hash(Self) -> Int
+pub fn Value::hash(Self) -> Int32
 pub fn Value::hash_combine(Self, Hasher) -> Unit
 pub fn Value::not_equal(Self, Self) -> Bool
 pub fn Value::op_ge(Self, Self) -> Bool

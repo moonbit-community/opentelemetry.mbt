@@ -110,9 +110,9 @@ pub(all) enum Severity {
   Fatal3
   Fatal4
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
-pub fn Severity::compare(Self, Self) -> Int
+pub fn Severity::compare(Self, Self) -> Int32
 pub fn Severity::equal(Self, Self) -> Bool
-pub fn Severity::hash(Self) -> Int
+pub fn Severity::hash(Self) -> Int32
 pub fn Severity::hash_combine(Self, Hasher) -> Unit
 pub fn Severity::name(Self) -> String
 pub fn Severity::not_equal(Self, Self) -> Bool

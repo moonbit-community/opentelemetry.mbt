@@ -22,7 +22,7 @@ pub fn ExportProfilesPartialSuccess::new(Int64, String) -> Self
 pub fn ExportProfilesPartialSuccess::not_equal(Self, Self) -> Bool
 pub fn ExportProfilesPartialSuccess::read(&@protobuf.Reader) -> Self raise
 pub fn ExportProfilesPartialSuccess::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
-pub fn ExportProfilesPartialSuccess::size_of(Self) -> UInt
+pub fn ExportProfilesPartialSuccess::size_of(Self) -> UInt32
 pub fn ExportProfilesPartialSuccess::to_json(Self) -> Json
 pub fn ExportProfilesPartialSuccess::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ExportProfilesPartialSuccess
@@ -45,7 +45,7 @@ pub fn ExportProfilesServiceRequest::new(Array[@moonbit-community/opentelemetry/
 pub fn ExportProfilesServiceRequest::not_equal(Self, Self) -> Bool
 pub fn ExportProfilesServiceRequest::read(&@protobuf.Reader) -> Self raise
 pub fn ExportProfilesServiceRequest::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
-pub fn ExportProfilesServiceRequest::size_of(Self) -> UInt
+pub fn ExportProfilesServiceRequest::size_of(Self) -> UInt32
 pub fn ExportProfilesServiceRequest::to_json(Self) -> Json
 pub fn ExportProfilesServiceRequest::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ExportProfilesServiceRequest
@@ -67,7 +67,7 @@ pub fn ExportProfilesServiceResponse::new(ExportProfilesPartialSuccess) -> Self
 pub fn ExportProfilesServiceResponse::not_equal(Self, Self) -> Bool
 pub fn ExportProfilesServiceResponse::read(&@protobuf.Reader) -> Self raise
 pub fn ExportProfilesServiceResponse::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
-pub fn ExportProfilesServiceResponse::size_of(Self) -> UInt
+pub fn ExportProfilesServiceResponse::size_of(Self) -> UInt32
 pub fn ExportProfilesServiceResponse::to_json(Self) -> Json
 pub fn ExportProfilesServiceResponse::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ExportProfilesServiceResponse

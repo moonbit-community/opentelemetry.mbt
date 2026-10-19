@@ -16,10 +16,10 @@ pub struct Event {
   name : String
   timestamp_unix_nano : Int64
   attributes : Array[@common.KeyValue]
-  dropped_attributes_count : Int
+  dropped_attributes_count : Int32
 } derive(Eq, ToJson, @debug.Debug)
 pub fn Event::equal(Self, Self) -> Bool
-pub fn Event::new(StringView, timestamp_unix_nano? : Int64, attributes? : ArrayView[@common.KeyValue], dropped_attributes_count? : Int) -> Self
+pub fn Event::new(StringView, timestamp_unix_nano? : Int64, attributes? : ArrayView[@common.KeyValue], dropped_attributes_count? : Int32) -> Self
 pub fn Event::not_equal(Self, Self) -> Bool
 pub fn Event::to_json(Self) -> Json
 pub fn Event::to_repr(Self) -> @debug.Repr
@@ -27,10 +27,10 @@ pub fn Event::to_repr(Self) -> @debug.Repr
 pub struct Link {
   span_context : @common.SpanContext
   attributes : Array[@common.KeyValue]
-  dropped_attributes_count : Int
+  dropped_attributes_count : Int32
 } derive(Eq, ToJson, @debug.Debug)
 pub fn Link::equal(Self, Self) -> Bool
-pub fn Link::new(@common.SpanContext, attributes? : ArrayView[@common.KeyValue], dropped_attributes_count? : Int) -> Self
+pub fn Link::new(@common.SpanContext, attributes? : ArrayView[@common.KeyValue], dropped_attributes_count? : Int32) -> Self
 pub fn Link::not_equal(Self, Self) -> Bool
 pub fn Link::to_json(Self) -> Json
 pub fn Link::to_repr(Self) -> @debug.Repr
@@ -89,9 +89,9 @@ pub(all) enum SpanKind {
   Producer
   Consumer
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
-pub fn SpanKind::compare(Self, Self) -> Int
+pub fn SpanKind::compare(Self, Self) -> Int32
 pub fn SpanKind::equal(Self, Self) -> Bool
-pub fn SpanKind::hash(Self) -> Int
+pub fn SpanKind::hash(Self) -> Int32
 pub fn SpanKind::hash_combine(Self, Hasher) -> Unit
 pub fn SpanKind::not_equal(Self, Self) -> Bool
 pub fn SpanKind::op_ge(Self, Self) -> Bool
@@ -121,9 +121,9 @@ pub(all) enum StatusCode {
   Ok
   Error
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
-pub fn StatusCode::compare(Self, Self) -> Int
+pub fn StatusCode::compare(Self, Self) -> Int32
 pub fn StatusCode::equal(Self, Self) -> Bool
-pub fn StatusCode::hash(Self) -> Int
+pub fn StatusCode::hash(Self) -> Int32
 pub fn StatusCode::hash_combine(Self, Hasher) -> Unit
 pub fn StatusCode::not_equal(Self, Self) -> Bool
 pub fn StatusCode::op_ge(Self, Self) -> Bool

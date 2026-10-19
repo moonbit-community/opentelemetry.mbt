@@ -22,7 +22,7 @@ pub fn ExportLogsPartialSuccess::new(Int64, String) -> Self
 pub fn ExportLogsPartialSuccess::not_equal(Self, Self) -> Bool
 pub fn ExportLogsPartialSuccess::read(&@protobuf.Reader) -> Self raise
 pub fn ExportLogsPartialSuccess::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
-pub fn ExportLogsPartialSuccess::size_of(Self) -> UInt
+pub fn ExportLogsPartialSuccess::size_of(Self) -> UInt32
 pub fn ExportLogsPartialSuccess::to_json(Self) -> Json
 pub fn ExportLogsPartialSuccess::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ExportLogsPartialSuccess
@@ -44,7 +44,7 @@ pub fn ExportLogsServiceRequest::new(Array[@moonbit-community/opentelemetry/prot
 pub fn ExportLogsServiceRequest::not_equal(Self, Self) -> Bool
 pub fn ExportLogsServiceRequest::read(&@protobuf.Reader) -> Self raise
 pub fn ExportLogsServiceRequest::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
-pub fn ExportLogsServiceRequest::size_of(Self) -> UInt
+pub fn ExportLogsServiceRequest::size_of(Self) -> UInt32
 pub fn ExportLogsServiceRequest::to_json(Self) -> Json
 pub fn ExportLogsServiceRequest::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ExportLogsServiceRequest
@@ -66,7 +66,7 @@ pub fn ExportLogsServiceResponse::new(ExportLogsPartialSuccess) -> Self
 pub fn ExportLogsServiceResponse::not_equal(Self, Self) -> Bool
 pub fn ExportLogsServiceResponse::read(&@protobuf.Reader) -> Self raise
 pub fn ExportLogsServiceResponse::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
-pub fn ExportLogsServiceResponse::size_of(Self) -> UInt
+pub fn ExportLogsServiceResponse::size_of(Self) -> UInt32
 pub fn ExportLogsServiceResponse::to_json(Self) -> Json
 pub fn ExportLogsServiceResponse::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ExportLogsServiceResponse

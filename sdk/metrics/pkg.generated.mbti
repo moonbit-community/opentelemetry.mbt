@@ -142,9 +142,9 @@ pub(all) enum InstrumentKind {
   ObservableUpDownCounter
   ObservableGauge
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
-pub fn InstrumentKind::compare(Self, Self) -> Int
+pub fn InstrumentKind::compare(Self, Self) -> Int32
 pub fn InstrumentKind::equal(Self, Self) -> Bool
-pub fn InstrumentKind::hash(Self) -> Int
+pub fn InstrumentKind::hash(Self) -> Int32
 pub fn InstrumentKind::hash_combine(Self, Hasher) -> Unit
 pub fn InstrumentKind::not_equal(Self, Self) -> Bool
 pub fn InstrumentKind::op_ge(Self, Self) -> Bool
@@ -162,7 +162,7 @@ pub fn ManualReader::collect(Self) -> Array[MetricData]
 pub fn ManualReader::collect_result(Self) -> Result[Array[MetricData], @error.OTelSdkError]
 pub async fn ManualReader::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
 pub async fn ManualReader::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
-pub async fn ManualReader::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub async fn ManualReader::shutdown_with_timeout(Self, Int32) -> Result[Unit, @error.OTelSdkError]
 
 pub struct ManualReaderBuilder {
   mut temporality : Temporality
@@ -201,7 +201,7 @@ pub async fn MetricExporter::force_flush(Self) -> Result[Unit, @error.OTelSdkErr
 pub fn MetricExporter::name(Self) -> String
 pub fn MetricExporter::new(async (ArrayView[MetricData]) -> Result[Unit, @error.OTelSdkError], force_flush_fn? : async () -> Result[Unit, @error.OTelSdkError], shutdown_fn? : async () -> Result[Unit, @error.OTelSdkError], name_fn? : () -> String) -> Self
 pub async fn MetricExporter::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
-pub async fn MetricExporter::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub async fn MetricExporter::shutdown_with_timeout(Self, Int32) -> Result[Unit, @error.OTelSdkError]
 
 pub(all) enum Number {
   Int64(Int64)
@@ -340,15 +340,15 @@ pub fn PeriodicMetricReader::collect(Self) -> Array[MetricData]
 pub async fn PeriodicMetricReader::force_flush(Self) -> Result[Unit, @error.OTelSdkError]
 pub async fn PeriodicMetricReader::run(Self) -> Unit
 pub async fn PeriodicMetricReader::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
-pub async fn PeriodicMetricReader::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub async fn PeriodicMetricReader::shutdown_with_timeout(Self, Int32) -> Result[Unit, @error.OTelSdkError]
 
 pub struct PeriodicMetricReaderBuilder {
   exporter : MetricExporter
-  mut interval_millis : Int
+  mut interval_millis : Int32
   mut temporality : Temporality
 }
 pub fn PeriodicMetricReaderBuilder::build(Self) -> PeriodicMetricReader
-pub fn PeriodicMetricReaderBuilder::with_interval(Self, Int) -> Self
+pub fn PeriodicMetricReaderBuilder::with_interval(Self, Int32) -> Self
 pub fn PeriodicMetricReaderBuilder::with_temporality(Self, Temporality) -> Self
 
 type PeriodicMetricReaderState
@@ -385,7 +385,7 @@ pub fn SdkMeterProvider::manual_reader(Self) -> ManualReader
 pub fn SdkMeterProvider::meter(Self, StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> SdkMeter
 pub fn SdkMeterProvider::resource(Self) -> @resource.Resource
 pub async fn SdkMeterProvider::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
-pub async fn SdkMeterProvider::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub async fn SdkMeterProvider::shutdown_with_timeout(Self, Int32) -> Result[Unit, @error.OTelSdkError]
 pub fn SdkMeterProvider::spawn_periodic_readers(Self, @async.TaskGroup[Unit], allow_failure? : Bool) -> Unit
 
 pub struct SdkMeterProviderBuilder {
@@ -397,7 +397,7 @@ pub struct SdkMeterProviderBuilder {
 }
 pub fn SdkMeterProviderBuilder::build(Self) -> SdkMeterProvider
 pub fn SdkMeterProviderBuilder::with_exporter(Self, MetricExporter) -> Self
-pub fn SdkMeterProviderBuilder::with_periodic_exporter(Self, MetricExporter, interval_millis? : Int) -> Self
+pub fn SdkMeterProviderBuilder::with_periodic_exporter(Self, MetricExporter, interval_millis? : Int32) -> Self
 pub fn SdkMeterProviderBuilder::with_periodic_reader(Self, PeriodicMetricReader) -> Self
 pub fn SdkMeterProviderBuilder::with_reader(Self, ManualReader) -> Self
 pub fn SdkMeterProviderBuilder::with_resource(Self, @resource.Resource) -> Self
@@ -409,7 +409,7 @@ pub struct Stream {
   unit : String?
   aggregation : StreamAggregation?
   allowed_attribute_keys : Array[String]?
-  cardinality_limit : Int?
+  cardinality_limit : Int32?
 } derive(Eq, ToJson, @debug.Debug)
 pub fn Stream::builder() -> StreamBuilder
 pub fn Stream::equal(Self, Self) -> Bool
@@ -435,12 +435,12 @@ pub struct StreamBuilder {
   mut unit : String?
   mut aggregation : StreamAggregation?
   mut allowed_attribute_keys : Array[String]?
-  mut cardinality_limit : Int?
+  mut cardinality_limit : Int32?
 }
 pub fn StreamBuilder::build(Self) -> Stream
 pub fn StreamBuilder::with_aggregation(Self, StreamAggregation) -> Self
 pub fn StreamBuilder::with_allowed_attribute_keys(Self, ArrayView[StringView]) -> Self
-pub fn StreamBuilder::with_cardinality_limit(Self, Int) -> Self
+pub fn StreamBuilder::with_cardinality_limit(Self, Int32) -> Self
 pub fn StreamBuilder::with_description(Self, StringView) -> Self
 pub fn StreamBuilder::with_name(Self, StringView) -> Self
 pub fn StreamBuilder::with_unit(Self, StringView) -> Self
@@ -452,9 +452,9 @@ pub(all) enum Temporality {
   Delta
   LowMemory
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
-pub fn Temporality::compare(Self, Self) -> Int
+pub fn Temporality::compare(Self, Self) -> Int32
 pub fn Temporality::equal(Self, Self) -> Bool
-pub fn Temporality::hash(Self) -> Int
+pub fn Temporality::hash(Self) -> Int32
 pub fn Temporality::hash_combine(Self, Hasher) -> Unit
 pub fn Temporality::not_equal(Self, Self) -> Bool
 pub fn Temporality::op_ge(Self, Self) -> Bool

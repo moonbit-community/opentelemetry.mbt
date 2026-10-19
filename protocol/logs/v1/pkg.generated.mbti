@@ -18,8 +18,8 @@ pub(all) struct LogRecord {
   mut severity_text : String
   mut body : @moonbit-community/opentelemetry/protocol/common/v1.AnyValue
   mut attributes : Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue]
-  mut dropped_attributes_count : UInt
-  mut flags : UInt
+  mut dropped_attributes_count : UInt32
+  mut flags : UInt32
   mut trace_id : Bytes
   mut span_id : Bytes
   mut event_name : String
@@ -27,11 +27,11 @@ pub(all) struct LogRecord {
 pub fn LogRecord::default() -> Self
 pub fn LogRecord::equal(Self, Self) -> Bool
 pub fn LogRecord::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn LogRecord::new(UInt64, UInt64, SeverityNumber, String, @moonbit-community/opentelemetry/protocol/common/v1.AnyValue, Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt, UInt, Bytes, Bytes, String) -> Self
+pub fn LogRecord::new(UInt64, UInt64, SeverityNumber, String, @moonbit-community/opentelemetry/protocol/common/v1.AnyValue, Array[@moonbit-community/opentelemetry/protocol/common/v1.KeyValue], UInt32, UInt32, Bytes, Bytes, String) -> Self
 pub fn LogRecord::not_equal(Self, Self) -> Bool
 pub fn LogRecord::read(&@protobuf.Reader) -> Self raise
 pub fn LogRecord::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
-pub fn LogRecord::size_of(Self) -> UInt
+pub fn LogRecord::size_of(Self) -> UInt32
 pub fn LogRecord::to_json(Self) -> Json
 pub fn LogRecord::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for LogRecord
@@ -52,7 +52,7 @@ pub fn LogRecordFlags::equal(Self, Self) -> Bool
 pub fn LogRecordFlags::from_enum(@protobuf.Enum) -> Self
 pub fn LogRecordFlags::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn LogRecordFlags::not_equal(Self, Self) -> Bool
-pub fn LogRecordFlags::size_of(Self) -> UInt
+pub fn LogRecordFlags::size_of(Self) -> UInt32
 pub fn LogRecordFlags::to_enum(Self) -> @protobuf.Enum
 pub fn LogRecordFlags::to_json(Self) -> Json
 pub impl Default for LogRecordFlags
@@ -70,7 +70,7 @@ pub fn LogsData::new(Array[ResourceLogs]) -> Self
 pub fn LogsData::not_equal(Self, Self) -> Bool
 pub fn LogsData::read(&@protobuf.Reader) -> Self raise
 pub fn LogsData::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
-pub fn LogsData::size_of(Self) -> UInt
+pub fn LogsData::size_of(Self) -> UInt32
 pub fn LogsData::to_json(Self) -> Json
 pub fn LogsData::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for LogsData
@@ -94,7 +94,7 @@ pub fn ResourceLogs::new(@moonbit-community/opentelemetry/protocol/resource/v1.R
 pub fn ResourceLogs::not_equal(Self, Self) -> Bool
 pub fn ResourceLogs::read(&@protobuf.Reader) -> Self raise
 pub fn ResourceLogs::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
-pub fn ResourceLogs::size_of(Self) -> UInt
+pub fn ResourceLogs::size_of(Self) -> UInt32
 pub fn ResourceLogs::to_json(Self) -> Json
 pub fn ResourceLogs::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ResourceLogs
@@ -118,7 +118,7 @@ pub fn ScopeLogs::new(@moonbit-community/opentelemetry/protocol/common/v1.Instru
 pub fn ScopeLogs::not_equal(Self, Self) -> Bool
 pub fn ScopeLogs::read(&@protobuf.Reader) -> Self raise
 pub fn ScopeLogs::read_with_limit(@protobuf.LimitedReader[&@protobuf.Reader]) -> Self raise
-pub fn ScopeLogs::size_of(Self) -> UInt
+pub fn ScopeLogs::size_of(Self) -> UInt32
 pub fn ScopeLogs::to_json(Self) -> Json
 pub fn ScopeLogs::write(Self, &@protobuf.Writer) -> Unit raise
 pub impl Default for ScopeLogs
@@ -162,7 +162,7 @@ pub fn SeverityNumber::equal(Self, Self) -> Bool
 pub fn SeverityNumber::from_enum(@protobuf.Enum) -> Self
 pub fn SeverityNumber::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn SeverityNumber::not_equal(Self, Self) -> Bool
-pub fn SeverityNumber::size_of(Self) -> UInt
+pub fn SeverityNumber::size_of(Self) -> UInt32
 pub fn SeverityNumber::to_enum(Self) -> @protobuf.Enum
 pub fn SeverityNumber::to_json(Self) -> Json
 pub impl Default for SeverityNumber

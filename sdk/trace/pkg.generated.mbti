@@ -17,17 +17,17 @@ import {
 
 // Types and methods
 pub struct BatchConfig {
-  max_queue_size : Int
-  max_export_batch_size : Int
-  scheduled_delay_millis : Int
-  export_timeout_millis : Int
+  max_queue_size : Int32
+  max_export_batch_size : Int32
+  scheduled_delay_millis : Int32
+  export_timeout_millis : Int32
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
-pub fn BatchConfig::compare(Self, Self) -> Int
+pub fn BatchConfig::compare(Self, Self) -> Int32
 pub fn BatchConfig::default() -> Self
 pub fn BatchConfig::equal(Self, Self) -> Bool
-pub fn BatchConfig::hash(Self) -> Int
+pub fn BatchConfig::hash(Self) -> Int32
 pub fn BatchConfig::hash_combine(Self, Hasher) -> Unit
-pub fn BatchConfig::new(max_queue_size? : Int, max_export_batch_size? : Int, scheduled_delay_millis? : Int, export_timeout_millis? : Int) -> Self
+pub fn BatchConfig::new(max_queue_size? : Int32, max_export_batch_size? : Int32, scheduled_delay_millis? : Int32, export_timeout_millis? : Int32) -> Self
 pub fn BatchConfig::not_equal(Self, Self) -> Bool
 pub fn BatchConfig::op_ge(Self, Self) -> Bool
 pub fn BatchConfig::op_gt(Self, Self) -> Bool
@@ -103,9 +103,9 @@ pub(all) enum SamplingDecision {
   RecordOnly
   RecordAndSample
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
-pub fn SamplingDecision::compare(Self, Self) -> Int
+pub fn SamplingDecision::compare(Self, Self) -> Int32
 pub fn SamplingDecision::equal(Self, Self) -> Bool
-pub fn SamplingDecision::hash(Self) -> Int
+pub fn SamplingDecision::hash(Self) -> Int32
 pub fn SamplingDecision::hash_combine(Self, Hasher) -> Unit
 pub fn SamplingDecision::not_equal(Self, Self) -> Bool
 pub fn SamplingDecision::op_ge(Self, Self) -> Bool
@@ -153,7 +153,7 @@ pub async fn SdkTracerProvider::force_flush(Self) -> Result[Unit, @error.OTelSdk
 pub fn SdkTracerProvider::into_tracer_provider(Self) -> @moonbit-community/opentelemetry/interface/trace.TracerProvider
 pub fn SdkTracerProvider::resource(Self) -> @resource.Resource
 pub async fn SdkTracerProvider::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
-pub async fn SdkTracerProvider::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub async fn SdkTracerProvider::shutdown_with_timeout(Self, Int32) -> Result[Unit, @error.OTelSdkError]
 pub fn SdkTracerProvider::spawn_batch_processor_tasks(Self, @async.TaskGroup[Unit], allow_failure? : Bool) -> Unit
 pub fn SdkTracerProvider::tracer(Self, StringView, version? : String?, schema_url? : String?, attributes? : ArrayView[@common.KeyValue]) -> SdkTracer
 
@@ -181,8 +181,8 @@ pub fn SimpleSpanProcessor::new(SpanExporter) -> Self
 pub struct Span {
   state : @ref.Ref[SpanState]
 }
-pub fn Span::add_event(Self, StringView, attributes? : ArrayView[@common.KeyValue], timestamp_unix_nano? : Int64, dropped_attributes_count? : Int) -> Unit
-pub fn Span::add_link(Self, @common.SpanContext, attributes? : ArrayView[@common.KeyValue], dropped_attributes_count? : Int) -> Unit
+pub fn Span::add_event(Self, StringView, attributes? : ArrayView[@common.KeyValue], timestamp_unix_nano? : Int64, dropped_attributes_count? : Int32) -> Unit
+pub fn Span::add_link(Self, @common.SpanContext, attributes? : ArrayView[@common.KeyValue], dropped_attributes_count? : Int32) -> Unit
 pub fn Span::context(Self) -> @context.Context
 pub async fn Span::end(Self, end_time_unix_nano? : Int64) -> Unit
 pub fn Span::has_ended(Self) -> Bool
@@ -201,11 +201,11 @@ pub struct SpanData {
   start_time_unix_nano : Int64
   end_time_unix_nano : Int64?
   attributes : Array[@common.KeyValue]
-  dropped_attributes_count : Int
+  dropped_attributes_count : Int32
   events : Array[SpanEvent]
-  dropped_events_count : Int
+  dropped_events_count : Int32
   links : Array[SpanLink]
-  dropped_links_count : Int
+  dropped_links_count : Int32
   status : Status
   resource : @resource.Resource
   instrumentation_scope : @common.InstrumentationScope
@@ -219,10 +219,10 @@ pub struct SpanEvent {
   name : String
   timestamp_unix_nano : Int64
   attributes : Array[@common.KeyValue]
-  dropped_attributes_count : Int
+  dropped_attributes_count : Int32
 } derive(Eq, ToJson, @debug.Debug)
 pub fn SpanEvent::equal(Self, Self) -> Bool
-pub fn SpanEvent::new(StringView, attributes? : ArrayView[@common.KeyValue], timestamp_unix_nano? : Int64, dropped_attributes_count? : Int) -> Self
+pub fn SpanEvent::new(StringView, attributes? : ArrayView[@common.KeyValue], timestamp_unix_nano? : Int64, dropped_attributes_count? : Int32) -> Self
 pub fn SpanEvent::not_equal(Self, Self) -> Bool
 pub fn SpanEvent::to_json(Self) -> Json
 pub fn SpanEvent::to_repr(Self) -> @debug.Repr
@@ -238,7 +238,7 @@ pub async fn SpanExporter::force_flush(Self) -> Result[Unit, @error.OTelSdkError
 pub fn SpanExporter::name(Self) -> String
 pub fn SpanExporter::new(async (ArrayView[SpanData]) -> Result[Unit, @error.OTelSdkError], force_flush_fn? : async () -> Result[Unit, @error.OTelSdkError], shutdown_fn? : async () -> Result[Unit, @error.OTelSdkError], name_fn? : () -> String) -> Self
 pub async fn SpanExporter::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
-pub async fn SpanExporter::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub async fn SpanExporter::shutdown_with_timeout(Self, Int32) -> Result[Unit, @error.OTelSdkError]
 
 pub(all) enum SpanKind {
   Internal
@@ -247,9 +247,9 @@ pub(all) enum SpanKind {
   Producer
   Consumer
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
-pub fn SpanKind::compare(Self, Self) -> Int
+pub fn SpanKind::compare(Self, Self) -> Int32
 pub fn SpanKind::equal(Self, Self) -> Bool
-pub fn SpanKind::hash(Self) -> Int
+pub fn SpanKind::hash(Self) -> Int32
 pub fn SpanKind::hash_combine(Self, Hasher) -> Unit
 pub fn SpanKind::not_equal(Self, Self) -> Bool
 pub fn SpanKind::op_ge(Self, Self) -> Bool
@@ -260,18 +260,18 @@ pub fn SpanKind::to_json(Self) -> Json
 pub fn SpanKind::to_repr(Self) -> @debug.Repr
 
 pub struct SpanLimits {
-  max_attributes_per_span : Int
-  max_events_per_span : Int
-  max_links_per_span : Int
-  max_attributes_per_event : Int
-  max_attributes_per_link : Int
+  max_attributes_per_span : Int32
+  max_events_per_span : Int32
+  max_links_per_span : Int32
+  max_attributes_per_event : Int32
+  max_attributes_per_link : Int32
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
-pub fn SpanLimits::compare(Self, Self) -> Int
+pub fn SpanLimits::compare(Self, Self) -> Int32
 pub fn SpanLimits::default() -> Self
 pub fn SpanLimits::equal(Self, Self) -> Bool
-pub fn SpanLimits::hash(Self) -> Int
+pub fn SpanLimits::hash(Self) -> Int32
 pub fn SpanLimits::hash_combine(Self, Hasher) -> Unit
-pub fn SpanLimits::new(max_attributes_per_span? : Int, max_events_per_span? : Int, max_links_per_span? : Int, max_attributes_per_event? : Int, max_attributes_per_link? : Int) -> Self
+pub fn SpanLimits::new(max_attributes_per_span? : Int32, max_events_per_span? : Int32, max_links_per_span? : Int32, max_attributes_per_event? : Int32, max_attributes_per_link? : Int32) -> Self
 pub fn SpanLimits::not_equal(Self, Self) -> Bool
 pub fn SpanLimits::op_ge(Self, Self) -> Bool
 pub fn SpanLimits::op_gt(Self, Self) -> Bool
@@ -284,10 +284,10 @@ pub impl Default for SpanLimits
 pub struct SpanLink {
   span_context : @common.SpanContext
   attributes : Array[@common.KeyValue]
-  dropped_attributes_count : Int
+  dropped_attributes_count : Int32
 } derive(Eq, ToJson, @debug.Debug)
 pub fn SpanLink::equal(Self, Self) -> Bool
-pub fn SpanLink::new(@common.SpanContext, attributes? : ArrayView[@common.KeyValue], dropped_attributes_count? : Int) -> Self
+pub fn SpanLink::new(@common.SpanContext, attributes? : ArrayView[@common.KeyValue], dropped_attributes_count? : Int32) -> Self
 pub fn SpanLink::not_equal(Self, Self) -> Bool
 pub fn SpanLink::to_json(Self) -> Json
 pub fn SpanLink::to_repr(Self) -> @debug.Repr
@@ -303,7 +303,7 @@ pub fn SpanProcessor::new(on_start_fn? : (@context.Context, SpanData) -> Unit, o
 pub async fn SpanProcessor::on_end(Self, SpanData) -> Unit
 pub fn SpanProcessor::on_start(Self, @context.Context, SpanData) -> Unit
 pub async fn SpanProcessor::shutdown(Self) -> Result[Unit, @error.OTelSdkError]
-pub async fn SpanProcessor::shutdown_with_timeout(Self, Int) -> Result[Unit, @error.OTelSdkError]
+pub async fn SpanProcessor::shutdown_with_timeout(Self, Int32) -> Result[Unit, @error.OTelSdkError]
 
 type SpanState
 
@@ -327,9 +327,9 @@ pub(all) enum StatusCode {
   Ok
   Error
 } derive(Compare, Eq, Hash, ToJson, @debug.Debug)
-pub fn StatusCode::compare(Self, Self) -> Int
+pub fn StatusCode::compare(Self, Self) -> Int32
 pub fn StatusCode::equal(Self, Self) -> Bool
-pub fn StatusCode::hash(Self) -> Int
+pub fn StatusCode::hash(Self) -> Int32
 pub fn StatusCode::hash_combine(Self, Hasher) -> Unit
 pub fn StatusCode::not_equal(Self, Self) -> Bool
 pub fn StatusCode::op_ge(Self, Self) -> Bool
